@@ -592,76 +592,7 @@
 544F: 8E 20 75    LDX    #$2075
 5452: BD 50 25    JSR    $5025
 5455: 35 C0       PULS   U,PC
-5457: 00 30       NEG    $30
-5459: 54          LSRB
-545A: 8B 54       ADDA   #$54
-545C: 8F 54 93    XSTX   #$5493
-545F: 54          LSRB
-5460: 97 54       STA    $54
-5462: 9B 54       ADDA   $54
-5464: 9F 54       STX    $54
-5466: A3 54       SUBD   -$C,U
-5468: A7 54       STA    -$C,U
-546A: AB 54       ADDA   -$C,U
-546C: AF 54       STX    -$C,U
-546E: B3 54 B7    SUBD   $54B7
-5471: 54          LSRB
-5472: BB 54 BF    ADDA   $54BF
-5475: 54          LSRB
-5476: C3 54 C7    ADDD   #$54C7
-5479: 54          LSRB
-547A: CB 54       ADDB   #$54
-547C: CF 54 D3    XSTU   #$54D3
-547F: 54          LSRB
-5480: D7 54       STB    $54
-5482: DB 54       ADDB   $54
-5484: DF 54       STU    $54
-5486: E3 00       ADDD   $0,X
-5488: 00 00       NEG    $00
-548A: 10 00 00    NEG    $00
-548D: 00 50       NEG    $50
-548F: 00 00       NEG    $00
-5491: 01 00       NEG    $00
-5493: 00 00       NEG    $00
-5495: 02 00       XNC    $00
-5497: 00 00       NEG    $00
-5499: 03 00       COM    $00
-549B: 00 00       NEG    $00
-549D: 04 00       LSR    $00
-549F: 00 00       NEG    $00
-54A1: 05 00       LSR    $00
-54A3: 00 00       NEG    $00
-54A5: 08 00       ASL    $00
-54A7: 00 00       NEG    $00
-54A9: 10 00 00    NEG    $00
-54AC: 00 20       NEG    $20
-54AE: 00 00       NEG    $00
-54B0: 00 30       NEG    $30
-54B2: 00 00       NEG    $00
-54B4: 00 40       NEG    $40
-54B6: 00 00       NEG    $00
-54B8: 00 50       NEG    $50
-54BA: 00 00       NEG    $00
-54BC: 00 60       NEG    $60
-54BE: 00 00       NEG    $00
-54C0: 00 70       NEG    $70
-54C2: 00 FF       NEG    $FF
-54C4: FF 80 00    STU    $8000
-54C7: FF FF 90    STU    $FF90
-54CA: 00 00       NEG    $00
-54CC: 01 00       NEG    $00
-54CE: 00 00       NEG    $00
-54D0: 02 00       XNC    $00
-54D2: 00 00       NEG    $00
-54D4: 03 00       COM    $00
-54D6: 00 00       NEG    $00
-54D8: 05 00       LSR    $00
-54DA: 00 00       NEG    $00
-54DC: 10 00 00    NEG    $00
-54DF: 00 01       NEG    $01
-54E1: 50          NEGB
-54E2: 00 34       NEG    $34
-54E4: 40          NEGA
+
 54E5: 8E 28 00    LDX    #$2800
 54E8: 33 89 04 00 LEAU   $0400,X
 54EC: 10 8E 04 00 LDY    #$0400
@@ -673,6 +604,7 @@
 54F9: 26 F8       BNE    $54F3
 54FB: 0F F0       CLR    $F0
 54FD: 35 C0       PULS   U,PC
+
 54FF: 10 CE 20 00 LDS    #$2000
 5503: CE 00 00    LDU    #$0000
 5506: 4F          CLRA
@@ -1339,6 +1271,8 @@
 5A86: 5A          DECB
 5A87: 26 F5       BNE    $5A7E
 5A89: 39          RTS
+
+
 5A8A: 10 8E 15 72 LDY    #$1572
 5A8E: D6 08       LDB    $08
 5A90: 58          ASLB
@@ -1430,6 +1364,7 @@
 5B35: ED C1       STD    ,U++
 5B37: E7 C4       STB    ,U
 5B39: 39          RTS
+
 5B3A: BD 69 1C    JSR    $691C
 5B3D: 10 8E 15 72 LDY    #$1572
 5B41: D6 08       LDB    $08
