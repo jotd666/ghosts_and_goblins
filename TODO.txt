@@ -1,0 +1,5 @@
+- 130 occurrences of jump tables: J..    ..,..$
+- script: check [indirect_jump], check LD? above change into "jump_table_xxxx"
+  then read rom and create table ranging until out of ROM or equals
+  one of the table entries
+  
