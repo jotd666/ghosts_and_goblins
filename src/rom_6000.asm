@@ -20,7 +20,13 @@
 
 bankswitch_3e00 = $3e00
 bankswitch_copy_d9 = $d9
+weapon_type_0073 = $73
+starting_level_0072 = $72
+armour_flag_00ac = $ac
+nb_lives_0060 = $60
+time_00aa = $aa
 
+; jump to 607D to skip ram/rom checks
 6000: 1A 50       ORCC   #$50		; disable interrupts
 6002: 8E 1E 00    LDX    #$1E00
 6005: 10 8E 00 60 LDY    #$0060
@@ -77,6 +83,7 @@ bankswitch_copy_d9 = $d9
 6073: F7 3E 00    STB    bankswitch_3e00
 6076: 10 8E 60 7D LDY    #$607D
 607A: 7E 54 FF    JMP    $54FF		; [bank_3]
+; end of memory tests
 607D: C6 00       LDB    #$00
 607F: 1F 9B       TFR    B,DP
 6081: 4F          CLRA
@@ -410,7 +417,7 @@ jump_table_6188:
 63F3: A6 C4       LDA    ,U
 63F5: 26 E9       BNE    $63E0
 63F7: BD 68 DF    JSR    $68DF
-63FA: 96 72       LDA    $72
+63FA: 96 72       LDA    starting_level_0072
 63FC: 81 04       CMPA   #$04
 63FE: 24 1B       BCC    $641B
 6400: 8E 1E 14    LDX    #$1E14
@@ -447,7 +454,7 @@ jump_table_6188:
 6444: 25 02       BCS    $6448
 6446: 6C 13       INC    -$D,X
 6448: 39          RTS
-6449: 96 72       LDA    $72
+6449: 96 72       LDA    starting_level_0072
 644B: 81 04       CMPA   #$04
 644D: 25 03       BCS    $6452
 644F: BD 64 00    JSR    $6400
@@ -1079,7 +1086,7 @@ jump_table_6188:
 6AED: 0C 0B       INC    $0B
 6AEF: 39          RTS
 
-6AF8: 96 72    LDA    $72
+6AF8: 96 72    LDA    starting_level_0072
 6AFA: 81 06    CMPA   #$06
 6AFC: 27 0C       BEQ    $6B0A
 6AFE: BD 80 A0    JSR    $80A0
@@ -1202,13 +1209,13 @@ jump_table_6188:
 6C03: 8E 40 00    LDX    #$4000
 6C06: 9F 6C       STX    $6C
 6C08: C6 01       LDB    #$01
-6C0A: D7 73       STB    $73
+6C0A: D7 73       STB    weapon_type_0073		; set lance as weapon
 6C0C: 96 57       LDA    $57
 6C0E: 5F          CLRB
 6C0F: DD 61       STD    $61
 6C11: D7 71       STB    $71
 6C13: D7 80       STB    $80
-6C15: D7 72       STB    $72
+6C15: D7 72       STB    starting_level_0072
 6C17: D7 7F       STB    $7F
 6C19: 8D 18       BSR    $6C33
 6C1B: 5F          CLRB
@@ -1223,7 +1230,7 @@ jump_table_6188:
 6C30: 26 F8       BNE    $6C2A
 6C32: 39          RTS
 6C33: D6 50       LDB    $50
-6C35: D7 60       STB    $60
+6C35: D7 60       STB    nb_lives_0060
 6C37: 0F 63       CLR    $63
 6C39: 9E 55       LDX    $55
 6C3B: EC 84       LDD    ,X
@@ -1295,13 +1302,13 @@ jump_table_6188:
 
 6D22: 5F          CLRB
 6D23: 30 40       LEAX   $0,U
-6D25: 0F AC       CLR    $AC
+6D25: 0F AC       CLR    armour_flag_00ac
 6D27: 0F 99       CLR    $99
 6D29: 8E 6C E9    LDX    #$6CE9
 6D2C: D6 81       LDB    $81
 6D2E: 58          ASLB
 6D2F: AE 85       LDX    B,X
-6D31: D6 72       LDB    $72
+6D31: D6 72       LDB    starting_level_0072
 6D33: 58          ASLB
 6D34: 58          ASLB
 6D35: 3A          ABX
@@ -1430,7 +1437,7 @@ jump_table_6188:
 6E3B: C6 02       LDB    #$02
 6E3D: F7 3E 00    STB    bankswitch_3e00
 6E40: CE 4B 00    LDU    #$4B00
-6E43: D6 72       LDB    $72
+6E43: D6 72       LDB    starting_level_0072
 6E45: 58          ASLB
 6E46: 58          ASLB
 6E47: AE C5       LDX    B,U
@@ -1457,7 +1464,7 @@ jump_table_6188:
 6E6E: C6 02       LDB    #$02
 6E70: F7 3E 00    STB    bankswitch_3e00
 6E73: CE 4B 00    LDU    #$4B00
-6E76: D6 72       LDB    $72
+6E76: D6 72       LDB    starting_level_0072
 6E78: 58          ASLB
 6E79: 58          ASLB
 6E7A: 33 C5       LEAU   B,U
@@ -1490,7 +1497,7 @@ jump_table_6188:
 
 6EE1: 8E 6E BB    LDX    #$6EBB
 6EE4: EC 85       LDD    B,X
-6EE6: DD AA       STD    $AA
+6EE6: DD AA       STD    time_00aa
 6EE8: CC 0D 00    LDD    #$0D00
 6EEB: BD 69 09    JSR    $6909
 6EEE: 4F          CLRA
@@ -1499,7 +1506,7 @@ jump_table_6188:
 6EF2: D7 A4       STB    $A4
 6EF4: DD A5       STD    $A5
 6EF6: 39          RTS
-6EF7: D6 72       LDB    $72
+6EF7: D6 72       LDB    starting_level_0072
 6EF9: 58          ASLB
 6EFA: CE 6F 15    LDU    #$6F15
 6EFD: EE C5       LDU    B,U
@@ -1545,7 +1552,7 @@ jump_table_6188:
 7125: 8E 71 47    LDX    #jump_table_7147                                  
 7128: D6 71       LDB    $71
 712A: 27 08       BEQ    $7134
-712C: D6 72       LDB    $72
+712C: D6 72       LDB    starting_level_0072
 712E: 58          ASLB
 
 712F: 8E 71 39    LDX    #table_of_jump_tables_7139
@@ -1746,11 +1753,11 @@ jump_table_7151:
 72C5: 4A          DECA
 72C6: 97 61       STA    $61
 72C8: 39          RTS
-72C9: D6 72       LDB    $72
+72C9: D6 72       LDB    starting_level_0072
 72CB: C1 05       CMPB   #$05
 72CD: 10 22 00 9C LBHI   $736D
 72D1: 25 06       BCS    $72D9
-72D3: D6 73       LDB    $73
+72D3: D6 73       LDB    weapon_type_0073
 72D5: C1 03       CMPB   #$03
 72D7: 26 3C       BNE    $7315
 72D9: C6 04       LDB    #$04
@@ -1806,7 +1813,7 @@ jump_table_7151:
 735E: 9F 09       STX    $09
 7360: 26 0A       BNE    $736C
 7362: C6 04       LDB    #$04
-7364: D7 72       STB    $72
+7364: D7 72       STB    starting_level_0072
 7366: 0F 08       CLR    $08
 7368: 0F 0B       CLR    $0B
 736A: 0F 0E       CLR    $0E
@@ -1816,7 +1823,7 @@ jump_table_7151:
 7371: D6 71       LDB    $71
 7373: 5A          DECB
 7374: 10 26 00 86 LBNE   $73FE
-7378: 0F 72       CLR    $72
+7378: 0F 72       CLR    starting_level_0072
 737A: 0F 08       CLR    $08
 737C: 0F 0B       CLR    $0B
 737E: 0F 0E       CLR    $0E
@@ -1901,7 +1908,7 @@ jump_table_7151:
 7440: C6 01       LDB    #$01
 7442: D7 7F       STB    $7F
 7444: D7 71       STB    $71
-7446: 0F 72       CLR    $72
+7446: 0F 72       CLR    starting_level_0072
 7448: 0F 08       CLR    $08
 744A: 0F 0B       CLR    $0B
 744C: 0F 0E       CLR    $0E
@@ -1919,7 +1926,7 @@ jump_table_7151:
 7473: 7E ED 2A    JMP    $ED2A
 7476: BD 69 1C    JSR    $691C
 7479: BD 90 AB    JSR    $90AB
-747C: D6 72       LDB    $72
+747C: D6 72       LDB    starting_level_0072
 747E: C1 04       CMPB   #$04
 7480: 24 1C       BCC    $749E
 7482: DC 5A       LDD    $5A
@@ -1983,7 +1990,7 @@ jump_table_7151:
 
 7523: 6A 88 10    DEC    $10,X
 7526: 26 0C       BNE    $7534
-7528: 0F AC       CLR    $AC
+7528: 0F AC       CLR    armour_flag_00ac
 752A: BD 9A 2F    JSR    $9A2F
 752D: C6 46       LDB    #$46
 752F: E7 88 10    STB    $10,X
@@ -1994,12 +2001,12 @@ jump_table_7151:
 753A: CE 95 53    LDU    #$9553
 753D: BD 94 77    JSR    $9477
 7540: 7E 90 74    JMP    $9074
-7543: D6 72       LDB    $72
+7543: D6 72       LDB    starting_level_0072
 7545: 5C          INCB
 7546: C1 07       CMPB   #$07
 7548: 25 01       BCS    $754B
 754A: 5F          CLRB
-754B: D7 72       STB    $72
+754B: D7 72       STB    starting_level_0072
 754D: BD 6C 53    JSR    $6C53
 7550: 0F 08       CLR    $08
 7552: 0F 0B       CLR    $0B
@@ -2040,7 +2047,7 @@ jump_table_7151:
 75A3: ED 10       STD    -$10,X
 75A5: C6 00       LDB    #$00
 75A7: E7 1F       STB    -$1,X
-75A9: D6 72       LDB    $72
+75A9: D6 72       LDB    starting_level_0072
 75AB: 58          ASLB
 75AC: CE 75 C0    LDU    #$75C0
 75AF: EC C5       LDD    B,U
@@ -2079,7 +2086,7 @@ jump_table_7151:
 7620: 0C 0E       INC    $0E
 7622: 39          RTS
 
-7625: D6 72       LDB    $72
+7625: D6 72       LDB    starting_level_0072
 7627: CE 76 3C    LDU    #$763C
 762A: 58          ASLB
 762B: EC C5       LDD    B,U
@@ -2111,7 +2118,7 @@ jump_table_7151:
 7665: A6 A4       LDA    ,Y
 7667: E6 A0       LDB    ,Y+
 7669: DD E4       STD    $E4
-766B: D6 72       LDB    $72
+766B: D6 72       LDB    starting_level_0072
 766D: 26 0C       BNE    $767B
 766F: CE 77 52    LDU    #$7752
 7672: E6 88 12    LDB    $12,X
@@ -2147,14 +2154,14 @@ jump_table_7151:
 76B7: 26 4A       BNE    $7703
 76B9: C6 05       LDB    #$05
 76BB: D7 E3       STB    $E3
-76BD: D6 72       LDB    $72
+76BD: D6 72       LDB    starting_level_0072
 76BF: C1 04       CMPB   #$04
 76C1: 25 05       BCS    $76C8
 76C3: 8E 21 B2    LDX    #$21B2
 76C6: 20 03       BRA    $76CB
 76C8: 8E 22 92    LDX    #$2292
 76CB: CE 77 04    LDU    #$7704
-76CE: D6 72       LDB    $72
+76CE: D6 72       LDB    starting_level_0072
 76D0: 86 0A       LDA    #$0A
 76D2: 3D          MUL
 76D3: 33 CB       LEAU   D,U
@@ -2171,7 +2178,7 @@ jump_table_7151:
 76EE: E7 80       STB    ,X+
 76F0: 0A E3       DEC    $E3
 76F2: 26 F4       BNE    $76E8
-76F4: D6 72       LDB    $72
+76F4: D6 72       LDB    starting_level_0072
 76F6: CE 77 40    LDU    #$7740
 76F9: 58          ASLB
 76FA: 33 C5       LEAU   B,U
@@ -2199,7 +2206,7 @@ jump_table_7151:
 77A1: 9F 0C       STX    $0C
 77A3: 26 1A       BNE    $77BF
 77A5: 0F 0E       CLR    $0E
-77A7: 0A 60       DEC    $60
+77A7: 0A 60       DEC    nb_lives_0060
 77A9: 26 10       BNE    $77BB
 77AB: CC 02 0B    LDD    #$020B
 77AE: DB 27       ADDB   $27
@@ -2222,7 +2229,7 @@ jump_table_7151:
 77CD: D7 08       STB    $08
 77CF: D7 0B       STB    $0B
 77D1: D7 0E       STB    $0E
-77D3: D6 60       LDB    $60
+77D3: D6 60       LDB    nb_lives_0060
 77D5: 27 10       BEQ    $77E7
 77D7: D6 26       LDB    $26
 77D9: 27 07       BEQ    $77E2
@@ -2366,7 +2373,7 @@ jump_table_7151:
 7905: C6 01       LDB    #$01
 7907: D7 05       STB    $05
 7909: 39          RTS
-790A: D6 60       LDB    $60
+790A: D6 60       LDB    nb_lives_0060
 790C: 26 F7       BNE    $7905
 790E: C6 01       LDB    #$01
 7910: D7 02       STB    $02
@@ -2562,9 +2569,9 @@ jump_table_7151:
 7ADF: CE 7A E4    LDU    #$7AE4
 
 7AEC: C6 01       LDB    #$01
-7AEE: D7 AC       STB    $AC
+7AEE: D7 AC       STB    armour_flag_00ac
 7AF0: D7 DE       STB    $DE
-7AF2: 0F 72       CLR    $72
+7AF2: 0F 72       CLR    starting_level_0072
 7AF4: CC 40 00    LDD    #$4000
 7AF7: DD 6C       STD    $6C
 7AF9: CC 06 00    LDD    #$0600
@@ -2665,7 +2672,7 @@ jump_table_7151:
 7BF7: CE 95 53    LDU    #$9553
 7BFA: BD 94 77    JSR    $9477
 7BFD: 7E 90 74    JMP    $9074
-7C00: 0F AC       CLR    $AC
+7C00: 0F AC       CLR    armour_flag_00ac
 7C02: BD 79 A6    JSR    $79A6
 7C05: C6 1E       LDB    #$1E
 7C07: E7 88 14    STB    $14,X
@@ -2732,7 +2739,7 @@ jump_table_7151:
 7CB1: BD 7B 18    JSR    $7B18
 7CB4: CC 7C C3    LDD    #$7CC3
 7CB7: 7E 7D 43    JMP    $7D43
-7CBA: D6 AC       LDB    $AC
+7CBA: D6 AC       LDB    armour_flag_00ac
 7CBC: 26 04       BNE    $7CC2
 7CBE: 4F          CLRA
 7CBF: 5F          CLRB
@@ -2883,7 +2890,7 @@ jump_table_7151:
 7E29: E7 1F       STB    -$1,X
 7E2B: C6 32       LDB    #$32
 7E2D: E7 88 14    STB    $14,X
-7E30: 0F AC       CLR    $AC
+7E30: 0F AC       CLR    armour_flag_00ac
 7E32: BD 9A 2F    JSR    $9A2F
 7E35: 6C 13       INC    -$D,X
 7E37: 39          RTS
@@ -5090,7 +5097,7 @@ jump_table_7151:
 9139: BD 94 85    JSR    $9485
 913C: C6 0F       LDB    #$0F
 913E: E7 88 1A    STB    $1A,X
-9141: D6 AC       LDB    $AC
+9141: D6 AC       LDB    armour_flag_00ac
 9143: 58          ASLB
 9144: CE 97 E7    LDU    #$97E7
 9147: EE C5       LDU    B,U
@@ -5236,7 +5243,7 @@ jump_table_7151:
 927E: CE 93 94    LDU    #$9394
 9281: 20 03       BRA    $9286
 9283: CE 93 98    LDU    #$9398
-9286: D6 AC       LDB    $AC
+9286: D6 AC       LDB    armour_flag_00ac
 9288: 58          ASLB
 9289: EC C5       LDD    B,U
 928B: BD 98 FE    JSR    $98FE
@@ -5261,7 +5268,7 @@ jump_table_7151:
 92B4: CE 93 98    LDU    #$9398
 92B7: 20 03       BRA    $92BC
 92B9: CE 93 94    LDU    #$9394
-92BC: D6 AC       LDB    $AC
+92BC: D6 AC       LDB    armour_flag_00ac
 92BE: 58          ASLB
 92BF: EC C5       LDD    B,U
 92C1: BD 98 FE    JSR    $98FE
@@ -5358,7 +5365,7 @@ jump_table_7151:
 9384: A9 19       ADCA   -$7,X
 9386: A7 19       STA    -$7,X
 9388: 39          RTS
-9389: D6 AC       LDB    $AC
+9389: D6 AC       LDB    armour_flag_00ac
 938B: 58          ASLB
 938C: CE 93 CC    LDU    #$93CC
 938F: EC C5       LDD    B,U
@@ -5531,7 +5538,7 @@ jump_table_7151:
 9531: BD 95 82    JSR    $9582
 9534: E6 14       LDB    -$C,X
 9536: 58          ASLB
-9537: CE 95 3C    LDU    #$953C
+9537: CE 95 3C    LDU    #jump_table_953c
 953A: 6E D5       JMP    [B,U]        ; [indirect_jump]
 953C: 95 42       BITA   $42
 953E: 95 D3       BITA   $D3
@@ -5755,7 +5762,7 @@ jump_table_7151:
 9727: C6 01       LDB    #$01
 9729: 20 F3       BRA    $971E
 
-98F3: D6 AC       LDB    $AC
+98F3: D6 AC       LDB    armour_flag_00ac
 98F5: 58          ASLB
 98F6: EE C5       LDU    B,U
 98F8: A6 0E       LDA    $E,X
@@ -5776,9 +5783,7 @@ jump_table_7151:
 9978: 58          ASLB
 9979: CE 99 7E    LDU    #jump_table_997e
 997C: 6E D5       JMP    [B,U]        ; [indirect_jump]
-997E: 99 84       ADCA   $84
-9980: 99 9E       ADCA   $9E
-9982: 99 C8       ADCA   $C8
+
 9984: C6 81       LDB    #$81
 9986: D7 DF       STB    $DF
 9988: CC 08 01    LDD    #$0801
@@ -5831,7 +5836,7 @@ jump_table_7151:
 99F3: C6 10       LDB    #$10
 99F5: E7 88 10    STB    $10,X
 99F8: CE 9A 39    LDU    #$9A39
-99FB: D6 AC       LDB    $AC
+99FB: D6 AC       LDB    armour_flag_00ac
 99FD: 58          ASLB
 99FE: EE C5       LDU    B,U
 9A00: E6 0E       LDB    $E,X
@@ -5904,7 +5909,7 @@ jump_table_7151:
 9A9B: CE 9A A1    LDU    #$9AA1
 9A9E: 7E 98 F3    JMP    $98F3
 
-9AF9: 96 AC       LDA    $AC
+9AF9: 96 AC       LDA    armour_flag_00ac
 9AFB: 10 26 01 3A LBNE   $9C39
 9AFF: 58          ASLB
 9B00: CE 9B 0F    LDU    #jump_table_9b0f
@@ -5971,14 +5976,14 @@ jump_table_7151:
 9B93: 20 24       BRA    $9BB9
 9B95: C6 01       LDB    #$01
 9B97: E7 10       STB    -$10,X
-9B99: D7 AC       STB    $AC
+9B99: D7 AC       STB    armour_flag_00ac
 9B9B: BD 9A 28    JSR    $9A28
 9B9E: 6F 88 16    CLR    $16,X
 9BA1: 0F 99       CLR    $99
 9BA3: CE 95 5F    LDU    #$955F
 9BA6: BD 91 A1    JSR    $91A1
 9BA9: 7E 9A 20    JMP    $9A20
-9BAC: D6 60       LDB    $60
+9BAC: D6 60       LDB    nb_lives_0060
 9BAE: 5A          DECB
 9BAF: 26 05       BNE    $9BB6
 9BB1: BD 7A 19    JSR    $7A19
@@ -5998,7 +6003,7 @@ jump_table_7151:
 9BD1: E7 0E       STB    $E,X
 9BD3: E7 1E       STB    -$2,X
 9BD5: CE 9A A5    LDU    #$9AA5
-9BD8: D6 AC       LDB    $AC
+9BD8: D6 AC       LDB    armour_flag_00ac
 9BDA: 58          ASLB
 9BDB: EE C5       LDU    B,U
 9BDD: BD 98 F8    JSR    $98F8
@@ -6040,7 +6045,7 @@ jump_table_7151:
 9C3A: CE 9C 42    LDU    #jump_table_9c42
 9C3D: AD D5       JSR    [B,U]        ; [indirect_jump]
 9C3F: 7E 9B 05    JMP    $9B05
-9C42: 9B AC       ADDA   $AC
+9C42: 9B AC       ADDA   armour_flag_00ac
 9C44: 95 D3       BITA   $D3
 9C46: 96 12       LDA    $12
 9C48: 9B FB       ADDA   $FB
@@ -6206,7 +6211,7 @@ jump_table_a066:
 9D88: ED 13       STD    -$D,X
 9D8A: E7 15       STB    -$B,X
 9D8C: 39          RTS
-9D8D: D6 73       LDB    $73
+9D8D: D6 73       LDB    weapon_type_0073
 9D8F: CE 9D BA    LDU    #$9DBA
 9D92: E6 C5       LDB    B,U
 9D94: 27 04       BEQ    $9D9A
@@ -6218,7 +6223,7 @@ jump_table_a066:
 9DA1: BD 79 97    JSR    $7997
 9DA4: 6C 14       INC    -$C,X
 9DA6: 39          RTS
-9DA7: D6 73       LDB    $73
+9DA7: D6 73       LDB    weapon_type_0073
 9DA9: CE 9D BA    LDU    #$9DBA
 9DAC: E6 C5       LDB    B,U
 9DAE: 27 04       BEQ    $9DB4
@@ -6264,7 +6269,7 @@ jump_table_a066:
 9E67: 6E D5       JMP    [B,U]        ; [indirect_jump]
 9E69: 9C D4       CMPX   $D4
 9E6B: 9E B8       LDX    $B8
-9E6D: 9C AC       CMPX   $AC
+9E6D: 9C AC       CMPX   armour_flag_00ac
 9E6F: 9E 75       LDX    $75
 9E71: 9D 75       JSR    $75
 9E73: 9E 8B       LDX    $8B
@@ -6285,7 +6290,7 @@ jump_table_a066:
 9E8F: E7 15       STB    -$B,X
 9E91: ED 10       STD    -$10,X
 9E93: 39          RTS
-9E94: 9C AC       CMPX   $AC
+9E94: 9C AC       CMPX   armour_flag_00ac
 9E96: 9E 9C       LDX    $9C
 9E98: 9D 75       JSR    $75
 9E9A: 9E 8B       LDX    $8B
@@ -6322,7 +6327,7 @@ jump_table_a066:
 9F5B: 4F          CLRA
 9F5C: 5F          CLRB
 9F5D: ED 33       STD    -$D,Y
-9F5F: D6 73       LDB    $73
+9F5F: D6 73       LDB    weapon_type_0073
 9F61: E7 25       STB    $5,Y
 9F63: E6 0F       LDB    $F,X
 9F65: CE 9F 91    LDU    #$9F91
@@ -6349,7 +6354,7 @@ jump_table_a066:
 9F90: 39          RTS
 9F91: 09 FD       ROL    $FD
 9F93: CE 9F A9    LDU    #$9FA9
-9F96: D6 73       LDB    $73
+9F96: D6 73       LDB    weapon_type_0073
 9F98: A6 C5       LDA    B,U
 9F9A: 10 8E 05 40 LDY    #$0540
 9F9E: E6 30       LDB    -$10,Y
@@ -8471,7 +8476,7 @@ B639: 33 C5       LEAU   B,U
 B63B: 7E B8 7E    JMP    $B87E
 B63E: 00 80       NEG    $80
 B640: 01 00       NEG    $00
-B642: 00 60       NEG    $60
+B642: 00 60       NEG    nb_lives_0060
 B644: 00 C0       NEG    $C0
 B646: 00 40       NEG    $40
 B648: 00 80       NEG    $80
@@ -8869,7 +8874,7 @@ B9A0: 00 50       NEG    $50
 B9A2: 00 18       NEG    $18
 B9A4: 00 58       NEG    $58
 B9A6: 00 10       NEG    $10
-B9A8: 00 60       NEG    $60
+B9A8: 00 60       NEG    nb_lives_0060
 B9AA: 00 0C       NEG    $0C
 B9AC: 00 64       NEG    $64
 B9AE: 00 0C       NEG    $0C
@@ -10351,7 +10356,7 @@ C75C: 39          RTS
 C75D: A6 88 12    LDA    $12,X
 C760: 81 02       CMPA   #$02
 C762: 27 17       BEQ    $C77B
-C764: 96 72       LDA    $72
+C764: 96 72       LDA    starting_level_0072
 C766: 81 01       CMPA   #$01
 C768: 27 29       BEQ    $C793
 C76A: DC 5A       LDD    $5A
@@ -10441,7 +10446,7 @@ C83B: BD 68 F9    JSR    $68F9
 C83E: C4 03       ANDB   #$03
 C840: E6 C5       LDB    B,U
 C842: E7 88 13    STB    $13,X
-C845: 96 72       LDA    $72
+C845: 96 72       LDA    starting_level_0072
 C847: 81 05       CMPA   #$05
 C849: 27 19       BEQ    $C864
 C84B: 81 01       CMPA   #$01
@@ -10881,7 +10886,7 @@ CC32: 96 B5       LDA    $B5
 CC34: 27 02       BEQ    $CC38
 CC36: 0A B5       DEC    $B5
 CC38: BD 8E 0C    JSR    $8E0C
-CC3B: D6 72       LDB    $72
+CC3B: D6 72       LDB    starting_level_0072
 CC3D: C1 05       CMPB   #$05
 CC3F: 27 03       BEQ    $CC44
 CC41: 7E E8 44    JMP    $E844
@@ -12069,7 +12074,7 @@ D6D6: A6 0D       LDA    $D,X
 D6D8: 48          ASLA
 D6D9: CE D7 06    LDU    #jump_table_d706
 D6DC: AD D6       JSR    [A,U]	; [indirect_jump]
-D6DE: D6 72       LDB    $72
+D6DE: D6 72       LDB    starting_level_0072
 D6E0: C1 02       CMPB   #$02
 D6E2: 27 21       BEQ    $D705
 D6E4: EC 16       LDD    -$A,X
@@ -12148,7 +12153,7 @@ D791: 0A 07       DEC    $07
 D793: 0A 08       DEC    $08
 D795: 00 00       NEG    $00
 D797: CE D7 B5    LDU    #$D7B5
-D79A: 96 72       LDA    $72
+D79A: 96 72       LDA    starting_level_0072
 D79C: 81 05       CMPA   #$05
 D79E: 27 03       BEQ    $D7A3
 D7A0: CE D7 B1    LDU    #$D7B1
@@ -12210,7 +12215,7 @@ D814: 7E A4 27    JMP    $A427
 D817: 39          RTS
 D818: 6A 0A       DEC    $A,X
 D81A: 26 FB       BNE    $D817
-D81C: 96 72       LDA    $72
+D81C: 96 72       LDA    starting_level_0072
 D81E: 81 05       CMPA   #$05
 D820: 27 42       BEQ    $D864
 D822: D6 EB       LDB    $EB
@@ -12300,7 +12305,7 @@ D8E0: ED 26       STD    $6,Y
 D8E2: 86 01       LDA    #$01
 D8E4: A7 A8 18    STA    $18,Y
 D8E7: 39          RTS
-D8E8: D6 72       LDB    $72
+D8E8: D6 72       LDB    starting_level_0072
 D8EA: C1 05       CMPB   #$05
 D8EC: 27 1C       BEQ    bankswitch_copy_d90A
 D8EE: CE D9 47    LDU    #bankswitch_copy_d947
@@ -12512,7 +12517,7 @@ DAC6: 96 B5       LDA    $B5
 DAC8: 27 02       BEQ    $DACC
 DACA: 0A B5       DEC    $B5
 DACC: BD 8E 0C    JSR    $8E0C
-DACF: D6 72       LDB    $72
+DACF: D6 72       LDB    starting_level_0072
 DAD1: C1 05       CMPB   #$05
 DAD3: 27 03       BEQ    $DAD8
 DAD5: 7E E8 44    JMP    $E844
@@ -13565,7 +13570,7 @@ E3F4: CE E3 FA    LDU    #jump_table_e3fa
 E3F7: 6E D5       JMP    [B,U]	; [indirect_jump]
 E3F9: 39          RTS
 
-E402: D6 AC       LDB    $AC
+E402: D6 AC       LDB    armour_flag_00ac
 E404: 27 1E       BEQ    $E424
 E406: CE 16 12    LDU    #$1612
 E409: EC 16       LDD    -$A,X
@@ -14030,7 +14035,7 @@ E79D: 39          RTS
 E79E: CC A6 31    LDD    #$A631
 E7A1: ED 03       STD    $3,X
 E7A3: BD 79 A6    JSR    $79A6
-E7A6: 0F AC       CLR    $AC
+E7A6: 0F AC       CLR    armour_flag_00ac
 E7A8: 34 10       PSHS   X
 E7AA: 8E 05 10    LDX    #$0510
 E7AD: BD 9A 33    JSR    $9A33
@@ -14039,7 +14044,7 @@ E7B2: CC A6 31    LDD    #$A631
 E7B5: ED 03       STD    $3,X
 E7B7: E6 12       LDB    -$E,X
 E7B9: 5A          DECB
-E7BA: D7 73       STB    $73
+E7BA: D7 73       STB    weapon_type_0073
 E7BC: CC 08 00    LDD    #$0800
 E7BF: 7E 69 09    JMP    $6909
 E7C2: BD 79 88    JSR    $7988
@@ -14048,7 +14053,7 @@ E7C7: E6 12       LDB    -$E,X
 E7C9: C1 0C       CMPB   #$0C
 E7CB: 27 06       BEQ    $E7D3
 E7CD: 4A          DECA
-E7CE: D6 72       LDB    $72
+E7CE: D6 72       LDB    starting_level_0072
 E7D0: 26 01       BNE    $E7D3
 E7D2: 4A          DECA
 E7D3: 48          ASLA
@@ -14110,7 +14115,7 @@ E841: E7 15       STB    -$B,X
 E843: 39          RTS
 E844: 0A B6       DEC    $B6
 E846: 26 12       BNE    $E85A
-E848: 96 72       LDA    $72
+E848: 96 72       LDA    starting_level_0072
 E84A: 81 06       CMPA   #$06
 E84C: 27 03       BEQ    $E851
 E84E: BD 7A 66    JSR    $7A66
@@ -14394,7 +14399,7 @@ EB0A: C5 02       BITB   #$02
 EB0C: 27 26       BEQ    $EB34
 EB0E: A6 04       LDA    $4,X
 EB10: CE EB 3C    LDU    #$EB3C
-EB13: D6 72       LDB    $72
+EB13: D6 72       LDB    starting_level_0072
 EB15: A0 C5       SUBA   B,U
 EB17: 97 E5       STA    $E5
 EB19: 10 8E EF 2D LDY    #$EF2D
@@ -14516,10 +14521,10 @@ EBFE: 8B 15       ADDA   #$15
 EC00: 97 7E       STA    $7E
 EC02: 25 04       BCS    $EC08
 EC04: C6 06       LDB    #$06
-EC06: DB 72       ADDB   $72
+EC06: DB 72       ADDB   starting_level_0072
 EC08: 39          RTS
 EC09: 10 8E EF 2D LDY    #$EF2D
-EC0D: D6 73       LDB    $73
+EC0D: D6 73       LDB    weapon_type_0073
 EC0F: E6 A5       LDB    B,Y
 EC11: 53          COMB
 EC12: D7 E2       STB    $E2
@@ -14540,11 +14545,11 @@ EC2A: 4C          INCA
 EC2B: 1F 89       TFR    A,B
 EC2D: 39          RTS
 EC2E: C6 0D       LDB    #$0D
-EC30: DB 72       ADDB   $72
+EC30: DB 72       ADDB   starting_level_0072
 EC32: 39          RTS
 EC33: 34 40       PSHS   U
 EC35: CE EC 52    LDU    #$EC52
-EC38: D6 72       LDB    $72
+EC38: D6 72       LDB    starting_level_0072
 EC3A: 58          ASLB
 EC3B: EE C5       LDU    B,U
 EC3D: 10 8E 00 7D LDY    #$007D
@@ -14673,16 +14678,16 @@ ED27: BD ED 58    JSR    $ED58
 ED2A: D6 21       LDB    $21
 ED2C: C4 3F       ANDB   #$3F
 ED2E: 26 27       BNE    $ED57
-ED30: DC AA       LDD    $AA
+ED30: DC AA       LDD    time_00aa
 ED32: 83 00 01    SUBD   #$0001
-ED35: DD AA       STD    $AA
+ED35: DD AA       STD    time_00aa
 ED37: 26 0F       BNE    $ED48
 ED39: BD 7A 29    JSR    $7A29
 ED3C: C6 01       LDB    #$01
-ED3E: D7 AC       STB    $AC
+ED3E: D7 AC       STB    armour_flag_00ac
 ED40: CC 03 03    LDD    #$0303
 ED43: FD 05 03    STD    $0503
-ED46: DC AA       LDD    $AA
+ED46: DC AA       LDD    time_00aa
 ED48: 10 83 00 0F CMPD   #$000F
 ED4C: 26 03       BNE    $ED51
 ED4E: BD 79 BF    JSR    $79BF
@@ -14694,7 +14699,7 @@ ED5A: 58          ASLB
 ED5B: 8E ED 60    LDX    #jump_table_ed60
 ED5E: 6E 95       JMP    [B,X]	; [indirect_jump]
 
-ED64: D6 72       LDB    $72
+ED64: D6 72       LDB    starting_level_0072
 ED66: 58          ASLB
 ED67: 8E ED 88    LDX    #$ED88
 ED6A: 30 85       LEAX   B,X
@@ -14702,10 +14707,10 @@ ED6C: DC 9C       LDD    $9C
 ED6E: 10 A3 84    CMPD   ,X
 ED71: 23 14       BLS    $ED87
 ED73: 8E 6E BB    LDX    #$6EBB
-ED76: D6 72       LDB    $72
+ED76: D6 72       LDB    starting_level_0072
 ED78: 58          ASLB
 ED79: EC 85       LDD    B,X
-ED7B: DD AA       STD    $AA
+ED7B: DD AA       STD    time_00aa
 ED7D: C6 01       LDB    #$01
 ED7F: D7 81       STB    $81
 ED81: CC 0D 00    LDD    #$0D00
@@ -14747,7 +14752,7 @@ EDE9: 39          RTS
 EDEA: DC 64       LDD    $64
 EDEC: 10 93 68    CMPD   $68
 EDEF: 22 0D       BHI    $EDFE
-EDF1: 0C 60       INC    $60
+EDF1: 0C 60       INC    nb_lives_0060
 EDF3: CC 07 00    LDD    #$0700
 EDF6: BD 69 09    JSR    $6909
 EDF9: BD 7A 3E    JSR    $7A3E
@@ -14762,7 +14767,7 @@ EE06: 39          RTS
 EE07: C4 18       ANDB   #$18
 EE09: 54          LSRB
 EE0A: 54          LSRB
-EE0B: 96 72       LDA    $72
+EE0B: 96 72       LDA    starting_level_0072
 EE0D: 48          ASLA
 EE0E: CE EE 13    LDU    #jump_table_ee13
 EE11: 6E D6       JMP    [A,U]	; [indirect_jump]
@@ -14806,7 +14811,7 @@ EEC9: 23 02       BLS    $EECD
 EECB: 86 3F       LDA    #$3F
 EECD: DD 9A       STD    $9A
 EECF: 39          RTS
-EED0: D6 72       LDB    $72
+EED0: D6 72       LDB    starting_level_0072
 EED2: 58          ASLB
 EED3: 8E EE D8    LDX    #jump_table_eed8
 EED6: 6E 95       JMP    [B,X]	; [indirect_jump]
@@ -14864,7 +14869,7 @@ EF61: DD E8       STD    $E8
 EF63: 34 10       PSHS   X
 EF65: 33 84       LEAU   ,X
 EF67: 8E F0 36    LDX    #$F036
-EF6A: D6 73       LDB    $73
+EF6A: D6 73       LDB    weapon_type_0073
 EF6C: 58          ASLB
 EF6D: AE 85       LDX    B,X
 EF6F: E6 45       LDB    $5,U
@@ -14874,7 +14879,7 @@ EF73: 58          ASLB
 EF74: 3A          ABX
 EF75: 9F E2       STX    $E2
 EF77: 8E EF 2D    LDX    #$EF2D
-EF7A: D6 73       LDB    $73
+EF7A: D6 73       LDB    weapon_type_0073
 EF7C: A6 85       LDA    B,X
 EF7E: 97 E4       STA    $E4
 EF80: 10 8E 05 40 LDY    #$0540
@@ -14925,7 +14930,7 @@ EFE2: CC 02 00    LDD    #$0200
 EFE5: ED 53       STD    -$D,U
 EFE7: E7 55       STB    -$B,U
 EFE9: 8E F0 EB    LDX    #$F0EB
-EFEC: D6 73       LDB    $73
+EFEC: D6 73       LDB    weapon_type_0073
 EFEE: E6 85       LDB    B,X
 EFF0: 26 0B       BNE    $EFFD
 EFF2: 9E E6       LDX    $E6
@@ -14982,7 +14987,7 @@ F136: EC 56       LDD    -$A,U
 F138: A3 36       SUBD   -$A,Y
 F13A: E3 84       ADDD   ,X
 F13C: 10 A3 02    CMPD   $2,X
-F13F: 22 0F       BHI    $F150
+F13F: 22 0F       BHI    $F150	; always branch: invincibility
 F141: A3 84       SUBD   ,X
 F143: DD AE       STD    $AE
 F145: 68 30       ASL    -$10,Y
@@ -14996,14 +15001,14 @@ F155: 26 B8       BNE    $F10F
 F157: 39          RTS
 
 F3CE: 8E F4 8E    LDX    #$F48E
-F3D1: D6 73       LDB    $73
+F3D1: D6 73       LDB    weapon_type_0073
 F3D3: 58          ASLB
 F3D4: EC 85       LDD    B,X
 F3D6: DD E2       STD    $E2
 F3D8: CE F4 52    LDU    #$F452
-F3DB: 96 73       LDA    $73
+F3DB: 96 73       LDA    weapon_type_0073
 F3DD: 48          ASLA
-F3DE: 9B 73       ADDA   $73
+F3DE: 9B 73       ADDA   weapon_type_0073
 F3E0: 48          ASLA
 F3E1: 48          ASLA
 F3E2: 33 C6       LEAU   A,U
@@ -15091,7 +15096,7 @@ F56A: EC 56       LDD    -$A,U
 F56C: A3 36       SUBD   -$A,Y
 F56E: E3 84       ADDD   ,X
 F570: 10 A3 02    CMPD   $2,X
-F573: 22 25       BHI    $F59A
+F573: 22 25       BHI    $F59A	; always branch: invincibility
 F575: A3 84       SUBD   ,X
 F577: DD AE       STD    $AE
 F579: E6 45       LDB    $5,U
@@ -15185,7 +15190,7 @@ F774: F6 05 03    LDB    $0503
 F777: C1 03       CMPB   #$03
 F779: 27 0C       BEQ    $F787
 F77B: 0F AD       CLR    $AD
-F77D: D6 60       LDB    $60
+F77D: D6 60       LDB    nb_lives_0060
 F77F: 5A          DECB
 F780: 10 27 82 95 LBEQ   $7A19
 F784: 7E 7A 29    JMP    $7A29
@@ -15203,7 +15208,7 @@ F79E: BD F7 FB    JSR    $F7FB
 F7A1: BD F7 CF    JSR    $F7CF
 F7A4: BD F8 11    JSR    $F811
 F7A7: BD F7 C3    JSR    $F7C3
-F7AA: D6 72       LDB    $72
+F7AA: D6 72       LDB    starting_level_0072
 F7AC: C1 06       CMPB   #$06
 F7AE: 26 03       BNE    $F7B3
 F7B0: BD F7 C9    JSR    $F7C9
