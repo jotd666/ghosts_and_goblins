@@ -49,6 +49,9 @@ def process(asm_file,rom_file,offset,end_address):
     # create a label for table at the previous LDx instruction that matches the
     # index register (X,Y). Widely used in a lot of games, Konami but not just them.
     for i,line in enumerate(asm_lines):
+        # table offset in lowercase
+        asm_lines[i] = re.sub("(jump_table_)(\w+)",lambda m: m.group(1)+m.group(2).lower(),line)
+
         if "[indirect_jump]" in line:
             base_reg = None
             # detect index register
@@ -124,13 +127,22 @@ def process(asm_file,rom_file,offset,end_address):
                     if not first_entry:
                         first_entry = a
                     asm_lines.append(f"\tdc.w\t${a:04x}\t; ${table_address:04x}\n")
+
+                    if a != first_entry and a not in inst_addresses:
+                        closest_idx = bisect.bisect(inst_addresses_list,a)
+                        closest_address = inst_addresses_list[closest_idx]
+                        print(f"{label}: table entry {a:04x} not in listing (closest: {closest_address:04x})")
+                        not_in_listing.add((first_entry,closest_address))
+
                     nb_entries += 1
                     table_address += 2
+
                 if first_entry and first_entry not in inst_addresses:
                     closest_idx = bisect.bisect(inst_addresses_list,first_entry)
                     closest_address = inst_addresses_list[closest_idx]
                     print(f"{label}: first entry {first_entry:04x} not in listing (closest: {closest_address:04x})")
                     not_in_listing.add((first_entry,closest_address))
+
                 if nb_entries < 2:
                     print(f"{label}: no or not enough entries")
 

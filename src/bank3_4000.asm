@@ -271,77 +271,10 @@
 519D: 0A FD       DEC    $FD
 519F: 26 EB       BNE    $518C
 51A1: 35 C0       PULS   U,PC
-51A3: 00 01       NEG    $01
-51A5: 02 03       XNC    $03
-51A7: 04 05       LSR    $05
-51A9: 06 07       ROR    $07
-51AB: 08 09       ASL    $09
-51AD: 0A 0B       DEC    $0B
-51AF: 0C 0D       INC    $0D
-51B1: 0E 0F       JMP    $0F
-51B3: 40          NEGA
-51B4: 41          NEGA
-51B5: 42          XNCA
-51B6: 43          COMA
-51B7: 44          LSRA
-51B8: 70 10 11    NEG    $1011
-51BB: 12          NOP
-51BC: 13          SYNC
-51BD: 14          XHCF
-51BE: 15          XHCF
-51BF: 16 17 18    LBRA   $68DA
-51C2: 19          DAA
-51C3: 1A 1B       ORCC   #$1B
-51C5: 1C 1D       ANDCC  #$1D
-51C7: 1E 1F       EXG    X,inv
-51C9: 50          NEGB
-51CA: 51          NEGB
-51CB: 52          XNCB
-51CC: 53          COMB
-51CD: 54          LSRB
-51CE: 71 20 21    NEG    $2021
-51D1: 22 23       BHI    $51F6
-51D3: 24 25       BCC    $51FA
-51D5: 26 27       BNE    $51FE
-51D7: 28 29       BVC    $5202
-51D9: 2A 2B       BPL    $5206
-51DB: 2C 2D       BGE    $520A
-51DD: 2E 2F       BGT    $520E
-51DF: 60 61       NEG    $1,S
-51E1: 62 63       XNC    $3,S
-51E3: 64 72       LSR    -$E,S
-51E5: 30 30       LEAX   -$10,Y
-51E7: 30 30       LEAX   -$10,Y
-51E9: 30 30       LEAX   -$10,Y
-51EB: 30 30       LEAX   -$10,Y
-51ED: 30 30       LEAX   -$10,Y
-51EF: 30 30       LEAX   -$10,Y
-51F1: 30 30       LEAX   -$10,Y
-51F3: 30 30       LEAX   -$10,Y
-51F5: 30 30       LEAX   -$10,Y
-51F7: 30 30       LEAX   -$10,Y
-51F9: 30 30       LEAX   -$10,Y
-51FB: A8 C0       EORA   ,U+
-51FD: C7 00       XSTB   #$00
-51FF: 60 00       NEG    $0,X
-5201: 00 00       NEG    $00
-5203: 88 66       EORA   #$66
-5205: AA 00       ORA    $0,X
-5207: A0 80       SUBA   ,X+
-5209: C0 00       SUBB   #$00
-520B: A8 88 AA    EORA   -$56,X
-520E: 00 60       NEG    $60
-5210: A0 C0       SUBA   ,U+
-5212: 00 99       NEG    $99
-5214: AA C0       ORA    ,U+
-5216: 00 00       NEG    $00
-5218: C0 00       SUBB   #$00
-521A: 00 88       NEG    $88
-521C: AA C0       ORA    ,U+
-521E: 00 A0       NEG    $A0
-5220: C0 00       SUBB   #$00
-5222: 00 D6       NEG    $D6
-5224: 73 58 58    COM    $5858
+
+5223: D6 73       LDB    $73                                       
+5225: 58          ASLB                                             
+5226: 58          ASLB                                             
 5227: 58          ASLB
 5228: 8E 51 FB    LDX    #$51FB
 522B: 31 85       LEAY   B,X
@@ -390,23 +323,7 @@
 5290: 0A FC       DEC    $FC
 5292: 26 E3       BNE    $5277
 5294: 39          RTS
-5295: A0 A1       SUBA   ,Y++
-5297: A2 A3       SBCA   ,--Y
-5299: B0 20 20    SUBA   $2020
-529C: B3 C0 20    SUBD   $C020
-529F: 20 C3       BRA    $5264
-52A1: D0 D1       SUBB   $D1
-52A3: D2 D3       SBCB   $D3
-52A5: 82 83       SBCA   #$83
-52A7: 92 93       SBCA   $93
-52A9: 80 81       SUBA   #$81
-52AB: 90 91       SUBA   $91
-52AD: 88 89       EORA   #$89
-52AF: 98 99       EORA   $99
-52B1: 86 87       LDA    #$87
-52B3: 96 97       LDA    $97
-52B5: 84 85       ANDA   #$85
-52B7: 94 95       ANDA   $95
+
 52B9: C6 26       LDB    #$26
 52BB: BD 48 9B    JSR    $489B
 52BE: 9E AA       LDX    $AA
@@ -463,9 +380,7 @@
 533A: 31 48       LEAY   $8,U
 533C: C6 03       LDB    #$03
 533E: 7E 50 25    JMP    $5025
-5341: 22 4E       BHI    $5391
-5343: 22 8E       BHI    $52D3
-5345: 22 CE       BHI    $5315
+
 5347: 34 40       PSHS   U
 5349: 96 51       LDA    $51
 534B: 26 38       BNE    $5385
@@ -502,16 +417,7 @@
 5394: E7 A0       STB    ,Y+
 5396: 20 F2       BRA    $538A
 5398: 39          RTS
-5399: 43          COMA
-539A: 4F          CLRA
-539B: 49          ROLA
-539C: 4E          XCLRA
-539D: 40          NEGA
-539E: 50          NEGB
-539F: 4C          INCA
-53A0: 41          NEGA
-53A1: 59          ROLB
-53A2: 40          NEGA
+
 53A3: 34 40       PSHS   U
 53A5: C6 10       LDB    #$10
 53A7: BD 48 9B    JSR    $489B
@@ -749,12 +655,13 @@
 5635: 39          RTS
 5636: D6 05       LDB    $05
 5638: 58          ASLB
-5639: 8E 56 3E    LDX    #$563E
-563C: 6E 95       JMP    [B,X]
-563E: 56          RORB
-563F: 42          XNCA
-5640: 56          RORB
-5641: 55          LSRB
+5639: 8E 56 3E    LDX    #jump_table_563e
+563C: 6E 95       JMP    [B,X]		; [indirect_jump]
+
+jump_table_563e:
+	.word	$5642	; $563E
+	.word	$5655	; $5640
+
 5642: 7F 05 04    CLR    $0504
 5645: 96 42       LDA    $42
 5647: 85 40       BITA   #$40
@@ -766,8 +673,8 @@
 5654: 39          RTS
 5655: D6 08       LDB    $08
 5657: 58          ASLB
-5658: 8E 56 92    LDX    #$5692
-565B: AD 95       JSR    [B,X]
+5658: 8E 56 92    LDX    #jump_table_5692
+565B: AD 95       JSR    [B,X]		; [indirect_jump]
 565D: D6 43       LDB    $43
 565F: 53          COMB
 5660: D4 42       ANDB   $42
@@ -795,21 +702,27 @@
 568D: 25 02       BCS    $5691
 568F: 0F 08       CLR    $08
 5691: 39          RTS
-5692: 56          RORB
-5693: 98 58       EORA   $58
-5695: D8 59       EORB   $59
-5697: C0 D6       SUBB   #$D6
-5699: 0B 58       XDEC   $58
-569B: 8E 56 A0    LDX    #$56A0
-569E: 6E 95       JMP    [B,X]
-56A0: 56          RORB
-56A1: AC 56       CMPX   -$A,U
-56A3: D6 56       LDB    $56
-56A5: AC 56       CMPX   -$A,U
-56A7: FF 56 AC    STU    $56AC
-56AA: 57          ASRB
-56AB: 0C D6       INC    $D6
-56AD: F0 26 02    SUBB   $2602
+
+jump_table_5692:
+	.word	$5698 
+	.word	$58D8 
+	.word	$59C0
+ 
+5698: D6 0B       LDB    $0B                                         
+569A: 58          ASLB                                               
+569B: 8E 56 A0    LDX    #jump_table_56a0
+569E: 6E 95       JMP    [B,X]		; [indirect_jump]
+
+jump_table_56a0:
+	.word	$56AC 
+	.word	$56D6 
+	.word	$56AC 
+	.word	$56FF 
+	.word	$56AC 
+	.word	$570C
+	
+56AC: D6 F0       LDB    $F0                                         
+56AE: 26 02       BNE    $56B2                                       
 56B0: 0C 0B       INC    $0B
 56B2: 39          RTS
 56B3: C6 01       LDB    #$01
@@ -1056,19 +969,20 @@
 58D7: 39          RTS
 58D8: D6 0B       LDB    $0B
 58DA: 58          ASLB
-58DB: 8E 58 E0    LDX    #$58E0
-58DE: 6E 95       JMP    [B,X]
-58E0: 56          RORB
-58E1: AC 58       CMPX   -$8,U
-58E3: EC 56       LDD    -$A,U
-58E5: AC 59       CMPX   -$7,U
-58E7: 03 56       COM    $56
-58E9: AC 59       CMPX   -$7,U
-58EB: 78 BD 56    ASL    $BD56
-58EE: B3 7D 05    SUBD   $7D05
-58F1: 04 27       LSR    $27
-58F3: 06 CC       ROR    $CC
-58F5: 02 21       XNC    $21
+58DB: 8E 58 E0    LDX    #jump_table_58e0
+58DE: 6E 95       JMP    [B,X]		; [indirect_jump]
+jump_table_58e0:
+	.word	$56AC 
+	.word	$58EC 
+	.word	$56AC 
+	.word	$5903 
+	.word	$56AC 
+	.word	$5978
+
+58EC: BD 56 B3    JSR    $56B3                                      
+58EF: 7D 05 04    TST    $0504                                      
+58F2: 27 06       BEQ    $58FA                                      
+58F4: CC 02 21    LDD    #$0221                                     
 58F7: BD 69 09    JSR    $6909
 58FA: 4F          CLRA
 58FB: 5F          CLRB
@@ -1167,20 +1081,21 @@
 59BF: 39          RTS
 59C0: D6 0B       LDB    $0B
 59C2: 58          ASLB
-59C3: 8E 59 C8    LDX    #$59C8
-59C6: 6E 95       JMP    [B,X]
-59C8: 56          RORB
-59C9: AC 59       CMPX   -$7,U
-59CB: D6 56       LDB    $56
-59CD: AC 59       CMPX   -$7,U
-59CF: E2 56       SBCB   -$A,U
-59D1: AC 59       CMPX   -$7,U
-59D3: EF 5A       STU    -$6,U
-59D5: 2D BD       BLT    $5994
-59D7: 56          RORB
-59D8: B3 CC 02    SUBD   $CC02
-59DB: 22 BD       BHI    $599A
-59DD: 69 09       ROL    $9,X
+59C3: 8E 59 C8    LDX    #jump_table_59c8
+59C6: 6E 95       JMP    [B,X]	; [indirect_jump]
+
+jump_table_59c8:
+	.word	$56AC
+	.word	$59D6
+	.word	$56AC
+	.word	$59E2
+	.word	$56AC
+	.word	$59EF
+	.word	$5A2D
+
+59D6: BD 56 B3    JSR    $56B3   
+59D9: CC 02 22    LDD    #$0222  
+59DC: BD 69 09    JSR    $6909   
 59DF: 0C 0B       INC    $0B
 59E1: 39          RTS
 59E2: C6 01       LDB    #$01
@@ -1276,11 +1191,13 @@
 5A8A: 10 8E 15 72 LDY    #$1572
 5A8E: D6 08       LDB    $08
 5A90: 58          ASLB
-5A91: 8E 5A 96    LDX    #$5A96
-5A94: 6E 95       JMP    [B,X]
-5A96: 5A          DECB
-5A97: 9C 5A       CMPX   $5A
-5A99: B1 5A CE    CMPA   $5ACE
+5A91: 8E 5A 96    LDX    #jump_table_5a96
+5A94: 6E 95       JMP    [B,X]	; [indirect_jump]
+
+jump_table_5a96:
+	.word	$5A9C 
+	.word	$5AB1
+	.word	$5ACE
 5A9C: 4F          CLRA
 5A9D: 5F          CLRB
 5A9E: ED A4       STD    ,Y
@@ -1369,13 +1286,15 @@
 5B3D: 10 8E 15 72 LDY    #$1572
 5B41: D6 08       LDB    $08
 5B43: 58          ASLB
-5B44: 8E 5B 49    LDX    #$5B49
-5B47: 6E 95       JMP    [B,X]
-5B49: 5B          XDECB
-5B4A: 4D          TSTA
-5B4B: 5B          XDECB
-5B4C: 63 D6       COM    [A,U]
-5B4E: F0 26 11    SUBB   $2611
+5B44: 8E 5B 49    LDX    #jump_table_5b49
+5B47: 6E 95       JMP    [B,X]	; [indirect_jump]
+
+jump_table_5b49:
+	.word	$5B4D
+	.word	$5B63
+
+5B4D: D6 F0       LDB    $F0                                        
+5B4F: 26 11       BNE    $5B62                                      
 5B51: C6 01       LDB    #$01
 5B53: D7 F0       STB    $F0
 5B55: BD 68 DF    JSR    $68DF
@@ -1386,14 +1305,17 @@
 5B62: 39          RTS
 5B63: D6 0B       LDB    $0B
 5B65: 58          ASLB
-5B66: 8E 5B 6B    LDX    #$5B6B
-5B69: 6E 95       JMP    [B,X]
-5B6B: 5B          XDECB
-5B6C: 77 5B A6    ASR    $5BA6
-5B6F: 5B          XDECB
-5B70: B1 5B DD    CMPA   $5BDD
-5B73: 5B          XDECB
-5B74: F3 5C 0A    ADDD   $5C0A
+5B66: 8E 5B 6B    LDX    #jump_table_5b6b
+5B69: 6E 95       JMP    [B,X]	; [indirect_jump]
+
+jump_table_5b6b:
+	.word	$5B77 
+	.word	$5BA6
+	.word	$5BB1
+	.word	$5BDD
+	.word	$5BF3
+	.word	$5C0A
+
 5B77: CC 00 01    LDD    #$0001
 5B7A: 6D 2C       TST    $C,Y
 5B7C: 27 03       BEQ    $5B81
@@ -1415,10 +1337,10 @@
 5BA1: EF 27       STU    $7,Y
 5BA3: 0C 0B       INC    $0B
 5BA5: 39          RTS
-5BA6: CE 5B CA    LDU    #$5BCA
+5BA6: CE 5B CA    LDU    #jump_table_5bca
 5BA9: E6 2C       LDB    $C,Y
 5BAB: 58          ASLB
-5BAC: AD D5       JSR    [B,U]
+5BAC: AD D5       JSR    [B,U]	; [indirect_jump]
 5BAE: 0C 0B       INC    $0B
 5BB0: 39          RTS
 5BB1: AE 2E       LDX    $E,Y
@@ -1432,19 +1354,14 @@
 5BC2: 10 8E 15 72 LDY    #$1572
 5BC6: BD 5B DD    JSR    $5BDD
 5BC9: 39          RTS
-5BCA: 7A 05 7A    DEC    $057A
-5BCD: 0F 7A       CLR    $7A
-5BCF: 00 7A       NEG    $7A
-5BD1: 0A 08       DEC    $08
-5BD3: 23 28       BLS    $5BFD
-5BD5: 49          ROLA
-5BD6: 4E          XCLRA
-5BD7: 49          ROLA
-5BD8: 54          LSRB
-5BD9: 49          ROLA
-5BDA: 41          NEGA
-5BDB: 4C          INCA
-5BDC: 20 BD       BRA    $5B9B
+
+jump_table_5bca:
+	.word	$7A05
+	.word	$7A0F
+jump_table_5bce:
+	.word	$7A00 
+	.word	$7A0A
+
 5BDE: 5C          INCB
 5BDF: 1B          NOP
 5BE0: BD 5D 5E    JSR    $5D5E
@@ -1457,10 +1374,10 @@
 5BF0: 97 0B       STA    $0B
 5BF2: 39          RTS
 5BF3: BD 5D DD    JSR    $5DDD
-5BF6: CE 5B CE    LDU    #$5BCE
+5BF6: CE 5B CE    LDU    #jump_table_5bce
 5BF9: F6 15 7E    LDB    $157E
 5BFC: 58          ASLB
-5BFD: AD D5       JSR    [B,U]
+5BFD: AD D5       JSR    [B,U]	; [indirect_jump]
 5BFF: 10 8E 15 72 LDY    #$1572
 5C03: 86 04       LDA    #$04
 5C05: A7 2D       STA    $D,Y
