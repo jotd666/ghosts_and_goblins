@@ -182,23 +182,24 @@ bankswitch_copy_d9 = $d9
 616A: 25 03       BCS    $616F
 616C: 8E 01 00    LDX    #$0100
 616F: 9F 12       STX    $12
-6171: 8E 61 88    LDX    #$6188
+6171: 8E 61 88    LDX    #jump_table_6188
 6174: AE 86       LDX    A,X
 6176: 86 03       LDA    #$03
 6178: 97 D9       STA    bankswitch_copy_d9
 617A: B7 3E 00    STA    bankswitch_3e00
-617D: AD 84       JSR    ,X
+617D: AD 84       JSR    ,X			; [indirect_jump] to bank 3
 617F: 9E 12       LDX    $12
 6181: EC 84       LDD    ,X
 6183: 48          ASLA
 6184: 24 DA       BCC    $6160
 6186: 20 F7       BRA    $617F
-6188: 48          ASLA
-6189: 00 48       NEG    $48
-618B: 5C          INCB
-618C: 48          ASLA
-618D: 9B 48       ADDA   $48
-618F: BD 50 22    JSR    $5022		; [bank_3]
+; from bank 3
+jump_table_6188:
+	.word	$4800 
+	.word	$485C
+	.word	$489B 
+	.word	$48BD 
+	.word	$5022
 
 6248: 97 52       STA    $52
 624A: CC 01 01    LDD    #$0101
@@ -1524,8 +1525,7 @@ bankswitch_copy_d9 = $d9
 70F0: 39          RTS
 
 
-70FB: D6 F0       LDB    $F0
-70FD: 26 15       BNE    $7114
+
 70FC: F0 26 15    SUBB   $2615
 70FF: C6 01       LDB    #$01
 7101: D7 F0       STB    $F0
@@ -2802,7 +2802,6 @@ jump_table_7151:
 7C48: 6E D5       JMP    [B,U]        ; [indirect_jump]
 
 7C54: CC 00 70    LDD    #$0070
-7C55: 00 70       NEG    $70
 7C57: ED 16       STD    -$A,X
 7C59: BD 7B 18    JSR    $7B18
 7C5C: C6 96       LDB    #$96
@@ -8464,10 +8463,7 @@ ABBC: AD D5       JSR    [B,U]	; [special_indirect_jump] (jumped to)
 ABBE: BD A9 85    JSR    $A985
 ABC1: BD 90 74    JSR    $9074
 ABC4: 7E 8F 62    JMP    $8F62
-ABC7: AC F4       CMPX   [,S]
-ABC9: AD 09       JSR    $9,X
-ABCB: AC F4       CMPX   [,S]
-ABCD: AD 09       JSR    $9,X
+
 ABCF: E6 15       LDB    -$B,X
 ABD1: 58          ASLB
 ABD2: CE AB D7    LDU    #jump_table_abd7
@@ -11335,13 +11331,8 @@ C5DA: ED 13       STD    -$D,X
 C5DC: E7 15       STB    -$B,X
 C5DE: E6 15       LDB    -$B,X
 C5E0: 58          ASLB
-<<<<<<< HEAD
 C5E1: CE C6 42    LDU    #jump_table_c642		; 2 entries
 C5E4: AD D5       JSR    [B,U]		; [indirect_jump]
-=======
-C5E1: CE C6 42    LDU    #$C642
-C5E4: AD D5       JSR    [B,U]		; [indirect_jump_bogus]        ; [indirect_jump]
->>>>>>> cd53050166427a99fd66dffb53e35fb9dc8dfa2d
 C5E6: BD CB 3A    JSR    $CB3A
 C5E9: E6 88 1B    LDB    $1B,X
 C5EC: 26 32       BNE    $C620
@@ -11382,51 +11373,9 @@ C63C: CC 05 00    LDD    #$0500
 C63F: ED 14       STD    -$C,X
 C641: 39          RTS
 
-<<<<<<< HEAD
-
 C696: D6 21       LDB    $21                                        
 C698: DB E0       ADDB   $E0                                        
 C69A: 5C          INCB                                              
-=======
-C64E: 01 28       NEG    $28
-C650: 00 23       NEG    $23
-C652: 02 1F       XNC    $1F
-C654: 01 24       NEG    $24
-C656: 82 22       SBCA   #$22
-C658: C6 4E       LDB    #$4E
-C65A: 00 14       NEG    $14
-C65C: 02 25       XNC    $25
-C65E: 01 14       NEG    $14
-C660: 02 1F       XNC    $1F
-C662: 01 1A       NEG    $1A
-C664: 80 2B       SUBA   #$2B
-C666: C6 5A       LDB    #$5A
-C668: 02 0F       XNC    $0F
-C66A: 01 23       NEG    $23
-C66C: 00 28       NEG    $28
-C66E: 02 22       XNC    $22
-C670: 81 14       CMPA   #$14
-C672: C6 68       LDB    #$68
-C674: 01 1E       NEG    $1E
-C676: 02 2D       XNC    $2D
-C678: 00 1D       NEG    $1D
-C67A: 02 0A       XNC    $0A
-C67C: 01 1E       NEG    $1E
-C67E: 80 22       SUBA   #$22
-C680: C6 74       LDB    #$74
-C682: 00 00       NEG    $00
-C684: 00 00       NEG    $00
-C686: 00 88       NEG    $88
-C688: 00 00       NEG    $00
-C68A: FF 78 00    STU    $7800
-C68D: 00 5A       NEG    $5A
-C68F: 6E 46       JMP    $6,U
-C691: 63 6D       COM    $D,S
-C693: 33 5A       LEAU   -$6,U
-C695: 82 D6       SBCA   #$D6
-C697: 21 DB       BRN    $C674
-C699: E0 5C       SUBB   -$4,U
->>>>>>> cd53050166427a99fd66dffb53e35fb9dc8dfa2d
 C69B: C4 03       ANDB   #$03
 C69D: CE C6 46    LDU    #$C646
 C6A0: 58          ASLB

@@ -167,6 +167,7 @@
 509B: 5A          DECB
 509C: 26 ED       BNE    $508B
 509E: 35 90       PULS   X,PC
+
 50A0: 34 30       PSHS   Y,X
 50A2: C6 03       LDB    #$03
 50A4: 4F          CLRA
@@ -867,9 +868,7 @@ jump_table_56a0:
 57FF: 31 48       LEAY   $8,U
 5801: C6 01       LDB    #$01
 5803: 7E 50 25    JMP    $5025
-5806: 21 6E       BRN    $5876
-5808: 21 8E       BRN    $5798
-580A: 21 AE       BRN    $57BA
+
 580C: 8E 22 0A    LDX    #$220A
 580F: 96 46       LDA    $46
 5811: 10 8E 00 06 LDY    #$0006
@@ -1437,13 +1436,7 @@ jump_table_5bce:
 5C7C: EF 23       STU    $3,Y
 5C7E: 39          RTS
 5C7F: 20 C4       BRA    $5C45
-5C81: 21 3F       BRN    $5CC2
-5C83: 26 2C       BNE    $5CB1
-5C85: 1D          SEX
-5C86: 28 29       BVC    $5CB1
-5C88: 2F 3A       BLE    $5CC4
-5C8A: 2A 40       BPL    $5CCC
-5C8C: 1E 1F       EXG    X,inv
+
 5C8E: 6C 22       INC    $2,Y
 5C90: A6 22       LDA    $2,Y
 5C92: 81 0A       CMPA   #$0A
