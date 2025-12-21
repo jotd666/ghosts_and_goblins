@@ -10,7 +10,8 @@
 import pathlib,re,bisect
 
 
-fake = set()
+fake = {0xce9c,0x6070,0x6810,0xbd68,0xf9c4,0xb291,0xb29f,0xb324,0xB336,0xba29,
+0xcc00,0xc64e,0xC65A,0xC668,0xC674}
 
 def process(asm_file,rom_file,offset,end_address):
     with open(asm_file) as f:
@@ -126,13 +127,17 @@ def process(asm_file,rom_file,offset,end_address):
 
                     if not first_entry:
                         first_entry = a
+
+                    if a in fake:
+                        a = 0xFFFF
+
                     asm_lines.append(f"\tdc.w\t${a:04x}\t; ${table_address:04x}\n")
 
-                    if a != first_entry and a not in inst_addresses:
+                    if a != 0xFFFF and a != first_entry and a not in inst_addresses:
                         closest_idx = bisect.bisect(inst_addresses_list,a)
                         closest_address = inst_addresses_list[closest_idx]
                         print(f"{label}: table entry {a:04x} not in listing (closest: {closest_address:04x})")
-                        not_in_listing.add((first_entry,closest_address))
+                        not_in_listing.add((a,closest_address))
 
                     nb_entries += 1
                     table_address += 2
@@ -147,7 +152,7 @@ def process(asm_file,rom_file,offset,end_address):
                     print(f"{label}: no or not enough entries")
 
     # write mame debug script to find missing entrypoints
-    # once run in MAME, use "type d_*asm > missing.asm 2>&1" to reunite the dumps
+    # once run in MAME, use "type d-*asm > missing.asm 2>&1" to reunite the dumps
     with open("debug_script","w") as f:
         for n,c in sorted(not_in_listing):
 
