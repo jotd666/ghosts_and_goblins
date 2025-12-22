@@ -8888,16 +8888,6 @@ BA0C: BD B9 36    JSR    $B936
 BA0F: 7E B9 57    JMP    $B957
 BA12: 39          RTS
 
-BA25: 01 C0       NEG    $C0
-BA27: FE 40 02    LDU    $4002
-BA2A: 00 FE       NEG    $FE
-BA2C: 00 40       NEG    $40
-BA2E: 48          ASLA
-BA2F: 54          LSRB
-BA30: 44          LSRA
-BA31: 4C          INCA
-BA32: 38 50       XANDCC #$50
-BA34: 58          ASLB
 BA35: 6F 1E       CLR    -$2,X
 BA37: EC 16       LDD    -$A,X
 BA39: 10 93 A0    CMPD   $A0
@@ -9594,18 +9584,7 @@ C066: BD 68 F9    JSR    $68F9
 C069: C4 03       ANDB   #$03
 C06B: E6 C5       LDB    B,U
 C06D: 39          RTS
-C06E: 2F 3C       BLE    $C0AC
-C070: 5A          DECB
-C071: 2F 32       BLE    $C0A5
-C073: 2D 28       BLT    $C09D
-C075: 2F 86       BLE    $BFFD
-C077: 01 E6       NEG    $E6
-C079: 1E C1       EXG    inv,X
-C07B: 05 25       LSR    $25
-C07D: 05 C1       LSR    $C1
-C07F: 0C 22       INC    $22
-C081: 01 4F       NEG    $4F
-C083: 48          ASLA
+
 C084: CE 4C CD    LDU    #$4CCD
 C087: EC C6       LDD    A,U
 C089: ED 84       STD    ,X
@@ -11717,11 +11696,7 @@ D427: EC C4       LDD    ,U
 D429: ED 1C       STD    -$4,X
 D42B: 6C 15       INC    -$B,X
 D42D: 39          RTS
-D42E: 28 5A       BVC    $D48A
-D430: 6E 50       JMP    -$10,U
-D432: 46          RORA
-D433: 64 5A       LSR    -$6,U
-D435: 32 BD A4 27 LEAS   [$7860,PCR]
+
 D439: BD 90 74    JSR    $9074
 D43C: EC 19       LDD    -$7,X
 D43E: 83 00 02    SUBD   #$0002
@@ -12130,7 +12105,7 @@ D7C0: DC A2       LDD    $A2
 D7C2: C3 00 20    ADDD   #$0020
 D7C5: A3 19       SUBD   -$7,X
 D7C7: 2B 24       BMI    $D7ED
-D7C9: C1 05       CMPB   #$05
+D7C9: C1 05       CMPB   #$05		; [useless]
 D7CB: D6 21       LDB    $21
 D7CD: 5C          INCB
 D7CE: C4 0F       ANDB   #$0F
@@ -12164,7 +12139,7 @@ D807: BD 90 74    JSR    $9074
 D80A: BD 68 F9    JSR    $68F9
 D80D: D7 EB       STB    $EB
 D80F: 8D 07       BSR    $D818
-D811: BD D9 81    JSR    bankswitch_copy_d981
+D811: BD D9 81    JSR    $D981
 D814: 7E A4 27    JMP    $A427
 D817: 39          RTS
 D818: 6A 0A       DEC    $A,X
@@ -12261,14 +12236,14 @@ D8E4: A7 A8 18    STA    $18,Y
 D8E7: 39          RTS
 D8E8: D6 72       LDB    starting_level_0072
 D8EA: C1 05       CMPB   #$05
-D8EC: 27 1C       BEQ    bankswitch_copy_d90A
-D8EE: CE D9 47    LDU    #bankswitch_copy_d947
+D8EC: 27 1C       BEQ    $D90A
+D8EE: CE D9 47    LDU    #$D947
 D8F1: EC 19       LDD    -$7,X
 D8F3: 93 A2       SUBD   $A2
-D8F5: 2B 09       BMI    bankswitch_copy_d900
+D8F5: 2B 09       BMI    $D900
 D8F7: 10 83 00 A0 CMPD   #$00A0
 D8FB: 25 C5       BCS    $D8C2
-D8FD: CE D9 43    LDU    #bankswitch_copy_d943
+D8FD: CE D9 43    LDU    #$D943
 D900: E6 88 14    LDB    $14,X
 D903: 58          ASLB
 D904: EC C5       LDD    B,U
@@ -12278,68 +12253,65 @@ D90A: EC 88 19    LDD    $19,X
 D90D: 93 A2       SUBD   $A2
 D90F: C3 01 00    ADDD   #$0100
 D912: 10 83 02 00 CMPD   #$0200
-D916: 22 1C       BHI    bankswitch_copy_d934
+D916: 22 1C       BHI    $D934
 D918: EC 19       LDD    -$7,X
 D91A: 93 A2       SUBD   $A2
 D91C: C3 00 5E    ADDD   #$005E
 D91F: 10 83 00 BC CMPD   #$00BC
 D923: 25 9D       BCS    $D8C2
-D925: CE D9 47    LDU    #bankswitch_copy_d947
+D925: CE D9 47    LDU    #$D947
 D928: EC 19       LDD    -$7,X
 D92A: 10 93 A2    CMPD   $A2
-D92D: 25 03       BCS    bankswitch_copy_d932
-D92F: CE D9 43    LDU    #bankswitch_copy_d943
-D932: 20 CC       BRA    bankswitch_copy_d900
-D934: CE D9 47    LDU    #bankswitch_copy_d947
+D92D: 25 03       BCS    $D932
+D92F: CE D9 43    LDU    #$D943
+D932: 20 CC       BRA    $D900
+D934: CE D9 47    LDU    #$D947
 D937: EC 19       LDD    -$7,X
 D939: 10 93 A2    CMPD   $A2
-D93C: 22 03       BHI    bankswitch_copy_d941
-D93E: CE D9 43    LDU    #bankswitch_copy_d943
-D941: 20 BD       BRA    bankswitch_copy_d900
-D943: 24 02       BCC    bankswitch_copy_d947
-D945: 24 06       BCC    bankswitch_copy_d94D
-D947: 24 0E       BCC    bankswitch_copy_d957
-D949: 24 0A       BCC    bankswitch_copy_d955
+D93C: 22 03       BHI    $D941
+D93E: CE D9 43    LDU    #$D943
+D941: 20 BD       BRA    $D900
+
 D94B: A6 88 13    LDA    $13,X
-D94E: 26 30       BNE    bankswitch_copy_d980
-D950: 8D 03       BSR    bankswitch_copy_d955
+D94E: 26 30       BNE    $D980
+D950: 8D 03       BSR    $D955
 D952: 7E A4 27    JMP    $A427
 D955: E6 88 18    LDB    $18,X
-D958: 27 26       BEQ    bankswitch_copy_d980
+D958: 27 26       BEQ    $D980
 D95A: 6A 07       DEC    $7,X
-D95C: 26 22       BNE    bankswitch_copy_d980
+D95C: 26 22       BNE    $D980
 D95E: E6 06       LDB    $6,X
 D960: E7 1E       STB    -$2,X
 D962: 6F 88 18    CLR    $18,X
 D965: 10 AE 88 1E LDY    $1E,X
-D969: 27 15       BEQ    bankswitch_copy_d980
+D969: 27 15       BEQ    $D980
 D96B: A6 1E       LDA    -$2,X
 D96D: A7 26       STA    $6,Y
 D96F: C6 06       LDB    #$06
 D971: A6 2D       LDA    $D,Y
 D973: 81 02       CMPA   #$02
-D975: 27 02       BEQ    bankswitch_copy_d979
+D975: 27 02       BEQ    $D979
 D977: C6 07       LDB    #$07
 D979: E7 27       STB    $7,Y
 D97B: 86 01       LDA    #$01
 D97D: A7 A8 18    STA    $18,Y
 D980: 39          RTS
 D981: E6 88 15    LDB    $15,X
-D984: 26 63       BNE    bankswitch_copy_d9E9
+D984: 26 63       BNE    $D9E9
 D986: EC 19       LDD    -$7,X
 D988: 93 A2       SUBD   $A2
 D98A: C3 00 48    ADDD   #$0048
 D98D: 10 83 00 90 CMPD   #$0090
-D991: 22 ED       BHI    bankswitch_copy_d980
+D991: 22 ED       BHI    $D980
 D993: D6 21       LDB    $21
 D995: 5C          INCB
 D996: C4 1F       ANDB   #$1F
-D998: 26 E6       BNE    bankswitch_copy_d980
+D998: 26 E6       BNE    $D980
 D99A: D6 EB       LDB    $EB
 D99C: C4 03       ANDB   #$03
-D99E: 26 E0       BNE    bankswitch_copy_d980
+D99E: 26 E0       BNE    $D980
 D9A0: D6 A7       LDB    $A7
-D9A2: 27 DC       BEQ    bankswitch_copy_d980
+D9A2: 27 DC       BEQ    $D980
 D9A4: E6 88 14    LDB    $14,X
 D9A7: 58          ASLB
 D9A8: CE 51 F6    LDU    #$51F6
@@ -12353,11 +12325,11 @@ D9B8: 6C 88 15    INC    $15,X
 D9BB: BD 8E 2E    JSR    $8E2E
 D9BE: E6 88 14    LDB    $14,X
 D9C1: E7 3E       STB    -$2,Y
-D9C3: 27 09       BEQ    bankswitch_copy_d9CE
+D9C3: 27 09       BEQ    $D9CE
 D9C5: EC 16       LDD    -$A,X
 D9C7: 83 00 0A    SUBD   #$000A
 D9CA: ED 36       STD    -$A,Y
-D9CC: 20 07       BRA    bankswitch_copy_d9D5
+D9CC: 20 07       BRA    $D9D5
 D9CE: EC 16       LDD    -$A,X
 D9D0: C3 00 0A    ADDD   #$000A
 D9D3: ED 36       STD    -$A,Y
@@ -12401,7 +12373,7 @@ DA2D: ED 13       STD    -$D,X
 DA2F: A7 10       STA    -$10,X
 DA31: A7 88 10    STA    $10,X
 DA34: 34 60       PSHS   U,Y
-DA36: BD D9 4B    JSR    bankswitch_copy_d94B
+DA36: BD D9 4B    JSR    $D94B
 DA39: 35 60       PULS   Y,U
 DA3B: 10 AE C8 1C LDY    $1C,U
 DA3F: E6 A8 1B    LDB    $1B,Y
@@ -13228,18 +13200,7 @@ E16C: EF 03       STU    $3,X
 E16E: CC 01 00    LDD    #$0100
 E171: ED 14       STD    -$C,X
 E173: 39          RTS
-E174: 92 9B       SBCA   $9B
-E176: 93 9C       SUBD   $9C
-E178: 94 9D       ANDA   $9D
-E17A: 9C 94       CMPX   $94
-E17C: 9D 92       JSR    $92
-E17E: 9B 93       ADDA   $93
-E180: 92 9B       SBCA   $9B
-E182: 93 92       SUBD   $92
-E184: 9B 93       ADDA   $93
-E186: 92 9B       SBCA   $9B
-E188: 93 99       SUBD   $99
-E18A: 91 9A       CMPA   $9A
+
 E18C: BD 8E 2E    JSR    $8E2E
 E18F: EC 16       LDD    -$A,X
 E191: ED 36       STD    -$A,Y
@@ -14376,10 +14337,7 @@ EB36: 5F          CLRB
 EB37: ED 10       STD    -$10,X
 EB39: ED 13       STD    -$D,X
 EB3B: 39          RTS
-EB3C: 00 0E       NEG    $0E
-EB3E: 25 45       BCS    $EB85
-EB40: 51          NEGB
-EB41: 60 6A       NEG    $A,S
+
 EB43: BD 8D FC    JSR    $8DFC
 EB46: EE 0E       LDU    $E,X
 EB48: E6 02       LDB    $2,X

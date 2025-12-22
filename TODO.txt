@@ -1,3 +1,3 @@
-- implement PSHU/PULU using D4/U register memory (not too difficult, except that not necessary word aligned)
+- table of tables (special jump)
 - implement JSR ,X (debug real game) 617D
 - use audio mixer for that one!
