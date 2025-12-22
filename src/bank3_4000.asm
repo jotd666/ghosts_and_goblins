@@ -36,6 +36,7 @@
 4856: BD 50 25    JSR    $5025
 4859: 0F F0       CLR    $F0
 485B: 39          RTS
+l_485c:
 485C: 5D          TSTB
 485D: 2B 1E       BMI    $487D
 485F: D7 FD       STB    $FD
@@ -66,6 +67,7 @@
 4895: 8C 23 FF    CMPX   #$23FF
 4898: 23 F5       BLS    $488F
 489A: 39          RTS
+l_489b:
 489B: 34 40       PSHS   U
 489D: 58          ASLB
 489E: 25 20       BCS    $48C0
@@ -82,6 +84,7 @@
 48B7: E7 80       STB    ,X+
 48B9: 20 F0       BRA    $48AB
 48BB: 35 C0       PULS   U,PC
+l_48bd:
 48BD: 34 40       PSHS   U
 48BF: 58          ASLB
 48C0: 8E 48 DD    LDX    #$48DD
@@ -98,9 +101,12 @@
 48D9: E7 80       STB    ,X+
 48DB: 20 EE       BRA    $48CB
 
+l_5022:
 5022: D7 F1       STB    $F1                                         
 5024: 39          RTS                                                
 
+l_5025:
+5025: 34 14       PSHS   X,B                                        
 5027: C6 08       LDB    #$08
 5029: D7 FC       STB    $FC
 502B: 86 20       LDA    #$20
@@ -123,6 +129,7 @@
 504D: 4A          DECA
 504E: 26 F7       BNE    $5047
 5050: 39          RTS
+l_5051:
 5051: A6 A4       LDA    ,Y
 5053: 44          LSRA
 5054: 44          LSRA
@@ -512,6 +519,7 @@
 54FB: 0F F0       CLR    $F0
 54FD: 35 C0       PULS   U,PC
 
+l_54ff:
 54FF: 10 CE 20 00 LDS    #$2000
 5503: CE 00 00    LDU    #$0000
 5506: 4F          CLRA
@@ -598,14 +606,14 @@
 55B7: 8D 66       BSR    $561F
 55B9: 8E 40 00    LDX    #$4000
 55BC: 8D 61       BSR    $561F
-55BE: 8E 1A 00    LDX    #$1A00
+55BE: 8E 1A 00    LDX    #$1A00		; dest in RAM
 55C1: 10 8E 55 D1 LDY    #$55D1
 55C5: C6 4E       LDB    #$4E
 55C7: A6 A0       LDA    ,Y+
 55C9: A7 80       STA    ,X+
 55CB: 5A          DECB
 55CC: 26 F9       BNE    $55C7
-55CE: 7E 1A 00    JMP    $1A00
+55CE: 7E 1A 00    JMP    $1A00		; jump in RAM
 55D1: 10 8E 5F F0 LDY    #$5FF0
 55D5: 86 04       LDA    #$04
 55D7: 97 E4       STA    $E4
@@ -1361,8 +1369,8 @@ jump_table_5bce:
 	.word	$7A00 
 	.word	$7A0A
 
-5BDE: 5C          INCB
-5BDF: 1B          NOP
+l_5bdd:
+5BDD: BD 5C 1B    JSR    $5C1B                                       
 5BE0: BD 5D 5E    JSR    $5D5E
 5BE3: BD 5D 7C    JSR    $5D7C
 5BE6: 9E 09       LDX    $09

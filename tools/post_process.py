@@ -106,11 +106,25 @@ for i,line in enumerate(lines):
     # game_specific
     line = process_jump_table(line)
 
+    if address == 0x55CE:
+        line = "\tILLEGAL\n"  # not reachable anyway, part of ROM/RAM check code
     lines[i] = line
+
+
+
 
 with open(source_dir / f"{bankname}.68k","w") as fw:
     # game_specific: fill global symbols
-    for gs in ["l_4800","l_5025"]:
+    for gs in """l_4800
+l_5025
+l_485c
+l_489b
+l_48bd
+l_5022
+l_5025
+l_5051
+l_54ff
+l_5bdd""".splitlines():
         fw.write(f"\t.global\t{gs}\n")
     fw.write("\n")
     fw.writelines(lines)
@@ -128,6 +142,10 @@ for i,line in enumerate(lines):
 
     ###############################################
     # game_specific
+
+    # skip RAM/ROM check
+    if address == 0x6000:
+        line = change_instruction("jmp\tend_of_memory_test_607d",lines,i)
 
     # remove stray bcc/bcs issues by protecting SR or moving POP_SR
     if address in {0xec02}:
@@ -165,10 +183,22 @@ with open(source_dir / "data.inc","w") as fw:
 
 with open(source_dir / f"{gamename}.68k","w") as fw:
     # game_specific: fill global symbols
-    fw.write(f"""\t.include "data.inc"
-\t.global\tirq_xxxx
-\t.global\treset_yyyy
+    fw.write(f'\t.include "data.inc"\n')
+    # referenced in bank3 code
+    for gs in """l_68df
+l_6909
+l_691c
+l_791d
+l_7a0f
+l_7a05
+l_7a00
+l_7a0a
+l_7a14
+l_fef0""".splitlines():
+        fw.write(f"\t.global\t{gs}\n")
+    fw.write("\n")
 
+    fw.write("""
 l_ffff:
     *BREAKPOINT  "FFFF"
     illegal

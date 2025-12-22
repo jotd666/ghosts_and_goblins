@@ -1,17 +1,7 @@
 # this script allows to collect the remaining jump tables that the
 # other make_jump_tables.py didn't see for some reason
 
-tables = """A60E A612
-A658 A65C
-A824 A828
-A851 A855
-A8B4 A8BA
-BF57 BF5F
-C500 C504
-CC5B CC5F
-CCB2 CCB8
-CF4C CF50
-D2F3 D2F7
+tables = """beed befd
 """.lower().splitlines()
 
 with open("rom.bin","rb") as f:

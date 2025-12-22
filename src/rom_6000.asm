@@ -89,6 +89,7 @@ time_00aa = $aa
 6076: 10 8E 60 7D LDY    #$607D
 607A: 7E 54 FF    JMP    $54FF		; [bank_3]
 ; end of memory tests
+end_of_memory_test_607d:
 607D: C6 00       LDB    #$00
 607F: 1F 9B       TFR    B,DP
 6081: 4F          CLRA
@@ -213,6 +214,26 @@ jump_table_6188:
 	.word	$48BD 
 	.word	$5022
 
+622C: B6 30 03    LDA    $3003
+622F: 43          COMA
+6230: 97 40       STA    $40
+6232: B6 30 04    LDA    $3004
+6235: 43          COMA
+6236: 97 41       STA    $41
+6238: 39          RTS
+
+6239: D6 40       LDB    $40
+623B: 4F          CLRA
+623C: 58          ASLB
+623D: 49          ROLA
+623E: 97 DA       STA    $DA
+6240: 4F          CLRA
+6241: 58          ASLB
+6242: 49          ROLA
+6243: 97 0F       STA    $0F
+6245: 4F          CLRA
+6246: 58          ASLB
+6247: 49          ROLA
 6248: 97 52       STA    $52
 624A: CC 01 01    LDD    #$0101
 624D: FD 15 85    STD    $1585
@@ -2101,12 +2122,7 @@ jump_table_7151:
 7636: ED 88 12    STD    $12,X
 7639: 0C 0E       INC    $0E
 763B: 39          RTS
-763C: 2B 2D       BMI    $766B
-763E: 2B 2C       BMI    $766C
-7640: 2B 2C       BMI    $766E
-7642: 2B 2C       BMI    $7670
-7644: 29 2C       BVS    $7672
-7646: 29 2C       BVS    $7674
+
 7648: 8E 15 A2    LDX    #$15A2
 764B: E6 88 12    LDB    $12,X
 764E: 27 64       BEQ    $76B4
@@ -2385,6 +2401,7 @@ jump_table_7151:
 7917: 26 04       BNE    $791D
 7919: 0D 28       TST    $28
 791B: 27 12       BEQ    $792F
+l_791d:
 791D: 10 9E 14    LDY    $14
 7920: E7 A0       STB    ,Y+
 7922: 10 8C 01 7F CMPY   #$017F
@@ -2409,6 +2426,7 @@ jump_table_7151:
 7950: D6 28       LDB    $28
 7952: 10 26 FF EF LBNE   $7945
 7956: C6 35       LDB    #$35
+l_7958:
 7958: BD 79 1D    JSR    $791D
 795B: C6 FF       LDB    #$FF
 795D: 7E 79 1D    JMP    $791D
@@ -2476,14 +2494,19 @@ jump_table_7151:
 79F8: 7E 79 58    JMP    $7958
 79FB: C6 24       LDB    #$24
 79FD: 7E 79 15    JMP    $7915
+l_7a00:
 7A00: C6 25       LDB    #$25
 7A02: 7E 79 15    JMP    $7915
+l_7a05:
 7A05: C6 26       LDB    #$26
 7A07: 7E 79 15    JMP    $7915
+l_7a0a:
 7A0A: C6 27       LDB    #$27
 7A0C: 7E 79 15    JMP    $7915
+l_7a0f:
 7A0F: C6 2C       LDB    #$2C
 7A11: 7E 79 15    JMP    $7915
+l_7a14:
 7A14: C6 28       LDB    #$28
 7A16: 7E 79 15    JMP    $7915
 7A19: BD 7A 66    JSR    $7A66
@@ -6208,10 +6231,7 @@ jump_table_a066:
 9DB4: 8D 0F       BSR    $9DC5
 9DB6: C6 08       LDB    #$08
 9DB8: 20 E4       BRA    $9D9E
-9DBA: 01 01       NEG    $01
-9DBC: 00 00       NEG    $00
-9DBE: 00 CE       NEG    $CE
-9DC0: 9D CD       JSR    $CD
+
 9DC2: 7E 90 6B    JMP    $906B
 9DC5: CC 9D E5    LDD    #$9DE5
 9DC8: ED 84       STD    ,X
@@ -6258,10 +6278,7 @@ jump_table_a066:
 9E8F: E7 15       STB    -$B,X
 9E91: ED 10       STD    -$10,X
 9E93: 39          RTS
-9E94: 9C AC       CMPX   armour_flag_00ac
-9E96: 9E 9C       LDX    $9C
-9E98: 9D 75       JSR    $75
-9E9A: 9E 8B       LDX    $8B
+
 9E9C: 58          ASLB
 9E9D: CE 9E A2    LDU    #jump_table_9ea2
 9EA0: 6E D5       JMP    [B,U]        ; [indirect_jump]
@@ -7864,6 +7881,7 @@ AF6F: CC 03 00    LDD    #$0300
 AF72: ED 13       STD    -$D,X
 AF74: 39          RTS
 
+AFFC: EC 13       LDD    -$D,X                                      
 AFFE: 48          ASLA
 AFFF: CE B0 04    LDU    #jump_table_b004
 B002: 6E D6       JMP    [A,U]        ; [indirect_jump]
@@ -8049,10 +8067,7 @@ B1B5: ED 88 1E    STD    $1E,X
 B1B8: 6F 14       CLR    -$C,X
 B1BA: 6C 13       INC    -$D,X
 B1BC: 39          RTS
-B1BD: 0E 10       JMP    $10
-B1BF: 0A 8C       DEC    $8C
-B1C1: 07 08       ASR    $08
-B1C3: 04 B0       LSR    $B0
+
 B1C5: E6 14       LDB    -$C,X
 B1C7: 58          ASLB
 B1C8: CE B1 CD    LDU    #jump_table_b1cd		; only 1 valid entry!
@@ -9876,7 +9891,7 @@ C35C: 58          ASLB
 C35D: CE C3 62    LDU    #jump_table_c362
 C360: 6E D5       JMP    [B,U]	; [indirect_jump]
 
-C368: BD 79       JSR    $79A1                                        A1
+C368: BD 79       JSR    $79A1
 C36B: C6 3F       LDB    #$3F                                         
 C36D: E7 0A       STB    $A,X
 C36F: CC 01 00    LDD    #$0100
@@ -15814,6 +15829,8 @@ FEE9: 6A E4       DEC    ,S
 FEEB: 26 F2       BNE    $FEDF
 FEED: 32 62       LEAS   $2,S
 FEEF: 39          RTS
+
+l_fef0:
 FEF0: 34 06       PSHS   D
 FEF2: C6 10       LDB    #$10
 FEF4: 34 04       PSHS   B
@@ -15834,6 +15851,7 @@ FF0C: 26 EA       BNE    $FEF8
 FF0E: 32 63       LEAS   $3,S
 FF10: 39          RTS
 
+; FFFF is not really FFFF but address is bogus
 	; from bank 4
 jump_table_4540:
 	.word	$EF4A 
@@ -16353,7 +16371,7 @@ jump_table_ba13:
 	dc.w	$bab8	; $ba1b
 	dc.w	$bac5	; $ba1d
 	dc.w	$baea	; $ba1f
-	dc.w	$ba25	; $ba21
+	dc.w	$ffff	; $ba21 ba25 bogus
 	dc.w	$ffff	; $ba23
 jump_table_bb32:
 	dc.w	$bb3a	; $bb32
@@ -16949,3 +16967,9 @@ jump_table_cf4c:
 jump_table_d2f3:
 	.word	$d2f7	; $d2f3
 	.word	$d37a	; $d2f5
+jump_table_7792:
+	.word	$7796	; $7792
+	.word	$779d	; $7794
+jump_table_beed:
+	.word	$bef1	; $beed
+	.word	$bf1e	; $beef	
