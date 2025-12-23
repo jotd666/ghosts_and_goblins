@@ -1,51 +1,10 @@
 import re,pathlib
+from shared import *
 
 bankname = "bank3_code_4000"
 gamename = "main_code_6000"
 # post-conversion automatic patches, allowing not to change the asm file by hand
-tablere = re.compile("move.w\t#(\w*table_....),d(.)")
-jmpre = re.compile("(j..)\s+\[a,(.)\]")
 
-
-def remove_error(line):
-    if "ERROR" in line:
-        return ""
-    else:
-        raise Exception(f"No ERROR to remove in {line}")
-
-def remove_instruction(lines,i):
-    return change_instruction("",lines,i)
-
-def remove_continuing_lines(lines,i):
-    for j in range(i+1,i+4):
-        if "[...]" in lines[j]:
-            lines[j] = ""
-        else:
-            break
-
-
-def get_line_address(line):
-    try:
-        toks = line.split("|")
-        address = toks[1].strip(" [$").split(":")[0]
-        return int(address,16)
-    except (ValueError,IndexError):
-        return None
-
-def change_instruction(code,lines,i):
-    line = lines[i]
-    toks = line.split("|")
-    if len(toks)==2:
-        toks[0] = f"\t{code}"
-        remove_continuing_lines(lines,i)
-        return " | ".join(toks)
-    return line
-
-def remove_code(pattern,lines,i):
-    if pattern in lines[i]:
-        lines[i] = remove_instruction(lines,i)
-        remove_continuing_lines(lines,i)
-    return lines[i]
 
 def subt(m):
     tn = m.group(1)
@@ -58,8 +17,6 @@ def subt(m):
 \tlea\t{tn},a{rn}"""
     return rval
 
-dreg_dict = {'a':'d0','b':'d1'}
-areg_dict = {'x':'a2','y':'a3','u':'a4'}
 equates = []
 
 this_dir = pathlib.Path(__file__).absolute().parent
@@ -68,32 +25,12 @@ source_dir = this_dir / "../src"
 
 # game_specific: replace or remove I/O addresses
 input_dict = {
-#"sh_irqtrigger_w_1481":"",
+"bankswitch_3e00":"set_bank"
 }
 
 store_to_video = re.compile("GET_ADDRESS\s+0x2")   # game_specific
 
-def process_jump_table(line):
-    if "#jump_table_" in line:
-        # move.w  #jump_table...,dX => lea jump_table...,aX works as X ranges from 2 to 4
-        line = line.replace("move.w\t#","lea\t").replace(",d",",a")
 
-    if "indirect j" in line:
-        # grab original code in comments, dirty but works as long as converter
-        # presents it like this
-        comment = line.split('|')[1]
-        orig_inst = line.split(":")[1].split("]")[0].replace('[','')
-        # parse code: Jxx [R1,R2], R1 = A or B, R2 = X,Y,U
-        toks = orig_inst.split()
-
-        dreg,areg = toks[1].split(",")
-        dreg = dreg_dict[dreg]
-        areg = areg_dict[areg]
-        line = remove_error(line)
-        line = f"""\tadd.w\t{dreg},{dreg}
-\t{toks[0]}\t({areg},{dreg}.w)  |{comment}
-"""
-    return line
 
 # various dirty but at least automatic patches applying on the converted code
 with open(source_dir / f"{bankname}.s") as f:
@@ -142,13 +79,36 @@ for i,line in enumerate(lines):
 
     ###############################################
     # game_specific
+    # the 210+ jump tables!
+    line = process_jump_table(line)
 
     # skip RAM/ROM check
     if address == 0x6000:
-        line = change_instruction("jmp\tend_of_memory_test_607d",lines,i)
+        start_boot = i
+    elif address == 0x607d:
+        for j in range(start_boot,i):
+            lines[j] = remove_instruction(lines,j)
+    elif address == 0x65C4:
+        line = remove_instruction(lines,i)
+    elif address == 0x65fa:
+        line = change_instruction("rts",lines,i)
+    elif address == 0x6174:
+         line = remove_instruction(lines,i)
+         line = change_instruction("add.w\td6,d6",lines,i)
+    elif address == 0x617d:
+         line = change_instruction("jsr\t(a2,d6.w)",lines,i)
 
+    elif address == 0x712e:
+        # code must be reworked a lot because of table of tables
+        # that we need to convert to native 68k code
+        line = change_instruction("asl.b\t#2,d1",lines,i)
+        line += "\text.w\td1\n\tlea\ttable_of_jump_tables_7139,a2"
+        lines[i+1] = remove_instruction(lines,i+1)
+        lines[i+2] = change_instruction("move.l\t(a2,d1.w),a2",lines,i+2)
+    elif address == 0x7132:
+        line = remove_instruction(lines,i)
     # remove stray bcc/bcs issues by protecting SR or moving POP_SR
-    if address in {0xec02}:
+    elif address in {0xec02}:
         line = "\tPOP_SR   | restore C\n"+line
         lines[i+1] = remove_error(lines[i+1])
         lines[i-2] += "\tPUSH_SR  | save C\n"
@@ -169,13 +129,34 @@ for i,line in enumerate(lines):
         # remove DAA
         line = remove_instruction(lines,i)
 
-    line = process_jump_table(line)
+    # game uses $E2 to save/restore stack. We need to use a longword
+    if "unsupported instruction sts" in line:
+        line = change_instruction("move.l\tsp,stack_save",lines,i)
+    if address in {0x6652,0x668F,0x66CC,0x6710}:
+        line = change_instruction("move.l\tstack_save,sp",lines,i)
+        lines[i+1] = remove_instruction(lines,i+1)
+
 
     if "stray cmp" in line:
         # 1 useless CMP instruction
         line = remove_error(line)
     # end game_specific
     ###############################################
+
+    if "GET_ADDRESS" in line:
+        val = line.split()[1]
+        is_stb = ": stb" in line
+
+        osd_call = input_dict.get(val)
+        if osd_call is not None:
+            if osd_call:
+                line = change_instruction(f"jbsr\tosd_{osd_call}",lines,i)
+                if is_stb:
+                    line = f"\texg\td0,d1\n{line}\texg\td0,d1\n"
+            else:
+                line = remove_instruction(lines,i)
+            lines[i+1] = remove_instruction(lines,i+1)
+
     lines[i] = line
 
 with open(source_dir / "data.inc","w") as fw:
@@ -185,7 +166,9 @@ with open(source_dir / f"{gamename}.68k","w") as fw:
     # game_specific: fill global symbols
     fw.write(f'\t.include "data.inc"\n')
     # referenced in bank3 code
-    for gs in """l_68df
+    for gs in """irq_65c4
+reset_6000
+l_68df
 l_6909
 l_691c
 l_791d
@@ -194,6 +177,7 @@ l_7a05
 l_7a00
 l_7a0a
 l_7a14
+l_7958
 l_fef0""".splitlines():
         fw.write(f"\t.global\t{gs}\n")
     fw.write("\n")
