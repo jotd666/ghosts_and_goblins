@@ -98,6 +98,9 @@ for i,line in enumerate(lines):
     elif address == 0x617d:
          line = change_instruction("jsr\t(a2,d6.w)",lines,i)
 
+    ###################################################
+    # 2 table of tables to rework almost completely
+    # this mixes with table rework and is quite a mess but works
     elif address == 0x712e:
         # code must be reworked a lot because of table of tables
         # that we need to convert to native 68k code
@@ -105,8 +108,22 @@ for i,line in enumerate(lines):
         line += "\text.w\td1\n\tlea\ttable_of_jump_tables_7139,a2"
         lines[i+1] = remove_instruction(lines,i+1)
         lines[i+2] = change_instruction("move.l\t(a2,d1.w),a2",lines,i+2)
-    elif address == 0x7132:
+    elif address == 0x9c85:
+        # code must be reworked a lot because of table of tables
+        # that we need to convert to native 68k code
+        line = change_instruction("asl.b\t#2,d1",lines,i)
+        line += "\text.w\td1\n\tlea\ttable_of_jump_tables_9c98,a4"
+        lines[i+1] = remove_instruction(lines,i+1)
+        lines[i+2] = remove_instruction(lines,i+2)
+        lines[i+2] = "\tmove.l\t(a4,d1.w),a4"   # will be side by side with comment
+    elif address in {0x7132,0x9C89}:
         line = remove_instruction(lines,i)
+    elif address in {0x9c8e}:
+        # add sign extend + optimize
+        lines[i-1] = "\text.w\td0\n"+change_instruction("add.w\td0,d0",lines,i-1)
+
+    ###################################################
+
     # remove stray bcc/bcs issues by protecting SR or moving POP_SR
     elif address in {0xec02}:
         line = "\tPOP_SR   | restore C\n"+line

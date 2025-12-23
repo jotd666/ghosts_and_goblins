@@ -59,7 +59,7 @@ def process_jump_table(line):
         dreg = dreg_dict[dreg]
         areg = areg_dict[areg]
         line = remove_error(line)
-        line = f"""\tadd.w\t{dreg},{dreg}
+        line = f"""\text.w\t{dreg}\n\tadd.w\t{dreg},{dreg}
 \t{toks[0]}\t({areg},{dreg}.w)  |{comment}
 """
     return line

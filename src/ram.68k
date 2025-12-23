@@ -1,9 +1,10 @@
 	.include	"options.inc"
 
 	.global infinite_lives_flag
+	.global infinite_time_flag
 
 	.global invincible_flag
-	.global start_level
+	.global start_level_flag
 	.global vb_ticks_count
 	.global break_at_startup_flag
 	.global log_ptr
@@ -60,7 +61,8 @@ m6809_direct_page_pointer:
 
 skip_intro_flag:
 	.byte	0
-
+start_level_flag:
+	.byte	0
 invincible_flag:
 	.byte	0
 infinite_lives_flag:
@@ -90,11 +92,6 @@ no_sync_flag:
 break_at_startup_flag:
 	.byte	0
 
-* maybe sound-related?? maybe useless
-
-start_level:
-	.byte	0
-	
 
 
 	

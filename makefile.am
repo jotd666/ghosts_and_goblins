@@ -1,4 +1,4 @@
-PROGNAME = digdug2
+PROGNAME = GhostsNGoblins
 MAIN_AGA = ..\$(PROGNAME)_aga
 MAIN_OCS = ..\$(PROGNAME)_ocs
 AMIGA_SHELL = ..\$(PROGNAME)
@@ -32,10 +32,11 @@ WHDASM = vasmm68k_mot -DDATETIME -I$(HDBASE)/amiga39_JFF_OS/include -I$(WHDBASE)
 
 
 # leave MAIN_OBJ first
-AGA_OBJS = amiga_aga.o sounds.o amiga_shared.o $(PROGNAME)_020.o ram.o graphics_aga.o rom.o vbr.o ReadJoyPad.o ptplayer.o 
-OCS_OBJS = amiga_ocs.o sounds.o amiga_shared.o $(PROGNAME)_000.o ram.o graphics_ocs.o rom.o vbr.o ReadJoyPad.o ptplayer.o 
+MEM_OBJS = rom.o ram.o bank0.o bank1.o bank2.o bank3.o bank4.o
+AGA_OBJS = amiga_aga.o sounds.o main_code_6000_020.o bank3_code_4000_020.o $(MEM_OBJS) graphics_aga.o vbr.o ReadJoyPad.o ptplayer.o 
+OCS_OBJS = amiga_ocs.o sounds.o $(PROGNAME)_000.o ram.o graphics_ocs.o rom.o vbr.o ReadJoyPad.o ptplayer.o 
 
-all: $(AMIGA_SHELL) $(MAIN_AGA) $(MAIN_OCS) $(WHDLOADER_OCS) $(WHDLOADER_OCS_CHIP) $(WHDLOADER_AGA) $(WHDLOADER_AGA_CHIP) $(AMIGASRC)/aga/graphics.68k $(AMIGASRC)/sounds.68k
+all: $(MAIN_AGA) $(WHDLOADER_AGA) $(WHDLOADER_AGA_CHIP) $(AMIGASRC)/aga/graphics.68k $(AMIGASRC)/sounds.68k
  
 $(AMIGA_SHELL): shell.o
 	$(GCC_BIN)/m68k-amigaos-ld $(OPT_RELEASE_LINK) -o $(AMIGA_SHELL) shell.o
@@ -46,12 +47,14 @@ clean:
 	
 shell.o: $(AMIGASRC)/shell.68k
 	$(ASM_000) -I$(AMIGASRC) -I$(AMIGASRC)/mit_includes $(AMIGASRC)/shell.68k -o shell.o
-$(AMIGASRC)/aga/graphics.68k: $(ASSETS)/convert_graphics_aga.py
+#$(AMIGASRC)/graphics_aga.68k: $(ASSETS)/convert_graphics_aga.py
+$(AMIGASRC)/graphics_aga.68k:
 	cmd /c $(ASSETS)\convert_graphics_aga.py
 $(AMIGASRC)/ocs/graphics.68k: $(ASSETS)/convert_graphics_ocs.py
 	cmd /c $(ASSETS)\convert_graphics_ocs.py
 
-$(AMIGASRC)/sounds.68k: $(ASSETS)/convert_sounds.py 
+#$(AMIGASRC)/sounds.68k: $(ASSETS)/convert_sounds.py 
+$(AMIGASRC)/sounds.68k:
 	cmd /c $(ASSETS)\convert_sounds.py
 	del sound_entries.o sounds.o
 	
@@ -64,12 +67,26 @@ ram.o: ram.68k options.inc
 	$(ASM) ram.68k -o ram.o
 rom.o: rom.68k
 	$(ASM) rom.68k -o rom.o
-$(PROGNAME)_020.o: $(PROGNAME).68k options.inc include.inc sounds.inc data.inc
-	$(ASM_020) $(PROGNAME).68k -o $(PROGNAME)_020.o
+bank0.o: bank0.68k
+	$(ASM) bank0.68k -o bank0.o
+bank1.o: bank1.68k
+	$(ASM) bank1.68k -o bank1.o
+bank2.o: bank2.68k
+	$(ASM) bank2.68k -o bank2.o
+bank3.o: bank3.68k
+	$(ASM) bank3.68k -o bank3.o
+bank4.o: bank4.68k
+	$(ASM) bank4.68k -o bank4.o
+	
+main_code_6000_020.o: main_code_6000.68k options.inc include.inc data.inc
+	$(ASM_020) main_code_6000.68k -o main_code_6000_020.o
+bank3_code_4000_020.o: bank3_code_4000.68k options.inc include.inc 
+	$(ASM_020) bank3_code_4000.68k -o bank3_code_4000_020.o
+	
 $(PROGNAME)_000.o: $(PROGNAME).68k options.inc include.inc sounds.inc data.inc
 	$(ASM_000) $(PROGNAME).68k -o $(PROGNAME)_000.o
-amiga_aga.o: $(AMIGASRC)/amiga.68k options.inc include.inc data.inc $(AMIGASRC)/ReadJoyPad.i $(AMIGASRC)/aga/palette.68k $(AMIGASRC)/aga/graphics.68k $(AMIGASRC)/sound_entries.68k  $(AMIGASRC)/scroll_table_64.68k
-	$(ASM_020) -I$(AMIGASRC)/aga -I$(AMIGASRC) -I$(AMIGASRC)/mit_includes $(AMIGASRC)/amiga.68k -o amiga_aga.o
+amiga_aga.o: $(AMIGASRC)/amiga.68k options.inc include.inc data.inc $(AMIGASRC)/ReadJoyPad.i $(AMIGASRC)/palette.68k $(AMIGASRC)/graphics_aga.68k $(AMIGASRC)/sound_entries.68k  $(AMIGASRC)/scroll_table_64.68k
+	$(ASM_020) -I$(AMIGASRC) -I$(AMIGASRC)/mit_includes $(AMIGASRC)/amiga.68k -o amiga_aga.o
 amiga_ocs.o: $(AMIGASRC)/amiga.68k options.inc include.inc data.inc $(AMIGASRC)/ReadJoyPad.i $(AMIGASRC)/ocs/palette.68k $(AMIGASRC)/sound_entries.68k $(AMIGASRC)/scroll_table_16.68k
 	$(ASM_000) -I$(AMIGASRC)/ocs -I$(AMIGASRC) -I$(AMIGASRC)/mit_includes $(AMIGASRC)/amiga.68k -o amiga_ocs.o
 amiga_shared.o: $(AMIGASRC)/amiga_shared.68k options.inc  data.inc $(AMIGASRC)/sound_entries.68k $(AMIGASRC)/ReadJoyPad.i
@@ -82,19 +99,19 @@ sounds.o: $(AMIGASRC)/sounds.68k
 	$(ASM) -I$(AMIGASRC) $(AMIGASRC)/sounds.68k -o sounds.o
 ReadJoyPad.o: $(AMIGASRC)/ReadJoyPad.68k amiga/ReadJoyPad.i
 	$(ASM) -I$(AMIGASRC) -I$(AMIGASRC)/mit_includes $(AMIGASRC)/ReadJoyPad.68k -o ReadJoyPad.o
-graphics_aga.o: $(AMIGASRC)/aga/graphics.68k
-	$(ASM) $(AMIGASRC)/aga/graphics.68k -o graphics_aga.o
+graphics_aga.o: $(AMIGASRC)/graphics_aga.68k
+	$(ASM) $(AMIGASRC)/graphics_aga.68k -o graphics_aga.o
 graphics_ocs.o: $(AMIGASRC)/ocs/graphics.68k
 	$(ASM) $(AMIGASRC)/ocs/graphics.68k -o graphics_ocs.o
 
 
-$(WHDLOADER_AGA) : $(AMIGASRC)/aga/$(PROGNAME)HD.s
+$(WHDLOADER_AGA) : $(AMIGASRC)/$(PROGNAME)HD.s
 	wdate.py> datetime
-	$(WHDASM) -o $(WHDLOADER_AGA) $(AMIGASRC)/aga/$(PROGNAME)HD.s
+	$(WHDASM) -o $(WHDLOADER_AGA) $(AMIGASRC)/$(PROGNAME)HD.s
 	
-$(WHDLOADER_AGA_CHIP) : $(AMIGASRC)/aga/$(PROGNAME)HD.s
+$(WHDLOADER_AGA_CHIP) : $(AMIGASRC)/$(PROGNAME)HD.s
 	wdate.py> datetime
-	$(WHDASM) -DCHIP_ONLY -o $(WHDLOADER_AGA_CHIP) $(AMIGASRC)/aga/$(PROGNAME)HD.s
+	$(WHDASM) -DCHIP_ONLY -o $(WHDLOADER_AGA_CHIP) $(AMIGASRC)/$(PROGNAME)HD.s
 
 $(WHDLOADER_OCS) : $(AMIGASRC)/ocs/$(PROGNAME)HD.s
 	wdate.py> datetime
