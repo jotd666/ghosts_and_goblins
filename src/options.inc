@@ -21,7 +21,7 @@ ROM_START = 0x6000
 
 	.else
 	
-LOG_BUFFER_SIZE = 0x80000
+LOG_BUFFER_SIZE = 0x8000
 	* amiga specific
 	.macro	BREAKPOINT comment
 	move.l	a0,-(a7)

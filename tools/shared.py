@@ -56,11 +56,11 @@ def process_jump_table(line):
         toks = orig_inst.split()
 
         dreg,areg = toks[1].split(",")
-        dreg = dreg_dict[dreg]
+
         areg = areg_dict[areg]
         line = remove_error(line)
-        line = f"""\text.w\t{dreg}\n\tadd.w\t{dreg},{dreg}
-\t{toks[0]}\t({areg},{dreg}.w)  |{comment}
+        macro = f"{toks[0].upper()}_{dreg.upper()}_INDEXED"
+        line = f"""\t{macro}\t{areg}  |{comment}
 """
     return line
 

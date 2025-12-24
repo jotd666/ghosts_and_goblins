@@ -26,6 +26,11 @@ armour_flag_00ac = $ac
 nb_lives_0060 = $60
 time_00aa = $aa
 stack_save_00e2 = $e2
+system_3000 = $3000
+p1_3001 = $3001
+p2_3002 = $3002
+dsw1_3003 = $3003
+dsw2_3004 = $3004
 
 ; horrible code when it comes to jump tables
 ; there are more than 200+ jump tables, that had to be
@@ -217,10 +222,10 @@ jump_table_6188:
 	.word	$48BD 
 	.word	$5022
 
-622C: B6 30 03    LDA    $3003
+622C: B6 30 03    LDA    dsw1_3003
 622F: 43          COMA
 6230: 97 40       STA    $40
-6232: B6 30 04    LDA    $3004
+6232: B6 30 04    LDA    dsw2_3004
 6235: 43          COMA
 6236: 97 41       STA    $41
 6238: 39          RTS
@@ -698,13 +703,13 @@ irq_65c4:
 677B: A7 A2       STA    ,-Y
 677D: 5A          DECB
 677E: 26 F9       BNE    $6779
-6780: B6 30 00    LDA    $3000
+6780: B6 30 00    LDA    system_3000
 6783: 43          COMA
 6784: 97 42       STA    $42
-6786: B6 30 01    LDA    $3001
+6786: B6 30 01    LDA    p1_3001
 6789: 43          COMA
 678A: 97 46       STA    $46
-678C: B6 30 02    LDA    $3002
+678C: B6 30 02    LDA    p2_3002
 678F: 43          COMA
 6790: 97 48       STA    $48
 6792: 39          RTS

@@ -89,13 +89,8 @@ OPT_ENABLE_LOGGING = 1
 OPT_DEBUG_BANKSWITCH = 0
 	.endif
 	
-* neat trick to avoid drawing the net/poles sprites continuously (there are a lot of them)
-* instead: draw only once per screen (first time) and draw it in the restore buffer too
-* (draw it 2/3 times only once, then it's free to display it)
-* the net is mostly on the background except for some rare cases where we reactivate sprite
-* display of the net, but only for a short time (and only net, not poles)
-OPT_NET_BACKGROUND_TRICK = 1
-OPT_ENABLE_DOUBLE_BUFFERING = 1
+
+OPT_ENABLE_DOUBLE_BUFFERING = 0
 
 _custom = 0xDFF000
 
@@ -183,7 +178,8 @@ c_address_of_continue_2949 = 0x2949
 	.global		_dosbase
 	.global		cheat_used
 * osd layer		
-	.global osd_interrupt_control
+	.global osd_enable_interrupts
+	.global osd_disable_interrupts
 	.global osd_break		| for debug	
 	.global osd_blitz		| for debug
 	.global osd_read_dsw1
@@ -660,8 +656,10 @@ demo_game:
 	
 	jbsr	cache_tiles_address
 
-	moveq	#1,d0
-	jbsr	osd_interrupt_control
+	moveq	#0,d0
+	jbsr	osd_set_bank
+	
+	jbsr	osd_enable_interrupts
 	move.l	bank_base,a5
 	jmp		reset_6000								| pass control to the mpatrol core
 	
@@ -1900,12 +1898,10 @@ osd_set_irq_return_address:
 
 * 60Hz VBLANK interrupt (also keyboard)
 * only called at bootup, not from interrupts (at least!!)
-osd_interrupt_control:
-	tst.b	d0
-	jeq		0f
+osd_enable_interrupts:
 	move.w	#0xC038,_custom+intena
 	rts
-0:
+osd_disable_interrupts:
 	move.w	#0x0030,_custom+intena
 	rts
 	
@@ -1937,15 +1933,21 @@ osd_sound_command:
 	
 
 	
-* set bank and y scroll
+* set bank
 * < D0.B bank 0-4
-
+* > A1 bank pointer minus 0x4000
 osd_set_bank:
 	cmp.b	current_rom_bank,d0
-	jeq		0f
+	jeq		1f
 	movem.l	d0/a0,-(a7)
 	move.b	d0,current_rom_bank
 	and.w	#0xFF,d0
+	.ifndef	RELEASE
+	cmp.b	#5,d0
+	jcs		0f
+	BREAKPOINT	"illegal bank index"
+0:
+	.endif
 	lea		bank_table,a0
 	.ifdef	NO68020
 	add.w	d0,d0
@@ -1956,7 +1958,7 @@ osd_set_bank:
 	.endif
 
 	movem.l	(a7)+,d0/a0
-0:
+1:
 	rts
 
 * a0=screen address (preserved)
@@ -3161,7 +3163,7 @@ get_file_size:
 	.ifne	OPT_ENABLE_LOGGING
 
 osd_get_last_known_pc:
-	move.w	last_known_m6502_pc,d6
+	move.w	last_known_m6809_pc,d6
 	rts
 	
 	
@@ -3173,28 +3175,28 @@ osd_cpu_logging_control:
 
 osd_log_cpu:
 
-	move.w	(6,a7),last_known_m6502_pc
+	move.w	(6,a7),last_known_m6809_pc
 	move.w	(6,a7),0x100
 
 
 	move.l	a6,-(a7)
-	cmp.w	#0x4000,last_known_m6502_pc
+	cmp.w	#0x4000,last_known_m6809_pc
 	jcs		0f
-	cmp.w	#0x8000,last_known_m6502_pc
+	cmp.w	#0x8000,last_known_m6809_pc
 	jcc		0f
 	* 4000-8000 PC: check if bank 0 is set
 	tst.b	current_rom_bank
 	jeq		0f
 	* we could have missed one bankswitch
 	move.w	last_bankswitch_pc,d5
-	move.w  last_known_m6502_pc,d4
+	move.w  last_known_m6809_pc,d4
 *	.ifndef	RELEASE
 *	tst.b	disable_bank_0_check
 *	jne		0f
 *	BREAKPOINT		"running code in 4000-8000 when bank doesn't match"
 *	ILLEGAL
-*0:
 *	.endif
+0:
 	* check if cpu log is enabled
 	tst.b	cpu_log_enable
 	jeq		445f
@@ -3240,6 +3242,17 @@ osd_dump_logs:
 	
     movem.l (a7)+,d0-a6
 	move.w	(a7)+,SR
+	rts
+
+* zero all registers but 6809 stack pointer
+cpu_init:
+	moveq	#0,d0
+	moveq	#0,d1
+	moveq	#0,d2
+	moveq	#0,d3
+	moveq	#0,d4
+	moveq	#0,d6
+	moveq	#0,d7
 	rts
 
 save_cpu_log:
@@ -3339,7 +3352,7 @@ music_pattern:
 	.word	0
 music_tick:
 	.word	0
-last_known_m6502_pc:
+last_known_m6809_pc:
 	.word	0xFFFF
 last_bankswitch_pc:
 	.word	0xFFFF
@@ -3374,33 +3387,7 @@ palette_file_name:
 palette_file_name_end:
 	.skip	30
 
-level1_context:
-	.asciz	"level_1"
-level2_context:
-	.asciz	"level_2"
-level3_context:
-	.asciz	"level_3"
-level4_context:
-	.asciz	"level_4"
-level5_context:
-	.asciz	"level_5"
-intro_context:
-	.asciz	"intro"
-map_context:
-	.asciz	"map"
-
 	.align	2
-
-* there are 8 possible contexts (prom banks)
-context_table:
-	.long	level1_context     | 0 daytona
-	.long	level2_context     | 1 new york
-	.long	level3_context     | 2 los angeles
-	.long	level4_context     | 3 hawai
-	.long	level5_context     | 4 aircraft
-	.long	map_context     | 5 map context
-	.long	0     | 6
-	.long	intro_context     | 7
 
 
 old_intena:
