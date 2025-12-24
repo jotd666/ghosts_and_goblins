@@ -27,8 +27,8 @@
 * < d1.l = raw joy[01]dat value read from input port
 *
 
-	.include	"cia.i"
-	.include	"custom.i"
+	.include	"hardware/cia.i"
+	.include	"hardware/custom.i"
 	.include	"ReadJoypad.i"
 
 

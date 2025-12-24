@@ -32,8 +32,8 @@
 
 	.align	4
 
-ram_buffer:
 	.ifeq	OPT_ALIGNED_MEMORY
+ram_buffer:
 	.skip	0x4000		| stops at 0x3000
 rom_bank:
 	.skip	0x2000

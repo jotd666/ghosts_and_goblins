@@ -21,6 +21,7 @@
 	BITDEF	JP,BTN_RED,0x16
 	BITDEF	JP,BTN_BLU,0x17
 	
+	.global	_detect_controller_types_nowait
 	.global	_detect_controller_types
 	.global	_read_joystick
 	.global	controller_joypad_0

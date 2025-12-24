@@ -34,7 +34,6 @@ NB_PLAYFIELD_PLANES = 6  | this is externally defined!!
 	.endif
 
 
-
 BORDERBLANK = 1
 
 PREVIOUS_SPRITE_SIZE = 8
@@ -608,30 +607,42 @@ demo_game:
 		bsr			platform_init					| amiga-specific init
 		
 0:	
-	* compute ram start
-	lea		ram_buffer,a6
-	.ifndef	RELEASE
-	* align so real addresses are $xxxx0yyy
-	* and lower 16-bit match original RAM offsets
+	.ifne	OPT_ALIGNED_MEMORY
+	* compute ram start for dev mode
+	* align so real addresses LSW match actual arcade addresses
+	* and lower 16-bit match original RAM & even ROM offsets
+	*
+	lea		dev_ram_buffer,a6
 	move.l	a6,d0
 	clr.w	d0
-	add.l	#0x10000,d0
-	move.l	d0,a6
-	move.l	a6,ram_start_0000
+	move.l	d0,d1
+	add.l	#0x10000+RAM_START,d1
+	move.l	d1,ram_start_0000		| memory (0x1000-0xFFFF)
+	
+	
+	* relocate rom tables just after shared RAM
+	* memory is contiguous (only 1 segment of memory RAM+ROM)
+	* and 6809 memory access is way faster (no bank switching)
+	
+	* copy the ROM data
+	add.l	#ROM_START-RAM_START,d1
+	move.l 	d1,a1
+	move.w	#(0x10000-ROM_START)/4-1,d0
+	.else
+	* release mode
+
+	* copy the ROM data after RAM
+	lea		rom_buffer,a1
+	move.w	#(0x10000-ROM_START)/4-1,d0
 	.endif
 	
-	* install RAM 0 in 0x4000, we may as well use that space
-
-	jbsr	install_bank_0
-	
-	* copy ROM at the end. Memory is one big block now
-	lea	rom_6000,a0
-	move.l	a6,a1
-	add.l	#0x6000,a1
-	move.w	#(0x10000-0x6000)/4-1,d0
+	lea		rom_base,a0
 0:
 	move.l	(a0)+,(a1)+
 	dbf		d0,0b
+	* install bank 0 in 0x4000, we may as well use that space
+
+	jbsr	install_bank_0
 	
 	
 	.ifndef	RELEASE
@@ -661,27 +672,21 @@ dump_and_quit:
 	.endif
 	
 
-copy_bank_1:
-	move.l	#bank1_4000-0x4000,bank_base
-	move.b	#1,current_rom_bank
-	rts
-copy_bank_0:
-	move.l	a6,bank_base
-	clr.b	current_rom_bank
-	rts
 	
 * < A6: memory base
 install_bank_0:
 	movem.l	a0/a1/d0,-(a7)
 	lea	bank0_4000,a0
 	lea		(0x4000,a6),a1
-	move.w	#0xFFF,d0
+	move.w	#0x7FF,d0
 0:
 	move.l	(a0)+,(a1)+
 	dbf		d0,0b
+	
+	move.l	a6,bank_table	| first entry is RAM base
 	movem.l	(a7)+,a0/a1/d0
 	
-	jbra	copy_bank_0
+	rts
 
 call_nmi:
 	move.l	bank_base,a5
@@ -1620,6 +1625,14 @@ hw_sprite_allocated_frames:
 current_hw_sprite:
 	.word	0
 
+bank_base:
+	.long	0
+bank_table:
+	.long	0
+	.long	bank1_4000-0x4000
+	.long	bank2_4000-0x4000
+	.long	bank3_4000-0x4000
+	.long	bank4_4000-0x4000
 	
 bob_previous_positions_1:
 	.fill NB_TARGET_SPRITES*PREVIOUS_SPRITE_SIZE , 1 , -1
@@ -1922,30 +1935,28 @@ osd_sound_command:
 
 	
 	
-	.macro		SET_BANK	arg
-	move.b	d4,bank_value
-	cmp.b	#\arg,current_rom_bank
-	jeq		0f
-	.ifne	OPT_DEBUG_BANKSWITCH
-	moveq.l	#\arg,d3
-	move.w	last_bankswitch_pc,d4
-	move.w	last_known_m6809_pc,d5
-	BREAKPOINT	"setting bank \arg, prev bspc in d4, curpc in d5"
-	.endif
-	*COLOR0_FLASH	((\arg+1)*7)<<0x5
-	jbsr	copy_bank_\arg
-	.ifndef	RELEASE
-	move.w	last_known_m6809_pc,last_bankswitch_pc
-	.endif
-	move.l	bank_base,a5		| update bank pointer
-0:
-	rts	
-	.endm
+
 	
 * set bank and y scroll
+* < D0.B bank 0-4
 
 osd_set_bank:
-	BREAKPOINT	"set_bank!"
+	cmp.b	current_rom_bank,d0
+	jeq		0f
+	movem.l	d0/a0,-(a7)
+	move.b	d0,current_rom_bank
+	and.w	#0xFF,d0
+	lea		bank_table,a0
+	.ifdef	NO68020
+	add.w	d0,d0
+	add.w	d0,d0
+	move.l	(a0,d0.w),a1
+	.else
+	move.l	(a0,d0.w*4),a1
+	.endif
+
+	movem.l	(a7)+,d0/a0
+0:
 	rts
 
 * a0=screen address (preserved)
@@ -2383,7 +2394,6 @@ osd_read_p1_inputs:
 	tst.b	(1,a0)		| "1" key like in MAME
 	beq.b	0f
 	bclr	#BIT_START_1P,d0
-	move.b	#1,net_needs_drawing	| kludge as "continue" screen redraws the field. Starting resets flag!
 0:
 	jbsr		is_game_playing
 	jne	0f
@@ -2392,7 +2402,6 @@ osd_read_p1_inputs:
 	btst	#JPB_BTN_UP,d1		| "1" key like in MAME
 	beq.b	0f
 	bclr	#BIT_START_1P,d0
-	move.b	#1,net_needs_drawing
 0:
 
 	movem.l	(a7)+,a0/d1
@@ -2405,7 +2414,6 @@ osd_read_p2_inputs:
 	tst.b	(2,a0)		| "2" key like in MAME
 	beq.b	0f
 	bclr	#BIT_START_2P,d0
-	move.b	#1,net_needs_drawing
 0:	
 	jbsr		is_game_playing
 	jne	0f
@@ -2414,51 +2422,11 @@ osd_read_p2_inputs:
 	btst	#JPB_BTN_DOWN,d1		| "2" key like in MAME
 	beq.b	0f
 	bclr	#BIT_START_2P,d0
-	move.b	#1,net_needs_drawing
 0:	
 
 	move.l	(a7)+,a0
 	rts
 	
-osd_set_scrollx_hi:
-	movem.w	d0/d1,-(a7)
-	move.b	d0,d1
-	and.w	#2,d0
-	lsl.w	#7,d0
-	move.w	d0,scroll_x_hi
-	move.b	d1,d0
-	lsr.b	#2,d0
-	and.b	#7,d0
-	* this is tiles prom bank number
-	cmp.b	current_tile_prom_bank,d0
-	jeq		0f
-	* time to change palette (means: change context)
-	move.b	d0,current_tile_prom_bank
-	jbsr	load_tile_data
-0:
-	move.b	d1,d0
-	lsr.b	#5,d0
-	and.b	#7,d0
-	* this is sprites prom bank number
-	cmp.b	current_sprite_prom_bank,d0
-	jeq		0f
-	* ATM we're trying to avoid separate sprite palette, let's see
-	* if we can pull it off given that there are only sprites on 4
-	* different tilesets (4 fields) so coupling is probably OK
-	*BREAKPOINT	"sprites prom shift"
-	move.b	d0,current_sprite_prom_bank
-0:
-	
-	movem.w	(a7)+,d0/d1
-	
-	rts
-osd_set_scrollx_lo:
-	move.b	d0,scroll_x_lo+1
-	rts
-osd_set_scrolly_lo:
-	move.b	d0,scroll_y+1
-	rts
-
 
 	
 	.ifne	OPT_ENABLE_LOGGING
@@ -2807,7 +2775,7 @@ handle_keyboard:
 	* last life, if killed, direct game over
 	cmp.b	#0x57,d0	| F8 key: set time at 0
 	bne.b	0f
-	jbsr	no_more_time
+	nop
 
 0:
 	cmp.b	#0x58,d0	| F9 key crashes game (restarts whdload)
@@ -3091,16 +3059,16 @@ osd_sound_start:
 	bsr		force_sound_stop
     lea _custom,a6
  	movem.l	d0/a0,-(a7)
-	lea	tunes_table,a0
-	lsr.w	#1,d0		| times 4 not 8
-	move.l	(a0,d0.w),d0	| filename
-	jeq		no_tune
-	move.l	d0,a0
-	move.l	music_memory_ptr,a1
-	move.l	_resload,a2
-	jbsr	resload_LoadFileDecrunch(a2)
-	
-	move.l	music_memory_ptr,a0
+*	lea	tunes_table,a0
+*	lsr.w	#1,d0		| times 4 not 8
+*	move.l	(a0,d0.w),d0	| filename
+*	jeq		no_tune
+*	move.l	d0,a0
+*	move.l	music_memory_ptr,a1
+*	move.l	_resload,a2
+*	jbsr	resload_LoadFileDecrunch(a2)
+*	
+*	move.l	music_memory_ptr,a0
 	moveq	#0,d0
     sub.l   a1,a1		| samples are in the module
     jsr _mt_init
@@ -3220,13 +3188,13 @@ osd_log_cpu:
 	* we could have missed one bankswitch
 	move.w	last_bankswitch_pc,d5
 	move.w  last_known_m6502_pc,d4
-	.ifndef	RELEASE
-	tst.b	disable_bank_0_check
-	jne		0f
-	BREAKPOINT		"running code in 4000-8000 when bank doesn't match"
-	ILLEGAL
-0:
-	.endif
+*	.ifndef	RELEASE
+*	tst.b	disable_bank_0_check
+*	jne		0f
+*	BREAKPOINT		"running code in 4000-8000 when bank doesn't match"
+*	ILLEGAL
+*0:
+*	.endif
 	* check if cpu log is enabled
 	tst.b	cpu_log_enable
 	jeq		445f
@@ -3283,7 +3251,7 @@ save_cpu_log:
 	move.l	log_ptr,a0
 	* add RAM & ROM base in the end
 	move.l	a6,(a0)+
-	move.l	#rom_6000,(a0)+
+	move.l	#rom_base,(a0)+
 	addq	#8,d0
 	lea		cpu_log_name(pc),a0
 	jbsr	resload_SaveFile(a2)
@@ -3344,20 +3312,12 @@ lost_mod:
 game_over_mod:
 	.asciz	"game_over.mod"
 	
-* game sets prom bank 2 then switches to 7 at bootup
-* prom bank 2 is not used at this moment, let's skip
-current_tile_prom_bank:
-	.byte	2
-current_sprite_prom_bank:
-	.byte	0
 difficulty_dsw:
 	.byte	0
-net_needs_drawing:
-	.byte	0
+
 detect_controllers:
 	.byte	0
-net_in_front_of_right_objects:
-	.byte	0
+
 music_playing:
 	.byte	0
 dont_store_blitted_coords:
@@ -3576,26 +3536,15 @@ playfield_drawed_screen_ptr:
 	.long	0
 playfield_displayed_screen_ptr:
 	.long	0
-public_memory_current_ptr:
-	.long	0
-chip_memory_current_ptr:
-	.long	0
-chip_memory_start_ptr:
-	.long	chip_memory_block
+
 palette_ptr:
 	.long	0
-music_memory_ptr:
-	.long	0
+
 tiles_ptr:
 	.long	0
 bobs_ptr:
 	.long	0
-work_tiles_ptr:
-	.long	0
-work_bobs_ptr:
-	.long	0
-net_ptr:
-	.long	0
+
 
 
 sprite_size_table:

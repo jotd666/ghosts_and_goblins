@@ -36,7 +36,7 @@ MEM_OBJS = rom.o ram.o bank0.o bank1.o bank2.o bank3.o bank4.o
 AGA_OBJS = amiga_aga.o sounds.o main_code_6000_020.o bank3_code_4000_020.o $(MEM_OBJS) graphics_aga.o vbr.o ReadJoyPad.o ptplayer.o 
 OCS_OBJS = amiga_ocs.o sounds.o $(PROGNAME)_000.o ram.o graphics_ocs.o rom.o vbr.o ReadJoyPad.o ptplayer.o 
 
-all: $(MAIN_AGA) $(WHDLOADER_AGA) $(WHDLOADER_AGA_CHIP) $(AMIGASRC)/aga/graphics.68k $(AMIGASRC)/sounds.68k
+all: $(MAIN_AGA) $(WHDLOADER_AGA) $(WHDLOADER_AGA_CHIP) $(AMIGASRC)/graphics_aga.68k $(AMIGASRC)/sounds.68k
  
 $(AMIGA_SHELL): shell.o
 	$(GCC_BIN)/m68k-amigaos-ld $(OPT_RELEASE_LINK) -o $(AMIGA_SHELL) shell.o
