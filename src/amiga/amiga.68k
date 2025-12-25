@@ -2570,7 +2570,7 @@ osd_read_system:
 *0:
 *
 *1:	
-	movem.l	(a7)+,a0/d1
+*	movem.l	(a7)+,a0/d1
 	rts
 
 	
