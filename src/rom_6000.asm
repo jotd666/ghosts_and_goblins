@@ -33,6 +33,7 @@ dsw1_3003 = $3003
 dsw2_3004 = $3004
 copy_of_dsw1_0040 = $40
 copy_of_dsw2_0041 = $41
+task_pointer_0012 = $12
 
 ; horrible code when it comes to jump tables
 ; there are more than 200+ jump tables, that had to be
@@ -115,7 +116,7 @@ end_of_memory_test_607d:
 6097: 9F 16       STX    $16
 6099: 9F 14       STX    $14
 609B: 8E 01 00    LDX    #$0100
-609E: 9F 12       STX    $12
+609E: 9F 12       STX    task_pointer_0012
 60A0: 9F 10       STX    $10
 60A2: CC FF FF    LDD    #$FFFF
 60A5: ED 81       STD    ,X++
@@ -207,11 +208,12 @@ end_of_memory_test_607d:
 
 mainloop_6160:
 6160: 10 8E FF FF LDY    #$FFFF
-6164: 10 AF 81    STY    ,X++
+6164: 10 AF 81    STY    ,X++		; ack with FFFF
 6167: 8C 01 3F    CMPX   #$013F
 616A: 25 03       BCS    $616F
+; wrap
 616C: 8E 01 00    LDX    #$0100
-616F: 9F 12       STX    $12
+616F: 9F 12       STX    task_pointer_0012
 6171: 8E 61 88    LDX    #jump_table_6188
 6174: AE 86       LDX    A,X
 ; set bank 3 before jump to it
@@ -219,8 +221,8 @@ mainloop_6160:
 6178: 97 D9       STA    bankswitch_copy_d9
 617A: B7 3E 00    STA    bankswitch_3e00
 617D: AD 84       JSR    ,X			; [direct_jump] to bank 3
-617F: 9E 12       LDX    $12
-6181: EC 84       LDD    ,X
+617F: 9E 12       LDX    task_pointer_0012
+6181: EC 84       LDD    ,X				; get action number
 6183: 48          ASLA					; times 2
 6184: 24 DA       BCC    mainloop_6160	; branch if positive
 6186: 20 F7       BRA    $617F			; loop until positive
@@ -2152,19 +2154,19 @@ jump_table_7151:
 7632: 4F          CLRA
 7633: 5F          CLRB
 7634: ED 13       STD    -$D,X
-7636: ED 88 12    STD    $12,X
+7636: ED 88 12    STD    task_pointer_0012,X
 7639: 0C 0E       INC    $0E
 763B: 39          RTS
 
 7648: 8E 15 A2    LDX    #$15A2
-764B: E6 88 12    LDB    $12,X
+764B: E6 88 12    LDB    task_pointer_0012,X
 764E: 27 64       BEQ    $76B4
 7650: E6 88 13    LDB    $13,X
 7653: 27 05       BEQ    $765A
 7655: 6A 88 13    DEC    $13,X
 7658: 26 5A       BNE    $76B4
 765A: 10 8E 77 4C LDY    #$774C
-765E: E6 88 12    LDB    $12,X
+765E: E6 88 12    LDB    task_pointer_0012,X
 7661: 58          ASLB
 7662: 10 AE A5    LDY    B,Y
 7665: A6 A4       LDA    ,Y
@@ -2173,7 +2175,7 @@ jump_table_7151:
 766B: D6 72       LDB    starting_level_0072
 766D: 26 0C       BNE    $767B
 766F: CE 77 52    LDU    #$7752
-7672: E6 88 12    LDB    $12,X
+7672: E6 88 12    LDB    task_pointer_0012,X
 7675: A6 C5       LDA    B,U
 7677: E6 C5       LDB    B,U
 7679: DD E4       STD    $E4
@@ -2193,12 +2195,12 @@ jump_table_7151:
 769A: 26 E7       BNE    $7683
 769C: C6 32       LDB    #$32
 769E: E7 88 13    STB    $13,X
-76A1: 6C 88 12    INC    $12,X
-76A4: E6 88 12    LDB    $12,X
+76A1: 6C 88 12    INC    task_pointer_0012,X
+76A4: E6 88 12    LDB    task_pointer_0012,X
 76A7: C1 03       CMPB   #$03
 76A9: 25 09       BCS    $76B4
 76AB: 0C 0E       INC    $0E
-76AD: 6F 88 12    CLR    $12,X
+76AD: 6F 88 12    CLR    task_pointer_0012,X
 76B0: C6 28       LDB    #$28
 76B2: D7 0C       STB    $0C
 76B4: 39          RTS
@@ -6165,7 +6167,7 @@ jump_table_a066:
 9CD7: E6 05       LDB    $5,X
 9CD9: 6F 88 11    CLR    $11,X
 9CDC: A6 C5       LDA    B,U
-9CDE: A7 88 12    STA    $12,X
+9CDE: A7 88 12    STA    task_pointer_0012,X
 9CE1: 4F          CLRA
 9CE2: E6 C5       LDB    B,U
 9CE4: 58          ASLB
@@ -6493,7 +6495,7 @@ A0FB: E7 10       STB    -$10,X
 A0FD: 4F          CLRA
 A0FE: 5F          CLRB
 A0FF: ED 88 10    STD    $10,X
-A102: ED 88 12    STD    $12,X
+A102: ED 88 12    STD    task_pointer_0012,X
 A105: ED 88 1E    STD    $1E,X
 A108: E7 08       STB    $8,X
 A10A: E7 0A       STB    $A,X
@@ -7646,7 +7648,7 @@ ACF2: 00 08       NEG    $08
 ACF4: 6A 07       DEC    $7,X
 ACF6: 26 10       BNE    $AD08
 ACF8: A6 1E       LDA    -$2,X
-ACFA: A1 88 12    CMPA   $12,X
+ACFA: A1 88 12    CMPA   task_pointer_0012,X
 ACFD: 27 09       BEQ    $AD08
 ACFF: 4C          INCA
 AD00: 84 0F       ANDA   #$0F
@@ -7657,7 +7659,7 @@ AD08: 39          RTS
 AD09: 6A 07       DEC    $7,X
 AD0B: 26 10       BNE    $AD1D
 AD0D: A6 1E       LDA    -$2,X
-AD0F: A1 88 12    CMPA   $12,X
+AD0F: A1 88 12    CMPA   task_pointer_0012,X
 AD12: 27 09       BEQ    $AD1D
 AD14: 4A          DECA
 AD15: 84 0F       ANDA   #$0F
@@ -7715,7 +7717,7 @@ AD8A: A7 0B       STA    $B,X
 AD8C: A6 C0       LDA    ,U+
 AD8E: A7 1E       STA    -$2,X
 AD90: A6 C4       LDA    ,U
-AD92: A7 88 12    STA    $12,X
+AD92: A7 88 12    STA    task_pointer_0012,X
 AD95: 8D 47       BSR    $ADDE
 AD97: CE A9 AF    LDU    #$A9AF
 AD9A: E6 0B       LDB    $B,X
@@ -8127,7 +8129,7 @@ B1FD: 44          LSRA
 B1FE: A7 88 11    STA    $11,X
 B201: A7 88 10    STA    $10,X
 B204: 86 0A       LDA    #$0A
-B206: A7 88 12    STA    $12,X
+B206: A7 88 12    STA    task_pointer_0012,X
 B209: CC B2 AD    LDD    #$B2AD
 B20C: ED 84       STD    ,X
 B20E: ED 03       STD    $3,X
@@ -8367,7 +8369,7 @@ B492: 6C 15       INC    -$B,X
 B494: 39          RTS
 
 
-B4BD: 6A 88 12    DEC    $12,X
+B4BD: 6A 88 12    DEC    task_pointer_0012,X
 B4C0: 26 4A       BNE    $B50C
 B4C2: 64 10       LSR    -$10,X
 B4C4: C6 02       LDB    #$02
@@ -8954,7 +8956,7 @@ BA53: E6 C5       LDB    B,U
 BA55: E7 88 14    STB    $14,X
 BA58: 6F 08       CLR    $8,X
 BA5A: EC 19       LDD    -$7,X
-BA5C: ED 88 12    STD    $12,X
+BA5C: ED 88 12    STD    task_pointer_0012,X
 BA5F: C6 09       LDB    #$09
 BA61: E7 1F       STB    -$1,X
 BA63: CE 4B 49    LDU    #$4B49
@@ -9044,7 +9046,7 @@ BB19: 10 83 00 30 CMPD   #$0030
 BB1D: 22 0A       BHI    $BB29
 BB1F: CC 01 00    LDD    #$0100
 BB22: ED 14       STD    -$C,X
-BB24: EC 88 12    LDD    $12,X
+BB24: EC 88 12    LDD    task_pointer_0012,X
 BB27: ED 19       STD    -$7,X
 BB29: 39          RTS
 BB2A: CE BB 32    LDU    #jump_table_bb32
@@ -9220,7 +9222,7 @@ BCBD: E6 C5       LDB    B,U
 BCBF: E7 88 14    STB    $14,X
 BCC2: 6F 08       CLR    $8,X
 BCC4: EC 19       LDD    -$7,X
-BCC6: ED 88 12    STD    $12,X
+BCC6: ED 88 12    STD    task_pointer_0012,X
 BCC9: C6 09       LDB    #$09
 BCCB: E7 1F       STB    -$1,X
 BCCD: CE 4B 49    LDU    #$4B49
@@ -9275,7 +9277,7 @@ BD34: A6 88 14    LDA    $14,X
 BD37: 3D          MUL
 BD38: 1F 89       TFR    A,B
 BD3A: 4F          CLRA
-BD3B: E3 88 12    ADDD   $12,X
+BD3B: E3 88 12    ADDD   task_pointer_0012,X
 BD3E: ED 19       STD    -$7,X
 BD40: 39          RTS
 
@@ -9346,7 +9348,7 @@ BDDB: E7 88 14    STB    $14,X
 BDDE: DC A0       LDD    $A0
 BDE0: ED 88 10    STD    $10,X
 BDE3: DC A2       LDD    $A2
-BDE5: ED 88 12    STD    $12,X
+BDE5: ED 88 12    STD    task_pointer_0012,X
 BDE8: 6F 08       CLR    $8,X
 BDEA: 6C 15       INC    -$B,X
 BDEC: 39          RTS
@@ -9361,7 +9363,7 @@ BDFB: A6 88 14    LDA    $14,X
 BDFE: 3D          MUL
 BDFF: 1F 89       TFR    A,B
 BE01: 4F          CLRA
-BE02: E3 88 12    ADDD   $12,X
+BE02: E3 88 12    ADDD   task_pointer_0012,X
 BE05: ED 19       STD    -$7,X
 BE07: D6 E1       LDB    $E1
 BE09: A6 88 15    LDA    $15,X
@@ -9405,7 +9407,7 @@ BE55: A6 88 14    LDA    $14,X
 BE58: 3D          MUL
 BE59: 1F 89       TFR    A,B
 BE5B: 4F          CLRA
-BE5C: E3 88 12    ADDD   $12,X
+BE5C: E3 88 12    ADDD   task_pointer_0012,X
 BE5F: ED 19       STD    -$7,X
 BE61: D6 E1       LDB    $E1
 BE63: A6 88 15    LDA    $15,X
@@ -9590,12 +9592,12 @@ C001: A6 88 10    LDA    $10,X
 C004: 26 1E       BNE    $C024
 C006: 6D 11       TST    -$F,X
 C008: 27 11       BEQ    $C01B
-C00A: 6A 88 12    DEC    $12,X
+C00A: 6A 88 12    DEC    task_pointer_0012,X
 C00D: 26 0C       BNE    $C01B
 C00F: BD C2 4C    JSR    $C24C
 C012: CE C0 72    LDU    #$C072
 C015: BD C0 66    JSR    $C066
-C018: E7 88 12    STB    $12,X
+C018: E7 88 12    STB    task_pointer_0012,X
 C01B: 6A 88 1A    DEC    $1A,X
 C01E: 26 42       BNE    $C062
 C020: 6C 88 10    INC    $10,X
@@ -9624,7 +9626,7 @@ C054: A7 88 1B    STA    $1B,X
 C057: BD C0 63    JSR    $C063
 C05A: E7 88 1A    STB    $1A,X
 C05D: 86 05       LDA    #$05
-C05F: A7 88 12    STA    $12,X
+C05F: A7 88 12    STA    task_pointer_0012,X
 C062: 39          RTS
 C063: CE C0 6E    LDU    #$C06E
 C066: BD 68 F9    JSR    $68F9
@@ -10120,7 +10122,7 @@ C50B: ED 88 10    STD    $10,X
 C50E: ED 88 1C    STD    $1C,X
 C511: A7 88 15    STA    $15,X
 C514: A6 12       LDA    -$E,X
-C516: A7 88 12    STA    $12,X
+C516: A7 88 12    STA    task_pointer_0012,X
 C519: C6 04       LDB    #$04
 C51B: E7 1F       STB    -$1,X
 C51D: C6 01       LDB    #$01
@@ -10283,7 +10285,7 @@ C6D7: E6 C5       LDB    B,U
 C6D9: E7 06       STB    $6,X
 C6DB: 6F 0A       CLR    $A,X
 C6DD: 6F 0B       CLR    $B,X
-C6DF: E6 88 12    LDB    $12,X
+C6DF: E6 88 12    LDB    task_pointer_0012,X
 C6E2: 27 0A       BEQ    $C6EE
 C6E4: C1 02       CMPB   #$02
 C6E6: 27 06       BEQ    $C6EE
@@ -10340,7 +10342,7 @@ C756: 26 04       BNE    $C75C
 C758: C6 01       LDB    #$01
 C75A: E7 0A       STB    $A,X
 C75C: 39          RTS
-C75D: A6 88 12    LDA    $12,X
+C75D: A6 88 12    LDA    task_pointer_0012,X
 C760: 81 02       CMPA   #$02
 C762: 27 17       BEQ    $C77B
 C764: 96 72       LDA    starting_level_0072
@@ -10402,11 +10404,11 @@ C7F6: 58          ASLB
 C7F7: EE C5       LDU    B,U
 C7F9: EF 84       STU    ,X
 C7FB: EF 03       STU    $3,X
-C7FD: E6 88 12    LDB    $12,X
+C7FD: E6 88 12    LDB    task_pointer_0012,X
 C800: 27 16       BEQ    $C818
 C802: C1 02       CMPB   #$02
 C804: 27 29       BEQ    $C82F
-C806: 6F 88 12    CLR    $12,X
+C806: 6F 88 12    CLR    task_pointer_0012,X
 C809: C6 10       LDB    #$10
 C80B: A6 88 13    LDA    $13,X
 C80E: 4A          DECA
@@ -10711,7 +10713,7 @@ CAD1: 5A          DECB
 CAD2: 26 03       BNE    $CAD7
 CAD4: 6A 15       DEC    -$B,X
 CAD6: 39          RTS
-CAD7: E6 88 12    LDB    $12,X
+CAD7: E6 88 12    LDB    task_pointer_0012,X
 CADA: C1 02       CMPB   #$02
 CADC: 27 11       BEQ    $CAEF
 CADE: BD 68 F9    JSR    $68F9
@@ -10780,7 +10782,7 @@ CB6B: 27 05       BEQ    $CB72
 CB6D: CC 04 00    LDD    #$0400
 CB70: ED 14       STD    -$C,X
 CB72: 39          RTS
-CB73: A6 88 12    LDA    $12,X
+CB73: A6 88 12    LDA    task_pointer_0012,X
 CB76: 81 02       CMPA   #$02
 CB78: 27 07       BEQ    $CB81
 CB7A: BD 68 F9    JSR    $68F9
@@ -12526,7 +12528,7 @@ DAFF: E7 1E       STB    -$2,X
 DB01: E7 88 18    STB    $18,X
 DB04: 6F 88 19    CLR    $19,X
 DB07: 6F 0D       CLR    $D,X
-DB09: 6F 88 12    CLR    $12,X
+DB09: 6F 88 12    CLR    task_pointer_0012,X
 DB0C: D6 9A       LDB    $9A
 DB0E: C4 30       ANDB   #$30
 DB10: 54          LSRB
@@ -12684,12 +12686,12 @@ DC7E: 10 AF 88 10 STY    $10,X
 DC82: 27 0C       BEQ    $DC90
 DC84: BD 68 F9    JSR    $68F9
 DC87: C4 01       ANDB   #$01
-DC89: E7 88 12    STB    $12,X
+DC89: E7 88 12    STB    task_pointer_0012,X
 DC8C: BD DC 9F    JSR    $DC9F
 DC8F: 39          RTS
 DC90: BD DB DE    JSR    $DBDE
 DC93: 6F 0D       CLR    $D,X
-DC95: 6F 88 12    CLR    $12,X
+DC95: 6F 88 12    CLR    task_pointer_0012,X
 DC98: BD DC DE    JSR    $DCDE
 DC9B: BD DC 39    JSR    $DC39
 DC9E: 39          RTS
@@ -12735,14 +12737,14 @@ DCF5: EF 03       STU    $3,X
 DCF7: 6F 02       CLR    $2,X
 DCF9: 39          RTS
 DCFA: 86 01       LDA    #$01
-DCFC: A7 88 12    STA    $12,X
+DCFC: A7 88 12    STA    task_pointer_0012,X
 DCFF: 96 20       LDA    $20
 DD01: BD 68 F9    JSR    $68F9
 DD04: C4 03       ANDB   #$03
 DD06: 26 03       BNE    $DD0B
-DD08: 6F 88 12    CLR    $12,X
+DD08: 6F 88 12    CLR    task_pointer_0012,X
 DD0B: BD DC 9F    JSR    $DC9F
-DD0E: 6F 88 12    CLR    $12,X
+DD0E: 6F 88 12    CLR    task_pointer_0012,X
 DD11: 39          RTS
 DD12: D6 A7       LDB    $A7
 DD14: 27 50       BEQ    $DD66
@@ -12770,7 +12772,7 @@ DD40: ED 36       STD    -$A,Y
 DD42: EC 19       LDD    -$7,X
 DD44: 83 00 05    SUBD   #$0005
 DD47: ED 39       STD    -$7,Y
-DD49: 6D 88 12    TST    $12,X
+DD49: 6D 88 12    TST    task_pointer_0012,X
 DD4C: 27 18       BEQ    $DD66
 DD4E: EC 16       LDD    -$A,X
 DD50: 6D 88 18    TST    $18,X
@@ -13207,7 +13209,7 @@ E0F8: EE 03       LDU    $3,X
 E0FA: A6 C1       LDA    ,U++
 E0FC: ED 88 10    STD    $10,X
 E0FF: A6 C0       LDA    ,U+
-E101: A7 88 12    STA    $12,X
+E101: A7 88 12    STA    task_pointer_0012,X
 E104: A6 C4       LDA    ,U
 E106: A7 88 13    STA    $13,X
 E109: 33 88 10    LEAU   $10,X
@@ -13251,7 +13253,7 @@ E158: EE 03       LDU    $3,X
 E15A: A6 C1       LDA    ,U++
 E15C: ED 88 10    STD    $10,X
 E15F: A6 C0       LDA    ,U+
-E161: A7 88 12    STA    $12,X
+E161: A7 88 12    STA    task_pointer_0012,X
 E164: A6 C4       LDA    ,U
 E166: A7 88 13    STA    $13,X
 E169: 33 88 10    LEAU   $10,X
@@ -13325,7 +13327,7 @@ E20A: EB 0F       ADDB   $F,X
 E20C: CE E1 74    LDU    #$E174
 E20F: 33 C5       LEAU   B,U
 E211: EC 41       LDD    $1,U
-E213: A7 88 12    STA    $12,X
+E213: A7 88 12    STA    task_pointer_0012,X
 E216: E7 88 13    STB    $13,X
 E219: E6 0D       LDB    $D,X
 E21B: C5 03       BITB   #$03
@@ -13361,7 +13363,7 @@ E25C: 33 C5       LEAU   B,U
 E25E: E6 C4       LDB    ,U
 E260: E7 88 10    STB    $10,X
 E263: EC 41       LDD    $1,U
-E265: A7 88 12    STA    $12,X
+E265: A7 88 12    STA    task_pointer_0012,X
 E268: E7 88 13    STB    $13,X
 E26B: E6 0D       LDB    $D,X
 E26D: C5 03       BITB   #$03
@@ -14068,7 +14070,7 @@ E818: 0C 0A       INC    $0A
 E81A: E9 40       ADCB   $0,U
 E81C: 0C 0D       INC    $0D
 E81E: E9 48       ADCB   $8,U
-E820: 0C 12       INC    $12
+E820: 0C 12       INC    task_pointer_0012
 E822: 58          ASLB
 E823: CE E8 28    LDU    #jump_table_e828
 E826: 6E D5       JMP    [B,U]	; [indirect_jump]
@@ -15408,7 +15410,7 @@ F981: E7 2E       STB    $E,Y
 F983: E7 A8 1A    STB    $1A,Y
 F986: C0 10       SUBB   #$10
 F988: E7 26       STB    $6,Y
-F98A: E7 A8 12    STB    $12,Y
+F98A: E7 A8 12    STB    task_pointer_0012,Y
 F98D: E7 A8 1E    STB    $1E,Y
 F990: C0 10       SUBB   #$10
 F992: E7 2A       STB    $A,Y
@@ -15516,7 +15518,7 @@ FA77: D6 E7       LDB    $E7
 FA79: 50          NEGB
 FA7A: C0 10       SUBB   #$10
 FA7C: E7 22       STB    $2,Y
-FA7E: E7 A8 12    STB    $12,Y
+FA7E: E7 A8 12    STB    task_pointer_0012,Y
 FA81: E7 A8 22    STB    $22,Y
 FA84: E7 A8 32    STB    $32,Y
 FA87: C0 10       SUBB   #$10
@@ -15671,7 +15673,7 @@ FBD5: 50          NEGB
 FBD6: C0 10       SUBB   #$10
 FBD8: E7 22       STB    $2,Y
 FBDA: E7 2A       STB    $A,Y
-FBDC: E7 A8 12    STB    $12,Y
+FBDC: E7 A8 12    STB    task_pointer_0012,Y
 FBDF: C0 10       SUBB   #$10
 FBE1: E7 26       STB    $6,Y
 FBE3: E7 2E       STB    $E,Y

@@ -624,6 +624,7 @@ demo_game:
 	dbf		d0,0b
 	* install bank 0 in 0x4000, we may as well use that space
 
+	GET_MEMORY_START_AND_DP
 	jbsr	install_bank_0
 	
 	

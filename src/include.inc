@@ -485,8 +485,13 @@
 	.endm
 
 get_address:
+	cmp.w	#0x2000,a0
+	jcs		0f		| below 0x2000: RAM: OK
 	cmp.w	#0x3000,a0
-	jcs		0f		| below 0x3000: RAM: OK
+	jcc		1f		| above 0x3000: continue
+	BREAKPOINT	"accessing videoram 0x2000-0x2FFF, PC in D6"
+	jra		0f
+1:
 	cmp.w	#0x6000,a0
 	jcc		0f		| above 0x6000: ROM: OK
 	* make it simple: ignore most read/writes
