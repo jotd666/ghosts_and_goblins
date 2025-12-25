@@ -113,13 +113,8 @@ BASE_BPLCON2_VALUE = 0x0224			| add killehb
 	.else
 BASE_BPLCON2_VALUE = 0x0024
 	.endif
-	
-* game originally runs on a 512*512 screen, but only uses mostly the lower half
-* (scrolls very little)
-* so we just ignore the upper half which saves a lot of chipmem!
 NB_TARGET_LINES = 512
-SMALL_SCROLL_HEIGHT = 48
-NB_LINES = 256+SMALL_SCROLL_HEIGHT
+NB_LINES = 256
 Y_MAX = NB_LINES
 NB_PLAYFIELD_LINES = NB_LINES
 
@@ -150,15 +145,6 @@ BIT_DOWN = 3
 BIT_FIRE_1 = 4
 BIT_FIRE_2 = 5
 
-c_address_of_continue_2949 = 0x2949
-
-	.macro	GET_RAM_START_IN_A6	
-	.ifdef	RELEASE
-	lea		ram_buffer,a6
-	.else
-	move.l		ram_start_0000,a6
-	.endif
-	.endm
 	
 	.macro	COLOR0_FLASH	v
 	.ifne	OPT_AGA_MODE
@@ -608,13 +594,13 @@ demo_game:
 	* align so real addresses LSW match actual arcade addresses
 	* and lower 16-bit match original RAM & even ROM offsets
 	*
+
 	lea		dev_ram_buffer,a6
 	move.l	a6,d0
 	clr.w	d0
 	move.l	d0,d1
 	add.l	#0x10000+RAM_START,d1
 	move.l	d1,ram_start_0000		| memory (0x1000-0xFFFF)
-	
 	
 	* relocate rom tables just after shared RAM
 	* memory is contiguous (only 1 segment of memory RAM+ROM)
@@ -658,8 +644,7 @@ demo_game:
 
 	moveq	#0,d0
 	jbsr	osd_set_bank
-	
-	move.l	bank_base,a5
+	GET_MEMORY_START_AND_DP	
 	jmp		reset_6000								| pass control to the mpatrol core
 	
 	.ifndef	RELEASE
@@ -681,12 +666,20 @@ install_bank_0:
 	dbf		d0,0b
 	
 	move.l	a6,bank_table	| first entry is RAM base
+	move.l	a6,bank_base
 	movem.l	(a7)+,a0/a1/d0
 	
 	rts
 
 call_nmi:
-	move.l	bank_base,a5
+	GET_MEMORY_START_AND_DP
+	* at this point, D5 is supposed to be in the same
+	* state as in the non-interrupt code
+	* this remains uncertain as it's difficult to guarantee
+	* that non-interrupt code never uses D5 for anything
+	* non-stack.
+	jbsr	cpu_init
+	moveq	#-1,d5		| trash stack pointer, let's see if irq uses it
 	jra	irq_65c4
 	
 * just in case some hardware calls nmi
@@ -896,7 +889,7 @@ is_game_playing:
 	rts
 	
 *	move.l	a6,-(a7)
-*	GET_RAM_START_IN_A6
+*	GET_MEMORY_START_AND_DP
 *	* both flags are at 1 when actual game is playing (not demo)
 *	tst.b	(game_playing_flag_36,a6)
 *	jeq		0f
@@ -1027,7 +1020,7 @@ really_update_sprites:
 
 	move.l	bobs_ptr,d0
 	jeq		20f
-	GET_RAM_START_IN_A6
+	GET_MEMORY_START_AND_DP
 	lea		(SPRITE_ADDRESS,a6),a0
 	*lea		mockup,a0
     lea _custom,A5
@@ -1171,7 +1164,6 @@ update_one_bob:
 	
 	* BOBs must follow screen scroll
 	add.w	scroll_y,d1
-	sub.w	#256-SMALL_SCROLL_HEIGHT,d1
 	add.w	scroll_x_lo,d0
 	add.w	scroll_x_hi,d0
 	and.w	#0x1FF,d0
@@ -1955,7 +1947,8 @@ osd_set_bank:
 	.else
 	move.l	(a0,d0.w*4),a1
 	.endif
-
+	move.l	a1,bank_base
+	
 	movem.l	(a7)+,d0/a0
 1:
 	rts
@@ -2092,7 +2085,6 @@ compute_tile_xy:
 	add.w	#0x20,d0	| right quadrant
 0:
 	lsl.w	#3,d1		| Y times 8
-	add.w	#SMALL_SCROLL_HEIGHT,d1
 	rts
 
 *compute_tile_xy_portrait:
@@ -2314,7 +2306,6 @@ set_bobs_bitplanes:
 	
 
 	move.w	scroll_y,d0
-	sub.w	#256-SMALL_SCROLL_HEIGHT,d0
 	jpl		0f
 	moveq	#0,d0
 	jra		1f			| avoids non-atomic illegal scroll value
@@ -2328,8 +2319,6 @@ set_bobs_bitplanes:
 	move.w	(a2,d0.w),d0		| compute Y offset
 	.endif
 1:	
-	* at start, lo=0xFC, hi=0x100
-	* m_scrollx = (m_scrollx_hi + m_scrollx_lo + 4)
 	moveq	#4,d2
 
 	add.w	scroll_x_lo,d2
@@ -2389,6 +2378,9 @@ osd_debug_hook:
 	
 
 osd_read_p1_inputs:
+	st.B	d0
+	rts
+
 	move.b	player_1_controls,d0
 	movem.l	d1/A0,-(a7)
 	lea		keyboard_table(pc),a0
@@ -2409,6 +2401,9 @@ osd_read_p1_inputs:
 	rts
 	
 osd_read_p2_inputs:
+	st.B	d0
+	rts
+	
 	move.b	player_2_controls,d0
 	move.l	A0,-(a7)
 	lea		keyboard_table(pc),a0
@@ -2536,50 +2531,48 @@ decode_joypad_controls:
 0:
 	rts
 	
+
 osd_read_dsw1:
 	* actual dipswitches
-	move.b	#0xF8,d0	| what MAME returns, 2P only
-	*move.b	#0x78,d0	| what MAME returns, 4P possible
-	or.b	difficulty_dsw,d0
+	move.b	#~0x20,d0	| what MAME returns by default
+	rts
+
+osd_read_dsw2:
+	* actual dipswitches
+	move.b	#~0x04,d0	| what MAME returns by default
 	rts
 	
 osd_read_system:
 	st.b	d0
-	movem.l	a0/d1,-(a7)
-	lea		keyboard_table(pc),a0
-	tst.b	(5,a0)		| "5" key like in MAME
-	beq.b	0f
-	st.b	detect_controllers
-	bclr	#BIT_COIN1,d0
-0:
-	tst.b	(6,a0)		| "6" key like in MAME
-	beq.b	0f
-	st.b	detect_controllers
-	bclr	#BIT_COIN2,d0
-0:	
-
-	jbsr		is_game_playing
-	jne	1f
-	move.l	joypad_1_state,d1
-
-	* game not playing, we can insert coin/start with joypad
-	btst	#JPB_BTN_RED,d1		| "5" key like in MAME
-	jeq		0f
-	st.b	detect_controllers
-	bclr	#BIT_COIN1,d0
-0:
-
-1:	
+*	movem.l	a0/d1,-(a7)
+*	lea		keyboard_table(pc),a0
+*	tst.b	(5,a0)		| "5" key like in MAME
+*	beq.b	0f
+*	st.b	detect_controllers
+*	bclr	#BIT_COIN1,d0
+*0:
+*	tst.b	(6,a0)		| "6" key like in MAME
+*	beq.b	0f
+*	st.b	detect_controllers
+*	bclr	#BIT_COIN2,d0
+*0:	
+*
+*	jbsr		is_game_playing
+*	jne	1f
+*	move.l	joypad_1_state,d1
+*
+*	* game not playing, we can insert coin/start with joypad
+*	btst	#JPB_BTN_RED,d1		| "5" key like in MAME
+*	jeq		0f
+*	st.b	detect_controllers
+*	bclr	#BIT_COIN1,d0
+*0:
+*
+*1:	
 	movem.l	(a7)+,a0/d1
 	rts
 
 	
-osd_read_dsw2:
-	* actual dipswitches
-	move.b	dip_switches_2(pc),d0
-	move.b	#0x87,d0		| demo sounds on, 1 coin 1 credit
-	rts
-
 
 	
 
@@ -2606,7 +2599,7 @@ log_used_tiles:
 	* scan the whole screen, see what was updated
 	* main screen
 	
-	GET_RAM_START_IN_A6
+	GET_MEMORY_START_AND_DP
 	lea		(SCREEN_TILE_ADDRESS,a6),a5
 	lea		(SCREEN_COLOR_ADDRESS,a6),a4
 	lea		tile_bank_table,a3
@@ -2648,7 +2641,7 @@ log_used_sprites:
 	* scan the whole screen, see what was updated
 	* main screen
 	
-	GET_RAM_START_IN_A6
+	GET_MEMORY_START_AND_DP
 	lea		(SPRITE_ADDRESS,a6),a5
 	lea	sprite_log_table,a0
 	moveq	#0,d7
@@ -2844,7 +2837,7 @@ read_args_string_end:
 * < A0: buffer
 osd_read_high_scores:
 	movem.l	d0-d7/a0-a6,-(a7)
-	GET_RAM_START_IN_A6
+	GET_MEMORY_START_AND_DP
 	*lea		(high_score_table_0294,a6),a1
 	move.l	_resload,d0
 	beq.b	0f
@@ -2878,7 +2871,7 @@ osd_write_high_scores:
 	tst.b	cheat_used		| don't save score if cheat on
 	bne.b	2f
 	.endif
-	GET_RAM_START_IN_A6
+	GET_MEMORY_START_AND_DP
 	lea		(high_score_table_0294,a6),a0
 
 	move.l	_resload,d0
@@ -3243,13 +3236,15 @@ osd_dump_logs:
 	move.w	(a7)+,SR
 	rts
 
-* zero all registers but 6809 stack pointer
+* zero all registers even 6809 stack pointer
+* (some games use stack pointer manually for auto variables)
 cpu_init:
 	moveq	#0,d0
 	moveq	#0,d1
 	moveq	#0,d2
 	moveq	#0,d3
 	moveq	#0,d4
+	moveq	#0,d5
 	moveq	#0,d6
 	moveq	#0,d7
 	rts

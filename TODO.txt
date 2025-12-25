@@ -1,3 +1,8 @@
-- debug around 66F8
+- redo division: FED8
+- trap write to screen 2000-3000
+- stuck in mainloop_6160
 - use audio mixer for that one!
 fix 5025 push using movem do 2 separate pushes
+
+converter: add warnings with leas
+

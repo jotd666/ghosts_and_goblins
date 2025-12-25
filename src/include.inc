@@ -35,6 +35,9 @@
 	* release mode: don't check
 	.macro	GET_ADDRESS_FUNC
 	GET_UNCHECKED_ADDRESS_FUNC
+	.macro	GET_BANK_ADDRESS_FUNC
+	GET_UNCHECKED_BANK_ADDRESS_FUNC
+	.endm
 	.endm
 
 	.else
@@ -42,7 +45,9 @@
 	.macro	GET_ADDRESS_FUNC
 	jbsr	get_address
 	.endm
-
+	.macro	GET_BANK_ADDRESS_FUNC
+	jbsr	get_bank_address
+	.endm
 	.endif
 
 	.macro	ABX
@@ -427,6 +432,16 @@
 	.endm
 
 	
+	.macro GET_REG_BANK_ADDRESS	offset,reg
+	.ifeq	\offset
+	move.l	\reg,a0
+	.else
+	lea	\offset,a0
+	add.l	\reg,a0
+	.endif
+	GET_BANK_ADDRESS_FUNC
+	.endm
+
 	.macro GET_REG_UNCHECKED_BANK_ADDRESS	offset,reg
 	.ifeq	\offset
 	move.l	\reg,a0
@@ -481,18 +496,21 @@ get_address:
 	
 	cmp.w	#0x4000,a0
 	jcs		1f
-	BREAKPOINT	"accessing bank 0x4000-0x6000"
+	jbsr	osd_get_last_known_pc
+	BREAKPOINT	"accessing bank 0x4000-0x6000, PC in D6"
 	jra		0f
 1:
 	* zone 0x3000-0x3fff
 	cmp.w	#0x3e00,a0
 	jne		1f
-	BREAKPOINT	"accessing bankswitch 0x3E00 address"
+	jbsr	osd_get_last_known_pc
+	BREAKPOINT	"accessing bankswitch 0x3E00 address, PC in D6"
 	jra		0f
 1:
 	cmp.w	#0x3800,a0
 	jcc		0f			| >= 0x3800, let it live
-	BREAKPOINT	"accessing range 0x3000-0x37ff"
+	jbsr	osd_get_last_known_pc
+	BREAKPOINT	"accessing range 0x3000-0x37ff, PC in D6"
 0:
 	GET_UNCHECKED_ADDRESS_FUNC
 	rts

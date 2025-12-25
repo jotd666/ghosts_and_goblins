@@ -38,11 +38,11 @@ next\@:
 	
 	.macro	GET_MEMORY_START_AND_DP
 	move.l	m6809_direct_page_pointer,a5
+	move.l	bank_base,a1
 	.ifeq	OPT_ALIGNED_MEMORY
 	lea		ram_buffer-RAM_START,a6
 	.else
 	move.l		ram_start_0000,a6
-	
 	* adjust offset to avoid subbing at run-time
 	.ifne	RAM_START
 	sub.w	#RAM_START,a6

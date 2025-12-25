@@ -25,7 +25,12 @@ source_dir = this_dir / "../src"
 
 # game_specific: replace or remove I/O addresses
 input_dict = {
-"bankswitch_3e00":"set_bank"
+"bankswitch_3e00":"set_bank",
+"system_3000":"read_system",
+"p1_3001":"read_p1_inputs",
+"p2_3002":"read_p2_inputs",
+"dsw1_3003":"read_dsw1",
+"dsw2_3004":"read_dsw2",
 }
 
 
@@ -144,7 +149,12 @@ for i,line in enumerate(lines):
          line = change_instruction("add.w\td6,d6",lines,i)
     elif address == 0x617d:
          line = change_instruction("jsr\t(a2,d6.w)",lines,i)
-
+    elif address in {0x6626,0x6667,0x66a0,0x6729,0x66ec}:
+        line = "\tlea\t(a0,d5.w),sp   | really change stack\n"+line
+    elif address == 0xfeed:
+        line = change_instruction("addq.w\t#4*2,sp   | pop up both d1 pushes",lines,i)
+    elif address == 0xff0e:
+        line = change_instruction("add.w\t#4*3,sp   | pop up 3 dx pushes",lines,i)
     ###################################################
     # 2 table of tables to rework almost completely
     # this mixes with table rework and is quite a mess but works
@@ -196,7 +206,7 @@ for i,line in enumerate(lines):
     # game uses $E2 to save/restore stack. We need to use a longword
     if "unsupported instruction sts" in line:
         line = change_instruction("move.l\tsp,stack_save",lines,i)
-    if address in {0x6652,0x668F,0x66CC,0x6710}:
+    if address in {0x6652,0x668F,0x66CC,0x6710,0x6751}:
         line = change_instruction("move.l\tstack_save,sp",lines,i)
         lines[i+1] = remove_instruction(lines,i+1)
 

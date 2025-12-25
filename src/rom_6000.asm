@@ -31,6 +31,8 @@ p1_3001 = $3001
 p2_3002 = $3002
 dsw1_3003 = $3003
 dsw2_3004 = $3004
+copy_of_dsw1_0040 = $40
+copy_of_dsw2_0041 = $41
 
 ; horrible code when it comes to jump tables
 ; there are more than 200+ jump tables, that had to be
@@ -185,7 +187,7 @@ end_of_memory_test_607d:
 613B: DD D0       STD    $D0
 613D: 5F          CLRB
 613E: DD D2       STD    $D2
-6140: BD 62 2C    JSR    $622C
+6140: BD 62 2C    JSR    read_dip_switches_622c
 6143: BD 62 39    JSR    $6239
 6146: BD 62 74    JSR    $6274
 6149: 5F          CLRB
@@ -198,8 +200,12 @@ end_of_memory_test_607d:
 6155: D7 D8       STB    $D8
 6157: 86 01       LDA    #$01
 6159: B7 3D 01    STA    $3D01
-615C: 1C EF       ANDCC  #$EF
+615C: 1C EF       ANDCC  #$EF		; enable interrupts
 615E: 20 1F       BRA    $617F
+
+; game mainloop
+
+mainloop_6160:
 6160: 10 8E FF FF LDY    #$FFFF
 6164: 10 AF 81    STY    ,X++
 6167: 8C 01 3F    CMPX   #$013F
@@ -215,9 +221,9 @@ end_of_memory_test_607d:
 617D: AD 84       JSR    ,X			; [direct_jump] to bank 3
 617F: 9E 12       LDX    $12
 6181: EC 84       LDD    ,X
-6183: 48          ASLA
-6184: 24 DA       BCC    $6160
-6186: 20 F7       BRA    $617F
+6183: 48          ASLA					; times 2
+6184: 24 DA       BCC    mainloop_6160	; branch if positive
+6186: 20 F7       BRA    $617F			; loop until positive
 ; from bank 3
 jump_table_6188:
 	.word	$4800 
@@ -226,15 +232,16 @@ jump_table_6188:
 	.word	$48BD 
 	.word	$5022
 
+read_dip_switches_622c:
 622C: B6 30 03    LDA    dsw1_3003
 622F: 43          COMA
-6230: 97 40       STA    $40
+6230: 97 40       STA    copy_of_dsw1_0040
 6232: B6 30 04    LDA    dsw2_3004
 6235: 43          COMA
-6236: 97 41       STA    $41
+6236: 97 41       STA    copy_of_dsw2_0041
 6238: 39          RTS
 
-6239: D6 40       LDB    $40
+6239: D6 40       LDB    copy_of_dsw1_0040
 623B: 4F          CLRA
 623C: 58          ASLB
 623D: 49          ROLA
@@ -251,7 +258,7 @@ jump_table_6188:
 624D: FD 15 85    STD    $1585
 6250: FD 15 8D    STD    $158D
 6253: 5F          CLRB
-6254: 96 40       LDA    $40
+6254: 96 40       LDA    copy_of_dsw1_0040
 6256: 84 0F       ANDA   #$0F
 6258: 81 0F       CMPA   #$0F
 625A: 26 01       BNE    $625D
@@ -261,24 +268,24 @@ jump_table_6188:
 6263: 48          ASLA
 6264: 8E 62 08    LDX    #$6208
 6267: AE 86       LDX    A,X
-6269: D6 40       LDB    $40
+6269: D6 40       LDB    copy_of_dsw1_0040
 626B: C5 10       BITB   #$10
 626D: 27 02       BEQ    $6271
 626F: 31 28       LEAY   $8,Y
 6271: AF 23       STX    $3,Y
 6273: 39          RTS
-6274: 96 41       LDA    $41
+6274: 96 41       LDA    copy_of_dsw2_0041
 6276: 84 03       ANDA   #$03
 6278: 8E 61 C8    LDX    #$61C8
 627B: A6 86       LDA    A,X
 627D: 97 50       STA    $50
 627F: 5F          CLRB
-6280: 96 41       LDA    $41
+6280: 96 41       LDA    copy_of_dsw2_0041
 6282: 85 04       BITA   #$04
 6284: 26 01       BNE    $6287
 6286: 5C          INCB
 6287: D7 53       STB    $53
-6289: D6 41       LDB    $41
+6289: D6 41       LDB    copy_of_dsw2_0041
 628B: C4 18       ANDB   #$18
 628D: 54          LSRB
 628E: 54          LSRB
@@ -287,7 +294,7 @@ jump_table_6188:
 6294: A6 80       LDA    ,X+
 6296: 97 54       STA    $54
 6298: 9F 55       STX    $55
-629A: 96 41       LDA    $41
+629A: 96 41       LDA    copy_of_dsw2_0041
 629C: 84 60       ANDA   #$60
 629E: 44          LSRA
 629F: 44          LSRA
@@ -532,7 +539,7 @@ irq_65c4:
 65D1: 8D 28       BSR    $65FB
 65D3: BD 67 55    JSR    $6755
 65D6: BD 67 72    JSR    $6772
-65D9: BD 62 2C    JSR    $622C
+65D9: BD 62 2C    JSR    read_dip_switches_622c
 65DC: BD 79 30    JSR    $7930
 65DF: BD 67 B3    JSR    $67B3
 65E2: BD 62 39    JSR    $6239
@@ -608,6 +615,7 @@ irq_65c4:
 668D: 26 E0       BNE    $666F
 668F: 10 DE E2    LDS    stack_save_00e2
 6692: 39          RTS
+
 6693: 96 DF       LDA    $DF
 6695: 2B 3B       BMI    $66D2
 6697: 10 DF E2    STS    stack_save_00e2
@@ -633,6 +641,7 @@ irq_65c4:
 66CC: 10 DE E2    LDS    stack_save_00e2
 66CF: 0F DF       CLR    $DF
 66D1: 39          RTS
+
 66D2: 84 30       ANDA   #$30
 66D4: 10 8E 16 B2 LDY    #$16B2
 66D8: 31 A6       LEAY   A,Y
@@ -3032,7 +3041,7 @@ l_7a14:
 7F24: A3 16       SUBD   -$A,X
 7F26: 1F 98       TFR    B,A
 7F28: C6 03       LDB    #$03
-7F2A: BD FE D8    JSR    $FED8
+7F2A: BD FE D8    JSR    divide_fed8
 7F2D: 1F 89       TFR    A,B
 7F2F: 4F          CLRA
 7F30: E3 16       ADDD   -$A,X
@@ -4788,16 +4797,16 @@ l_7a14:
 8D8C: 00 30       NEG    $30
 8D8E: 00 30       NEG    $30
 8D90: 00 10       NEG    $10
-8D92: 00 40       NEG    $40
-8D94: 00 40       NEG    $40
-8D96: 00 40       NEG    $40
+8D92: 00 40       NEG    copy_of_dsw1_0040
+8D94: 00 40       NEG    copy_of_dsw1_0040
+8D96: 00 40       NEG    copy_of_dsw1_0040
 8D98: 00 10       NEG    $10
 8D9A: 00 10       NEG    $10
 8D9C: 00 30       NEG    $30
 8D9E: 00 30       NEG    $30
 8DA0: 00 20       NEG    $20
 8DA2: 00 10       NEG    $10
-8DA4: 00 40       NEG    $40
+8DA4: 00 40       NEG    copy_of_dsw1_0040
 8DA6: 00 08       NEG    $08
 8DA8: 00 08       NEG    $08
 8DAA: 00 08       NEG    $08
@@ -5010,7 +5019,7 @@ l_7a14:
 9010: D7 E1       STB    $E1
 9012: 96 E5       LDA    $E5
 9014: D6 E3       LDB    $E3
-9016: BD FE D8    JSR    $FED8
+9016: BD FE D8    JSR    divide_fed8
 9019: D7 E6       STB    $E6
 901B: C6 64       LDB    #$64
 901D: 3D          MUL
@@ -8485,10 +8494,10 @@ B63E: 00 80       NEG    $80
 B640: 01 00       NEG    $00
 B642: 00 60       NEG    nb_lives_0060
 B644: 00 C0       NEG    $C0
-B646: 00 40       NEG    $40
+B646: 00 40       NEG    copy_of_dsw1_0040
 B648: 00 80       NEG    $80
 B64A: 00 20       NEG    $20
-B64C: 00 40       NEG    $40
+B64C: 00 40       NEG    copy_of_dsw1_0040
 B64E: EC 13       LDD    -$D,X
 B650: 48          ASLA
 B651: CE B6 56    LDU    #jump_table_b656
@@ -8763,9 +8772,9 @@ B8C6: 43          COMA
 B8C7: 39          RTS
 B8C8: 00 46       NEG    $46
 B8CA: 00 8C       NEG    $8C
-B8CC: 00 40       NEG    $40
+B8CC: 00 40       NEG    copy_of_dsw1_0040
 B8CE: 00 80       NEG    $80
-B8D0: 00 40       NEG    $40
+B8D0: 00 40       NEG    copy_of_dsw1_0040
 B8D2: 00 80       NEG    $80
 B8D4: 00 38       NEG    $38
 B8D6: 00 70       NEG    $70
@@ -8774,7 +8783,7 @@ B8DA: 00 6C       NEG    $6C
 B8DC: 00 28       NEG    $28
 B8DE: 00 50       NEG    $50
 B8E0: 00 20       NEG    $20
-B8E2: 00 40       NEG    $40
+B8E2: 00 40       NEG    copy_of_dsw1_0040
 B8E4: 00 18       NEG    $18
 B8E6: 00 30       NEG    $30
 B8E8: 00 14       NEG    $14
@@ -8863,7 +8872,7 @@ B990: E7 08       STB    $8,X
 B992: EF 88 1C    STU    $1C,X
 B995: 39          RTS
 B996: 00 30       NEG    $30
-B998: 00 40       NEG    $40
+B998: 00 40       NEG    copy_of_dsw1_0040
 B99A: 00 28       NEG    $28
 B99C: 00 48       NEG    $48
 B99E: 00 20       NEG    $20
@@ -11087,7 +11096,7 @@ CE6D: C6 01       LDB    #$01
 CE6F: E7 88 1D    STB    $1D,X
 CE72: 47          ASRA
 CE73: C6 15       LDB    #$15
-CE75: BD FE D8    JSR    $FED8
+CE75: BD FE D8    JSR    divide_fed8
 CE78: CE 4E E1    LDU    #$4EE1
 CE7B: E6 C5       LDB    B,U
 CE7D: 6D 88 1D    TST    $1D,X
@@ -14551,7 +14560,7 @@ EC76: 33 80       LEAU   ,X+
 EC78: 00 00       NEG    $00
 EC7A: 33 19       LEAU   -$7,X
 EC7C: 80 19       SUBA   #$19
-EC7E: 00 40       NEG    $40
+EC7E: 00 40       NEG    copy_of_dsw1_0040
 EC80: 19          DAA
 EC81: 80 19       SUBA   #$19
 EC83: BD 8D FC    JSR    $8DFC
@@ -15854,6 +15863,12 @@ FECF: ED 10       STD    -$10,X
 FED1: ED 13       STD    -$D,X
 FED3: E7 15       STB    -$B,X
 FED5: 7E 8E 38    JMP    $8E38
+
+* < A: value
+* < B: divisor
+* > A: result
+* > B: remainder
+divide_fed8:
 FED8: 34 04       PSHS   B
 FEDA: C6 08       LDB    #$08
 FEDC: 34 04       PSHS   B
