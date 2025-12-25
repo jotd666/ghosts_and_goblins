@@ -391,11 +391,14 @@
 	GET_ADDRESS_FUNC
 	.endm
 
+
+
 	.macro GET_INDIRECT_ADDRESS	offset
 	GET_ADDRESS	\offset
 	READ_BE_WORD	a0
 	GET_ADDRESS_FUNC
 	.endm
+	
 	.macro GET_REG_UNCHECKED_ADDRESS	offset,reg
 	.ifeq	\offset
 	move.l	\reg,a0
@@ -406,6 +409,35 @@
 	GET_UNCHECKED_ADDRESS_FUNC
 	.endm
 
+	***** bank access *****
+	
+	.macro GET_BANK_ADDRESS	offset
+	lea	\offset,a0
+	GET_BANK_ADDRESS_FUNC
+	.endm
+
+	.macro GET_INDIRECT_BANK_ADDRESS	offset
+	GET_ADDRESS	\offset
+	READ_BE_WORD	a0
+	GET_BANK_ADDRESS_FUNC
+	.endm
+	
+	.macro	GET_UNCHECKED_BANK_ADDRESS_FUNC
+	add.l	a1,a0
+	.endm
+
+	
+	.macro GET_REG_UNCHECKED_BANK_ADDRESS	offset,reg
+	.ifeq	\offset
+	move.l	\reg,a0
+	.else
+	lea	\offset,a0
+	add.l	\reg,a0
+	.endif
+	GET_UNCHECKED_BANK_ADDRESS_FUNC
+	.endm
+
+	***** end bank access *****
 
 	.macro GET_REG_INDIRECT_UNCHECKED_ADDRESS	offset,reg
 	GET_REG_ADDRESS	\offset,\reg
@@ -465,6 +497,16 @@ get_address:
 	GET_UNCHECKED_ADDRESS_FUNC
 	rts
 
+get_bank_address:
+	cmp.l	#0x6000,a0
+	jcs		0f
+	cmp.w	#0x4000,a0
+	jcc		0f
+	jbsr	osd_get_last_known_pc
+	BREAKPOINT	"get_bank_address out of 0x4000-0x5FFF range, PC in D6"	
+0:
+	GET_UNCHECKED_BANK_ADDRESS_FUNC
+	rts
 
 
 

@@ -28,9 +28,20 @@ input_dict = {
 "bankswitch_3e00":"set_bank"
 }
 
-store_to_video = re.compile("GET_ADDRESS\s+0x2")   # game_specific
 
+def handle_bank(line):
+    # pre-add video_address tag if we find a store instruction to an explicit 3000-3FFF address
+    if store_to_video.search(line):
+        line = line.rstrip() + " [video_address]\n"
+    # pre-add bank_address tag if we find a read instruction to an explicit 4000-5FFF address
+    if access_bank.search(line):
+        line = line.rstrip() + " [bank_address]\n"
 
+    if "[bank_address" in line:
+        # give me the original instruction
+        line = line.replace("_ADDRESS","_BANK_ADDRESS")
+
+    return line
 
 # various dirty but at least automatic patches applying on the converted code
 with open(source_dir / f"{bankname}.s") as f:
@@ -38,6 +49,8 @@ with open(source_dir / f"{bankname}.s") as f:
 
 for i,line in enumerate(lines):
     address = get_line_address(line)
+
+    line = handle_bank(line)
 
     ###############################################
     # game_specific
@@ -76,6 +89,40 @@ for i,line in enumerate(lines):
 
 
     address = get_line_address(line)
+
+    line = handle_bank(line)
+
+    # generic for 6809 cpus
+
+    if "GET_ADDRESS" in line:
+        val = line.split()[1]
+        is_stb = ": stb" in line
+
+        osd_call = input_dict.get(val)
+        if osd_call is not None:
+            if osd_call:
+                line = change_instruction(f"jbsr\tosd_{osd_call}",lines,i)
+                if is_stb:
+                    line = f"\texg\td0,d1\n{line}\texg\td0,d1\n"
+            else:
+                line = remove_instruction(lines,i)
+            lines[i+1] = remove_instruction(lines,i+1)
+
+
+    if "[video_address" in line:
+        # give me the original instruction
+        line = line.replace("_ADDRESS","_UNCHECKED_ADDRESS")
+        # if it's a write, insert a "VIDEO_DIRTY" macro after the write
+        for j in range(i+1,len(lines)):
+            next_line = lines[j]
+            if "[...]" not in next_line:
+                break
+            if ",(a0)" in next_line or "clr" in next_line or "MOVE_W_FROM_REG" in next_line:
+                if any(x in next_line for x in ["address_word","MOVE_W_FROM_REG"]):
+                    lines[j] = next_line+"\tVIDEO_WORD_DIRTY | [...]\n"
+                else:
+                    lines[j] = next_line+"\tVIDEO_BYTE_DIRTY | [...]\n"
+                break
 
     ###############################################
     # game_specific
@@ -159,21 +206,7 @@ for i,line in enumerate(lines):
         line = remove_error(line)
     # end game_specific
     ###############################################
-
-    if "GET_ADDRESS" in line:
-        val = line.split()[1]
-        is_stb = ": stb" in line
-
-        osd_call = input_dict.get(val)
-        if osd_call is not None:
-            if osd_call:
-                line = change_instruction(f"jbsr\tosd_{osd_call}",lines,i)
-                if is_stb:
-                    line = f"\texg\td0,d1\n{line}\texg\td0,d1\n"
-            else:
-                line = remove_instruction(lines,i)
-            lines[i+1] = remove_instruction(lines,i+1)
-
+    # copy the current line
     lines[i] = line
 
 with open(source_dir / "data.inc","w") as fw:

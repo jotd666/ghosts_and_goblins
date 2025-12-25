@@ -1006,7 +1006,7 @@ l_530f:
 	LOG_REGS	5311   | added by add_reg_log.py
 	jbsr	l_489b                            	| [$5311: jsr    $489b]
 	LOG_REGS	5314   | added by add_reg_log.py
-	GET_ADDRESS	0x5341                     	| [$5314: ldx    $5341]
+	GET_BANK_ADDRESS	0x5341                     	| [$5314: ldx    $5341] [bank_address]
 	MOVE_W_TO_REG	a0,d2                         	| [...]
 	LOG_REGS	5317   | added by add_reg_log.py
 	GET_DP_ADDRESS	0x55                    	| [$5317: ldy    $55]
@@ -1021,7 +1021,7 @@ l_531f:
 	LOG_REGS	5321   | added by add_reg_log.py
 	jbsr	l_489b                            	| [$5321: jsr    $489b]
 	LOG_REGS	5324   | added by add_reg_log.py
-	GET_ADDRESS	0x5343                     	| [$5324: ldx    $5343]
+	GET_BANK_ADDRESS	0x5343                     	| [$5324: ldx    $5343] [bank_address]
 	MOVE_W_TO_REG	a0,d2                         	| [...]
 	LOG_REGS	5327   | added by add_reg_log.py
 	GET_DP_ADDRESS	0x55                    	| [$5327: ldu    $55]
@@ -1040,7 +1040,7 @@ l_5330:
 	LOG_REGS	5332   | added by add_reg_log.py
 	jbsr	l_489b                            	| [$5332: jsr    $489b]
 	LOG_REGS	5335   | added by add_reg_log.py
-	GET_ADDRESS	0x5345                     	| [$5335: ldx    $5345]
+	GET_BANK_ADDRESS	0x5345                     	| [$5335: ldx    $5345] [bank_address]
 	MOVE_W_TO_REG	a0,d2                         	| [...]
 	LOG_REGS	5338   | added by add_reg_log.py
 	GET_DP_ADDRESS	0x55                    	| [$5338: ldu    $55]
@@ -2187,7 +2187,7 @@ l_57d4:
 	LOG_REGS	57d6   | added by add_reg_log.py
 	jbsr	l_489b                            	| [$57d6: jsr    $489b]
 	LOG_REGS	57d9   | added by add_reg_log.py
-	GET_ADDRESS	0x5806                     	| [$57d9: ldx    $5806]
+	GET_BANK_ADDRESS	0x5806                     	| [$57d9: ldx    $5806] [bank_address]
 	MOVE_W_TO_REG	a0,d2                         	| [...]
 	LOG_REGS	57dc   | added by add_reg_log.py
 	GET_DP_ADDRESS	0x55                    	| [$57dc: ldy    $55]
@@ -2202,7 +2202,7 @@ l_57e4:
 	LOG_REGS	57e6   | added by add_reg_log.py
 	jbsr	l_489b                            	| [$57e6: jsr    $489b]
 	LOG_REGS	57e9   | added by add_reg_log.py
-	GET_ADDRESS	0x5808                     	| [$57e9: ldx    $5808]
+	GET_BANK_ADDRESS	0x5808                     	| [$57e9: ldx    $5808] [bank_address]
 	MOVE_W_TO_REG	a0,d2                         	| [...]
 	LOG_REGS	57ec   | added by add_reg_log.py
 	GET_DP_ADDRESS	0x55                    	| [$57ec: ldu    $55]
@@ -2221,7 +2221,7 @@ l_57f5:
 	LOG_REGS	57f7   | added by add_reg_log.py
 	jbsr	l_489b                            	| [$57f7: jsr    $489b]
 	LOG_REGS	57fa   | added by add_reg_log.py
-	GET_ADDRESS	0x580a                     	| [$57fa: ldx    $580a]
+	GET_BANK_ADDRESS	0x580a                     	| [$57fa: ldx    $580a] [bank_address]
 	MOVE_W_TO_REG	a0,d2                         	| [...]
 	LOG_REGS	57fd   | added by add_reg_log.py
 	GET_DP_ADDRESS	0x55                    	| [$57fd: ldu    $55]

@@ -101,10 +101,12 @@ end_of_memory_test_607d:
 607F: 1F 9B       TFR    B,DP
 6081: 4F          CLRA
 6082: 5F          CLRB
+; clear RAM
 6083: 8E 00 00    LDX    #$0000
 6086: ED 81       STD    ,X++
 6088: 8C 1F FF    CMPX   #$1FFF
 608B: 23 F9       BLS    $6086
+; set stack
 608D: 10 CE 03 00 LDS    #$0300
 6091: CE 02 80    LDU    #$0280
 6094: 8E 01 40    LDX    #$0140
@@ -134,20 +136,22 @@ end_of_memory_test_607d:
 60D0: A7 80       STA    ,X+
 60D2: 31 3F       LEAY   -$1,Y
 60D4: 26 FA       BNE    $60D0
+; set bank #4 and copy stuff from it in RAM
 60D6: C6 04       LDB    #$04
 60D8: D7 D9       STB    bankswitch_copy_d9
 60DA: F7 3E 00    STB    bankswitch_3e00
 60DD: 8E 40 00    LDX    #$4000
 60E0: 10 8E 04 80 LDY    #$0480
 60E4: C6 80       LDB    #$80
-60E6: A6 80       LDA    ,X+
+60E6: A6 80       LDA    ,X+		; [bank_address]
 60E8: A7 A0       STA    ,Y+
 60EA: 5A          DECB
 60EB: 26 F9       BNE    $60E6
+; copy more stuff from bank #4
 60ED: 8E 40 80    LDX    #$4080
 60F0: 10 8E 16 B2 LDY    #$16B2
 60F4: C6 80       LDB    #$80
-60F6: A6 80       LDA    ,X+
+60F6: A6 80       LDA    ,X+		; [bank_address]
 60F8: A7 A0       STA    ,Y+
 60FA: 5A          DECB
 60FB: 26 F9       BNE    $60F6

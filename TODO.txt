@@ -1,4 +1,3 @@
-- table of tables (special jump)
-- implement JSR ,X (debug real game) 617D
+- debug around 66F8
 - use audio mixer for that one!
 fix 5025 push using movem do 2 separate pushes

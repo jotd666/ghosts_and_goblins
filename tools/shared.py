@@ -7,6 +7,9 @@ this_dir = pathlib.Path(__file__).absolute().parent
 source_dir = this_dir / "../src"
 amiga_source_dir = source_dir / "amiga"
 
+store_to_video = re.compile("GET_ADDRESS\s+0x2\w\w\w",flags=re.I)
+access_bank = re.compile("GET_ADDRESS\s+0x[4-5]\w\w\w",flags=re.I)
+
 gfx_dir = this_dir / "../assets/sheets"
 
 # post-conversion automatic patches, allowing not to change the asm file by hand

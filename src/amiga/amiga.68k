@@ -659,7 +659,6 @@ demo_game:
 	moveq	#0,d0
 	jbsr	osd_set_bank
 	
-	jbsr	osd_enable_interrupts
 	move.l	bank_base,a5
 	jmp		reset_6000								| pass control to the mpatrol core
 	
