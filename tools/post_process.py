@@ -150,7 +150,7 @@ for i,line in enumerate(lines):
     elif address == 0x617d:
          line = change_instruction("jsr\t(a2,d6.w)",lines,i)
     elif address in {0x6626,0x6667,0x66a0,0x6729,0x66ec}:
-        line = "\tlea\t(a0,d5.w),sp   | really change stack\n"+line
+        line = "\tlea\t(a0,d5.w),a3   | change fake stack\n"+line
     elif address == 0xfeed:
         line = change_instruction("addq.w\t#4*2,sp   | pop up both d1 pushes",lines,i)
     elif address == 0xff0e:
@@ -203,13 +203,47 @@ for i,line in enumerate(lines):
         # remove DAA
         line = remove_instruction(lines,i)
 
-    # game uses $E2 to save/restore stack. We need to use a longword
+    ### U and S stack management need some complete change!!
+    if address in {0x6104,0xfeed,0xff0e,0x6122,0x62ee,0x6305} and ("sub" in line or "add" in line):
+        lines[i-1] = remove_error(lines[i-1])
+
+    if address in {0x6305,0x6326,0x6623,0x6664,0x669d,0x66e9,0x6726} and "move." in line:
+        # let leas -2,S slide, it's used as local storage, linked to D5
+        # also remove handled part where they're using the S and U to decode data
+        lines[i-1] = remove_error(lines[i-1])
+
+
+    # PULU movem that is actually a data read
+    if address in {0x6638,0x6648,0x6677,0x66b2,0x66c2,0x66f8,0x6706,0x6737,0x6747,0x6685,
+    0x6DC7,0x6db2}:
+        if "movem" in line:
+            # change wrong movem. It matches some ROM data structure
+            line = change_instruction("movem.w\t(a0)+,d1-d2  | same order than PULU we're lucky",lines,i)
+        if "GET_REG_ADDRESS" in line:
+            lines[i-1] = remove_error(lines[i-1])
+
+    if address in {0x728f}:
+        if "movem" in line:
+            # change wrong movem. It matches some ROM data structure
+            line = change_instruction("movem.w\t(a0)+,d1-d3  | same order than PULU we're lucky",lines,i)
+        if "GET_REG_ADDRESS" in line:
+            lines[i-1] = remove_error(lines[i-1])
+
+    # PULS
+    if address in {0x662e,0x663e,0x66a8,0x66b8} and "movem" in line:
+        # change wrong movem. It matches some ROM data structure
+        line = change_instruction("movem.w\t(a3)+,d1-d2  | same order than PULS we're lucky",lines,i)
+
+    # game uses $E2 to save/restore stack. but we don't need to save it
+    # we use another scratch register
     if "unsupported instruction sts" in line:
-        line = change_instruction("move.l\tsp,stack_save",lines,i)
+        line = remove_instruction(lines,i)
     if address in {0x6652,0x668F,0x66CC,0x6710,0x6751}:
-        line = change_instruction("move.l\tstack_save,sp",lines,i)
+        line = remove_instruction(lines,i)
         lines[i+1] = remove_instruction(lines,i+1)
 
+
+    ### end of stack management change
 
     if "stray cmp" in line:
         # 1 useless CMP instruction

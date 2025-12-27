@@ -567,19 +567,19 @@ irq_65c4:
 
 6619: 96 DE       LDA    $DE
 661B: 26 39       BNE    $6656
-661D: 10 DF E2    STS    stack_save_00e2
-6620: CE 16 32    LDU    #$1632
-6623: 32 C8 40    LEAS   $40,U
+661D: 10 DF E2    STS    stack_save_00e2	; save current stack
+6620: CE 16 32    LDU    #$1632		; load U
+6623: 32 C8 40    LEAS   $40,U		; change stack to U+$40
 6626: 10 8E 38 00 LDY    #$3800
 662A: C6 08       LDB    #$08
-662C: D7 E0       STB    $E0
-662E: 35 16       PULS   D,X
+662C: D7 E0       STB    $E0		; do it 8 times
+662E: 35 16       PULS   D,X		; get values from new stack
 6630: ED A9 01 00 STD    $0100,Y
 6634: AF A9 01 02 STX    $0102,Y
 6638: 37 16       PULU   D,X
 663A: ED A1       STD    ,Y++
 663C: AF A1       STX    ,Y++
-663E: 35 16       PULS   D,X
+663E: 35 16       PULS   D,X		; get values from new stack
 6640: ED A9 01 00 STD    $0100,Y
 6644: AF A9 01 02 STX    $0102,Y
 6648: 37 16       PULU   D,X
@@ -587,7 +587,7 @@ irq_65c4:
 664C: AF A1       STX    ,Y++
 664E: 0A E0       DEC    $E0
 6650: 26 DC       BNE    $662E
-6652: 10 DE E2    LDS    stack_save_00e2
+6652: 10 DE E2    LDS    stack_save_00e2	; restore current stack
 6655: 39          RTS
 6656: 4A          DECA
 6657: 10 DF E2    STS    stack_save_00e2
