@@ -1,6 +1,3 @@
-- 68df: push number of loops on stack?? needs rewrite!
-- 6307, 68F7, no RTS converter has issue!!!
-- complete pshu/pulu patches
 - redo division: FED8
 - trap write to screen 2000-3000
 - use audio mixer for that one!

@@ -916,8 +916,9 @@ irq_65c4:
 68DA: C6 01       LDB    #$01
 68DC: D7 02       STB    $02
 68DE: 39          RTS
-68DF: C6 18       LDB    #$18
-68E1: 34 44       PSHS   U,B
+
+68DF: C6 18       LDB    #$18		; number of times to loop
+68E1: 34 44       PSHS   U,B		; pushed on stack (urgh!)
 68E3: CE 1F 80    LDU    #$1F80
 68E6: CC F8 F8    LDD    #$F8F8
 68E9: 1F 01       TFR    D,X
@@ -925,9 +926,10 @@ irq_65c4:
 68ED: 36 36       PSHU   Y,X,D
 68EF: 36 36       PSHU   Y,X,D
 68F1: 36 16       PSHU   X,D
-68F3: 6A E4       DEC    ,S
+68F3: 6A E4       DEC    ,S			; one less
 68F5: 26 F6       BNE    $68ED
 68F7: 35 C4       PULS   B,U,PC
+
 68F9: D6 6F       LDB    $6F
 68FB: D8 6E       EORB   $6E
 68FD: 53          COMB

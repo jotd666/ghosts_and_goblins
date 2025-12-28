@@ -63,7 +63,7 @@ for i,line in enumerate(lines):
 
     if address == 0x55CE:
         line = "\tILLEGAL\n"  # not reachable anyway, part of ROM/RAM check code
-    if "review pshu instruction" in line or "review pulu instruction" in line:
+    if "review pshu instruction" in line or "review pulu instruction" in line or "review stack set from register" in line:
         line = remove_error(line)
     lines[i] = line
 
@@ -246,7 +246,7 @@ for i,line in enumerate(lines):
             line = remove_error(line,True)
 
     # PULS
-    if address in {0x662e,0x663e,0x66a8,0x66b8} and "movem" in line:
+    if address in {0x662e,0x663e,0x66a8,0x66b8,0x672d,0x673d} and "movem" in line:
         # change wrong movem. It matches some ROM data structure
         line = change_instruction("movem.w\t(a3)+,d1-d2  | same order than PULS we're lucky",lines,i)
 
@@ -258,6 +258,13 @@ for i,line in enumerate(lines):
         line = remove_instruction(lines,i)
         lines[i+1] = remove_instruction(lines,i+1)
 
+    # here it pushes B on stack and decreases the stack memory directly!!
+    if address == 0x68df:
+        # change loop count register
+        line = change_instruction("move.b\t#0x18,d7",lines,i)
+    if address == 0x68f3:
+        # change loop count register
+        line = change_instruction("subq.b\t#1,d7",lines,i)
 
     ### end of stack management change
 
