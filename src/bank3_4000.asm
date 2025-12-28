@@ -1,4 +1,4 @@
-
+; clear screen
 4800: 8E 20 00    LDX    #$2000
 4803: 10 8E 00 20 LDY    #$0020
 4807: 32 7F       LEAS   -$1,S
@@ -6,8 +6,8 @@
 480B: E7 E4       STB    ,S
 480D: 86 20       LDA    #$20
 480F: C6 00       LDB    #$00
-4811: E7 89 04 00 STB    $0400,X
-4815: A7 80       STA    ,X+
+4811: E7 89 04 00 STB    $0400,X		; [video_address]
+4815: A7 80       STA    ,X+		    ; [video_address]
 4817: 6A E4       DEC    ,S
 4819: 26 F6       BNE    $4811
 481B: 31 3F       LEAY   -$1,Y

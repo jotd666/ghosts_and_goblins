@@ -164,7 +164,8 @@ for i,line in enumerate(lines):
          line = remove_instruction(lines,i)
          line = change_instruction("add.w\td6,d6",lines,i)
     elif address == 0x617d:
-         line = change_instruction("jsr\t(a2,d6.w)",lines,i)
+        # direct jump
+         line = change_instruction("move.l\t(a2,d6.w),a2",lines,i) + "\tjsr\t(a2)\n"
     elif address in {0x6626,0x6667,0x66a0,0x6729,0x66ec}:
         line = "\tlea\t(a0,d5.w),a3   | change fake stack\n"+line
     elif address == 0xfeed:
@@ -246,7 +247,7 @@ for i,line in enumerate(lines):
             line = remove_error(line,True)
 
     # PULS
-    if address in {0x662e,0x663e,0x66a8,0x66b8,0x672d,0x673d} and "movem" in line:
+    if address in {0x662e,0x663e,0x66a8,0x66b8,0x672d,0x673d,0x666f,0x667d} and "movem" in line:
         # change wrong movem. It matches some ROM data structure
         line = change_instruction("movem.w\t(a3)+,d1-d2  | same order than PULS we're lucky",lines,i)
 

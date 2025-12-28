@@ -1,7 +1,6 @@
 - redo division: FED8
-- trap write to screen 2000-3000
+- trap write to screen 2000-3000: 4800 check what it does!!
 - use audio mixer for that one!
 - fix 5025 push using movem do 2 separate pushes (probably OK)
 
-converter: add warnings with leas
 
