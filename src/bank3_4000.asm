@@ -45,8 +45,8 @@ l_485c:
 4866: D7 FC       STB    $FC
 4868: 86 20       LDA    #$20
 486A: C6 00       LDB    #$00
-486C: E7 89 04 00 STB    $0400,X
-4870: A7 80       STA    ,X+
+486C: E7 89 04 00 STB    $0400,X	; [video_address]
+4870: A7 80       STA    ,X+	; [video_address]
 4872: 0A FC       DEC    $FC
 4874: 26 F6       BNE    $486C
 4876: 0A FD       DEC    $FD
@@ -62,8 +62,8 @@ l_485c:
 4889: 1F 01       TFR    D,X
 488B: 86 20       LDA    #$20
 488D: C6 00       LDB    #$00
-488F: E7 89 04 00 STB    $0400,X
-4893: A7 80       STA    ,X+
+488F: E7 89 04 00 STB    $0400,X	; [video_address]
+4893: A7 80       STA    ,X+	; [video_address]
 4895: 8C 23 FF    CMPX   #$23FF
 4898: 23 F5       BLS    $488F
 489A: 39          RTS
@@ -80,8 +80,8 @@ l_489b:
 48AD: 27 0C       BEQ    $48BB
 48AF: C1 2F       CMPB   #$2F
 48B1: 27 F4       BEQ    $48A7
-48B3: A7 89 04 00 STA    $0400,X
-48B7: E7 80       STB    ,X+
+48B3: A7 89 04 00 STA    $0400,X	; [video_address]
+48B7: E7 80       STB    ,X+		; [video_address]
 48B9: 20 F0       BRA    $48AB
 48BB: 35 C0       PULS   U,PC
 l_48bd:
@@ -96,9 +96,9 @@ l_48bd:
 48CD: 27 EC       BEQ    $48BB
 48CF: C1 2F       CMPB   #$2F
 48D1: 27 F2       BEQ    $48C5
-48D3: A7 89 04 00 STA    $0400,X
+48D3: A7 89 04 00 STA    $0400,X		; [video_address]
 48D7: C6 20       LDB    #$20
-48D9: E7 80       STB    ,X+
+48D9: E7 80       STB    ,X+		; [video_address]
 48DB: 20 EE       BRA    $48CB
 
 l_5022:
@@ -110,7 +110,7 @@ l_5025:
 5027: C6 08       LDB    #$08
 5029: D7 FC       STB    $FC
 502B: 86 20       LDA    #$20
-502D: A7 80       STA    ,X+
+502D: A7 80       STA    ,X+		; [video_address]
 502F: 0A FC       DEC    $FC
 5031: 26 FA       BNE    $502D
 5033: 35 04       PULS   B
@@ -123,9 +123,9 @@ l_5025:
 5041: 35 10       PULS   X
 5043: C6 20       LDB    #$20
 5045: 86 07       LDA    #$07
-5047: 6D 84       TST    ,X
+5047: 6D 84       TST    ,X		; [video_address]
 5049: 26 05       BNE    $5050
-504B: E7 80       STB    ,X+
+504B: E7 80       STB    ,X+		; [video_address]
 504D: 4A          DECA
 504E: 26 F7       BNE    $5047
 5050: 39          RTS
@@ -138,8 +138,8 @@ l_5051:
 5057: 8D 02       BSR    $505B
 5059: A6 A0       LDA    ,Y+
 505B: 84 0F       ANDA   #$0F
-505D: E7 89 04 00 STB    $0400,X
-5061: A7 80       STA    ,X+
+505D: E7 89 04 00 STB    $0400,X		; [video_address]
+5061: A7 80       STA    ,X+		; [video_address]
 5063: 39          RTS
 5064: 34 10       PSHS   X
 5066: 36 06       PSHU   D
@@ -179,7 +179,7 @@ l_5051:
 50A2: C6 03       LDB    #$03
 50A4: 4F          CLRA
 50A5: A6 A2       LDA    ,-Y
-50A7: A9 82       ADCA   ,-X
+50A7: A9 82       ADCA   ,-X	; [bank_address]
 50A9: 19          DAA
 50AA: A7 A4       STA    ,Y
 50AC: 5A          DECB
@@ -190,20 +190,20 @@ l_5051:
 50DF: 27 68       BEQ    $5149
 50E1: BD 50 64    JSR    $5064
 50E4: C6 20       LDB    #$20
-50E6: E7 84       STB    ,X
-50E8: E7 01       STB    $1,X
-50EA: E7 02       STB    $2,X
-50EC: E7 03       STB    $3,X
-50EE: E7 04       STB    $4,X
-50F0: E7 05       STB    $5,X
+50E6: E7 84       STB    ,X			; [video_address]
+50E8: E7 01       STB    $1,X       ; [video_address]
+50EA: E7 02       STB    $2,X       ; [video_address]
+50EC: E7 03       STB    $3,X       ; [video_address]
+50EE: E7 04       STB    $4,X       ; [video_address]
+50F0: E7 05       STB    $5,X       ; [video_address]
 50F2: 96 F1       LDA    $F1
 50F4: 30 89 04 00 LEAX   $0400,X
-50F8: A7 84       STA    ,X
-50FA: A7 01       STA    $1,X
-50FC: A7 02       STA    $2,X
-50FE: A7 03       STA    $3,X
-5100: A7 04       STA    $4,X
-5102: A7 05       STA    $5,X
+50F8: A7 84       STA    ,X         ; [video_address]
+50FA: A7 01       STA    $1,X       ; [video_address]
+50FC: A7 02       STA    $2,X       ; [video_address]
+50FE: A7 03       STA    $3,X       ; [video_address]
+5100: A7 04       STA    $4,X       ; [video_address]
+5102: A7 05       STA    $5,X       ; [video_address]
 5104: 30 89 FC 00 LEAX   -$0400,X
 5108: C6 06       LDB    #$06
 510A: A6 C4       LDA    ,U
@@ -211,10 +211,10 @@ l_5051:
 510E: 33 41       LEAU   $1,U
 5110: 5A          DECB
 5111: 26 F7       BNE    $510A
-5113: A7 84       STA    ,X
+5113: A7 84       STA    ,X    ; [video_address]
 5115: 39          RTS
 5116: A6 C0       LDA    ,U+
-5118: A7 80       STA    ,X+
+5118: A7 80       STA    ,X+   ; [video_address]
 511A: 5A          DECB
 511B: 26 F9       BNE    $5116
 511D: 39          RTS
@@ -273,9 +273,9 @@ l_5180:
 518A: D7 FD       STB    $FD
 518C: C6 16       LDB    #$16
 518E: 86 47       LDA    #$47
-5190: A7 C9 04 00 STA    $0400,U
-5194: A6 80       LDA    ,X+
-5196: A7 C0       STA    ,U+
+5190: A7 C9 04 00 STA    $0400,U	; [video_address]
+5194: A6 80       LDA    ,X+	; [bank_address]
+5196: A7 C0       STA    ,U+	; [video_address]
 5198: 5A          DECB
 5199: 26 F3       BNE    $518E
 519B: 33 4A       LEAU   $A,U
@@ -400,10 +400,10 @@ l_5347:
 534D: 8E 15 82    LDX    #$1582
 5350: 10 8E 21 E8 LDY    #$21E8
 5354: 86 00       LDA    #$00
-5356: A7 A9 04 00 STA    $0400,Y
+5356: A7 A9 04 00 STA    $0400,Y	; [video_address]
 535A: A6 03       LDA    $3,X
 535C: 8B 30       ADDA   #$30
-535E: A7 A0       STA    ,Y+
+535E: A7 A0       STA    ,Y+	; [video_address]
 5360: 8E 53 99    LDX    #$5399
 5363: 8D 23       BSR    $5388
 5365: 8E 15 82    LDX    #$1582
@@ -411,23 +411,23 @@ l_5347:
 536A: 4A          DECA
 536B: 27 0A       BEQ    $5377
 536D: 86 00       LDA    #$00
-536F: A7 A9 04 00 STA    $0400,Y
+536F: A7 A9 04 00 STA    $0400,Y	; [video_address]
 5373: 86 53       LDA    #$53
-5375: A7 A0       STA    ,Y+
+5375: A7 A0       STA    ,Y+	; [video_address]
 5377: 31 23       LEAY   $3,Y
 5379: B6 15 86    LDA    $1586
 537C: 8B 30       ADDA   #$30
-537E: A7 A0       STA    ,Y+
+537E: A7 A0       STA    ,Y+	; [video_address]
 5380: 8E 53 9E    LDX    #$539E
 5383: 8D 03       BSR    $5388
 5385: 35 40       PULS   U
 5387: 39          RTS
 5388: 86 03       LDA    #$03
-538A: E6 80       LDB    ,X+
+538A: E6 80       LDB    ,X+	; [bank_address]
 538C: C1 40       CMPB   #$40
 538E: 27 08       BEQ    $5398
-5390: A7 A9 04 00 STA    $0400,Y
-5394: E7 A0       STB    ,Y+
+5390: A7 A9 04 00 STA    $0400,Y	; [video_address]
+5394: E7 A0       STB    ,Y+	; [video_address]
 5396: 20 F2       BRA    $538A
 5398: 39          RTS
 l_53a3:
@@ -459,9 +459,9 @@ l_53a3:
 53DF: 35 C0       PULS   U,PC
 53E1: 86 03       LDA    #$03
 53E3: 34 02       PSHS   A
-53E5: A6 A0       LDA    ,Y+
-53E7: E7 89 04 00 STB    $0400,X
-53EB: A7 80       STA    ,X+
+53E5: A6 A0       LDA    ,Y+		; [bank_address]
+53E7: E7 89 04 00 STB    $0400,X	; [video_address]
+53EB: A7 80       STA    ,X+	; [video_address]
 53ED: 6A E4       DEC    ,S
 53EF: 26 F4       BNE    $53E5
 53F1: 35 82       PULS   A,PC

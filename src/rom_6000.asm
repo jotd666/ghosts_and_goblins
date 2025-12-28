@@ -618,16 +618,16 @@ irq_65c4:
 6667: 10 8E 16 32 LDY    #$1632
 666B: C6 08       LDB    #$08
 666D: D7 E0       STB    $E0
-666F: 35 16       PULS   D,X
+666F: 35 16       PULS   D,X		; [bank_address]
 6671: ED A8 40    STD    $40,Y
 6674: AF A8 42    STX    $42,Y
-6677: 37 16       PULU   D,X
+6677: 37 16       PULU   D,X		; [bank_address]
 6679: ED A1       STD    ,Y++
 667B: AF A1       STX    ,Y++
 667D: 35 16       PULS   D,X
 667F: ED A8 40    STD    $40,Y
 6682: AF A8 42    STX    $42,Y
-6685: 37 16       PULU   D,X
+6685: 37 16       PULU   D,X		; [bank_address]
 6687: ED A1       STD    ,Y++
 6689: AF A1       STX    ,Y++
 668B: 0A E0       DEC    $E0
@@ -871,17 +871,20 @@ irq_65c4:
 687E: D7 DF       STB    $DF
 6880: 0C 05       INC    $05
 6882: 39          RTS
+
+fill_screen_with_h_6883:
 6883: 8E 20 00    LDX    #$2000
-6886: 86 48       LDA    #$48
+6886: 86 48       LDA    #$48		; 'H'
 6888: C6 01       LDB    #$01
-688A: E7 89 04 00 STB    $0400,X
-688E: A7 80       STA    ,X+
+688A: E7 89 04 00 STB    $0400,X	; [video_address]
+688E: A7 80       STA    ,X+		; [video_address]
 6890: 8C 23 FF    CMPX   #$23FF
 6893: 23 F5       BLS    $688A
 6895: CC 00 B4    LDD    #$00B4
 6898: DD 03       STD    $03
 689A: 0C 05       INC    $05
 689C: 39          RTS
+
 689D: 9E 03       LDX    $03
 689F: 30 1F       LEAX   -$1,X
 68A1: 9F 03       STX    $03
@@ -15977,7 +15980,7 @@ jump_table_6611:
 	dc.w	$6716	; $6617
 jump_table_6857:
 	dc.w	$685f	; $6857
-	dc.w	$6883	; $6859
+	dc.w	fill_screen_with_h_6883	; $6859
 	dc.w	$689d	; $685b
 	dc.w	$68bc	; $685d
 jump_table_695a:

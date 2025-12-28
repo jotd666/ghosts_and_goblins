@@ -129,12 +129,14 @@ l_4864:
 	move.b	#0x00,d1                        	| [$486a: ldb    #$00]
 l_486c:
 	LOG_REGS	486c   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x0400,d2              	| [$486c: stb    $0400,x]
+	GET_REG_UNCHECKED_ADDRESS	0x0400,d2              	| [$486c: stb    $0400,x] [video_address]
 	move.b	d1,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	4870   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$4870: sta    ,x+]
+	GET_REG_UNCHECKED_ADDRESS	0,d2                   	| [$4870: sta    ,x+] [video_address]
 	addq.w	#1,d2                           	| [...]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	4872   | added by add_reg_log.py
 	OP_W_ON_DP_ADDRESS	subq,0xfc,#1         | [$4872: dec    $fc]
 	LOG_REGS	4874   | added by add_reg_log.py
@@ -173,12 +175,14 @@ l_487d:
 	move.b	#0x00,d1                        	| [$488d: ldb    #$00]
 l_488f:
 	LOG_REGS	488f   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x0400,d2              	| [$488f: stb    $0400,x]
+	GET_REG_UNCHECKED_ADDRESS	0x0400,d2              	| [$488f: stb    $0400,x] [video_address]
 	move.b	d1,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	4893   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$4893: sta    ,x+]
+	GET_REG_UNCHECKED_ADDRESS	0,d2                   	| [$4893: sta    ,x+] [video_address]
 	addq.w	#1,d2                           	| [...]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	4895   | added by add_reg_log.py
 	cmp.w	#0x23ff,d2                       	| [$4895: cmpx   #$23ff]
 	LOG_REGS	4898   | added by add_reg_log.py
@@ -225,12 +229,14 @@ l_48ab:
 	LOG_REGS	48b1   | added by add_reg_log.py
 	jeq	l_48a7                             	| [$48b1: beq    $48a7]
 	LOG_REGS	48b3   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x0400,d2              	| [$48b3: sta    $0400,x]
+	GET_REG_UNCHECKED_ADDRESS	0x0400,d2              	| [$48b3: sta    $0400,x] [video_address]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	48b7   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$48b7: stb    ,x+]
+	GET_REG_UNCHECKED_ADDRESS	0,d2                   	| [$48b7: stb    ,x+] [video_address]
 	addq.w	#1,d2                           	| [...]
 	move.b	d1,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	48b9   | added by add_reg_log.py
 	jra	l_48ab                             	| [$48b9: bra    $48ab]
 l_48bb:
@@ -273,14 +279,16 @@ l_48cb:
 	LOG_REGS	48d1   | added by add_reg_log.py
 	jeq	l_48c5                             	| [$48d1: beq    $48c5]
 	LOG_REGS	48d3   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x0400,d2              	| [$48d3: sta    $0400,x]
+	GET_REG_UNCHECKED_ADDRESS	0x0400,d2              	| [$48d3: sta    $0400,x] [video_address]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	48d7   | added by add_reg_log.py
 	move.b	#0x20,d1                        	| [$48d7: ldb    #$20]
 	LOG_REGS	48d9   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$48d9: stb    ,x+]
+	GET_REG_UNCHECKED_ADDRESS	0,d2                   	| [$48d9: stb    ,x+] [video_address]
 	addq.w	#1,d2                           	| [...]
 	move.b	d1,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	48db   | added by add_reg_log.py
 	jra	l_48cb                             	| [$48db: bra    $48cb]
 
@@ -302,9 +310,10 @@ l_5025:
 	move.b	#0x20,d0                        	| [$502b: lda    #$20]
 l_502d:
 	LOG_REGS	502d   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$502d: sta    ,x+]
+	GET_REG_UNCHECKED_ADDRESS	0,d2                   	| [$502d: sta    ,x+] [video_address]
 	addq.w	#1,d2                           	| [...]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	502f   | added by add_reg_log.py
 	OP_W_ON_DP_ADDRESS	subq,0xfc,#1         | [$502f: dec    $fc]
 	LOG_REGS	5031   | added by add_reg_log.py
@@ -333,14 +342,15 @@ l_503b:
 	move.b	#0x07,d0                        	| [$5045: lda    #$07]
 l_5047:
 	LOG_REGS	5047   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$5047: tst    ,x]
+	GET_REG_UNCHECKED_ADDRESS	0,d2                   	| [$5047: tst    ,x] [video_address]
 	tst.b	(a0)                             	| [...]
 	LOG_REGS	5049   | added by add_reg_log.py
 	jne	l_5050                             	| [$5049: bne    $5050]
 	LOG_REGS	504b   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$504b: stb    ,x+]
+	GET_REG_UNCHECKED_ADDRESS	0,d2                   	| [$504b: stb    ,x+] [video_address]
 	addq.w	#1,d2                           	| [...]
 	move.b	d1,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	504d   | added by add_reg_log.py
 	subq.b	#1,d0                           	| [$504d: deca]
 	LOG_REGS	504e   | added by add_reg_log.py
@@ -368,12 +378,14 @@ l_505b:
 	LOG_REGS	505b   | added by add_reg_log.py
 	and.b	#0x0f,d0                         	| [$505b: anda   #$0f]
 	LOG_REGS	505d   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x0400,d2              	| [$505d: stb    $0400,x]
+	GET_REG_UNCHECKED_ADDRESS	0x0400,d2              	| [$505d: stb    $0400,x] [video_address]
 	move.b	d1,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	5061   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$5061: sta    ,x+]
+	GET_REG_UNCHECKED_ADDRESS	0,d2                   	| [$5061: sta    ,x+] [video_address]
 	addq.w	#1,d2                           	| [...]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	5063   | added by add_reg_log.py
 	rts                                    	| [$5063: rts]
 l_5064:
@@ -382,7 +394,6 @@ l_5064:
 	LOG_REGS	5066   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$5066: pshu   d]
 	sub.l	a0,d4
-	LOG_REGS	5066   | added by add_reg_log.py
 	move.W	d1,-(a0)                        	| [$5066: pshu   d]
 	add.l	a0,d4
 	LOG_REGS	5068   | added by add_reg_log.py
@@ -390,7 +401,6 @@ l_5064:
 	LOG_REGS	506a   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$506a: pshu   b]
 	sub.l	a0,d4
-	LOG_REGS	506a   | added by add_reg_log.py
 	move.W	d1,-(a0)                        	| [$506a: pshu   b]
 	add.l	a0,d4
 	LOG_REGS	506c   | added by add_reg_log.py
@@ -400,38 +410,29 @@ l_5064:
 	LOG_REGS	506e   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$506e: pshu   d]
 	sub.l	a0,d4
-	LOG_REGS	506e   | added by add_reg_log.py
 	move.W	d1,-(a0)                        	| [$506e: pshu   d]
 	add.l	a0,d4
 	LOG_REGS	5070   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$5070: pshu   a]
 	sub.l	a0,d4
-	LOG_REGS	5070   | added by add_reg_log.py
 	move.W	d0,-(a0)                        	| [$5070: pshu   a]
 	add.l	a0,d4
 	LOG_REGS	5072   | added by add_reg_log.py
 	move.w	d4,d3                           	| [$5072: leay   $3,u]
-	LOG_REGS	5072   | added by add_reg_log.py
 	addq.w	#0x3,d3                         	| [$5072: leay   $3,u]
 	LOG_REGS	5074   | added by add_reg_log.py
 	move.w	#0x50b4,d2                      	| [$5074: ldx    #$50b4]
 l_5077:
 	LOG_REGS	5077   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x4,d4                 	| [$5077: lsr    $4,u]
-	LOG_REGS	5077   | added by add_reg_log.py
 	move.b	(a0),d6	| [$5077: lsr    $4,u]
-	LOG_REGS	5077   | added by add_reg_log.py
 	lsr.b	#1,d6                          	| [$5077: lsr    $4,u]
-	LOG_REGS	5077   | added by add_reg_log.py
 	move.b	d6,(a0)	| [$5077: lsr    $4,u]
 	LOG_REGS	5079   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x5,d4                 	| [$5079: ror    $5,u]
-	LOG_REGS	5079   | added by add_reg_log.py
 	move.b	(a0),d6	| [$5079: ror    $5,u]
-	LOG_REGS	5079   | added by add_reg_log.py
 	roxr.b	#1,d6                         	| [$5079: ror    $5,u]
 	PUSH_SR
-	LOG_REGS	5079   | added by add_reg_log.py
 	move.b	d6,(a0)	| [$5079: ror    $5,u]
 	POP_SR
 	LOG_REGS	507b   | added by add_reg_log.py
@@ -448,11 +449,9 @@ l_507f:
 	jne	l_5077                             	| [$5083: bne    $5077]
 	LOG_REGS	5085   | added by add_reg_log.py
 	move.w	d4,d2                           	| [$5085: leax   $3,u]
-	LOG_REGS	5085   | added by add_reg_log.py
 	addq.w	#0x3,d2                         	| [$5085: leax   $3,u]
 	LOG_REGS	5087   | added by add_reg_log.py
 	move.w	d4,d3                           	| [$5087: leay   $6,u]
-	LOG_REGS	5087   | added by add_reg_log.py
 	addq.w	#0x6,d3                         	| [$5087: leay   $6,u]
 	LOG_REGS	5089   | added by add_reg_log.py
 	move.b	#0x03,d1                        	| [$5089: ldb    #$03]
@@ -503,7 +502,7 @@ l_50a5:
 	move.b	(a0),d0                         	| [...]
 	subq.w	#1,d2                           	| [...]
 	LOG_REGS	50a7   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$50a7: adca   ,-x]
+	GET_REG_BANK_ADDRESS	0,d2                   	| [$50a7: adca   ,-x] [bank_address]
 	move.b	(a0),d6	| [...]
 	abcd	d6,d0	| [...]
 	LOG_REGS	50aa   | added by add_reg_log.py
@@ -527,45 +526,57 @@ l_50e1:
 	LOG_REGS	50e4   | added by add_reg_log.py
 	move.b	#0x20,d1                        	| [$50e4: ldb    #$20]
 	LOG_REGS	50e6   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$50e6: stb    ,x]
+	GET_REG_UNCHECKED_ADDRESS	0,d2                   	| [$50e6: stb    ,x] [video_address]
 	move.b	d1,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	50e8   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x1,d2                 	| [$50e8: stb    $1,x]
+	GET_REG_UNCHECKED_ADDRESS	0x1,d2                 	| [$50e8: stb    $1,x] [video_address]
 	move.b	d1,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	50ea   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x2,d2                 	| [$50ea: stb    $2,x]
+	GET_REG_UNCHECKED_ADDRESS	0x2,d2                 	| [$50ea: stb    $2,x] [video_address]
 	move.b	d1,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	50ec   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x3,d2                 	| [$50ec: stb    $3,x]
+	GET_REG_UNCHECKED_ADDRESS	0x3,d2                 	| [$50ec: stb    $3,x] [video_address]
 	move.b	d1,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	50ee   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x4,d2                 	| [$50ee: stb    $4,x]
+	GET_REG_UNCHECKED_ADDRESS	0x4,d2                 	| [$50ee: stb    $4,x] [video_address]
 	move.b	d1,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	50f0   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x5,d2                 	| [$50f0: stb    $5,x]
+	GET_REG_UNCHECKED_ADDRESS	0x5,d2                 	| [$50f0: stb    $5,x] [video_address]
 	move.b	d1,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	50f2   | added by add_reg_log.py
 	OP_R_ON_DP_ADDRESS	move,0xf1,d0         | [$50f2: lda    $f1]
 	LOG_REGS	50f4   | added by add_reg_log.py
 	add.w	#0x0400,d2                       	| [$50f4: leax   $0400,x]
 	LOG_REGS	50f8   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$50f8: sta    ,x]
+	GET_REG_UNCHECKED_ADDRESS	0,d2                   	| [$50f8: sta    ,x] [video_address]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	50fa   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x1,d2                 	| [$50fa: sta    $1,x]
+	GET_REG_UNCHECKED_ADDRESS	0x1,d2                 	| [$50fa: sta    $1,x] [video_address]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	50fc   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x2,d2                 	| [$50fc: sta    $2,x]
+	GET_REG_UNCHECKED_ADDRESS	0x2,d2                 	| [$50fc: sta    $2,x] [video_address]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	50fe   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x3,d2                 	| [$50fe: sta    $3,x]
+	GET_REG_UNCHECKED_ADDRESS	0x3,d2                 	| [$50fe: sta    $3,x] [video_address]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	5100   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x4,d2                 	| [$5100: sta    $4,x]
+	GET_REG_UNCHECKED_ADDRESS	0x4,d2                 	| [$5100: sta    $4,x] [video_address]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	5102   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x5,d2                 	| [$5102: sta    $5,x]
+	GET_REG_UNCHECKED_ADDRESS	0x5,d2                 	| [$5102: sta    $5,x] [video_address]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	5104   | added by add_reg_log.py
 	sub.w	#0x0400,d2                       	| [$5104: leax   -$0400,x]
 	LOG_REGS	5108   | added by add_reg_log.py
@@ -583,8 +594,9 @@ l_510a:
 	LOG_REGS	5111   | added by add_reg_log.py
 	jne	l_510a                             	| [$5111: bne    $510a]
 	LOG_REGS	5113   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$5113: sta    ,x]
+	GET_REG_UNCHECKED_ADDRESS	0,d2                   	| [$5113: sta    ,x] [video_address]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	5115   | added by add_reg_log.py
 	rts                                    	| [$5115: rts]
 l_5116:
@@ -593,9 +605,10 @@ l_5116:
 	addq.w	#1,d4                           	| [...]
 	move.b	(a0),d0                         	| [...]
 	LOG_REGS	5118   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$5118: sta    ,x+]
+	GET_REG_UNCHECKED_ADDRESS	0,d2                   	| [$5118: sta    ,x+] [video_address]
 	addq.w	#1,d2                           	| [...]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	511a   | added by add_reg_log.py
 	subq.b	#1,d1                           	| [$511a: decb]
 	LOG_REGS	511b   | added by add_reg_log.py
@@ -617,7 +630,6 @@ l_511e:
 	jbsr	l_489b                            	| [$5128: jsr    $489b]
 	LOG_REGS	512b   | added by add_reg_log.py
 	GET_DP_ADDRESS	0x22                    	| [$512b: ldd    $22]
-	LOG_REGS	512b   | added by add_reg_log.py
 	LOAD_D                                 	| [$512b: ldd    $22]
 	LOG_REGS	512d   | added by add_reg_log.py
 	move.w	#0x23a1,d2                      	| [$512d: ldx    #$23a1]
@@ -670,7 +682,6 @@ l_5157:
 	move.w	#0x5174,d3                      	| [$5157: ldy    #$5174]
 	LOG_REGS	515b   | added by add_reg_log.py
 	move.b	#0x0d,d0                        	| [$515b: ldd    #$0d0d]
-	LOG_REGS	515b   | added by add_reg_log.py
 	move.w	#0x0d0d,d1                      	| [$515b: ldd    #$0d0d]
 	MAKE_D                                 	| [...]
 	LOG_REGS	515e   | added by add_reg_log.py
@@ -683,14 +694,12 @@ l_5157:
 	LOG_REGS	5166   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d3                   	| [$5166: ldd    ,y++]
 	addq.w	#2,d3                           	| [...]
-	LOG_REGS	5166   | added by add_reg_log.py
 	LOAD_D                                 	| [$5166: ldd    ,y++]
 	LOG_REGS	5168   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0x20,d2               	| [$5168: std    -$20,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	LOG_REGS	516b   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d3                   	| [$516b: ldd    ,y]
-	LOG_REGS	516b   | added by add_reg_log.py
 	LOAD_D                                 	| [$516b: ldd    ,y]
 	LOG_REGS	516d   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d2                   	| [$516d: std    ,x++]
@@ -739,16 +748,18 @@ l_518e:
 	LOG_REGS	518e   | added by add_reg_log.py
 	move.b	#0x47,d0                        	| [$518e: lda    #$47]
 	LOG_REGS	5190   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x0400,d4              	| [$5190: sta    $0400,u]
+	GET_REG_UNCHECKED_ADDRESS	0x0400,d4              	| [$5190: sta    $0400,u] [video_address]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	5194   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$5194: lda    ,x+]
+	GET_REG_BANK_ADDRESS	0,d2                   	| [$5194: lda    ,x+] [bank_address]
 	addq.w	#1,d2                           	| [...]
 	move.b	(a0),d0                         	| [...]
 	LOG_REGS	5196   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d4                   	| [$5196: sta    ,u+]
+	GET_REG_UNCHECKED_ADDRESS	0,d4                   	| [$5196: sta    ,u+] [video_address]
 	addq.w	#1,d4                           	| [...]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	5198   | added by add_reg_log.py
 	subq.b	#1,d1                           	| [$5198: decb]
 	LOG_REGS	5199   | added by add_reg_log.py
@@ -777,7 +788,6 @@ l_5223:
 	DO_EXTB	d6                             	| [...] with sign extension
 	LOG_REGS	522b   | added by add_reg_log.py
 	move.w	d2,d3                           	| [$522b: leay   b,x]
-	LOG_REGS	522b   | added by add_reg_log.py
 	add.w	d6,d3                            	| [$522b: leay   b,x]
 	LOG_REGS	522d   | added by add_reg_log.py
 	move.w	#0x04bc,d2                      	| [$522d: ldx    #$04bc]
@@ -836,7 +846,6 @@ l_523f:
 	LOG_REGS	5257   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$5257: ldd    ,u++]
 	addq.w	#2,d4                           	| [...]
-	LOG_REGS	5257   | added by add_reg_log.py
 	LOAD_D                                 	| [$5257: ldd    ,u++]
 	LOG_REGS	5259   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d2                   	| [$5259: std    ,x]
@@ -844,14 +853,12 @@ l_523f:
 	LOG_REGS	525b   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$525b: ldd    ,u++]
 	addq.w	#2,d4                           	| [...]
-	LOG_REGS	525b   | added by add_reg_log.py
 	LOAD_D                                 	| [$525b: ldd    ,u++]
 	LOG_REGS	525d   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x20,d2                	| [$525d: std    $20,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	LOG_REGS	5260   | added by add_reg_log.py
 	move.b	#0x0f,d0                        	| [$5260: ldd    #$0f0f]
-	LOG_REGS	5260   | added by add_reg_log.py
 	move.w	#0x0f0f,d1                      	| [$5260: ldd    #$0f0f]
 	MAKE_D                                 	| [...]
 	LOG_REGS	5263   | added by add_reg_log.py
@@ -878,14 +885,12 @@ l_5277:
 	LOG_REGS	5277   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$5277: ldd    ,u++]
 	addq.w	#2,d4                           	| [...]
-	LOG_REGS	5277   | added by add_reg_log.py
 	LOAD_D                                 	| [$5277: ldd    ,u++]
 	LOG_REGS	5279   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d2                   	| [$5279: std    ,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	LOG_REGS	527b   | added by add_reg_log.py
 	move.b	#0x0e,d0                        	| [$527b: ldd    #$0e0e]
-	LOG_REGS	527b   | added by add_reg_log.py
 	move.w	#0x0e0e,d1                      	| [$527b: ldd    #$0e0e]
 	MAKE_D                                 	| [...]
 	LOG_REGS	527e   | added by add_reg_log.py
@@ -894,14 +899,12 @@ l_5277:
 	LOG_REGS	5282   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$5282: ldd    ,u++]
 	addq.w	#2,d4                           	| [...]
-	LOG_REGS	5282   | added by add_reg_log.py
 	LOAD_D                                 	| [$5282: ldd    ,u++]
 	LOG_REGS	5284   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x2,d2                 	| [$5284: std    $2,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	LOG_REGS	5286   | added by add_reg_log.py
 	move.b	#0x0e,d0                        	| [$5286: ldd    #$0e0e]
-	LOG_REGS	5286   | added by add_reg_log.py
 	move.w	#0x0e0e,d1                      	| [$5286: ldd    #$0e0e]
 	MAKE_D                                 	| [...]
 	LOG_REGS	5289   | added by add_reg_log.py
@@ -925,12 +928,10 @@ l_52b9:
 	MOVE_W_TO_REG	a0,d2                         	| [...]
 	LOG_REGS	52c0   | added by add_reg_log.py
 	move.b	#0x00,d0                        	| [$52c0: ldd    #$003c]
-	LOG_REGS	52c0   | added by add_reg_log.py
 	move.w	#0x003c,d1                      	| [$52c0: ldd    #$003c]
 	LOG_REGS	52c3   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$52c3: pshu   x]
 	sub.l	a0,d4
-	LOG_REGS	52c3   | added by add_reg_log.py
 	move.W	d2,-(a0)                        	| [$52c3: pshu   x]
 	add.l	a0,d4
 	LOG_REGS	52c5   | added by add_reg_log.py
@@ -942,7 +943,6 @@ l_52b9:
 	LOG_REGS	52ca   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$52ca: pulu   d]
 	sub.l	a0,d4
-	LOG_REGS	52ca   | added by add_reg_log.py
 	movem.W	(a0)+,d1                       	| [$52ca: pulu   d]
 	add.l	a0,d4
 	LOG_REGS	52cc   | added by add_reg_log.py
@@ -969,7 +969,6 @@ l_52b9:
 	movem.l	d0/d2,-(sp)                    	| [$52df: pshs   x,a]
 	LOG_REGS	52e1   | added by add_reg_log.py
 	GET_DP_ADDRESS	0xfc                    	| [$52e1: ldd    $fc]
-	LOG_REGS	52e1   | added by add_reg_log.py
 	LOAD_D                                 	| [$52e1: ldd    $fc]
 	LOG_REGS	52e3   | added by add_reg_log.py
 	jbsr	l_5064                            	| [$52e3: jsr    $5064]
@@ -1053,7 +1052,6 @@ l_531f:
 	MOVE_W_TO_REG	a0,d4                         	| [...]
 	LOG_REGS	5329   | added by add_reg_log.py
 	move.w	d4,d3                           	| [$5329: leay   $4,u]
-	LOG_REGS	5329   | added by add_reg_log.py
 	addq.w	#0x4,d3                         	| [$5329: leay   $4,u]
 	LOG_REGS	532b   | added by add_reg_log.py
 	move.b	#0x03,d1                        	| [$532b: ldb    #$03]
@@ -1072,7 +1070,6 @@ l_5330:
 	MOVE_W_TO_REG	a0,d4                         	| [...]
 	LOG_REGS	533a   | added by add_reg_log.py
 	move.w	d4,d3                           	| [$533a: leay   $8,u]
-	LOG_REGS	533a   | added by add_reg_log.py
 	add.w	#0x8,d3                          	| [$533a: leay   $8,u]
 	LOG_REGS	533c   | added by add_reg_log.py
 	move.b	#0x03,d1                        	| [$533c: ldb    #$03]
@@ -1092,17 +1089,19 @@ l_5347:
 	LOG_REGS	5354   | added by add_reg_log.py
 	move.b	#0x00,d0                        	| [$5354: lda    #$00]
 	LOG_REGS	5356   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x0400,d3              	| [$5356: sta    $0400,y]
+	GET_REG_UNCHECKED_ADDRESS	0x0400,d3              	| [$5356: sta    $0400,y] [video_address]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	535a   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x3,d2                 	| [$535a: lda    $3,x]
 	move.b	(a0),d0                         	| [...]
 	LOG_REGS	535c   | added by add_reg_log.py
 	add.b	#0x30,d0                         	| [$535c: adda   #$30]
 	LOG_REGS	535e   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d3                   	| [$535e: sta    ,y+]
+	GET_REG_UNCHECKED_ADDRESS	0,d3                   	| [$535e: sta    ,y+] [video_address]
 	addq.w	#1,d3                           	| [...]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	5360   | added by add_reg_log.py
 	move.w	#0x5399,d2                      	| [$5360: ldx    #$5399]
 	LOG_REGS	5363   | added by add_reg_log.py
@@ -1119,14 +1118,16 @@ l_5347:
 	LOG_REGS	536d   | added by add_reg_log.py
 	move.b	#0x00,d0                        	| [$536d: lda    #$00]
 	LOG_REGS	536f   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x0400,d3              	| [$536f: sta    $0400,y]
+	GET_REG_UNCHECKED_ADDRESS	0x0400,d3              	| [$536f: sta    $0400,y] [video_address]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	5373   | added by add_reg_log.py
 	move.b	#0x53,d0                        	| [$5373: lda    #$53]
 	LOG_REGS	5375   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d3                   	| [$5375: sta    ,y+]
+	GET_REG_UNCHECKED_ADDRESS	0,d3                   	| [$5375: sta    ,y+] [video_address]
 	addq.w	#1,d3                           	| [...]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 l_5377:
 	LOG_REGS	5377   | added by add_reg_log.py
 	addq.w	#0x3,d3                         	| [$5377: leay   $3,y]
@@ -1136,9 +1137,10 @@ l_5377:
 	LOG_REGS	537c   | added by add_reg_log.py
 	add.b	#0x30,d0                         	| [$537c: adda   #$30]
 	LOG_REGS	537e   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d3                   	| [$537e: sta    ,y+]
+	GET_REG_UNCHECKED_ADDRESS	0,d3                   	| [$537e: sta    ,y+] [video_address]
 	addq.w	#1,d3                           	| [...]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	5380   | added by add_reg_log.py
 	move.w	#0x539e,d2                      	| [$5380: ldx    #$539e]
 	LOG_REGS	5383   | added by add_reg_log.py
@@ -1153,7 +1155,7 @@ l_5388:
 	move.b	#0x03,d0                        	| [$5388: lda    #$03]
 l_538a:
 	LOG_REGS	538a   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$538a: ldb    ,x+]
+	GET_REG_BANK_ADDRESS	0,d2                   	| [$538a: ldb    ,x+] [bank_address]
 	addq.w	#1,d2                           	| [...]
 	move.b	(a0),d1                         	| [...]
 	LOG_REGS	538c   | added by add_reg_log.py
@@ -1161,12 +1163,14 @@ l_538a:
 	LOG_REGS	538e   | added by add_reg_log.py
 	jeq	l_5398                             	| [$538e: beq    $5398]
 	LOG_REGS	5390   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x0400,d3              	| [$5390: sta    $0400,y]
+	GET_REG_UNCHECKED_ADDRESS	0x0400,d3              	| [$5390: sta    $0400,y] [video_address]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	5394   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d3                   	| [$5394: stb    ,y+]
+	GET_REG_UNCHECKED_ADDRESS	0,d3                   	| [$5394: stb    ,y+] [video_address]
 	addq.w	#1,d3                           	| [...]
 	move.b	d1,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	5396   | added by add_reg_log.py
 	jra	l_538a                             	| [$5396: bra    $538a]
 l_5398:
@@ -1209,7 +1213,6 @@ l_53b7:
 	MOVE_W_TO_REG	a0,d3                         	| [...]
 	LOG_REGS	53c9   | added by add_reg_log.py
 	move.w	d4,d2                           	| [$53c9: leax   $4,u]
-	LOG_REGS	53c9   | added by add_reg_log.py
 	addq.w	#0x4,d2                         	| [$53c9: leax   $4,u]
 	LOG_REGS	53cb   | added by add_reg_log.py
 	move.b	#0x04,d1                        	| [$53cb: ldb    #$04]
@@ -1240,16 +1243,18 @@ l_53e1:
 	move.l	d0,-(sp)                        	| [$53e3: pshs   a]
 l_53e5:
 	LOG_REGS	53e5   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d3                   	| [$53e5: lda    ,y+]
+	GET_REG_BANK_ADDRESS	0,d3                   	| [$53e5: lda    ,y+] [bank_address]
 	addq.w	#1,d3                           	| [...]
 	move.b	(a0),d0                         	| [...]
 	LOG_REGS	53e7   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x0400,d2              	| [$53e7: stb    $0400,x]
+	GET_REG_UNCHECKED_ADDRESS	0x0400,d2              	| [$53e7: stb    $0400,x] [video_address]
 	move.b	d1,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	53eb   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$53eb: sta    ,x+]
+	GET_REG_UNCHECKED_ADDRESS	0,d2                   	| [$53eb: sta    ,x+] [video_address]
 	addq.w	#1,d2                           	| [...]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	53ed   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d5                   	| [$53ed: dec    ,s]
 	subq.b	#1,(a0)                         	| [...]
@@ -1320,7 +1325,6 @@ l_53f4:
 	OP_W_ON_DP_ADDRESS	move,0x68,d0         | [$541c: sta    $68]
 	LOG_REGS	541e   | added by add_reg_log.py
 	GET_DP_ADDRESS	0x68                    	| [$541e: ldd    $68]
-	LOG_REGS	541e   | added by add_reg_log.py
 	LOAD_D                                 	| [$541e: ldd    $68]
 	LOG_REGS	5420   | added by add_reg_log.py
 	GET_DP_ADDRESS	0xd0                    	| [$5420: cmpd   $d0]
@@ -1331,7 +1335,6 @@ l_53f4:
 	jcs	l_5442                             	| [$5425: bcs    $5442]
 	LOG_REGS	5427   | added by add_reg_log.py
 	GET_DP_ADDRESS	0x6a                    	| [$5427: ldd    $6a]
-	LOG_REGS	5427   | added by add_reg_log.py
 	LOAD_D                                 	| [$5427: ldd    $6a]
 	LOG_REGS	5429   | added by add_reg_log.py
 	GET_DP_ADDRESS	0xd2                    	| [$5429: cmpd   $d2]
@@ -1341,14 +1344,12 @@ l_53f4:
 l_542e:
 	LOG_REGS	542e   | added by add_reg_log.py
 	GET_DP_ADDRESS	0x68                    	| [$542e: ldd    $68]
-	LOG_REGS	542e   | added by add_reg_log.py
 	LOAD_D                                 	| [$542e: ldd    $68]
 	LOG_REGS	5430   | added by add_reg_log.py
 	GET_DP_ADDRESS	0xd0                    	| [$5430: std    $d0]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	LOG_REGS	5432   | added by add_reg_log.py
 	GET_DP_ADDRESS	0x6a                    	| [$5432: ldd    $6a]
-	LOG_REGS	5432   | added by add_reg_log.py
 	LOAD_D                                 	| [$5432: ldd    $6a]
 	LOG_REGS	5434   | added by add_reg_log.py
 	GET_DP_ADDRESS	0xd2                    	| [$5434: std    $d2]
@@ -1388,7 +1389,6 @@ l_54e3:
 	move.w	#0x2800,d2                      	| [$54e5: ldx    #$2800]
 	LOG_REGS	54e8   | added by add_reg_log.py
 	move.w	d2,d4                           	| [$54e8: leau   $0400,x]
-	LOG_REGS	54e8   | added by add_reg_log.py
 	add.w	#0x0400,d4                       	| [$54e8: leau   $0400,x]
 	LOG_REGS	54ec   | added by add_reg_log.py
 	move.w	#0x0400,d3                      	| [$54ec: ldy    #$0400]
@@ -1671,7 +1671,6 @@ l_55eb:
 	MOVE_W_FROM_REG	d4,a0                         	| [...]
 	LOG_REGS	55ed   | added by add_reg_log.py
 	move.b	#0x00,d0                        	| [$55ed: ldd    #$0000]
-	LOG_REGS	55ed   | added by add_reg_log.py
 	move.w	#0x0000,d1                      	| [$55ed: ldd    #$0000]
 	MAKE_D                                 	| [...]
 	LOG_REGS	55f0   | added by add_reg_log.py
@@ -1928,31 +1927,26 @@ l_56b3:
 	OP_W_ON_DP_ADDRESS	move,0xf0,d1         | [$56b5: stb    $f0]
 	LOG_REGS	56b7   | added by add_reg_log.py
 	move.b	#0x00,d0                        	| [$56b7: ldd    #$0000]
-	LOG_REGS	56b7   | added by add_reg_log.py
 	move.w	#0x0000,d1                      	| [$56b7: ldd    #$0000]
 	LOG_REGS	56ba   | added by add_reg_log.py
 	jbsr	l_6909                            	| [$56ba: jsr    $6909]
 	LOG_REGS	56bd   | added by add_reg_log.py
 	move.b	#0x03,d0                        	| [$56bd: ldd    #$0300]
-	LOG_REGS	56bd   | added by add_reg_log.py
 	move.w	#0x0300,d1                      	| [$56bd: ldd    #$0300]
 	LOG_REGS	56c0   | added by add_reg_log.py
 	jbsr	l_6909                            	| [$56c0: jsr    $6909]
 	LOG_REGS	56c3   | added by add_reg_log.py
 	move.b	#0x03,d0                        	| [$56c3: ldd    #$0301]
-	LOG_REGS	56c3   | added by add_reg_log.py
 	move.w	#0x0301,d1                      	| [$56c3: ldd    #$0301]
 	LOG_REGS	56c6   | added by add_reg_log.py
 	jbsr	l_6909                            	| [$56c6: jsr    $6909]
 	LOG_REGS	56c9   | added by add_reg_log.py
 	move.b	#0x03,d0                        	| [$56c9: ldd    #$0302]
-	LOG_REGS	56c9   | added by add_reg_log.py
 	move.w	#0x0302,d1                      	| [$56c9: ldd    #$0302]
 	LOG_REGS	56cc   | added by add_reg_log.py
 	jbsr	l_6909                            	| [$56cc: jsr    $6909]
 	LOG_REGS	56cf   | added by add_reg_log.py
 	move.b	#0x02,d0                        	| [$56cf: ldd    #$022b]
-	LOG_REGS	56cf   | added by add_reg_log.py
 	move.w	#0x022b,d1                      	| [$56cf: ldd    #$022b]
 	LOG_REGS	56d2   | added by add_reg_log.py
 	jbsr	l_6909                            	| [$56d2: jsr    $6909]
@@ -1963,25 +1957,21 @@ l_56d6:
 	jbsr	l_56b3                            	| [$56d6: jsr    $56b3]
 	LOG_REGS	56d9   | added by add_reg_log.py
 	move.b	#0x02,d0                        	| [$56d9: ldd    #$0217]
-	LOG_REGS	56d9   | added by add_reg_log.py
 	move.w	#0x0217,d1                      	| [$56d9: ldd    #$0217]
 	LOG_REGS	56dc   | added by add_reg_log.py
 	jbsr	l_6909                            	| [$56dc: jsr    $6909]
 	LOG_REGS	56df   | added by add_reg_log.py
 	move.b	#0x02,d0                        	| [$56df: ldd    #$021e]
-	LOG_REGS	56df   | added by add_reg_log.py
 	move.w	#0x021e,d1                      	| [$56df: ldd    #$021e]
 	LOG_REGS	56e2   | added by add_reg_log.py
 	jbsr	l_6909                            	| [$56e2: jsr    $6909]
 	LOG_REGS	56e5   | added by add_reg_log.py
 	move.b	#0x02,d0                        	| [$56e5: ldd    #$021f]
-	LOG_REGS	56e5   | added by add_reg_log.py
 	move.w	#0x021f,d1                      	| [$56e5: ldd    #$021f]
 	LOG_REGS	56e8   | added by add_reg_log.py
 	jbsr	l_6909                            	| [$56e8: jsr    $6909]
 	LOG_REGS	56eb   | added by add_reg_log.py
 	move.b	#0x02,d0                        	| [$56eb: ldd    #$0220]
-	LOG_REGS	56eb   | added by add_reg_log.py
 	move.w	#0x0220,d1                      	| [$56eb: ldd    #$0220]
 	LOG_REGS	56ee   | added by add_reg_log.py
 	jbsr	l_6909                            	| [$56ee: jsr    $6909]
@@ -2007,7 +1997,6 @@ l_56ff:
 	OP_W_ON_DP_ADDRESS	move,0xf0,d1         | [$5701: stb    $f0]
 	LOG_REGS	5703   | added by add_reg_log.py
 	move.b	#0x0e,d0                        	| [$5703: ldd    #$0e00]
-	LOG_REGS	5703   | added by add_reg_log.py
 	move.w	#0x0e00,d1                      	| [$5703: ldd    #$0e00]
 	LOG_REGS	5706   | added by add_reg_log.py
 	jbsr	l_6909                            	| [$5706: jsr    $6909]
@@ -2243,7 +2232,6 @@ l_57e4:
 	MOVE_W_TO_REG	a0,d4                         	| [...]
 	LOG_REGS	57ee   | added by add_reg_log.py
 	move.w	d4,d3                           	| [$57ee: leay   $4,u]
-	LOG_REGS	57ee   | added by add_reg_log.py
 	addq.w	#0x4,d3                         	| [$57ee: leay   $4,u]
 	LOG_REGS	57f0   | added by add_reg_log.py
 	move.b	#0x01,d1                        	| [$57f0: ldb    #$01]
@@ -2262,7 +2250,6 @@ l_57f5:
 	MOVE_W_TO_REG	a0,d4                         	| [...]
 	LOG_REGS	57ff   | added by add_reg_log.py
 	move.w	d4,d3                           	| [$57ff: leay   $8,u]
-	LOG_REGS	57ff   | added by add_reg_log.py
 	add.w	#0x8,d3                          	| [$57ff: leay   $8,u]
 	LOG_REGS	5801   | added by add_reg_log.py
 	move.b	#0x01,d1                        	| [$5801: ldb    #$01]
@@ -2517,7 +2504,6 @@ l_58ec:
 	jeq	l_58fa                             	| [$58f2: beq    $58fa]
 	LOG_REGS	58f4   | added by add_reg_log.py
 	move.b	#0x02,d0                        	| [$58f4: ldd    #$0221]
-	LOG_REGS	58f4   | added by add_reg_log.py
 	move.w	#0x0221,d1                      	| [$58f4: ldd    #$0221]
 	LOG_REGS	58f7   | added by add_reg_log.py
 	jbsr	l_6909                            	| [$58f7: jsr    $6909]
@@ -2545,7 +2531,6 @@ l_5903:
 	move.b	#0xf0,d1                        	| [$5905: ldb    #$f0]
 	LOG_REGS	5907   | added by add_reg_log.py
 	move.b	#0x0f,d0                        	| [$5907: ldd    #$0f00]
-	LOG_REGS	5907   | added by add_reg_log.py
 	move.w	#0x0f00,d1                      	| [$5907: ldd    #$0f00]
 	LOG_REGS	590a   | added by add_reg_log.py
 	jbsr	l_6909                            	| [$590a: jsr    $6909]
@@ -2710,7 +2695,6 @@ l_5998:
 l_5999:
 	LOG_REGS	5999   | added by add_reg_log.py
 	GET_DP_ADDRESS	0xd4                    	| [$5999: ldd    $d4]
-	LOG_REGS	5999   | added by add_reg_log.py
 	LOAD_D                                 	| [$5999: ldd    $d4]
 	LOG_REGS	599b   | added by add_reg_log.py
 	add.w	#0x0001,d1                       	| [$599b: addd   #$0001]
@@ -2726,7 +2710,6 @@ l_5999:
 l_59a1:
 	LOG_REGS	59a1   | added by add_reg_log.py
 	GET_DP_ADDRESS	0xd4                    	| [$59a1: ldd    $d4]
-	LOG_REGS	59a1   | added by add_reg_log.py
 	LOAD_D                                 	| [$59a1: ldd    $d4]
 	LOG_REGS	59a3   | added by add_reg_log.py
 	sub.w	#0x0001,d1                       	| [$59a3: subd   #$0001]
@@ -2742,7 +2725,6 @@ l_59a1:
 l_59a9:
 	LOG_REGS	59a9   | added by add_reg_log.py
 	GET_DP_ADDRESS	0xd6                    	| [$59a9: ldd    $d6]
-	LOG_REGS	59a9   | added by add_reg_log.py
 	LOAD_D                                 	| [$59a9: ldd    $d6]
 	LOG_REGS	59ab   | added by add_reg_log.py
 	add.w	#0x0001,d1                       	| [$59ab: addd   #$0001]
@@ -2758,7 +2740,6 @@ l_59a9:
 l_59b1:
 	LOG_REGS	59b1   | added by add_reg_log.py
 	GET_DP_ADDRESS	0xd6                    	| [$59b1: ldd    $d6]
-	LOG_REGS	59b1   | added by add_reg_log.py
 	LOAD_D                                 	| [$59b1: ldd    $d6]
 	LOG_REGS	59b3   | added by add_reg_log.py
 	sub.w	#0x0001,d1                       	| [$59b3: subd   #$0001]
@@ -2811,7 +2792,6 @@ l_59d6:
 	jbsr	l_56b3                            	| [$59d6: jsr    $56b3]
 	LOG_REGS	59d9   | added by add_reg_log.py
 	move.b	#0x02,d0                        	| [$59d9: ldd    #$0222]
-	LOG_REGS	59d9   | added by add_reg_log.py
 	move.w	#0x0222,d1                      	| [$59d9: ldd    #$0222]
 	LOG_REGS	59dc   | added by add_reg_log.py
 	jbsr	l_6909                            	| [$59dc: jsr    $6909]
@@ -2826,7 +2806,6 @@ l_59e2:
 	OP_W_ON_DP_ADDRESS	move,0xf0,d1         | [$59e4: stb    $f0]
 	LOG_REGS	59e6   | added by add_reg_log.py
 	move.b	#0x0e,d0                        	| [$59e6: ldd    #$0e00]
-	LOG_REGS	59e6   | added by add_reg_log.py
 	move.w	#0x0e00,d1                      	| [$59e6: ldd    #$0e00]
 	LOG_REGS	59e9   | added by add_reg_log.py
 	jbsr	l_6909                            	| [$59e9: jsr    $6909]
@@ -3194,7 +3173,6 @@ l_5af5:
 	MOVE_W_TO_REG	a0,d4                         	| [...]
 	LOG_REGS	5af7   | added by add_reg_log.py
 	GET_DP_ADDRESS	0x68                    	| [$5af7: ldd    $68]
-	LOG_REGS	5af7   | added by add_reg_log.py
 	LOAD_D                                 	| [$5af7: ldd    $68]
 	LOG_REGS	5af9   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$5af9: cmpd   ,u]
@@ -3205,7 +3183,6 @@ l_5af5:
 	jhi	l_5b09                             	| [$5afe: bhi    $5b09]
 	LOG_REGS	5b00   | added by add_reg_log.py
 	GET_DP_ADDRESS	0x6a                    	| [$5b00: ldd    $6a]
-	LOG_REGS	5b00   | added by add_reg_log.py
 	LOAD_D                                 	| [$5b00: ldd    $6a]
 	LOG_REGS	5b02   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x2,d4                 	| [$5b02: cmpd   $2,u]
@@ -3236,7 +3213,6 @@ l_5b15:
 	subq.w	#2,d2                           	| [...]
 	LOG_REGS	5b15   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d2                   	| [$5b15: ldd    ,--x]
-	LOG_REGS	5b15   | added by add_reg_log.py
 	LOAD_D                                 	| [$5b15: ldd    ,--x]
 	LOG_REGS	5b17   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x2,d2                 	| [$5b17: std    $2,x]
@@ -3264,7 +3240,6 @@ l_5b25:
 	LOG_REGS	5b28   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d2                   	| [$5b28: ldd    ,x++]
 	addq.w	#2,d2                           	| [...]
-	LOG_REGS	5b28   | added by add_reg_log.py
 	LOAD_D                                 	| [$5b28: ldd    ,x++]
 	LOG_REGS	5b2a   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$5b2a: std    ,u++]
@@ -3273,7 +3248,6 @@ l_5b25:
 	LOG_REGS	5b2c   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d2                   	| [$5b2c: ldd    ,x++]
 	addq.w	#2,d2                           	| [...]
-	LOG_REGS	5b2c   | added by add_reg_log.py
 	LOAD_D                                 	| [$5b2c: ldd    ,x++]
 	LOG_REGS	5b2e   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$5b2e: std    ,u++]
@@ -3284,7 +3258,6 @@ l_5b25:
 	MOVE_W_FROM_REG	d4,a0                         	| [...]
 	LOG_REGS	5b32   | added by add_reg_log.py
 	move.b	#0x2e,d0                        	| [$5b32: ldd    #$2e2e]
-	LOG_REGS	5b32   | added by add_reg_log.py
 	move.w	#0x2e2e,d1                      	| [$5b32: ldd    #$2e2e]
 	MAKE_D                                 	| [...]
 	LOG_REGS	5b35   | added by add_reg_log.py
@@ -3328,7 +3301,6 @@ l_5b4d:
 	jbsr	l_68df                            	| [$5b55: jsr    $68df]
 	LOG_REGS	5b58   | added by add_reg_log.py
 	move.b	#0x01,d0                        	| [$5b58: ldd    #$011a]
-	LOG_REGS	5b58   | added by add_reg_log.py
 	move.w	#0x011a,d1                      	| [$5b58: ldd    #$011a]
 	LOG_REGS	5b5b   | added by add_reg_log.py
 	jbsr	l_6909                            	| [$5b5b: jsr    $6909]
@@ -3361,7 +3333,6 @@ jump_table_5b6b:
 l_5b77:
 	LOG_REGS	5b77   | added by add_reg_log.py
 	move.b	#0x00,d0                        	| [$5b77: ldd    #$0001]
-	LOG_REGS	5b77   | added by add_reg_log.py
 	move.w	#0x0001,d1                      	| [$5b77: ldd    #$0001]
 	LOG_REGS	5b7a   | added by add_reg_log.py
 	GET_REG_ADDRESS	0xc,d3                 	| [$5b7a: tst    $c,y]
@@ -3370,7 +3341,6 @@ l_5b77:
 	jeq	l_5b81                             	| [$5b7c: beq    $5b81]
 	LOG_REGS	5b7e   | added by add_reg_log.py
 	move.b	#0x01,d0                        	| [$5b7e: ldd    #$0127]
-	LOG_REGS	5b7e   | added by add_reg_log.py
 	move.w	#0x0127,d1                      	| [$5b7e: ldd    #$0127]
 l_5b81:
 	MAKE_D                                 	| [...]
@@ -3684,7 +3654,6 @@ l_5c8e:
 	jeq	l_5cb7                             	| [$5ca2: beq    $5cb7]
 	LOG_REGS	5ca4   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x3,d3                 	| [$5ca4: ldd    $3,y]
-	LOG_REGS	5ca4   | added by add_reg_log.py
 	LOAD_D                                 	| [$5ca4: ldd    $3,y]
 	LOG_REGS	5ca6   | added by add_reg_log.py
 	sub.w	#0x001c,d1                       	| [$5ca6: subd   #$001c]
@@ -3697,7 +3666,6 @@ l_5c8e:
 	jne	l_5cc1                             	| [$5cab: bne    $5cc1]
 	LOG_REGS	5cad   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x3,d3                 	| [$5cad: ldd    $3,y]
-	LOG_REGS	5cad   | added by add_reg_log.py
 	LOAD_D                                 	| [$5cad: ldd    $3,y]
 	LOG_REGS	5caf   | added by add_reg_log.py
 	add.w	#0x0028,d1                       	| [$5caf: addd   #$0028]
@@ -3730,7 +3698,6 @@ l_5cb7:
 l_5cc1:
 	LOG_REGS	5cc1   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x3,d3                 	| [$5cc1: ldd    $3,y]
-	LOG_REGS	5cc1   | added by add_reg_log.py
 	LOAD_D                                 	| [$5cc1: ldd    $3,y]
 	LOG_REGS	5cc3   | added by add_reg_log.py
 	add.w	#0x0002,d1                       	| [$5cc3: addd   #$0002]
@@ -3775,7 +3742,6 @@ l_5ccb:
 	jeq	l_5cf4                             	| [$5cdf: beq    $5cf4]
 	LOG_REGS	5ce1   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x3,d3                 	| [$5ce1: ldd    $3,y]
-	LOG_REGS	5ce1   | added by add_reg_log.py
 	LOAD_D                                 	| [$5ce1: ldd    $3,y]
 	LOG_REGS	5ce3   | added by add_reg_log.py
 	sub.w	#0x0004,d1                       	| [$5ce3: subd   #$0004]
@@ -3788,7 +3754,6 @@ l_5ccb:
 	jne	l_5cfc                             	| [$5ce8: bne    $5cfc]
 	LOG_REGS	5cea   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x3,d3                 	| [$5cea: ldd    $3,y]
-	LOG_REGS	5cea   | added by add_reg_log.py
 	LOAD_D                                 	| [$5cea: ldd    $3,y]
 	LOG_REGS	5cec   | added by add_reg_log.py
 	sub.w	#0x0028,d1                       	| [$5cec: subd   #$0028]
@@ -3818,7 +3783,6 @@ l_5cf4:
 l_5cfc:
 	LOG_REGS	5cfc   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x3,d3                 	| [$5cfc: ldd    $3,y]
-	LOG_REGS	5cfc   | added by add_reg_log.py
 	LOAD_D                                 	| [$5cfc: ldd    $3,y]
 	LOG_REGS	5cfe   | added by add_reg_log.py
 	sub.w	#0x0002,d1                       	| [$5cfe: subd   #$0002]
@@ -3863,7 +3827,6 @@ l_5d06:
 	jls	l_5d28                             	| [$5d1c: bls    $5d28]
 	LOG_REGS	5d1e   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x3,d3                 	| [$5d1e: ldd    $3,y]
-	LOG_REGS	5d1e   | added by add_reg_log.py
 	LOAD_D                                 	| [$5d1e: ldd    $3,y]
 	LOG_REGS	5d20   | added by add_reg_log.py
 	add.w	#0x0040,d1                       	| [$5d20: addd   #$0040]
@@ -3882,7 +3845,6 @@ l_5d06:
 l_5d28:
 	LOG_REGS	5d28   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x3,d3                 	| [$5d28: ldd    $3,y]
-	LOG_REGS	5d28   | added by add_reg_log.py
 	LOAD_D                                 	| [$5d28: ldd    $3,y]
 	LOG_REGS	5d2a   | added by add_reg_log.py
 	sub.w	#0x0100,d1                       	| [$5d2a: subd   #$0100]
@@ -3927,7 +3889,6 @@ l_5d32:
 	jcc	l_5d54                             	| [$5d48: bcc    $5d54]
 	LOG_REGS	5d4a   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x3,d3                 	| [$5d4a: ldd    $3,y]
-	LOG_REGS	5d4a   | added by add_reg_log.py
 	LOAD_D                                 	| [$5d4a: ldd    $3,y]
 	LOG_REGS	5d4c   | added by add_reg_log.py
 	sub.w	#0x0040,d1                       	| [$5d4c: subd   #$0040]
@@ -3946,7 +3907,6 @@ l_5d32:
 l_5d54:
 	LOG_REGS	5d54   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x3,d3                 	| [$5d54: ldd    $3,y]
-	LOG_REGS	5d54   | added by add_reg_log.py
 	LOAD_D                                 	| [$5d54: ldd    $3,y]
 	LOG_REGS	5d56   | added by add_reg_log.py
 	add.w	#0x0100,d1                       	| [$5d56: addd   #$0100]
@@ -4116,7 +4076,6 @@ l_5dc0:
 	move.b	d0,(a0)                         	| [...]
 	LOG_REGS	5dcf   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x7,d3                 	| [$5dcf: ldd    $7,y]
-	LOG_REGS	5dcf   | added by add_reg_log.py
 	LOAD_D                                 	| [$5dcf: ldd    $7,y]
 	LOG_REGS	5dd1   | added by add_reg_log.py
 	sub.w	#0x0001,d1                       	| [$5dd1: subd   #$0001]

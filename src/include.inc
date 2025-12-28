@@ -96,7 +96,13 @@
 	and.b	\arg,d6
 	.endm
 
-
+	* useful when doing word movem restores
+	.macro	ZERO_MSW	reg
+	swap	\reg
+	clr.w	\reg
+	swap	\reg
+	.endm
+	
 	.macro	LOAD_D
 	move.b	(a0),d0
 	move.b	(1,a0),d1
@@ -554,6 +560,17 @@ multiply_ab:
 
 
 	.ifndef	RELEASE
+
+	.macro	ENABLE_LOG_REGS
+	moveq	#1,d6		| enable
+	jbsr	osd_cpu_logging_control	
+	.endm
+	.macro	DISABLE_REGS_LOG
+	moveq	#0,d6		| disable
+	jbsr	osd_cpu_logging_control	
+	.endm	
+
+	
 	* to trace at some virtual PCs, insert this macro
 	.macro	LOG_REGS	the_pc
 	move.w	sr,-(a7)

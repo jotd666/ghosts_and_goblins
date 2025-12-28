@@ -93,6 +93,7 @@ def remove_error(line,ignore_missing=False):
 sorted_cmp = False
 avoid_regs = []
 regslist = list("abdxu")
+excluded_pcs = set()
 
 def rework(name):
     regs[name] = decode_address(regs[name])

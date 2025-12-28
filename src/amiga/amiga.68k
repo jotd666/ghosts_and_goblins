@@ -646,7 +646,6 @@ demo_game:
 	moveq	#0,d0
 	jbsr	osd_set_bank
 	GET_MEMORY_START_AND_DP	
-	BREAKPOINT	"START"
 	jmp		reset_6000								| pass control to the mpatrol core
 	
 	.ifndef	RELEASE
@@ -681,7 +680,15 @@ call_nmi:
 	* that non-interrupt code never uses D5 for anything
 	* non-stack.
 	jbsr	cpu_init
-	moveq	#-1,d5		| trash stack pointer, let's see if irq uses it
+	* trash "stack pointer". We cannot rely on D5 being good
+	* when interrupting, as the irq could interrupt on non-6809
+	* converted code. Let's set it to something fixed, somewhere
+	* where memory exists but is not mapped (allowing local variable
+	* allocation & work)
+	* We made sure that the game isn't relying on the entry value
+	* it's one of the limitations of those conversions. Virtual stack
+	* access is possible but should be checked
+	move.w	#0x4000,d5
 	jra	irq_65c4
 	
 * just in case some hardware calls nmi
@@ -3166,50 +3173,51 @@ osd_cpu_logging_control:
 	move.b	d6,cpu_log_enable
 	rts
 	
-
-osd_log_cpu:
-
-	move.w	(6,a7),last_known_m6809_pc
-	move.w	(6,a7),0x100
-
-
-	move.l	a6,-(a7)
-	cmp.w	#0x4000,last_known_m6809_pc
-	jcs		0f
-	cmp.w	#0x8000,last_known_m6809_pc
-	jcc		0f
-	* 4000-8000 PC: check if bank 0 is set
-	tst.b	current_rom_bank
+	.macro	CHECK_ZERO_MSW	reg
+	swap	\reg
+	tst		\reg
 	jeq		0f
-	* we could have missed one bankswitch
-	move.w	last_bankswitch_pc,d5
-	move.w  last_known_m6809_pc,d4
-*	.ifndef	RELEASE
-*	tst.b	disable_bank_0_check
-*	jne		0f
-*	BREAKPOINT		"running code in 4000-8000 when bank doesn't match"
-*	ILLEGAL
-*	.endif
+	move.w	(6,a7),d6
+	swap	\reg
+	BREAKPOINT		"\reg MSW is not zero, PC=check d6!"
 0:
+	swap	\reg
+	.endm
+
+	
+osd_log_cpu:
+	* first, check that registers don't have a wrong longword mask
+	CHECK_ZERO_MSW	d1		| D
+	CHECK_ZERO_MSW	d2		| X
+	CHECK_ZERO_MSW	d3		| Y
+	CHECK_ZERO_MSW	d4		| U
+	CHECK_ZERO_MSW	d5		| S
+	move.w	(6,a7),last_known_m6809_pc
+	
+	move.w	last_known_m6809_pc,0x100
+	
+	move.l	a6,-(a7)
 	* check if cpu log is enabled
 	tst.b	cpu_log_enable
 	jeq		445f
 	move.l	log_ptr,a6
 	move.w	(10,a7),(a6)+	| the PC
 	move.l	d1,-(a7)
+	rol.w	#8,d1
+	move.b	d0,d1
+	rol.w	#8,d1   | make D, make sure that not too many diffs
 	move.w	d0,(a6)+
 	move.w	d1,(a6)+
 	move.w	d2,(a6)+
+	move.w	d3,(a6)+
+	move.w	d4,(a6)+
 	move.w	#0xDEAD,(a6)+
 	move.l	a6,log_ptr
 	cmp.w	#0xCAFE,(a6)  | hitting the protection buffer
 	jne		444f
-	* the old strategy dumped the buffer and quit. Now we dump the buffer
-	* and continue (just in case we need just the end of the execution)
-	
-	BREAKPOINT	"cpu log buffer full, dumping and resetting!"
+	BREAKPOINT	"cpu log buffer full, dumping and exiting!"
 	jbsr	osd_dump_logs
-	move.l	#log_buffer,log_ptr
+	illegal
 444:
 	move.l	(a7)+,d1
 445:
