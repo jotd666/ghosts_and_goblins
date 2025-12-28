@@ -63,6 +63,8 @@ for i,line in enumerate(lines):
 
     if address == 0x55CE:
         line = "\tILLEGAL\n"  # not reachable anyway, part of ROM/RAM check code
+    if "review pshu instruction" in line or "review pulu instruction" in line:
+        line = remove_error(line)
     lines[i] = line
 
 
@@ -79,9 +81,23 @@ l_5022
 l_5025
 l_5051
 l_54ff
-l_5bdd""".splitlines():
+l_5bdd
+l_511e
+l_513b
+l_523f
+l_5347
+l_52fb
+l_53a3
+l_53f4
+l_52b9
+l_54e3
+l_5910
+l_5180
+l_5975""".splitlines():
         fw.write(f"\t.global\t{gs}\n")
     fw.write("\n")
+
+
     fw.writelines(lines)
 
 with open(source_dir / f"{gamename}.s") as f:
@@ -204,10 +220,10 @@ for i,line in enumerate(lines):
         line = remove_instruction(lines,i)
 
     ### U and S stack management need some complete change!!
-    if address in {0x6104,0xfeed,0xff0e,0x6122,0x62ee,0x6305} and ("sub" in line or "add" in line):
+    if address in {0x6104,0x6326,0xfeed,0xff0e,0x6122,0x62ee,0x6305} and ("sub" in line or "add" in line):
         lines[i-1] = remove_error(lines[i-1])
 
-    if address in {0x6305,0x6326,0x6623,0x6664,0x669d,0x66e9,0x6726} and "move." in line:
+    if address in {0x6305,0x6623,0x6664,0x669d,0x66e9,0x6726} and "move." in line:
         # let leas -2,S slide, it's used as local storage, linked to D5
         # also remove handled part where they're using the S and U to decode data
         lines[i-1] = remove_error(lines[i-1])
@@ -219,15 +235,15 @@ for i,line in enumerate(lines):
         if "movem" in line:
             # change wrong movem. It matches some ROM data structure
             line = change_instruction("movem.w\t(a0)+,d1-d2  | same order than PULU we're lucky",lines,i)
-        if "GET_REG_ADDRESS" in line:
-            lines[i-1] = remove_error(lines[i-1])
 
     if address in {0x728f}:
         if "movem" in line:
             # change wrong movem. It matches some ROM data structure
             line = change_instruction("movem.w\t(a0)+,d1-d3  | same order than PULU we're lucky",lines,i)
-        if "GET_REG_ADDRESS" in line:
-            lines[i-1] = remove_error(lines[i-1])
+
+    # we know we handled all pshu properly, remove the errors
+    if "review pshu instruction" in line or "review pulu instruction" in line:
+            line = remove_error(line,True)
 
     # PULS
     if address in {0x662e,0x663e,0x66a8,0x66b8} and "movem" in line:

@@ -226,13 +226,30 @@ mainloop_6160:
 6183: 48          ASLA					; times 2
 6184: 24 DA       BCC    mainloop_6160	; branch if positive
 6186: 20 F7       BRA    $617F			; loop until positive
-; from bank 3
+; from bank 3 (and main bank when >=$6000)
 jump_table_6188:
 	.word	$4800 
 	.word	$485C
 	.word	$489B 
 	.word	$48BD 
 	.word	$5022
+	.word	$511E
+	.word	$62AB
+	.word	$513B   
+	.word	$523F 
+	.word	$5347 
+	.word	$52FB 
+	.word	$53A3 
+	.word	$53F4 
+	.word	$52B9 
+	.word	$54E3 
+	.word	$5910
+	.word	$5180
+	.word	$5975
+	.word	$6B46
+
+
+
 
 read_dip_switches_622c:
 622C: B6 30 03    LDA    dsw1_3003
