@@ -33,6 +33,38 @@ input_dict = {
 "dsw2_3004":"read_dsw2",
 }
 
+def handle_special_addresses(lines,i):
+    line = lines[i]
+    if "GET_ADDRESS" in line:
+        val = line.split()[1]
+        is_stb = ": stb" in line
+
+        osd_call = input_dict.get(val)
+        if osd_call is not None:
+            if osd_call:
+                line = change_instruction(f"jbsr\tosd_{osd_call}",lines,i)
+                if is_stb:
+                    line = f"\texg\td0,d1\n{line}\texg\td0,d1\n"
+            else:
+                line = remove_instruction(lines,i)
+            lines[i+1] = remove_instruction(lines,i+1)
+
+    if "[video_address" in line:
+        # give me the original instruction
+        line = line.replace("_ADDRESS","_UNCHECKED_ADDRESS")
+        # if it's a write, insert a "VIDEO_DIRTY" macro after the write
+        for j in range(i+1,len(lines)):
+            next_line = lines[j]
+            if "[...]" not in next_line:
+                break
+            if ",(a0)" in next_line or "clr" in next_line or "MOVE_W_FROM_REG" in next_line:
+                if any(x in next_line for x in ["address_word","MOVE_W_FROM_REG"]):
+                    lines[j] = next_line+"\tVIDEO_WORD_DIRTY | [...]\n"
+                else:
+                    lines[j] = next_line+"\tVIDEO_BYTE_DIRTY | [...]\n"
+                break
+    return line
+
 
 def handle_bank(line):
     # pre-add video_address tag if we find a store instruction to an explicit 3000-3FFF address
@@ -56,6 +88,8 @@ for i,line in enumerate(lines):
     address = get_line_address(line)
 
     line = handle_bank(line)
+    lines[i] = line
+    line = handle_special_addresses(lines,i)
 
     ###############################################
     # game_specific
@@ -72,7 +106,7 @@ for i,line in enumerate(lines):
 
 with open(source_dir / f"{bankname}.68k","w") as fw:
     # game_specific: fill global symbols
-    for gs in """l_4800
+    for gs in """clear_screen_and_show_status_4800
 l_5025
 l_485c
 l_489b
@@ -113,37 +147,10 @@ for i,line in enumerate(lines):
 
     line = handle_bank(line)
 
+    lines[i] = line
     # generic for 6809 cpus
 
-    if "GET_ADDRESS" in line:
-        val = line.split()[1]
-        is_stb = ": stb" in line
-
-        osd_call = input_dict.get(val)
-        if osd_call is not None:
-            if osd_call:
-                line = change_instruction(f"jbsr\tosd_{osd_call}",lines,i)
-                if is_stb:
-                    line = f"\texg\td0,d1\n{line}\texg\td0,d1\n"
-            else:
-                line = remove_instruction(lines,i)
-            lines[i+1] = remove_instruction(lines,i+1)
-
-
-    if "[video_address" in line:
-        # give me the original instruction
-        line = line.replace("_ADDRESS","_UNCHECKED_ADDRESS")
-        # if it's a write, insert a "VIDEO_DIRTY" macro after the write
-        for j in range(i+1,len(lines)):
-            next_line = lines[j]
-            if "[...]" not in next_line:
-                break
-            if ",(a0)" in next_line or "clr" in next_line or "MOVE_W_FROM_REG" in next_line:
-                if any(x in next_line for x in ["address_word","MOVE_W_FROM_REG"]):
-                    lines[j] = next_line+"\tVIDEO_WORD_DIRTY | [...]\n"
-                else:
-                    lines[j] = next_line+"\tVIDEO_BYTE_DIRTY | [...]\n"
-                break
+    line = handle_special_addresses(lines,i)
 
     ###############################################
     # game_specific

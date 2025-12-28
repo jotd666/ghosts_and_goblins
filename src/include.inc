@@ -452,6 +452,15 @@
 	GET_UNCHECKED_BANK_ADDRESS_FUNC
 	.endm
 
+	.macro GET_REG_BANK_ADDRESS_FROM_REG	reg,reg2
+	move.l	\reg,a0
+	add.l	\reg2,a0
+	GET_BANK_ADDRESS_FUNC
+	.endm
+
+
+
+
 	***** end bank access *****
 
 	.macro GET_REG_INDIRECT_UNCHECKED_ADDRESS	offset,reg
@@ -489,6 +498,7 @@ get_address:
 	jcs		0f		| below 0x2000: RAM: OK
 	cmp.w	#0x3000,a0
 	jcc		1f		| above 0x3000: continue
+	jbsr	osd_get_last_known_pc
 	BREAKPOINT	"accessing videoram 0x2000-0x2FFF, PC in D6"
 	jra		0f
 1:
@@ -502,7 +512,7 @@ get_address:
 	cmp.w	#0x4000,a0
 	jcs		1f
 	jbsr	osd_get_last_known_pc
-	BREAKPOINT	"accessing bank 0x4000-0x6000, PC in D6"
+	BREAKPOINT	"accessing bank memory 0x4000-0x6000, PC in D6"
 	jra		0f
 1:
 	* zone 0x3000-0x3fff

@@ -1,5 +1,5 @@
 - redo division: FED8
-- trap write to screen 2000-3000: 4800 check what it does!!
+- trap write to screen 2000-3000: implement 4800 status load front tiles/sprite layer test
 - use audio mixer for that one!
 - fix 5025 push using movem do 2 separate pushes (probably OK)
 

@@ -1,4 +1,4 @@
-; clear screen
+clear_screen_and_show_status_4800:
 4800: 8E 20 00    LDX    #$2000
 4803: 10 8E 00 20 LDY    #$0020
 4807: 32 7F       LEAS   -$1,S
@@ -73,10 +73,10 @@ l_489b:
 489E: 25 20       BCS    $48C0
 48A0: C4 7F       ANDB   #$7F
 48A2: 8E 48 DD    LDX    #$48DD
-48A5: EE 85       LDU    B,X
-48A7: AE C1       LDX    ,U++
-48A9: A6 C0       LDA    ,U+
-48AB: E6 C0       LDB    ,U+
+48A5: EE 85       LDU    B,X	; [bank_address]
+48A7: AE C1       LDX    ,U++	; [bank_address]
+48A9: A6 C0       LDA    ,U+	; [bank_address]
+48AB: E6 C0       LDB    ,U+	; [bank_address]
 48AD: 27 0C       BEQ    $48BB
 48AF: C1 2F       CMPB   #$2F
 48B1: 27 F4       BEQ    $48A7
@@ -88,11 +88,11 @@ l_48bd:
 48BD: 34 40       PSHS   U
 48BF: 58          ASLB
 48C0: 8E 48 DD    LDX    #$48DD
-48C3: EE 85       LDU    B,X
-48C5: AE C1       LDX    ,U++
+48C3: EE 85       LDU    B,X	; [bank_address]
+48C5: AE C1       LDX    ,U++	; [bank_address]
 48C7: 33 41       LEAU   $1,U
 48C9: 96 F2       LDA    $F2
-48CB: E6 C0       LDB    ,U+
+48CB: E6 C0       LDB    ,U+	; [bank_address]
 48CD: 27 EC       BEQ    $48BB
 48CF: C1 2F       CMPB   #$2F
 48D1: 27 F2       BEQ    $48C5

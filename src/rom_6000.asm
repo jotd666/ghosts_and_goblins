@@ -228,7 +228,7 @@ mainloop_6160:
 6186: 20 F7       BRA    $617F			; loop until positive
 ; from bank 3 (and main bank when >=$6000)
 jump_table_6188:
-	.word	$4800 
+	.word	clear_screen_and_show_status_4800
 	.word	$485C
 	.word	$489B 
 	.word	$48BD 
