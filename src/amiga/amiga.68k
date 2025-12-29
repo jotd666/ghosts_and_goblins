@@ -44,13 +44,18 @@ SCORE_FILE_SIZE = 0x23		| wrong
 
 LOG_BUFFER_SIZE = 0x8000
 
-NB_CLUTS_POW = 3
-NB_CLUTS = 1<<NB_CLUTS_POW
-NB_TILES = 0x4000
+FG_TILE_NB_CLUTS_POW = 4
+FG_TILE_NB_CLUTS = 1<<FG_TILE_NB_CLUTS_POW
+FG_TILE_COUNT = 0x400
+* wrongo
+BG_TILE_NB_CLUTS_POW = 4
+BG_TILE_NB_CLUTS = 1<<BG_TILE_NB_CLUTS_POW
+BG_TILE_COUNT = 0x400
 NB_SPRITES = 0x800
 
-SPRITE_LOG_LENGTH = NB_CLUTS*NB_SPRITES
-TILE_LOG_LENGTH = NB_CLUTS*NB_TILES
+SPRITE_LOG_LENGTH = 0x1000
+FG_TILE_LOG_LENGTH = FG_TILE_NB_CLUTS*FG_TILE_COUNT
+BG_TILE_LOG_LENGTH = BG_TILE_NB_CLUTS*BG_TILE_COUNT
 
 SPRITE_X_CORRECTION = 4
 SPRITE_Y_CORRECTION = 0
@@ -63,9 +68,11 @@ NTSC_Y_SHIFT = 12
 
 AGA_X_SHIFT = 0x38
 
-SCREEN_TILE_ADDRESS = 0x2000
-SCREEN_COLOR_ADDRESS = 0x3000
-SPRITE_ADDRESS = 0x800
+FG_SCREEN_TILE_ADDRESS = 0x2000
+FG_SCREEN_COLOR_ADDRESS = 0x2400
+BG_SCREEN_TILE_ADDRESS = 0x2800
+BG_SCREEN_COLOR_ADDRESS = 0x2C00
+SPRITE_ADDRESS = 0x1E00  | to 0x1FFF
 
 
 * if the alloc_sprite & update_sprite routines
@@ -102,9 +109,13 @@ OPT_AGA_MODE=1
 	.else
 OPT_AGA_MODE=0
 	.endif
-	
+
+* a plane of attached sprites	
+NB_FG_PLANES = 4
+
 TOTAL_NB_COLORS = 1<<NB_PLAYFIELD_PLANES
-NB_BYTES_PER_ROW = 80
+FG_NB_BYTES_PER_ROW = 0x20
+BG_NB_BYTES_PER_ROW = 80
 
 Y_START = 0x20
 
@@ -113,15 +124,18 @@ BASE_BPLCON2_VALUE = 0x0224			| add killehb
 	.else
 BASE_BPLCON2_VALUE = 0x0024
 	.endif
-NB_TARGET_LINES = 512
-NB_LINES = 256
-Y_MAX = NB_LINES
-NB_PLAYFIELD_LINES = NB_LINES
+FG_NB_LINES = 256
+BG_NB_LINES = 512
+Y_MAX = BG_NB_LINES
+NB_PLAYFIELD_LINES = BG_NB_LINES
 
 
-SCREEN_PLANE_SIZE = NB_BYTES_PER_ROW*(NB_PLAYFIELD_LINES+16)
+FG_SCREEN_PLANE_SIZE = FG_NB_BYTES_PER_ROW*(FG_NB_LINES)
+BG_SCREEN_PLANE_SIZE = BG_NB_BYTES_PER_ROW*(BG_NB_LINES+16)
 
-SCREEN_SIZE = SCREEN_PLANE_SIZE*NB_PLAYFIELD_PLANES
+FG_SCREEN_SIZE = FG_SCREEN_PLANE_SIZE*NB_FG_PLANES
+BG_SCREEN_SIZE = BG_SCREEN_PLANE_SIZE*NB_PLAYFIELD_PLANES
+
 NB_HOST_SPRITES = 8
 
 NB_TARGET_SPRITES = 64
@@ -177,6 +191,7 @@ BIT_FIRE_2 = 5
 	.global	osd_read_p2_inputs
 	
 	.global	osd_video_byte_dirty
+	.global	osd_video_word_dirty
 	.global	osd_set_scrollx_hi
 	.global	osd_set_scrollx_lo
 	.global	osd_set_scrolly_lo
@@ -641,7 +656,8 @@ demo_game:
 	* but relies on vbl sync flags
 	jbsr	cpu_init		| zero all registers
 	
-	jbsr	cache_tiles_address
+	jbsr	cache_fg_tiles_address
+	jbsr	cache_bg_tiles_address
 
 	moveq	#0,d0
 	jbsr	osd_set_bank
@@ -930,7 +946,7 @@ blit_background:
 	lea		_custom,a5
 	* adjust offset X: X//8
 	lsr.w	#3,d0
-	lea		mulNB_BYTES_PER_ROW_table(pc),a4
+	lea		mulBG_NB_BYTES_PER_ROW_table(pc),a4
 	add.w	d1,d1
 	* add Y offset: Y*NB_BYTES_PER_ROW
 	add.w	(a4,d1.w),d0
@@ -940,7 +956,7 @@ blit_background:
 	
 
     move.l  #0x09f00000,d3    | A->D copy, ascending mode	
-	move.w	#NB_BYTES_PER_ROW,d1		| blit modulo
+	move.w	#BG_NB_BYTES_PER_ROW,d1		| blit modulo
 
     sub.w   d2,d1       | blit modulo
     lsl.w   #6,d4
@@ -964,12 +980,12 @@ blit_background:
 	move.w  d4,bltsize(a5)	|rectangle size, starts blit
 	
 	.rept	NB_PLAYFIELD_PLANES-1
-	.if	SCREEN_PLANE_SIZE>0x7FFF
-	add.l	#SCREEN_PLANE_SIZE,a0
-	add.l	#SCREEN_PLANE_SIZE,a1
+	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
+	add.l	#BG_SCREEN_PLANE_SIZE,a0
+	add.l	#BG_SCREEN_PLANE_SIZE,a1
 	.else
-	add.w	#SCREEN_PLANE_SIZE,a0
-	add.w	#SCREEN_PLANE_SIZE,a1
+	add.w	#BG_SCREEN_PLANE_SIZE,a0
+	add.w	#BG_SCREEN_PLANE_SIZE,a1
 	.endif
 	WAIT_BLIT
 	* second bitplane
@@ -1005,7 +1021,7 @@ really_update_sprites:
 	move.w	(a4),d0
 	bmi.b	11f		| x=0: inactive
 	move.w	(2,a4),d1
-	cmp.w	#NB_LINES,d1
+	cmp.w	#BG_NB_LINES,d1
 	jcc		11f				| too low: discard
 	and.w	#0x1F0,d0		| align on 16 lower bound
 	* clear area where the sprite was
@@ -1216,7 +1232,7 @@ update_one_bob:
 	jra		9f
 
 8:
-	cmp.w	#NB_LINES,d1
+	cmp.w	#BG_NB_LINES,d1
 	jcc		2f		| avoid out of screen
 
 	* note down that this bob will have to be erased
@@ -1407,7 +1423,7 @@ clear_planes_any_blitter_internal:
 	* null or negative height after clipping: out
 	rts
 0:
-    lea mulNB_BYTES_PER_ROW_table(pc),a2
+    lea mulBG_NB_BYTES_PER_ROW_table(pc),a2
     add.w   d1,d1
     move.w  (a2,d1.w),d1
 1:
@@ -1422,7 +1438,7 @@ clear_planes_any_blitter_internal:
 	moveq	#1,d1
 	ror.l	#8,d1     | AKA move.l  #0x01000000,d1   | minterm useD & rect clear (0xA) 
 
-	move.w #NB_BYTES_PER_ROW,d0
+	move.w #BG_NB_BYTES_PER_ROW,d0
 	bclr	#0,d2		| make sure D2 is even (else strange things occur!)
     sub.w   d2,d0       | blit width
 
@@ -1445,7 +1461,7 @@ clear_planes_any_blitter_internal:
 	move.l a1,bltdpt(a5)	|destination top left corner
 	move.w  d4,bltsize(a5)	|rectangle size, starts blit
 32:
-	add.w	#SCREEN_PLANE_SIZE,a1
+	add.w	#BG_SCREEN_PLANE_SIZE,a1
 	dbf		d3,3b
 4:
 	rts
@@ -1493,7 +1509,7 @@ blit_planes_any_internal_cookie_cut:
     beq.b   5f    | optim
 	
 4:	
-    lea		mulNB_BYTES_PER_ROW_table(pc),a4
+    lea		mulBG_NB_BYTES_PER_ROW_table(pc),a4
 	.ifndef	MC68020
 	add.w	d1,d1
     move.w  (a4,d1.w),d1	| y times 40
@@ -1525,7 +1541,7 @@ blit_planes_any_internal_cookie_cut:
     * but a 68000 CPU doesn't and since we RETURN A1...
     *bclr    #0,d1
     add.w   d1,a1       | plane position (D1 < 0x7FFF, 288*40=0x2D00)
-	move.w	#NB_BYTES_PER_ROW,d0
+	move.w	#BG_NB_BYTES_PER_ROW,d0
 	tst.w	d4
 	bpl.b	5f
 	neg.w	d0
@@ -1562,7 +1578,7 @@ blit_planes_any_internal_cookie_cut:
 	move.l	a1,bltcpt(a5)	|pristine background top (bottom) left corner
 	move.l	a1,bltdpt(a5)	|destination top (bottom) left corner
 	move.w  d4,bltsize(a5)	|rectangle size, starts blit
-	add.w		#SCREEN_PLANE_SIZE,a1
+	add.w		#BG_SCREEN_PLANE_SIZE,a1
 	WAIT_BLIT
 	dbf		d3,6b
 7:
@@ -1807,7 +1823,7 @@ platform_init:
     move.w d1,diwstop(a5)
     move.w #0x0038,ddfstrt(a5)
 
-	move	#NB_BYTES_PER_ROW-40,d0
+	move	#BG_NB_BYTES_PER_ROW-40,d0
 
 	.ifne	OPT_AGA_MODE
     move.w #0x00C0,ddfstop(a5)		| C0 for fmode=3
@@ -1962,12 +1978,19 @@ osd_set_bank:
 1:
 	rts
 
+osd_video_word_dirty:
+	jbsr	osd_video_byte_dirty
+	addq	#1,a0
+	jbsr	osd_video_byte_dirty
+	subq	#1,a0
+	rts
+	
 * a0=screen address (preserved)
 * a6=ram base
 * should preserve all registers
-* allows 2000-3FFF range
-* 2000: tiles
-* 3000: attributes
+* allows 2000-3000 range
+* 2000: foreground/HUD (2400: attributes)
+* 2800: background
 osd_video_byte_dirty:
 	movem.l	d0-d7/a0-a2,-(a7)
 	move.b	(a0),d0
@@ -1977,10 +2000,10 @@ osd_video_byte_dirty:
 	jmi		2f
 	.endif
 
-	* we now suppose that we're in 2000-3FFF
+	* we now suppose that we're in 2000-3000
 	* check that in debug mode
 	.ifndef		RELEASE
-	cmp.w	#SCREEN_TILE_ADDRESS+0x2000,d7
+	cmp.w	#FG_SCREEN_TILE_ADDRESS+0x1000,d7
 	jcs		0f
 1:
 	BREAKPOINT	"write videoram out of range (D7)"
@@ -1988,24 +2011,27 @@ osd_video_byte_dirty:
 0:
 	.endif
 	
-	sub.w	#SCREEN_TILE_ADDRESS,d7
+	sub.w	#FG_SCREEN_TILE_ADDRESS,d7
 	.ifndef	RELEASE
 	jpl		0f
-	add.w	#SCREEN_TILE_ADDRESS,d7
+	add.w	#FG_SCREEN_TILE_ADDRESS,d7
 	BREAKPOINT	"write videoram out of range (D7)"
 	jra		osd_w_videoram_out		| sprite memory: out
 0:
 	.endif
 	
-	and.w	#0xFFF,d7
+	cmp.w	#BG_SCREEN_TILE_ADDRESS,d7
+	jcc		osd_w_videoram_out		| TEMP ATM only foreground
+	
+	and.w	#0x7FF,d7
 
-	lea		(SCREEN_TILE_ADDRESS,a6),a0
+	lea		(FG_SCREEN_TILE_ADDRESS,a6),a0
 	move.b	(a0,d7.w),d0
-	lea		(SCREEN_COLOR_ADDRESS,a6),a0
+	lea		(FG_SCREEN_COLOR_ADDRESS,a6),a0
 	move.b	(a0,d7.w),d1
 
 
-	jbsr	update_bg_tile
+	jbsr	update_fg_tile
 
 osd_w_videoram_out:
 	movem.l	(a7)+,d0-d7/a0-a2
@@ -2027,7 +2053,7 @@ osd_w_videoram_out:
 	clr.b	(offset,a2)  | buffer
 	.endif
 	clr.b	(offset,a3)  | background buffer
-	.set	offset,offset+NB_BYTES_PER_ROW
+	.set	offset,offset+FG_NB_BYTES_PER_ROW
 	.endr	
 	.endm
 	
@@ -2039,27 +2065,19 @@ osd_w_videoram_out:
 	add.l	d5,a3			| needed LONG
 	.endm
 
+cache_bg_tiles_address:
+	rts
 	
 * bruteforce all possible x/y combinations
 * d2: 0: no X swap, 1: X swap (for scrolling maps)
-cache_tiles_address:
+cache_fg_tiles_address:
 	moveq	#0,d7
-	lea		tile_address_table,a0
-	lea		mulNB_BYTES_PER_ROW_table,A1
+	lea		fg_tile_address_table,a0
+	lea		mulFG_NB_BYTES_PER_ROW_table,A1
 0:
 	moveq	#0,d0
-	jbsr	compute_tile_xy
-	sub.w	#NB_TARGET_LINES/2,d1
-	jpl		1f
-	move.w	#-1,(a0)+		| store invalid offset: -1 is not possible
-	jra		2f
-1:	
-	tst.b	d2
-	jeq		3f
-	* swap left & right screens (scrolling map)
-	add.w	#0x20,d0
-	and.w	#0x3F,d0	
-3:
+	jbsr	compute_fg_tile_xy
+
 
 	* displayable tile
 	add.w	d1,d1
@@ -2068,14 +2086,14 @@ cache_tiles_address:
 	move.w	d0,(a0)+		| store offset
 2:
 	addq.w	#1,d7
-	cmp.w	#0x1000,d7
+	cmp.w	#0x800,d7
 	jne		0b
 	rts
 
 
-* < D7: 0-0x1000
+* < D7: 0-0x800
 * > D0/D1: coords 
-compute_tile_xy:
+compute_fg_tile_xy:
 	moveq	#0,d0
 	move.b	d7,d0
 	
@@ -2083,17 +2101,7 @@ compute_tile_xy:
 	and.b	#0x1F,d0	| x
 	move.w	d7,d1
 	lsr.w	#5,d1		| Y
-	and.b	#0x1F,d1
-	* now add X or Y shift depending on quadrant
-	btst	#11,d7		| 0x8xx ?
-	jeq		0f
-	add.w	#0x20,d1	| lower quadrant
-0:
-	btst	#10,d7		| 0x4xx / 0xCxx ? right quadrant
-	jeq		0f
-	add.w	#0x20,d0	| right quadrant
-0:
-	lsl.w	#3,d1		| Y times 8
+	and.b	#0x1F,d1	| Y
 	rts
 
 *compute_tile_xy_portrait:
@@ -2119,40 +2127,27 @@ compute_tile_xy:
 * < D0: tile code
 * < D1: tile attribute
 
-update_bg_tile:
+update_fg_tile:
+	rts
+	
 	move.l	tiles_ptr,d2
 	jne		0f
 	rts
 0:
 
 	move.l	d2,a0
+	
 	moveq	#0,d2
 	moveq	#0,d3
 	move.b	d0,d2	| code
 	move.b	d1,d3	| attribute + tile msbits
-	and.w	#0x1F,d3
-	lsl.w	#8,d3
-	add.w	d3,d2			| extended tile code
+	and.w	#0xC0,d3
+	lsl.w	#2,d3
+	add.w	d3,d2	| extended tile code
 	move.b	d1,d3	| attribute + tile msbits
-	lsr.w	#5,d3	| clut
-	and.w	#7,d3
-	* note tile bank at the moment it's written to
-	* (for logging purposes)
-	.ifne	OPT_ENABLE_LOGGING
-	lea		tile_bank_table,a1
-	tst.b	higher_gfxset
-	jeq		10f
-	move.b	#1,(a1,d7.w)
-	jra		11f
-10:
-	move.b	#0,(a1,d7.w)
-11:
-	.endif
-	tst.b	higher_gfxset
-	jeq		12f
-	add.w	#NB_TILES/2,d2		| upper half
-12:
-	lea		tile_address_table,a1
+	and.w	#0xF,d3	| clut
+	
+	lea		fg_tile_address_table,a1
 	moveq	#0,d5
 	.ifdef	MC68020
 	move.w	(a1,d7.w*2),d5
@@ -2160,10 +2155,7 @@ update_bg_tile:
 	add.w	d7,d7
 	move.w	(a1,d7.w),d5
 	.endif
-	cmp.w	#-1,d5
-	jne		20f
-	* first half of the screen is never displayed!
-	rts
+
 20:
 	* now d5 holds the offset of the first plane of the tile on amiga screen
 	move.l	playfield_drawed_screen_ptr,a1
@@ -2176,7 +2168,7 @@ update_bg_tile:
 	add.l	d5,a1
 	add.l	d5,a3
 	* updating bitplanes
-	move.l	#SCREEN_PLANE_SIZE,d5
+	move.l	#BG_SCREEN_PLANE_SIZE,d5
 	move.w	#NB_PLAYFIELD_PLANES-1,d4
 
 	.ifdef	MC68020
@@ -2190,7 +2182,7 @@ update_bg_tile:
 	.ifndef	RELEASE
 	jne		12f
 	lsr.w	#2,d2
-	add.w	#SCREEN_TILE_ADDRESS,d7
+	add.w	#FG_SCREEN_TILE_ADDRESS,d7
 	*BREAKPOINT	"unregistered game tile (in D2, at address D7)"	
 
 	jra		11f
@@ -2220,7 +2212,7 @@ standard_tile:
 	.rept	8
 	move.b	(a0)+,d0
 	COPY_TILE8_PLANE_ROW
-	.set	offset,offset+NB_BYTES_PER_ROW
+	.set	offset,offset+FG_NB_BYTES_PER_ROW
 	.endr
 41:
 
@@ -2320,7 +2312,7 @@ set_bobs_bitplanes:
 	jra		1f			| avoids non-atomic illegal scroll value
 0:
 
-	lea		mulNB_BYTES_PER_ROW_table,a2
+	lea		mulBG_NB_BYTES_PER_ROW_table,a2
 	.ifdef	MC68020
 	move.w	(a2,d0.w*2),d0		| compute Y offset
 	.else
@@ -2348,7 +2340,7 @@ set_bobs_bitplanes:
 	
 	
     moveq #NB_PLAYFIELD_PLANES-1,d1
- 	move.w	#SCREEN_PLANE_SIZE,d2
+ 	move.w	#BG_SCREEN_PLANE_SIZE,d2
 	.ifndef	RELEASE
 	* quick check just in case someone uses that with plane size > 0x7FFF
 	jpl		10f
@@ -2437,20 +2429,13 @@ osd_read_p2_inputs:
 	.ifne	OPT_ENABLE_LOGGING
 purge_tile_log_data:
 	movem.l	d0-a6,-(a7)
-	lea		tile_log_table,a0
-	lea		tile_log_table_end,a1
+	lea		fg_tile_log_table,a0
+	lea		fg_tile_log_table_end,a1
 0:
 	clr.l (a0)+
 	cmp.l	a0,a1
 	jne		0b
 	
-	* set all to ffs (not written to yet)
-	lea		tile_bank_table,a0
-	move.w	#0x1000/4-1,d0
-	move.l	#-1,d1
-0:
-	move.l	d1,(a0)+
-	dbf		d0,0b
 	
 	movem.l	(a7)+,d0-a6
 	rts
@@ -2609,37 +2594,31 @@ log_used_tiles:
 	* main screen
 	
 	GET_MEMORY_START_AND_DP
-	lea		(SCREEN_TILE_ADDRESS,a6),a5
-	lea		(SCREEN_COLOR_ADDRESS,a6),a4
-	lea		tile_bank_table,a3
-	lea	tile_log_table,a0
-	move.w	#0x1000-1,d7
+	lea		(FG_SCREEN_TILE_ADDRESS,a6),a5
+	lea		(FG_SCREEN_COLOR_ADDRESS,a6),a4
+	lea		fg_tile_log_table,a0
+	move.w	#0x800-1,d7
 0:
-	jbsr	compute_tile_xy
-	cmp.w	#NB_TARGET_LINES/2,d1
-	jmi		20f			| we don't care about upper tiles
-
 	
-	move.b	(a3,d7.w),d3	| bank
-	jmi		20f
 	moveq	#0,d1
 	moveq	#0,d0
 	move.b	(a5,d7.w),d0	| tile code
 	move.b	(a4,d7.w),d1	| tile attribute
-	move.b	d1,d2
-	and.w	#0x1F,d2
-	lsl.w	#8,d2
-	add.w	d2,d0			| extended tile code
-	tst.b	d3
-	jeq		12f
-	add.w	#NB_TILES/2,d0		| upper half
-12:
-	lsr.w	#5,d1
 
-	and.w	#7,d1		| remove flip/mirror
-	lsl.l	#NB_CLUTS_POW,d0			| tile code * NB_CLUTS (long!)
-	add.l	d1,d0			| add clut
-	st.b	(a0,d0.l)
+	moveq	#0,d2
+	moveq	#0,d3
+	move.b	d0,d2	| code
+	move.b	d1,d3	| attribute + tile msbits
+	and.w	#0xC0,d3
+	lsl.w	#2,d3
+	add.w	d3,d2	| extended tile code
+	move.b	d1,d3	| attribute + tile msbits
+	and.w	#0xF,d3	| clut
+
+	| remove flip/mirror
+	lsl.l	#FG_TILE_NB_CLUTS_POW,d2			| tile code * NB_CLUTS (long!)
+	add.l	d3,d2			| add clut
+	st.b	(a0,d2.l)
 20:
 	dbf		d7,0b
 	rts
@@ -2671,7 +2650,7 @@ log_used_sprites:
 
 
 	
-	lsl.l	#NB_CLUTS_POW,d0			| sprite code * NB_CLUTS (long!)
+	lsl.l	#FG_TILE_NB_CLUTS_POW,d0			| sprite code * NB_CLUTS (long!)
 	add.l	d2,d0			| add clut
 	btst	#7,d1
 	jeq		20f
@@ -2829,7 +2808,8 @@ beamdelay:
 	rts
 
 	
-	MUL_TABLE	NB_BYTES_PER_ROW,NB_LINES
+	MUL_TABLE	BG_NB_BYTES_PER_ROW,BG_NB_LINES
+	MUL_TABLE	FG_NB_BYTES_PER_ROW,FG_NB_LINES
 
 	.align	4		| leave this long word alignment
 program_args:	ds.l	64,0
@@ -3232,15 +3212,15 @@ osd_dump_logs:
 	jbsr	save_cpu_log
 
 	move.l	_resload,a2
-	lea		tile_log_table,a1
-	lea		tile_log_name(pc),a0
-	move.l	#TILE_LOG_LENGTH,d0
+	lea		fg_tile_log_table,a1
+	lea		fg_tile_log_name(pc),a0
+	move.l	#FG_TILE_LOG_LENGTH,d0
 	jbsr	resload_SaveFile(a2)
 	
-	lea		sprite_log_table,a1
-	lea		sprite_log_name(pc),a0
-	move.l	#SPRITE_LOG_LENGTH,d0
-	jbsr	resload_SaveFile(a2)
+;	lea		sprite_log_table,a1
+;	lea		sprite_log_name(pc),a0
+;	move.l	#SPRITE_LOG_LENGTH,d0
+;	jbsr	resload_SaveFile(a2)
 	
     movem.l (a7)+,d0-a6
 	move.w	(a7)+,SR
@@ -3278,8 +3258,10 @@ save_cpu_log:
 
 cpu_log_name:
 	.asciz	"cpu_log"
-tile_log_name:
-	.asciz	"used_tiles"
+fg_tile_log_name:
+	.asciz	"fg_used_tiles"
+bg_tile_log_name:
+	.asciz	"bg_used_tiles"
 sprite_log_name:
 	.asciz	"used_sprites"
 
@@ -3591,18 +3573,22 @@ log_buffer_end:
 	.skip	16
 	
 	
-
-tile_address_table:
+fg_tile_address_table:
+	.skip	0x400*2
+bg_tile_address_table:
 	.skip	0x1000*2
-	
+
 	
 	.ifne	OPT_ENABLE_LOGGING
-tile_bank_table:
-	.skip	0x1000
-tile_log_table:
+
+fg_tile_log_table:
 	* a lot of combinations aren't used (fortunately!)
-	.skip	TILE_LOG_LENGTH
-tile_log_table_end:
+	.skip	FG_TILE_LOG_LENGTH
+fg_tile_log_table_end:
+bg_tile_log_table:
+	* a lot of combinations aren't used (fortunately!)
+	.skip	BG_TILE_LOG_LENGTH
+bg_tile_log_table_end:
 
 sprite_log_table:
 	* a lot of combinations aren't used (fortunately!)
@@ -3744,15 +3730,15 @@ pal_wait:
 		.section .bsschip
 	
 background_restore_buffer:
-	.skip	SCREEN_SIZE
+	.skip	BG_SCREEN_SIZE
 		
 bobs_screen_buffer_1:
-	.skip	SCREEN_SIZE
-	.skip	NB_BYTES_PER_ROW*48		| margin to avoid sprite blit wrap when game scrolls up
+	.skip	BG_SCREEN_SIZE
+	.skip	BG_NB_BYTES_PER_ROW*48		| margin to avoid sprite blit wrap when game scrolls up
 	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
 bobs_screen_buffer_2:
-	.skip	SCREEN_SIZE
-	.skip	NB_BYTES_PER_ROW*48
+	.skip	BG_SCREEN_SIZE
+	.skip	BG_NB_BYTES_PER_ROW*48
 	.endif
 	
 
