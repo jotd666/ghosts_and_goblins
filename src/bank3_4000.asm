@@ -3,12 +3,12 @@ clear_screen_and_show_status_4800:
 4803: 10 8E 00 20 LDY    #$0020
 4807: 32 7F       LEAS   -$1,S
 4809: C6 20       LDB    #$20
-480B: E7 E4       STB    ,S
+480B: E7 E4       STB    ,S			; do it 32 times
 480D: 86 20       LDA    #$20
 480F: C6 00       LDB    #$00
 4811: E7 89 04 00 STB    $0400,X		; [video_address]
 4815: A7 80       STA    ,X+		    ; [video_address]
-4817: 6A E4       DEC    ,S
+4817: 6A E4       DEC    ,S				; count one iteration
 4819: 26 F6       BNE    $4811
 481B: 31 3F       LEAY   -$1,Y
 481D: 26 EA       BNE    $4809
@@ -291,9 +291,9 @@ l_5180:
 522B: 31 85       LEAY   B,X
 522D: 8E 04 BC    LDX    #$04BC
 5230: C6 04       LDB    #$04
-5232: A6 24       LDA    $4,Y
+5232: A6 24       LDA    $4,Y		; [bank_address]
 5234: A7 88 40    STA    $40,X
-5237: A6 A0       LDA    ,Y+
+5237: A6 A0       LDA    ,Y+		; [bank_address]
 5239: A7 80       STA    ,X+
 523B: 5A          DECB
 523C: 26 F4       BNE    $5232
@@ -311,26 +311,27 @@ l_523f:
 5253: 58          ASLB
 5254: 58          ASLB
 5255: 33 C5       LEAU   B,U
-5257: EC C1       LDD    ,U++
-5259: ED 84       STD    ,X
-525B: EC C1       LDD    ,U++
-525D: ED 88 20    STD    $20,X
+5257: EC C1       LDD    ,U++		; [bank_address]
+5259: ED 84       STD    ,X			; [video_address]
+525B: EC C1       LDD    ,U++		; [bank_address]
+525D: ED 88 20    STD    $20,X			; [video_address]
 5260: CC 0F 0F    LDD    #$0F0F
-5263: ED 89 04 00 STD    $0400,X
-5267: ED 89 04 20 STD    $0420,X
+5263: ED 89 04 00 STD    $0400,X			; [video_address]
+5267: ED 89 04 20 STD    $0420,X			; [video_address]
 526B: 35 C0       PULS   U,PC
+
 526D: 8E 23 4E    LDX    #$234E
 5270: CE 52 95    LDU    #$5295
 5273: C6 04       LDB    #$04
 5275: D7 FC       STB    $FC
-5277: EC C1       LDD    ,U++
-5279: ED 84       STD    ,X
+5277: EC C1       LDD    ,U++		; [bank_address]
+5279: ED 84       STD    ,X			; [video_address]
 527B: CC 0E 0E    LDD    #$0E0E
-527E: ED 89 04 00 STD    $0400,X
-5282: EC C1       LDD    ,U++
-5284: ED 02       STD    $2,X
+527E: ED 89 04 00 STD    $0400,X	; [video_address]
+5282: EC C1       LDD    ,U++		; [bank_address]
+5284: ED 02       STD    $2,X		; [video_address]
 5286: CC 0E 0E    LDD    #$0E0E
-5289: ED 89 04 02 STD    $0402,X
+5289: ED 89 04 02 STD    $0402,X	; [video_address]
 528D: 30 88 20    LEAX   $20,X
 5290: 0A FC       DEC    $FC
 5292: 26 E3       BNE    $5277
@@ -346,22 +347,22 @@ l_52b9:
 52CA: 37 06       PULU   D
 52CC: 8E 20 A2    LDX    #$20A2
 52CF: 86 0B       LDA    #$0B
-52D1: A7 89 04 00 STA    $0400,X
-52D5: E7 80       STB    ,X+
-52D7: A7 89 04 00 STA    $0400,X
+52D1: A7 89 04 00 STA    $0400,X	; [video_address]
+52D5: E7 80       STB    ,X+	; [video_address]
+52D7: A7 89 04 00 STA    $0400,X	; [video_address]
 52DB: C6 3A       LDB    #$3A
-52DD: E7 80       STB    ,X+
+52DD: E7 80       STB    ,X+	; [video_address]
 52DF: 34 12       PSHS   X,A
 52E1: DC FC       LDD    $FC
 52E3: BD 50 64    JSR    $5064
 52E6: 35 12       PULS   A,X
 52E8: 33 44       LEAU   $4,U
-52EA: A7 89 04 00 STA    $0400,X
+52EA: A7 89 04 00 STA    $0400,X	; [video_address]
 52EE: E6 C0       LDB    ,U+
-52F0: E7 80       STB    ,X+
-52F2: A7 89 04 00 STA    $0400,X
+52F0: E7 80       STB    ,X+	; [video_address]
+52F2: A7 89 04 00 STA    $0400,X	; [video_address]
 52F6: E6 C0       LDB    ,U+
-52F8: E7 80       STB    ,X+
+52F8: E7 80       STB    ,X+	; [video_address]
 52FA: 39          RTS
 l_52fb:
 52FB: 34 40       PSHS   U
@@ -438,9 +439,10 @@ l_53a3:
 53AE: CE 20 CB    LDU    #$20CB
 53B1: 30 C4       LEAX   ,U
 53B3: 86 0A       LDA    #$0A
-53B5: 34 02       PSHS   A
+53B5: 34 02       PSHS   A			; push index on stack to do it 10 times
+; loop
 53B7: C6 04       LDB    #$04
-53B9: 34 20       PSHS   Y
+53B9: 34 20       PSHS   Y			; save Y
 53BB: 10 AE A4    LDY    ,Y
 53BE: 31 24       LEAY   $4,Y
 53C0: BD 53 E1    JSR    $53E1
@@ -451,20 +453,22 @@ l_53a3:
 53CD: BD 50 25    JSR    $5025
 53D0: 33 C8 40    LEAU   $40,U
 53D3: 30 C4       LEAX   ,U
-53D5: 35 20       PULS   Y
-53D7: 31 22       LEAY   $2,Y
-53D9: 6A E4       DEC    ,S
+53D5: 35 20       PULS   Y			; restore Y
+53D7: 31 22       LEAY   $2,Y		; Y += 2
+53D9: 6A E4       DEC    ,S			; count one iteration
 53DB: 26 DA       BNE    $53B7
 53DD: 32 61       LEAS   $1,S
 53DF: 35 C0       PULS   U,PC
+
 53E1: 86 03       LDA    #$03
-53E3: 34 02       PSHS   A
+53E3: 34 02       PSHS   A			; do it 3 times
 53E5: A6 A0       LDA    ,Y+		; [bank_address]
 53E7: E7 89 04 00 STB    $0400,X	; [video_address]
 53EB: A7 80       STA    ,X+	; [video_address]
-53ED: 6A E4       DEC    ,S
+53ED: 6A E4       DEC    ,S			; count one iteration
 53EF: 26 F4       BNE    $53E5
 53F1: 35 82       PULS   A,PC
+
 53F3: 39          RTS
 l_53f4:
 53F4: 96 28       LDA    $28
@@ -1424,7 +1428,7 @@ l_5bdd:
 5C3A: 8E 5C 7F    LDX    #$5C7F
 5C3D: EE 81       LDU    ,X++
 5C3F: C6 0D       LDB    #$0D
-5C41: 34 04       PSHS   B
+5C41: 34 04       PSHS   B			; do it 13 times
 5C43: C6 41       LDB    #$41
 5C45: 86 0B       LDA    #$0B
 5C47: A7 C9 04 00 STA    $0400,U

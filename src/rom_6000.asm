@@ -572,15 +572,15 @@ irq_65c4:
 65F5: D6 D9       LDB    bankswitch_copy_d9
 65F7: F7 3E 00    STB    bankswitch_3e00
 65FA: 3B          RTI
+
 65FB: D6 21       LDB    $21
-65FD: C4 03       ANDB   #$03
-65FF: 8E 66 0D    LDX    #$660D
+65FD: C4 03       ANDB   #$03		; index of bank index
+65FF: 8E 66 0D    LDX    #$660D		; in this table
 6602: A6 85       LDA    B,X
 6604: B7 3E 00    STA    bankswitch_3e00
 6607: 58          ASLB
 6608: 8E 66 11    LDX    #jump_table_6611
 660B: 6E 95       JMP    [B,X]	; [indirect_jump]
-
 
 6619: 96 DE       LDA    $DE
 661B: 26 39       BNE    $6656
@@ -1518,17 +1518,17 @@ fill_screen_with_h_6883:
 6E43: D6 72       LDB    starting_level_0072
 6E45: 58          ASLB
 6E46: 58          ASLB
-6E47: AE C5       LDX    B,U
-6E49: E6 80       LDB    ,X+
+6E47: AE C5       LDX    B,U	; [bank_address]
+6E49: E6 80       LDB    ,X+	; [bank_address]
 6E4B: D7 EF       STB    $EF
 6E4D: BD 8D FC    JSR    $8DFC
 6E50: 25 1B       BCS    $6E6D
-6E52: EC 81       LDD    ,X++
+6E52: EC 81       LDD    ,X++	; [bank_address]
 6E54: A7 25       STA    $5,Y
 6E56: E7 32       STB    -$E,Y
-6E58: EC 81       LDD    ,X++
+6E58: EC 81       LDD    ,X++	; [bank_address]
 6E5A: ED 36       STD    -$A,Y
-6E5C: EC 81       LDD    ,X++
+6E5C: EC 81       LDD    ,X++	; [bank_address]
 6E5E: ED 39       STD    -$7,Y
 6E60: 4F          CLRA
 6E61: 5F          CLRB
@@ -1539,6 +1539,7 @@ fill_screen_with_h_6883:
 6E69: 0A EF       DEC    $EF
 6E6B: 26 E0       BNE    $6E4D
 6E6D: 39          RTS
+
 6E6E: C6 02       LDB    #$02
 6E70: F7 3E 00    STB    bankswitch_3e00
 6E73: CE 4B 00    LDU    #$4B00
@@ -1546,17 +1547,17 @@ fill_screen_with_h_6883:
 6E78: 58          ASLB
 6E79: 58          ASLB
 6E7A: 33 C5       LEAU   B,U
-6E7C: AE 42       LDX    $2,U
-6E7E: E6 80       LDB    ,X+
+6E7C: AE 42       LDX    $2,U	; [bank_address]
+6E7E: E6 80       LDB    ,X+	; [bank_address]
 6E80: D7 EF       STB    $EF
 6E82: BD 8E 15    JSR    $8E15
 6E85: 25 1B       BCS    $6EA2
-6E87: EC 81       LDD    ,X++
+6E87: EC 81       LDD    ,X++	; [bank_address]
 6E89: A7 25       STA    $5,Y
 6E8B: E7 32       STB    -$E,Y
-6E8D: EC 81       LDD    ,X++
+6E8D: EC 81       LDD    ,X++	; [bank_address]
 6E8F: ED 36       STD    -$A,Y
-6E91: EC 81       LDD    ,X++
+6E91: EC 81       LDD    ,X++	; [bank_address]
 6E93: ED 39       STD    -$7,Y
 6E95: 4F          CLRA
 6E96: 5F          CLRB
@@ -1811,7 +1812,7 @@ jump_table_7151:
 7288: D7 DE       STB    $DE
 728A: 1F 02       TFR    D,Y
 728C: 8E 00 20    LDX    #$0020
-728F: 36 26       PSHU   Y,D
+728F: 36 26       PSHU   Y,D	; [video_address]
 7291: 30 1F       LEAX   -$1,X
 7293: 26 FA       BNE    $728F
 7295: 39          RTS
@@ -3452,7 +3453,7 @@ l_7a14:
 8266: D7 E2       STB    stack_save_00e2
 8268: C6 00       LDB    #$00
 826A: F7 3E 00    STB    bankswitch_3e00
-826D: E6 C0       LDB    ,U+
+826D: E6 C0       LDB    ,U+   ; [bank_address]
 826F: 4F          CLRA
 8270: 58          ASLB
 8271: 49          ROLA
@@ -3464,23 +3465,24 @@ l_7a14:
 8278: 1F 01       TFR    D,X
 827A: C6 01       LDB    #$01
 827C: F7 3E 00    STB    bankswitch_3e00
-827F: EC 04       LDD    $4,X
+827F: EC 04       LDD    $4,X   ; [bank_address]
 8281: ED A8 30    STD    $30,Y
-8284: EC 84       LDD    ,X
+8284: EC 84       LDD    ,X   ; [bank_address]
 8286: ED A1       STD    ,Y++
 8288: 0A E2       DEC    stack_save_00e2
 828A: 26 DC       BNE    $8268
 828C: 35 90       PULS   X,PC
+
 828E: C6 02       LDB    #$02
 8290: F7 3E 00    STB    bankswitch_3e00
-8293: E6 C4       LDB    ,U
+8293: E6 C4       LDB    ,U		; [bank_address]
 8295: 4F          CLRA
 8296: 58          ASLB
 8297: 49          ROLA
 8298: 10 8E 42 00 LDY    #$4200
-829C: EC AB       LDD    D,Y
+829C: EC AB       LDD    D,Y		; [bank_address]
 829E: DD E0       STD    $E0
-82A0: E6 C4       LDB    ,U
+82A0: E6 C4       LDB    ,U		; [bank_address]
 82A2: 86 40       LDA    #$40
 82A4: 3D          MUL
 82A5: C3 40 00    ADDD   #$4000
@@ -3550,7 +3552,7 @@ l_7a14:
 832C: D7 E2       STB    stack_save_00e2
 832E: C6 00       LDB    #$00
 8330: F7 3E 00    STB    bankswitch_3e00
-8333: E6 C0       LDB    ,U+
+8333: E6 C0       LDB    ,U+	; [bank_address]
 8335: 4F          CLRA
 8336: 58          ASLB
 8337: 49          ROLA
@@ -3562,13 +3564,14 @@ l_7a14:
 833E: 1F 01       TFR    D,X
 8340: C6 01       LDB    #$01
 8342: F7 3E 00    STB    bankswitch_3e00
-8345: EC 06       LDD    $6,X
+8345: EC 06       LDD    $6,X	; [bank_address]
 8347: ED A8 30    STD    $30,Y
-834A: EC 02       LDD    $2,X
+834A: EC 02       LDD    $2,X	; [bank_address]
 834C: ED A1       STD    ,Y++
 834E: 0A E2       DEC    stack_save_00e2
 8350: 26 DC       BNE    $832E
 8352: 35 90       PULS   X,PC
+
 8354: E6 03       LDB    $3,X
 8356: 5C          INCB
 8357: C4 1F       ANDB   #$1F
@@ -3985,9 +3988,9 @@ l_7a14:
 86AB: 30 01       LEAX   $1,X
 86AD: 31 89 04 00 LEAY   $0400,X
 86B1: A6 C8 30    LDA    $30,U
-86B4: A7 A2       STA    ,-Y
+86B4: A7 A2       STA    ,-Y		; [video_address]
 86B6: A6 C0       LDA    ,U+
-86B8: A7 82       STA    ,-X
+86B8: A7 82       STA    ,-X		; [video_address]
 86BA: 11 83 03 B0 CMPU   #$03B0
 86BE: 24 03       BCC    $86C3
 86C0: 5A          DECB
@@ -4878,6 +4881,7 @@ l_7a14:
 8DF6: D3 EA       ADDD   $EA
 8DF8: 1F 02       TFR    D,Y
 8DFA: 35 86       PULS   D,PC
+
 8DFC: D6 93       LDB    $93
 8DFE: 27 0A       BEQ    $8E0A
 8E00: DE 94       LDU    $94
@@ -4888,6 +4892,7 @@ l_7a14:
 8E09: 39          RTS
 8E0A: 53          COMB
 8E0B: 39          RTS
+
 8E0C: DE 94       LDU    $94
 8E0E: 36 10       PSHU   X
 8E10: DF 94       STU    $94
@@ -4997,9 +5002,9 @@ l_7a14:
 8FB8: 5F          CLRB
 8FB9: ED 33       STD    -$D,Y
 8FBB: 39          RTS
-8FBC: E6 41       LDB    $1,U
+8FBC: E6 41       LDB    $1,U	; [bank_address]
 8FBE: D7 DE       STB    $DE
-8FC0: E6 42       LDB    $2,U
+8FC0: E6 42       LDB    $2,U	; [bank_address]
 8FC2: 2A 04       BPL    $8FC8
 8FC4: A6 06       LDA    $6,X
 8FC6: 26 09       BNE    $8FD1
@@ -5007,7 +5012,7 @@ l_7a14:
 8FCA: 23 05       BLS    $8FD1
 8FCC: D7 BD       STB    $BD
 8FCE: BD 79 15    JSR    $7915
-8FD1: A6 43       LDA    $3,U
+8FD1: A6 43       LDA    $3,U	; [bank_address]
 8FD3: 10 8E 06 70 LDY    #$0670
 8FD7: E6 06       LDB    $6,X
 8FD9: ED A4       STD    ,Y

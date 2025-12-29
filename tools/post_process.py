@@ -99,10 +99,19 @@ for i,line in enumerate(lines):
         line = "\tILLEGAL\n"  # not reachable anyway, part of ROM/RAM check code
     if "review pshu instruction" in line or "review pulu instruction" in line or "review stack set from register" in line:
         line = remove_error(line)
+
+    # most routines using "dec ,s", "ora ,s"... instructions need reworking
+    # game uses load a with nb_iterations, then pshs a + dec,s.ora,s + puls a => not what we want as pshs uses move.l
+    # we have to remove the push/pull and replace by using virtual D5 stack for counter (dec ,s does that)
+    if address in {0x53e3,0x53b5}:
+        line = change_instruction("GET_REG_ADDRESS\t0,d5",lines,i) + "\tsubq.w\t#1,d5\n\tmove.b\td0,-(a0)   | [...]\n"
+    elif address in {0x53f1}:
+        # remove the puls A
+        line = "\taddq.w\t#1,d5\n"+change_instruction("rts",lines,i)
+    elif address == 0x5c41:
+        line = change_instruction("GET_REG_ADDRESS\t0,d5",lines,i) + "\tsubq.w\t#1,d5\n\tmove.b\td1,-(a0)   | [...]\n"
+
     lines[i] = line
-
-
-
 
 with open(source_dir / f"{bankname}.68k","w") as fw:
     # game_specific: fill global symbols
@@ -205,8 +214,24 @@ for i,line in enumerate(lines):
     elif address in {0x9c8e}:
         # add sign extend + optimize
         lines[i-1] = "\text.w\td0\n"+change_instruction("add.w\td0,d0",lines,i-1)
-
     ###################################################
+
+    # handle manual stack manipulation issues using ora  ,s+ / orb  ,s+
+    if ",s+" in line:
+        target = None
+        if ": ora" in line:
+            target = "d0"
+        elif ": orb" in line:
+            target = "d1"
+        if target:
+            # find the instruction above that wrongly pushes into native SP stack and change it
+            # there are 38 occurrences with ora and same with orb
+            for j in range(i-1,i-10,-1):
+                other_line = lines[j]
+                if "pshs" in other_line:
+                    lines[j] = change_instruction("GET_REG_ADDRESS\t0,d5",lines,j) + f"\tsubq.w\t#1,d5   | using virtual stack\n\tmove.b\t{target},-(a0)   | [...]\n"
+                    break
+
 
     # remove stray bcc/bcs issues by protecting SR or moving POP_SR
     elif address in {0xec02}:
