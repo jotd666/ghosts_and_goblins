@@ -378,14 +378,12 @@ l_505b:
 	LOG_REGS	505b   | added by add_reg_log.py
 	and.b	#0x0f,d0                         	| [$505b: anda   #$0f]
 	LOG_REGS	505d   | added by add_reg_log.py
-	GET_REG_UNCHECKED_ADDRESS	0x0400,d2              	| [$505d: stb    $0400,x] [video_address]
+	GET_REG_ADDRESS	0x0400,d2              	| [$505d: stb    $0400,x]
 	move.b	d1,(a0)                         	| [...]
-	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	5061   | added by add_reg_log.py
-	GET_REG_UNCHECKED_ADDRESS	0,d2                   	| [$5061: sta    ,x+] [video_address]
+	GET_REG_ADDRESS	0,d2                   	| [$5061: sta    ,x+]
 	addq.w	#1,d2                           	| [...]
 	move.b	d0,(a0)                         	| [...]
-	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	5063   | added by add_reg_log.py
 	rts                                    	| [$5063: rts]
 l_5064:

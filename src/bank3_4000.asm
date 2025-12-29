@@ -138,8 +138,8 @@ l_5051:
 5057: 8D 02       BSR    $505B
 5059: A6 A0       LDA    ,Y+
 505B: 84 0F       ANDA   #$0F
-505D: E7 89 04 00 STB    $0400,X		; [video_address]
-5061: A7 80       STA    ,X+		; [video_address]
+505D: E7 89 04 00 STB    $0400,X
+5061: A7 80       STA    ,X+
 5063: 39          RTS
 5064: 34 10       PSHS   X
 5066: 36 06       PSHU   D

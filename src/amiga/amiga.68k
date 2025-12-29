@@ -2340,7 +2340,7 @@ set_bobs_bitplanes:
 	
 	
     moveq #NB_PLAYFIELD_PLANES-1,d1
- 	move.w	#BG_SCREEN_PLANE_SIZE,d2
+ 	move.l	#BG_SCREEN_PLANE_SIZE,d2
 	.ifndef	RELEASE
 	* quick check just in case someone uses that with plane size > 0x7FFF
 	jpl		10f
@@ -2589,7 +2589,7 @@ level2_interrupt:
 
 	.ifne	OPT_ENABLE_LOGGING
 log_used_tiles:
-
+	move.b	#0,0x110
 	* scan the whole screen, see what was updated
 	* main screen
 	
