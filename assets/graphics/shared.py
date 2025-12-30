@@ -19,6 +19,8 @@ used_graphics_dir = this_dir / "used_graphics"
 
 NB_SPRITES = 0x100
 FG_NB_TILES = 0x400
+FG_NB_CLUTS = 16
+SPRITE_NB_CLUTS = 4
 
 def palette_pad(palette,pad_nb):
     palette += (pad_nb-len(palette)) * [(0x10,0x20,0x30)]

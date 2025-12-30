@@ -53,6 +53,8 @@ BG_TILE_NB_CLUTS = 1<<BG_TILE_NB_CLUTS_POW
 BG_TILE_COUNT = 0x400
 NB_SPRITES = 0x800
 
+HW_SPRITE_BUFFER_SIZE = (4*8*256+8*2)
+
 SPRITE_LOG_LENGTH = 0x1000
 FG_TILE_LOG_LENGTH = FG_TILE_NB_CLUTS*FG_TILE_COUNT
 BG_TILE_LOG_LENGTH = BG_TILE_NB_CLUTS*BG_TILE_COUNT
@@ -338,6 +340,15 @@ _user:
 	lea		debug_copperlist,a0
 	move.l	a0,cop1lc(a5)
 	
+	lea		hw_sprite_ram_buffer,a0
+	jbsr	align_for_fmode
+	moveq	#7,d0
+	lea		hw_sprite_pointers,a1
+0:
+	move.l	a0,(a1)+
+	add.w	#HW_SPRITE_BUFFER_SIZE,a0
+	dbf		d0,0b
+	
 	lea		bobs_screen_buffer_1,a0
 	addq	#2,a0	| leave 16 bits hidden for left side clipping
 	jbsr	align_for_fmode
@@ -374,17 +385,44 @@ _user:
 	* blank sprites
 	lea		game_sprites,a2
 	
-	* pad last sprite entries with blank
-	move.l	#blank_sprite,d0
+	* put static sprite entries, we'll write into
+	* that sprite area
+	lea		hw_sprite_pointers,a1
 1:
+	move.l	(a1)+,d0
 	move.w	d0,(6,a2)
 	swap	d0
 	move.w	d0,(2,a2)
-	swap	d0
+	*swap	d0
 	addq	#8,a2
 	cmp.l	#game_sprites_end,a2
 	bcs		1b
 2:
+	* compute control words for each sprite pair
+	lea		hw_sprite_pointers,a0
+	lea		HW_SpriteYTable_256,a1
+	moveq	#3,d7
+	moveq	#0,d0
+	moveq	#0,d2
+0:
+	move.w	d2,d0
+	moveq	#0,d1
+	jbsr	store_sprite_pos
+	add.w	#64,d2		| advance X
+	
+	* store control word
+	.rept	2
+	move.l	(a0)+,a2
+	move.w	d0,(6,a2)
+	swap 	d0
+	move.w	d0,(a2)
+	swap	d0
+	bset	#7,d0		| attach bit
+	addq	#8,a2
+	.endr
+	
+	dbf	d7,0b
+	
 	jbsr		set_bobs_bitplanes
 
 
@@ -2296,7 +2334,7 @@ HW_SpriteYTable_\height:
   .endr
 	.endm
 
-	DEF_HW_SPRITE_Y_TABLE	16
+	DEF_HW_SPRITE_Y_TABLE	256
 
 
 set_bobs_bitplanes:
@@ -3496,6 +3534,9 @@ delay_timer:
 one_out_of_five:
 	.word	0
 
+hw_sprite_pointers:
+	.skip	8*4
+	
 playfield_screen_data_1:
 	.long	0
 	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
@@ -3728,6 +3769,9 @@ pal_wait:
 	.align	8
 	
 		.section .bsschip
+
+hw_sprite_ram_buffer:
+	.skip	HW_SPRITE_BUFFER_SIZE*8+16	| 8 64-bit wide sprites + control words + align
 	
 background_restore_buffer:
 	.skip	BG_SCREEN_SIZE

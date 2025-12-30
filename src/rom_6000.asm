@@ -555,7 +555,7 @@ irq_65c4:
 65CA: CC 00 01    LDD    #$0001
 65CD: D3 20       ADDD   $20
 65CF: DD 20       STD    $20
-65D1: 8D 28       BSR    $65FB
+65D1: 8D 28       BSR    update_a_palette_65fb
 65D3: BD 67 55    JSR    $6755
 65D6: BD 67 72    JSR    $6772
 65D9: BD 62 2C    JSR    read_dip_switches_622c
@@ -573,6 +573,7 @@ irq_65c4:
 65F7: F7 3E 00    STB    bankswitch_3e00
 65FA: 3B          RTI
 
+update_a_palette_65fb:
 65FB: D6 21       LDB    $21
 65FD: C4 03       ANDB   #$03		; index of bank index
 65FF: 8E 66 0D    LDX    #$660D		; in this table
@@ -582,6 +583,7 @@ irq_65c4:
 6608: 8E 66 11    LDX    #jump_table_6611
 660B: 6E 95       JMP    [B,X]	; [indirect_jump]
 
+update_tiles_palette_6619:
 6619: 96 DE       LDA    $DE
 661B: 26 39       BNE    $6656
 661D: 10 DF E2    STS    stack_save_00e2	; save current stack
@@ -606,6 +608,7 @@ irq_65c4:
 6650: 26 DC       BNE    $662E
 6652: 10 DE E2    LDS    stack_save_00e2	; restore current stack
 6655: 39          RTS
+
 6656: 4A          DECA
 6657: 10 DF E2    STS    stack_save_00e2
 665A: 5F          CLRB
@@ -635,6 +638,7 @@ irq_65c4:
 668F: 10 DE E2    LDS    stack_save_00e2
 6692: 39          RTS
 
+update_sprites_palette_6693:
 6693: 96 DF       LDA    $DF
 6695: 2B 3B       BMI    $66D2
 6697: 10 DF E2    STS    stack_save_00e2
@@ -691,8 +695,11 @@ irq_65c4:
 6710: 10 DE E2    LDS    stack_save_00e2
 6713: 08 DF       ASL    $DF
 6715: 39          RTS
+
+update_some_palette_6716:
 6716: 10 8E 38 C0 LDY    #$38C0
 671A: 20 04       BRA    $6720
+update_some_palette_671c:
 671C: 10 8E 38 80 LDY    #$3880
 6720: 10 DF E2    STS    stack_save_00e2
 6723: CE 04 80    LDU    #$0480
@@ -715,6 +722,7 @@ irq_65c4:
 674F: 26 DC       BNE    $672D
 6751: 10 DE E2    LDS    stack_save_00e2
 6754: 39          RTS
+
 6755: D6 D8       LDB    $D8
 6757: D8 DA       EORB   $DA
 6759: F7 3D 00    STB    $3D00
@@ -15979,10 +15987,10 @@ jump_table_65bc:
 	dc.w	$694d	; $65be
 	dc.w	$70e3	; $65c0
 jump_table_6611:
-	dc.w	$6619	; $6611
-	dc.w	$6693	; $6613
-	dc.w	$671c	; $6615
-	dc.w	$6716	; $6617
+	dc.w	update_tiles_palette_6619	; $6611
+	dc.w	update_sprites_palette_6693	; $6613
+	dc.w	update_some_palette_671c	; $6615
+	dc.w	update_some_palette_6716	; $6617
 jump_table_6857:
 	dc.w	$685f	; $6857
 	dc.w	fill_screen_with_h_6883	; $6859
