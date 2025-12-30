@@ -423,6 +423,12 @@ _user:
 	
 	dbf	d7,0b
 	
+	* load attached sprites palette
+	lea		fg_tile_palette,a0
+	lea		sprite_colors,a1
+	move.w	#16,d0
+	jbsr	load_palette
+
 	jbsr		set_bobs_bitplanes
 
 
@@ -1865,14 +1871,14 @@ platform_init:
 
 	.ifne	OPT_AGA_MODE
     move.w #0x00C0,ddfstop(a5)		| C0 for fmode=3
-	move.w	#3,fmode(a5)
+	move.w	#(3<<2)+3,fmode(a5)		| wide sprites, faster fetch
 	subq	#8,d0			| change modulo
  	.else
 	move.w #0x00D0,ddfstop(a5)		| C0 for fmode=3
 	.endif
 	
 	# 0 modulo (OCS)
-   move.w d0,bpl1mod(a5)
+    move.w d0,bpl1mod(a5)
     move.w d0,bpl2mod(a5)
 
 	
@@ -2410,7 +2416,7 @@ scroll_table:
 	.include	"scroll_table_16.68k"
 	.endif
 	
-
+	.include	"palette.68k"
 osd_debug_hook:
 	rts
 	
@@ -3121,25 +3127,25 @@ no_tune:
 tunes_table:
 	.long	0                  | 0
 	.long	0                  | 1
-	.long	select_mod         | 2
-	.long	hurry_mod          | 3
-	.long	0                  | 4
-	.long	intro_mod          | 5
-	.long	level_2_mod        | 6
-	.long	level_3_mod        | 7
-	.long	level_4_mod        | 8
-	.long	level_1_mod        | 9
-	.long	-1                 | A
-	.long	-1                 | B
-	.long	-1                 | C
-	.long	level_5_mod         | D level_5_mod
-	.long	lost_mod            | E lost
-	.long	0                  | F
-	.long	game_over_mod         | 10
-	.long	0                  | 11
-	.long	game_won_mod            | 12
-	.long	0                  | 13
-	.long	won_mod             | 14 won
+	.long	0     | 2
+	.long	0     | 3
+	.long	0     | 4
+	.long	0     | 5
+	.long	0     | 6
+	.long	0     | 7
+	.long	0     | 8
+	.long	0     | 9
+	.long	0     | A
+	.long	0     | B
+	.long	0     | C
+	.long	0      | D level_5_mod
+	.long	0      | E lost
+	.long	0     | F
+	.long	0        | 10
+	.long	0     | 11
+	.long	0          | 12
+	.long	0     | 13
+	.long	0      | 14 won
 	
 
 quit_to_os:
@@ -3324,30 +3330,6 @@ looped_sound_enabled:
 return_address:
 	.long	0
 	
-select_mod:
-	.asciz	"select.mod"
-intro_mod:
-	.asciz	"demo.mod"
-level_1_mod:
-	.asciz	"level_1.mod"
-level_2_mod:
-	.asciz	"level_2.mod"
-level_3_mod:
-	.asciz	"level_3.mod"
-level_4_mod:
-	.asciz	"level_4.mod"
-level_5_mod:
-	.asciz	"level_5.mod"
-hurry_mod:
-	.asciz	"hurry.mod"
-game_won_mod:
-	.asciz	"game_won.mod"
-won_mod:
-	.asciz	"won.mod"
-lost_mod:
-	.asciz	"lost.mod"
-game_over_mod:
-	.asciz	"game_over.mod"
 	
 difficulty_dsw:
 	.byte	0
@@ -3642,13 +3624,6 @@ sprite_log_table_end:
 	.section	.datachip
 
 
-	.macro	DECL_32_COLORS
-	.set	colidx,0
-	.rept	32
-	dc.w	color+(colidx*2),0
-	.set	colidx,colidx+1
-	.endr
-	.endm
 	
 	.macro	DECL_BITPLANES	bpoff_start,nb_planes
 	.set	bpoff,\bpoff_start
@@ -3676,6 +3651,10 @@ sprite_log_table_end:
     .endr
 	.endm
 
+	.macro	DECL_32_COLORS
+	DECL_COLORS	0,32
+	.endm
+
 	
 	
 blank_sprite:
@@ -3692,9 +3671,6 @@ debug_color:
 	dc.l	-2
 	
 
-* outside the copperlist for now
-sprite_colors:
-	DECL_COLORS	16,16
 
 
 	
@@ -3730,10 +3706,9 @@ copperlist_colors:
 	.endr
 	.endif
 
-*palette_change_wait:
-*	.word	0x01+(275-224)<<8,0xFFFE
-*	.word	bplcon3,0
-*	.word	color,0xF00
+* outside the copperlist for now
+sprite_colors:
+	DECL_COLORS	16,16
 
 
 	* mid-line wait & extra interrupt
