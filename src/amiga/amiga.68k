@@ -122,10 +122,13 @@ BG_NB_BYTES_PER_ROW = 80
 Y_START = 0x20
 
 	.if	NB_PLAYFIELD_PLANES == 6
-BASE_BPLCON2_VALUE = 0x0224			| add killehb
+BASE_BPLCON2_VALUE = 0x0264			| killehb (we're using 6 real bitplanes) sprites above all playfields
 	.else
-BASE_BPLCON2_VALUE = 0x0024
+BASE_BPLCON2_VALUE = 0x0064
 	.endif
+
+BASE_BPLCON4_VALUE = 0x0044	  | sprites palette starts at color 64
+
 FG_NB_LINES = 256
 BG_NB_LINES = 512
 Y_MAX = BG_NB_LINES
@@ -335,7 +338,7 @@ _user:
 	.endif
 
 
-
+	* dummy copperlist with no bitplanes enabled
 	lea		_custom,a5
 	lea		debug_copperlist,a0
 	move.l	a0,cop1lc(a5)
@@ -367,9 +370,9 @@ _user:
 	.endif
 		
 	* init color table handling the bank switch issue
-	lea		copperlist_colors+2,a0
+	lea		copperlist_colors,a0
 	lea		color_copper_pointers,a1
-	moveq	#(TOTAL_NB_COLORS/32)-1,d0		| only 4 banks are required for max 128 colors
+	moveq	#(TOTAL_NB_COLORS/32),d0		| nb banks for all colors + sprite color bank
 0:
 	.ifne	OPT_AGA_MODE
 	addq.w	#4,a0		| skip set bank
@@ -382,11 +385,10 @@ _user:
 	dbf		d0,0b
 	
 	
-	* blank sprites
-	lea		game_sprites,a2
 	
 	* put static sprite entries, we'll write into
 	* that sprite area
+	lea		game_sprites,a2
 	lea		hw_sprite_pointers,a1
 1:
 	move.l	(a1)+,d0
@@ -413,7 +415,7 @@ _user:
 	* store control word
 	.rept	2
 	move.l	(a0)+,a2
-	move.w	d0,(6,a2)
+	move.w	d0,(8,a2)
 	swap 	d0
 	move.w	d0,(a2)
 	swap	d0
@@ -425,12 +427,24 @@ _user:
 	
 	* load attached sprites palette
 	lea		fg_tile_palette,a0
-	lea		sprite_colors,a1
+	move.l	color_copper_pointers+TOTAL_NB_COLORS*4,a1	| entries 64-80
 	move.w	#16,d0
 	jbsr	load_palette
-
+	
+	
+	lea		hw_sprite_pointers,a0
+	.rept	8
+	move.l	(a0)+,a1
+	add.w	#16,a1
+	move.w	#0x100,D0
+0:
+	move.l	#0xA5A53537,(a1)+
+	dbf		d0,0b
+	.endr
+	
+	
 	jbsr		set_bobs_bitplanes
-
+	
 
 	move.l	cheat_flags,d0
 	jeq		1f
@@ -1674,14 +1688,6 @@ start_process_1_plane:
 	GEN_MINTERM_TABLE_2	cookie_cut_mask_blit,0x0BCA
 
 
-* 2 words: first shift (as bplcon value), then
-* offset in bytes
-
-
-hw_sprite_allocated_frames:
-	.skip	0x80
-current_hw_sprite:
-	.word	0
 
 bank_base:
 	.long	0
@@ -1858,6 +1864,7 @@ platform_init:
 	* AGA
 
 	.ifne	OPT_AGA_MODE
+    move.w #BASE_BPLCON4_VALUE,bplcon4(a5)
     move.w #0x0C00+BORDERBLANK<<5,bplcon3(a5)     | no AGA specificities, default ECS
     add	#AGA_X_SHIFT,d0
     add	#AGA_X_SHIFT,d1
@@ -1887,14 +1894,6 @@ platform_init:
 	move.l	a0,cop1lc(a5)
 
 	
-	* set sprite registers in copperlist
-	
-	* attached sprites for main character & car
-	lea		game_sprites,a0
-	*bsr		init_game_sprite_bank
-	
-
-
 
 	* wait 300 lines
 	move.w	#100,d0
@@ -3696,19 +3695,15 @@ game_sprites_end:
 
 copperlist_colors:
 	.ifeq	OPT_AGA_MODE
-	DECL_32_COLORS	
+	DECL_32_COLORS
 	.else
 	.set	bpl_count,0
-	.rept	8
+	.rept	NB_PLAYFIELD_PLANES+1		| one more bank for sprites
 	.word	bplcon3,(bpl_count<<13)+(BORDERBLANK<<5)
 	.set	bpl_count,bpl_count+1
 	DECL_32_COLORS
 	.endr
 	.endif
-
-* outside the copperlist for now
-sprite_colors:
-	DECL_COLORS	16,16
 
 
 	* mid-line wait & extra interrupt
