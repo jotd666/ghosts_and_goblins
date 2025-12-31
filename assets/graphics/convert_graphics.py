@@ -402,7 +402,7 @@ with open(src_dir / "graphics_aga.68k","w") as f:
     f.write("\t.global\tbob_table\n")
     f.write("\t.global\thws_table\n")
 
-    f.write("character_table:\n")
+    f.write("fg_character_table:\n")
 
     for i,tile_entry in enumerate(fg_tile_table):
         f.write("\t.long\t")

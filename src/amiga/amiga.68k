@@ -53,7 +53,7 @@ BG_TILE_NB_CLUTS = 1<<BG_TILE_NB_CLUTS_POW
 BG_TILE_COUNT = 0x400
 NB_SPRITES = 0x800
 
-HW_SPRITE_BUFFER_SIZE = (4*8*256+8*2)
+HW_SPRITE_BUFFER_SIZE = (2*8*256+16*2)
 
 SPRITE_LOG_LENGTH = 0x1000
 FG_TILE_LOG_LENGTH = FG_TILE_NB_CLUTS*FG_TILE_COUNT
@@ -135,10 +135,8 @@ Y_MAX = BG_NB_LINES
 NB_PLAYFIELD_LINES = BG_NB_LINES
 
 
-FG_SCREEN_PLANE_SIZE = FG_NB_BYTES_PER_ROW*(FG_NB_LINES)
 BG_SCREEN_PLANE_SIZE = BG_NB_BYTES_PER_ROW*(BG_NB_LINES+16)
 
-FG_SCREEN_SIZE = FG_SCREEN_PLANE_SIZE*NB_FG_PLANES
 BG_SCREEN_SIZE = BG_SCREEN_PLANE_SIZE*NB_PLAYFIELD_PLANES
 
 NB_HOST_SPRITES = 8
@@ -404,8 +402,7 @@ _user:
 	lea		hw_sprite_pointers,a0
 	lea		HW_SpriteYTable_256,a1
 	moveq	#3,d7
-	moveq	#0,d0
-	moveq	#0,d2
+	moveq	#0x40,d2	| sprite X start
 0:
 	move.w	d2,d0
 	moveq	#0,d1
@@ -424,23 +421,13 @@ _user:
 	.endr
 	
 	dbf	d7,0b
+
 	
 	* load attached sprites palette
 	lea		fg_tile_palette,a0
 	move.l	color_copper_pointers+TOTAL_NB_COLORS*4,a1	| entries 64-80
 	move.w	#16,d0
 	jbsr	load_palette
-	
-	
-	lea		hw_sprite_pointers,a0
-	.rept	8
-	move.l	(a0)+,a1
-	add.w	#16,a1
-	move.w	#0x100,D0
-0:
-	move.l	#0xA5A53537,(a1)+
-	dbf		d0,0b
-	.endr
 	
 	
 	jbsr		set_bobs_bitplanes
@@ -1930,6 +1917,20 @@ platform_init:
 
 
 	
+*	lea		hw_sprite_pointers,a0
+*	move.w	#0x48,d7
+*
+*2:
+*	move.b	#0x48,d0
+*	move.b	#1,d1
+*	jbsr	update_fg_tile
+*	
+*	addq	#1,d7
+*	cmp.w	#0x400,d7
+*	jne		2b
+	
+	
+	
     rts
 	
 * < A0: palette
@@ -2066,7 +2067,7 @@ osd_video_byte_dirty:
 	cmp.w	#BG_SCREEN_TILE_ADDRESS,d7
 	jcc		osd_w_videoram_out		| TEMP ATM only foreground
 	
-	and.w	#0x7FF,d7
+	and.w	#0x3FF,d7
 
 	lea		(FG_SCREEN_TILE_ADDRESS,a6),a0
 	move.b	(a0,d7.w),d0
@@ -2082,30 +2083,19 @@ osd_w_videoram_out:
 	
 	.macro	COPY_TILE8_PLANE_ROW
 	move.b	d0,(offset,a1)  | buffer
-	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
-	move.b	d0,(offset,a2)  | buffer
-	.endif
-	move.b	d0,(offset,a3)  | background buffer
 	.endm
 	
 	.macro	CLEAR_TILE8_PLANE
 	.set	offset,0
 	.rept	8
 	clr.b	(offset,a1)
-	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
-	clr.b	(offset,a2)  | buffer
-	.endif
-	clr.b	(offset,a3)  | background buffer
 	.set	offset,offset+FG_NB_BYTES_PER_ROW
 	.endr	
 	.endm
 	
 	.macro	TILE8_NEXT_PLANE
-	add.l	d5,a1			| needed LONG but not anymore
-	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
-	add.l	d5,a2			| needed LONG
-	.endif
-	add.l	d5,a3			| needed LONG
+	add.l	d5,a1
+	add.l	d5,a2
 	.endm
 
 cache_bg_tiles_address:
@@ -2129,22 +2119,23 @@ cache_fg_tiles_address:
 	move.w	d0,(a0)+		| store offset
 2:
 	addq.w	#1,d7
-	cmp.w	#0x800,d7
+	cmp.w	#0x400,d7
 	jne		0b
 	rts
 
 
-* < D7: 0-0x800
+* < D7: 0-0x400
 * > D0/D1: coords 
 compute_fg_tile_xy:
 	moveq	#0,d0
 	move.b	d7,d0
 	
-	* for each screen quadrant, compute base X/Y (0-31)
 	and.b	#0x1F,d0	| x
 	move.w	d7,d1
 	lsr.w	#5,d1		| Y
 	and.b	#0x1F,d1	| Y
+	subq	#2,d1		| 2 first rows aren't visible
+	lsl.w	#3,d1		| times 8
 	rts
 
 *compute_tile_xy_portrait:
@@ -2163,23 +2154,17 @@ compute_fg_tile_xy:
 
 
 
-* each column has 0x20*8 = 256 pixels
-* each visible row has 28*8 = 244 pixels
 
-* < D7: 0-0x1000 offset
+* < D7: 0-0x400 offset
 * < D0: tile code
 * < D1: tile attribute
 
 update_fg_tile:
-	rts
-	
-	move.l	tiles_ptr,d2
-	jne		0f
+	* if < 0x40 bail out as not visible
+	cmp.w	#0x40,d7
+	jcc		0f
 	rts
 0:
-
-	move.l	d2,a0
-	
 	moveq	#0,d2
 	moveq	#0,d3
 	move.b	d0,d2	| code
@@ -2190,29 +2175,43 @@ update_fg_tile:
 	move.b	d1,d3	| attribute + tile msbits
 	and.w	#0xF,d3	| clut
 	
-	lea		fg_tile_address_table,a1
-	moveq	#0,d5
-	.ifdef	MC68020
-	move.w	(a1,d7.w*2),d5
-	.else
-	add.w	d7,d7
-	move.w	(a1,d7.w),d5
-	.endif
+	jbsr	compute_fg_tile_xy
+	* select which destination sprites (0-3)
+	move.w	d0,d4
+	lea		hw_sprite_pointers,a1
+	and.w	#0xF8,d4		| divide by 8
+							| then multiply by 8 (sprite go by pairs)
+	lea	(a1,d4.w),a1
+
+	
+	and.w	#0x7,d0		| dest X offset
+	lsl.w	#4,d1		| dest Y offset (8*2 pixels per row)
+	add.w	d0,d1
+	add.w	#0x10,d1	| skip control word
+	
+	* get 2 pointers for 2 attached sprites
+	move.l	(a1)+,a2
+	move.l	(a1),a1
+	exg		a1,a2
+	* add offset to destination
+	add.w	d1,a2
+	add.w	d1,a1
+	
+	* now get source data
+	lea		fg_character_table,a0
+	
+*	lea		fg_tile_address_table,a1
+*	moveq	#0,d5
+*	.ifdef	MC68020
+*	move.w	(a1,d7.w*2),d5
+*	.else
+*	add.w	d7,d7
+*	move.w	(a1,d7.w),d5
+*	.endif
 
 20:
-	* now d5 holds the offset of the first plane of the tile on amiga screen
-	move.l	playfield_drawed_screen_ptr,a1
-	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
-	move.l	playfield_displayed_screen_ptr,a2
-	add.l	d5,a2		| long add ensures offset from 1 to 0xFFFF
-	.endif
-	lea		background_restore_buffer,a3
 
-	add.l	d5,a1
-	add.l	d5,a3
 	* updating bitplanes
-	move.l	#BG_SCREEN_PLANE_SIZE,d5
-	move.w	#NB_PLAYFIELD_PLANES-1,d4
 
 	.ifdef	MC68020
 	move.l	(a0,d2.l*4),d0		| tile pointer as LONG!
@@ -2221,11 +2220,16 @@ update_fg_tile:
 	add.w	d2,d2	
 	move.l	(a0,d2.l),d0		| tile pointer as LONG!
 	.endif
-	*jeq		11f 	| can happen when tile code is read when screen is being erased	
-	.ifndef	RELEASE
+	
+	.ifdef	RELEASE
+	jeq		11f 	| can happen when tile code is read when screen is being erased	
+	.else
 	jne		12f
+	.ifndef	MC68020
 	lsr.w	#2,d2
+	.endif
 	add.w	#FG_SCREEN_TILE_ADDRESS,d7
+	COLOR0_FLASH	0xF0F
 	*BREAKPOINT	"unregistered game tile (in D2, at address D7)"	
 
 	jra		11f
@@ -2244,46 +2248,56 @@ update_fg_tile:
 	
 	move.l	d0,a4		| directly pointer on tile bitplanes
 	
-	
-standard_tile:
-	* just copy
+	.macro	NEXT_SOURCE_PLANE
 4:
 	move.l	(a4)+,d0		| next plane
-	jeq		5f
+	jne		5f
+	move.l	#empty_row,d0
+5:	
 	move.l	d0,a0
+	.endm
+	
+standard_tile:
+	* first plane: first sprite
+	NEXT_SOURCE_PLANE
 	.set	offset,0
 	.rept	8
 	move.b	(a0)+,d0
-	COPY_TILE8_PLANE_ROW
-	.set	offset,offset+FG_NB_BYTES_PER_ROW
+	move.b	d0,(offset,a1)
+	.set	offset,offset+16
 	.endr
-41:
+	* second plane: first sprite, with a 8 offset
+	NEXT_SOURCE_PLANE
+	.set	offset,8
+	.rept	8
+	move.b	(a0)+,d0
+	move.b	d0,(offset,a1)
+	.set	offset,offset+16
+	.endr
+	* third plane: second sprite
+	NEXT_SOURCE_PLANE
+	.set	offset,0
+	.rept	8
+	move.b	(a0)+,d0
+	move.b	d0,(offset,a2)
+	.set	offset,offset+16
+	.endr
+	* second plane: second sprite, with a 8 offset
+	NEXT_SOURCE_PLANE
+	.set	offset,8
+	.rept	8
+	move.b	(a0)+,d0
+	move.b	d0,(offset,a2)
+	.set	offset,offset+16
+	.endr
 
-
-	TILE8_NEXT_PLANE
-	dbf		d4,4b
-0:
-	rts
-5:
-	CLEAR_TILE8_PLANE
-	jra		41b
-41:
-	TILE8_NEXT_PLANE
-	dbf		d4,4b
-0:
-	rts
-
-	* clear tile
 11:
-	CLEAR_TILE8_PLANE
-	TILE8_NEXT_PLANE
-	dbf		d4,11b
-2:
 	rts
-	
 
 
-	
+empty_row:
+	.skip	8
+		
 * < d0.w: x
 * < d1.w: y
 * < a1: sprite pos table (depending on height)
@@ -3741,7 +3755,7 @@ pal_wait:
 		.section .bsschip
 
 hw_sprite_ram_buffer:
-	.skip	HW_SPRITE_BUFFER_SIZE*8+16	| 8 64-bit wide sprites + control words + align
+	.skip	HW_SPRITE_BUFFER_SIZE*8	| 8 64-bit wide sprites + control words + align
 	
 background_restore_buffer:
 	.skip	BG_SCREEN_SIZE

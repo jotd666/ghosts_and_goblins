@@ -1,3 +1,5 @@
+- quantize fg tiles to 16 colors
+- optimize fg tiles position computation
 - redo division: FED8
 - trap write to screen 2000-3000: implement 4800 status load front tiles/sprite layer test
 - use audio mixer for that one!
