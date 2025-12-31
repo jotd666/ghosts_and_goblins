@@ -1,5 +1,5 @@
-"# Your Game" 
-remake of Jail Break for Amiga
+"# Ghosts'N'Goblins" 
+port of Ghosts'n'Goblins for Amiga
 
 Requires a 2-button joystick, or the keyboard
 
@@ -7,9 +7,9 @@ Credits:
 
 - jotd: reverse-engineering, 68000 transcode, graphics conversion
   sound conversion for the Amiga.
-- no9 (soon): music
+- IM76: music
 - PascalDe73: icons
-- Konami: original game
+- Capcom: original game
 
 Instructions:
 

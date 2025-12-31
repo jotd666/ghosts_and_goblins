@@ -200,6 +200,68 @@ else:
 ##    tile_cluts[atc] = sorted(used_cluts)
 
 
+def apply_color_replacement(sprite_set_list,quantized):
+    """ change colors for list of tilesets (tiles, sprites)
+    quantized: RGB => RGB color replacement dictionary
+    """
+
+    for sset in sprite_set_list:
+        for tile in sset:
+            if tile:
+                bitplanelib.replace_color_from_dict(tile,quantized)
+
+def quantize_palette(rgb_tuples,img_type,nb_quantize,transparent=None,dump_it=False):
+    rgb_configs = set(rgb_tuples)
+
+    nb_target_colors = nb_quantize
+    if transparent:
+        rgb_configs.remove(transparent)
+        # remove black, white, we don't want it quantized
+        immutable_colors = (transparent,(0,0,0))
+    else:
+        immutable_colors = ((0,0,0),)
+
+    for c in immutable_colors:
+        rgb_configs.discard(c)
+        nb_quantize -= 1
+
+    dump_graphics = False
+    # now compose an image with the colors
+    clut_img = Image.new("RGB",(len(rgb_configs),1))
+    for i,rgb in enumerate(rgb_configs):
+        #rgb_value = (rgb[0]<<16)+(rgb[1]<<8)+rgb[2]
+        clut_img.putpixel((i,0),rgb)
+
+    reduced_colors_clut_img = clut_img.quantize(colors=nb_quantize,dither=0).convert('RGB')
+
+    # get the reduced palette
+    reduced_palette = [reduced_colors_clut_img.getpixel((i,0)) for i,_ in enumerate(rgb_configs)]
+    # apply rounding now, else possible color duplicates, which would be a pity
+    reduced_palette = bitplanelib.palette_round(reduced_palette,0xF0)
+
+    # now create a dictionary by associating the original & reduced colors
+    rval = dict(zip(rgb_configs,reduced_palette))
+
+    # add black & white & transparent back
+    for c in immutable_colors:
+        rval[c] = c
+
+
+    if dump_it:  # debug it, create 2 rows, 1 non-quantized, and 1 quantized, separated by bloack
+        s = clut_img.size
+        ns = (s[0]*30,s[1]*30)
+        clut_img = clut_img.resize(ns,resample=0)
+        whole_image = Image.new("RGB",(clut_img.size[0],clut_img.size[1]*3))
+        whole_image.paste(clut_img,(0,0))
+        reduced_colors_clut_img = reduced_colors_clut_img.resize(ns,resample=0)
+        whole_image.paste(reduced_colors_clut_img,(0,clut_img.size[1]*2))
+        whole_image.save(dump_dir / "{}_colors.png".format(img_type))
+
+    result_nb = len(set(reduced_palette))
+    if nb_quantize < result_nb:
+        raise Exception(f"quantize: {img_type}: {nb_quantize} expected, found {result_nb}")
+    # return it
+    return rval
 
 
 
@@ -212,16 +274,9 @@ if dump_it:
             fg_tile_cluts_dict = {hex(k):[hex(x) for x in v] for k,v in fg_tile_cluts.items() if v}
             json.dump(fg_tile_cluts_dict,f,indent=2)
 
-def add_hw_sprite(index,name,cluts=[0]):
-    if isinstance(index,range):
-        pass
-    elif not isinstance(index,(list,tuple)):
-        index = [index]
-    for idx in index:
-        sprite_names[idx] = name
-        hw_sprite_cluts[idx] = cluts
 
-FG_NB_TILES
+
+
 sprite_sheet_dict = {i:Image.open(sheets_path / "sprites" / f"pal_{i:02x}.png") for i in range(SPRITE_NB_CLUTS)}
 fg_tile_sheet_dict = {i:Image.open(sheets_path / "fg_tiles" / f"pal_{i:02x}.png") for i in range(FG_NB_CLUTS)}
 
@@ -236,7 +291,13 @@ for i,tsd in fg_tile_sheet_dict.items():
     fg_tile_palette.update(tp)
 
 # pad
-fg_tile_palette = sorted(fg_tile_palette)
+if len(fg_tile_palette)>16:
+    print(f"Too many colors in fg tiles ({len(fg_tile_palette)}), quantizing")
+    fg_replacement_dict = quantize_palette(fg_tile_palette,"foreground_tiles",16,transparent=None,dump_it=dump_it)
+    apply_color_replacement(fg_tile_set_list,fg_replacement_dict)
+
+fg_tile_palette = sorted(set(fg_replacement_dict.values()))
+
 print(f"Used fg tile colors: {len(fg_tile_palette)}")
 
 fg_tile_palette += (16-len(fg_tile_palette)) * [(0x10,0x20,0x30)]

@@ -1,6 +1,8 @@
-- quantize fg tiles to 16 colors
-- optimize fg tiles position computation
+- 16 credits wtf! $50a7: adca   ,-x bad convert
+- highscore table wrong chars: wrong memory 
+- 52C3 U wrong value
 - redo division: FED8
+- wrong palette for spear: is that dynamic: re-dump
 - trap write to screen 2000-3000: implement 4800 status load front tiles/sprite layer test
 - use audio mixer for that one!
 - fix 5025 push using movem do 2 separate pushes (probably OK)

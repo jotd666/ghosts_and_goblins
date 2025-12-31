@@ -108,7 +108,7 @@ for i,line in enumerate(lines):
     elif address in {0x53f1}:
         # remove the puls A
         line = "\taddq.w\t#1,d5\n"+change_instruction("rts",lines,i)
-    elif address == 0x5c41:
+    elif address in {0x5c41,0x5241}:
         line = change_instruction("GET_REG_ADDRESS\t0,d5",lines,i) + "\tsubq.w\t#1,d5\n\tmove.b\td1,-(a0)   | [...]\n"
 
     lines[i] = line

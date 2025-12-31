@@ -154,7 +154,7 @@ l_5051:
 5077: 64 44       LSR    $4,U
 5079: 66 45       ROR    $5,U
 507B: 24 02       BCC    $507F
-507D: 8D 21       BSR    $50A0
+507D: 8D 21       BSR    coin_inserted_50a0
 507F: 30 03       LEAX   $3,X
 5081: 6A 43       DEC    $3,U
 5083: 26 F2       BNE    $5077
@@ -162,9 +162,11 @@ l_5051:
 5087: 31 46       LEAY   $6,U
 5089: C6 03       LDB    #$03
 508B: A6 82       LDA    ,-X
+; first digit of credit
 508D: 84 0F       ANDA   #$0F
 508F: A7 A2       STA    ,-Y
 5091: A6 84       LDA    ,X
+; second digit of credit
 5093: 44          LSRA
 5094: 44          LSRA
 5095: 44          LSRA
@@ -175,10 +177,12 @@ l_5051:
 509C: 26 ED       BNE    $508B
 509E: 35 90       PULS   X,PC
 
+coin_inserted_50a0:
 50A0: 34 30       PSHS   Y,X
 50A2: C6 03       LDB    #$03
 50A4: 4F          CLRA
 50A5: A6 A2       LDA    ,-Y
+; add number of credits
 50A7: A9 82       ADCA   ,-X	; [bank_address]
 50A9: 19          DAA
 50AA: A7 A4       STA    ,Y
@@ -249,19 +253,20 @@ l_513b:
 5156: 39          RTS
 5157: 10 8E 51 74 LDY    #$5174
 515B: CC 0D 0D    LDD    #$0D0D
-515E: ED 89 04 00 STD    $0400,X
-5162: ED 89 03 E0 STD    $03E0,X
-5166: EC A1       LDD    ,Y++
-5168: ED 88 E0    STD    -$20,X
-516B: EC A4       LDD    ,Y
-516D: ED 81       STD    ,X++
+515E: ED 89 04 00 STD    $0400,X		; [video_address]
+5162: ED 89 03 E0 STD    $03E0,X		; [video_address]
+5166: EC A1       LDD    ,Y++       ; [bank_address]
+5168: ED 88 E0    STD    -$20,X		; [video_address]
+516B: EC A4       LDD    ,Y       ; [bank_address]
+516D: ED 81       STD    ,X++		; [video_address]
 516F: 0A FC       DEC    $FC
 5171: 26 E4       BNE    $5157
 5173: 39          RTS
+
 5174: 8A 8B       ORA    #$8B
 5176: 9A 9B       ORA    $9B
 5178: 86 20       LDA    #$20
-517A: A7 80       STA    ,X+
+517A: A7 80       STA    ,X+		; [video_address]
 517C: 5A          DECB
 517D: 26 FB       BNE    $517A
 517F: 39          RTS
@@ -341,7 +346,7 @@ l_52b9:
 52BB: BD 48 9B    JSR    $489B
 52BE: 9E AA       LDX    $AA
 52C0: CC 00 3C    LDD    #$003C
-52C3: 36 10       PSHU   X
+52C3: 36 10       PSHU   X			; U should be around $280
 52C5: BD FE F0    JSR    $FEF0
 52C8: DD FC       STD    $FC
 52CA: 37 06       PULU   D

@@ -436,7 +436,7 @@ l_5077:
 	LOG_REGS	507b   | added by add_reg_log.py
 	jcc	l_507f                             	| [$507b: bcc    $507f]
 	LOG_REGS	507d   | added by add_reg_log.py
-	jbsr	l_50a0                            	| [$507d: bsr    $50a0]
+	jbsr	coin_inserted_50a0                	| [$507d: bsr    coin_inserted_50a0]
 l_507f:
 	LOG_REGS	507f   | added by add_reg_log.py
 	addq.w	#0x3,d2                         	| [$507f: leax   $3,x]
@@ -458,6 +458,7 @@ l_508b:
 	LOG_REGS	508b   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d2                   	| [$508b: lda    ,-x]
 	move.b	(a0),d0                         	| [...]
+* first digit of credit
 	LOG_REGS	508d   | added by add_reg_log.py
 	and.b	#0x0f,d0                         	| [$508d: anda   #$0f]
 	subq.w	#1,d3                           	| [...]
@@ -467,6 +468,7 @@ l_508b:
 	LOG_REGS	5091   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d2                   	| [$5091: lda    ,x]
 	move.b	(a0),d0                         	| [...]
+* second digit of credit
                                          | [$5093: lsra]
                                          | [$5094: lsra]
                                          | [$5095: lsra]
@@ -486,7 +488,7 @@ l_508b:
 	movem.l	(sp)+,d2                       	| [$509e: puls   x,pc]
 	rts                                    	| [...]
 
-l_50a0:
+coin_inserted_50a0:
 	LOG_REGS	50a0   | added by add_reg_log.py
 	movem.l	d2/d3,-(sp)                    	| [$50a0: pshs   y,x]
 	LOG_REGS	50a2   | added by add_reg_log.py
@@ -498,6 +500,7 @@ l_50a5:
 	LOG_REGS	50a5   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d3                   	| [$50a5: lda    ,-y]
 	move.b	(a0),d0                         	| [...]
+* add number of credits
 	subq.w	#1,d2                           	| [...]
 	LOG_REGS	50a7   | added by add_reg_log.py
 	GET_REG_BANK_ADDRESS	0,d2                   	| [$50a7: adca   ,-x] [bank_address]
@@ -683,32 +686,37 @@ l_5157:
 	move.w	#0x0d0d,d1                      	| [$515b: ldd    #$0d0d]
 	MAKE_D                                 	| [...]
 	LOG_REGS	515e   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x0400,d2              	| [$515e: std    $0400,x]
+	GET_REG_UNCHECKED_ADDRESS	0x0400,d2              	| [$515e: std    $0400,x] [video_address]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
+	VIDEO_WORD_DIRTY | [...]
 	MAKE_D                                 	| [...]
 	LOG_REGS	5162   | added by add_reg_log.py
-	GET_REG_ADDRESS	0x03e0,d2              	| [$5162: std    $03e0,x]
+	GET_REG_UNCHECKED_ADDRESS	0x03e0,d2              	| [$5162: std    $03e0,x] [video_address]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
+	VIDEO_WORD_DIRTY | [...]
 	LOG_REGS	5166   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d3                   	| [$5166: ldd    ,y++]
+	GET_REG_BANK_ADDRESS	0,d3                   	| [$5166: ldd    ,y++] [bank_address]
 	addq.w	#2,d3                           	| [...]
-	LOAD_D                                 	| [$5166: ldd    ,y++]
+	LOAD_D                                 	| [$5166: ldd    ,y++] [bank_address]
 	LOG_REGS	5168   | added by add_reg_log.py
-	GET_REG_ADDRESS	-0x20,d2               	| [$5168: std    -$20,x]
+	GET_REG_UNCHECKED_ADDRESS	-0x20,d2               	| [$5168: std    -$20,x] [video_address]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
+	VIDEO_WORD_DIRTY | [...]
 	LOG_REGS	516b   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d3                   	| [$516b: ldd    ,y]
-	LOAD_D                                 	| [$516b: ldd    ,y]
+	GET_REG_BANK_ADDRESS	0,d3                   	| [$516b: ldd    ,y] [bank_address]
+	LOAD_D                                 	| [$516b: ldd    ,y] [bank_address]
 	LOG_REGS	516d   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$516d: std    ,x++]
+	GET_REG_UNCHECKED_ADDRESS	0,d2                   	| [$516d: std    ,x++] [video_address]
 	addq.w	#2,d2                           	| [...]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
+	VIDEO_WORD_DIRTY | [...]
 	LOG_REGS	516f   | added by add_reg_log.py
 	OP_W_ON_DP_ADDRESS	subq,0xfc,#1         | [$516f: dec    $fc]
 	LOG_REGS	5171   | added by add_reg_log.py
 	jne	l_5157                             	| [$5171: bne    $5157]
 	LOG_REGS	5173   | added by add_reg_log.py
 	rts                                    	| [$5173: rts]
+
 	LOG_REGS	5174   | added by add_reg_log.py
 	or.b	#0x8b,d0                          	| [$5174: ora    #$8b]
 	LOG_REGS	5176   | added by add_reg_log.py
@@ -719,9 +727,10 @@ l_5178:
 	move.b	#0x20,d0                        	| [$5178: lda    #$20]
 l_517a:
 	LOG_REGS	517a   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$517a: sta    ,x+]
+	GET_REG_UNCHECKED_ADDRESS	0,d2                   	| [$517a: sta    ,x+] [video_address]
 	addq.w	#1,d2                           	| [...]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	517c   | added by add_reg_log.py
 	subq.b	#1,d1                           	| [$517c: decb]
 	LOG_REGS	517d   | added by add_reg_log.py
@@ -816,7 +825,9 @@ l_523f:
 	LOG_REGS	523f   | added by add_reg_log.py
 	move.l	d4,-(sp)                        	| [$523f: pshs   u]
 	LOG_REGS	5241   | added by add_reg_log.py
-	move.l	d1,-(sp)                        	| [$5241: pshs   b]
+	GET_REG_ADDRESS	0,d5 |  [$5241: pshs   b]
+	subq.w	#1,d5
+	move.b	d1,-(a0)   | [...]
 	LOG_REGS	5243   | added by add_reg_log.py
 	jbsr	l_526d                            	| [$5243: bsr    $526d]
 	LOG_REGS	5245   | added by add_reg_log.py
@@ -937,9 +948,9 @@ l_52b9:
 	move.b	#0x00,d0                        	| [$52c0: ldd    #$003c]
 	move.w	#0x003c,d1                      	| [$52c0: ldd    #$003c]
 	LOG_REGS	52c3   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d4                   	| [$52c3: pshu   x]
+	GET_REG_UNCHECKED_ADDRESS	0,d4                   	| [$52c3: pshu   x] [video_address]
 	sub.l	a0,d4
-	move.W	d2,-(a0)                        	| [$52c3: pshu   x]
+	move.W	d2,-(a0)                        	| [$52c3: pshu   x] [video_address]
 	add.l	a0,d4
 	LOG_REGS	52c5   | added by add_reg_log.py
 	jbsr	l_fef0                            	| [$52c5: jsr    $fef0]
