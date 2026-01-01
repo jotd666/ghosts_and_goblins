@@ -24,6 +24,7 @@
 	.include "include.inc"
 
 high_score_table_1518 = 0x1518
+time_left_00aa = 0xAA
 
 clear_screen_and_show_status_4800:
 l_4800:
@@ -945,18 +946,18 @@ l_52b9:
 	LOG_REGS	52bb   | added by add_reg_log.py
 	jbsr	l_489b                            	| [$52bb: jsr    $489b]
 	LOG_REGS	52be   | added by add_reg_log.py
-	GET_DP_ADDRESS	0xaa                    	| [$52be: ldx    $aa]
+	GET_DP_ADDRESS	time_left_00aa          	| [$52be: ldx    time_left_00aa] total time
 	MOVE_W_TO_REG	a0,d2                         	| [...]
 	LOG_REGS	52c0   | added by add_reg_log.py
-	move.b	#0x00,d0                        	| [$52c0: ldd    #$003c]
-	move.w	#0x003c,d1                      	| [$52c0: ldd    #$003c]
+	move.b	#0x00,d0                        	| [$52c0: ldd    #$003c] 60 seconds
+	move.w	#0x003c,d1                      	| [$52c0: ldd    #$003c] 60 seconds
 	LOG_REGS	52c3   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$52c3: pshu   x] U should be around $280
 	sub.l	a0,d4
 	move.W	d2,-(a0)                        	| [$52c3: pshu   x] U should be around $280
 	add.l	a0,d4
 	LOG_REGS	52c5   | added by add_reg_log.py
-	jbsr	l_fef0                            	| [$52c5: jsr    $fef0]
+	jbsr	remainder_fef0                    	| [$52c5: jsr    remainder_fef0]
 	MAKE_D                                 	| [...]
 	LOG_REGS	52c8   | added by add_reg_log.py
 	GET_DP_ADDRESS	0xfc                    	| [$52c8: std    $fc]
@@ -1238,8 +1239,7 @@ l_53b7:
 	LOG_REGS	53c0   | added by add_reg_log.py
 	jbsr	l_53e1                            	| [$53c0: jsr    $53e1]
 	LOG_REGS	53c3   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d5                   	| [$53c3: ldy    ,s]
-	MOVE_W_TO_REG	a0,d3                         	| [...]
+	move.l	(sp),d3 |  [$53c3: ldy    ,s]
 	LOG_REGS	53c6   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d3                   	| [$53c6: ldy    ,y]
 	MOVE_W_TO_REG	a0,d3                         	| [...]

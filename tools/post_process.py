@@ -118,6 +118,20 @@ for i,line in enumerate(lines):
     elif address == 0x5035:
         # manual read of d2 value from the stack
         line = change_instruction("move.l\t(sp),d2",lines,i)
+    elif address == 0x53c3:
+        # manual read of d3 value from the stack
+        line = change_instruction("move.l\t(sp),d3",lines,i)
+
+    # here it's ok to fully use target stack
+    if address in {0x4807,0x480b,0X4817,0X481f,0x5035,0x53C3,
+    0x53d9,0x53dd,0x53ed,0x59f1,0x59f5,0x59f9,0x5a02,0x5a0a,
+    0x5a0e,0x5a14,0x5a16,0x5a18,0x5a1e,0x5a20,0x5a24,0x5a26,0x5a4c,0x5a54,
+    0x5c58,0x5c5e,0x5c6a,0x5c74,0x5c78,
+    }:
+        lines[i-1] = remove_error(lines[i-1],ignore_missing=True)
+        lines[i-2] = remove_error(lines[i-2],ignore_missing=True)
+
+
     lines[i] = line
 
 with open(source_dir / f"{bankname}.68k","w") as fw:
@@ -172,6 +186,27 @@ for i,line in enumerate(lines):
     # game_specific
     # the 210+ jump tables!
     line = process_jump_table(line)
+
+    # remove divide code, replace by breakpoint ATM
+
+    if 0xfed8 == address:
+        line = '\tBREAKPOINT "implement divide"\n'
+        for j in range(i+1,len(lines)):
+            if "feef" in lines[j]:
+                break
+            lines[j] = ""
+
+    if 0xfef0 == address:
+        for j in range(i+1,len(lines)):
+            if "ff10" in lines[j]:
+                break
+            lines[j] = ""
+        line = """\tGET_REG_ADDRESS\t0,d4   | get pushed address
+\tMOVE_W_TO_REG\ta0,d6   | put to scratch register
+\tdivu\td6,d1   | divide
+\tclr.w\td1     | forget the result, we just need remainder
+\tswap\td1      | remainder
+"""
 
     # skip RAM/ROM check
     if address == 0x6000:
@@ -263,7 +298,7 @@ for i,line in enumerate(lines):
         line = remove_instruction(lines,i)
 
     ### U and S stack management need some complete change!!
-    if address in {0x6104,0x6326,0xfeed,0xff0e,0x6122,0x62ee,0x6305} and ("sub" in line or "add" in line):
+    if address in {0x6326,0xfeed,0x6305} and ("sub" in line or "add" in line):
         lines[i-1] = remove_error(lines[i-1])
 
     if address in {0x6305,0x6623,0x6664,0x669d,0x66e9,0x6726} and "move." in line:
@@ -272,9 +307,24 @@ for i,line in enumerate(lines):
         lines[i-1] = remove_error(lines[i-1])
 
 
+    # change target stack usage by host stack usage when needed
+    # (pshs + restore register without popping stack happens a lot)
+    if address in {0x815b}:
+        lines[i-1] = remove_error(lines[i-1])
+        line = change_instruction("move.l\t(sp),d2",lines,i)
+
+    # here it's ok to fully use target stack
+    if address in {0x6104,0x6108,0X6114,0x611a,0x611e,0x6122,0x62ee,0x62f6,0x62fa,0x6301,
+    0xff0a,0xff0e,0x62f2,0x6305,0x6326,0x632a,0x632e,0x6332,0x6339,0x63cc,0X63d5,0x68f3,
+    0x8cc3,0X8ce0,0x8ce5,0x8cf3,0xe66e
+    }:
+        lines[i-1] = remove_error(lines[i-1],ignore_missing=True)
+        lines[i-2] = remove_error(lines[i-2],ignore_missing=True)
+
+
     # PULU movem that is actually a data read
-    if address in {0x6638,0x6648,0x6677,0x66b2,0x66c2,0x66f8,0x6706,0x6737,0x6747,0x6685,
-    0x6DC7,0x6db2}:
+    if address in {0x6638,0x6648,0x6677,0x66b2,0x66c2,0x66f8,
+    0x6706,0x6737,0x6747,0x6685,0x6DC7,0x6db2}:
         if "movem" in line:
             # change wrong movem. It matches some ROM data structure
             line = change_instruction("movem.w\t(a0)+,d1-d2  | same order than PULU we're lucky",lines,i)
@@ -345,7 +395,7 @@ l_7a00
 l_7a0a
 l_7a14
 l_7958
-l_fef0""".splitlines():
+remainder_fef0""".splitlines():
         fw.write(f"\t.global\t{gs}\n")
     fw.write("\n")
 

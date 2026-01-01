@@ -1,6 +1,4 @@
-- converter: error on everything ",s"
 - 52C3 U wrong value
-- player 1 score 0, top score 10000 missing scores
 - redo division: FED8
 - use audio mixer for that one!
 - fix 5025 push using movem do 2 separate pushes (probably OK)

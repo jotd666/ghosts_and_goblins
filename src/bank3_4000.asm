@@ -1,4 +1,5 @@
 high_score_table_1518 = $1518
+time_left_00aa = $AA
 
 clear_screen_and_show_status_4800:
 4800: 8E 20 00    LDX    #$2000
@@ -346,10 +347,10 @@ l_523f:
 l_52b9:
 52B9: C6 26       LDB    #$26
 52BB: BD 48 9B    JSR    $489B
-52BE: 9E AA       LDX    $AA
-52C0: CC 00 3C    LDD    #$003C
+52BE: 9E AA       LDX    time_left_00aa		; total time
+52C0: CC 00 3C    LDD    #$003C		; 60 seconds
 52C3: 36 10       PSHU   X			; U should be around $280
-52C5: BD FE F0    JSR    $FEF0
+52C5: BD FE F0    JSR    remainder_fef0
 52C8: DD FC       STD    $FC
 52CA: 37 06       PULU   D
 52CC: 8E 20 A2    LDX    #$20A2

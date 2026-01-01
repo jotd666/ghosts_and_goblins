@@ -82,10 +82,11 @@ def subt(m):
 
 def remove_error(line,ignore_missing=False):
     if "ERROR" in line:
-        return ""
+        line = ""
     else:
         if not ignore_missing:
             raise Exception(f"No ERROR to remove in {line}")
+    return line
 
 # for log comparison
 

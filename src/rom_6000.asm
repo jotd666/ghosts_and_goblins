@@ -9751,13 +9751,13 @@ C110: 10 8E 4D 09 LDY    #$4D09
 C114: 10 AE A5    LDY    B,Y
 C117: 10 AF 88 18 STY    $18,X
 C11B: EC 22       LDD    $2,Y
-C11D: BD FE F0    JSR    $FEF0
+C11D: BD FE F0    JSR    remainder_fef0
 C120: 10 AE C4    LDY    ,U
 C123: 86 7F       LDA    #$7F
 C125: 5F          CLRB
 C126: ED C4       STD    ,U
 C128: 1F 20       TFR    Y,D
-C12A: BD FE F0    JSR    $FEF0
+C12A: BD FE F0    JSR    remainder_fef0
 C12D: A6 C4       LDA    ,U
 C12F: A7 88 15    STA    $15,X
 C132: C6 00       LDB    #$00
@@ -14573,35 +14573,7 @@ EC4B: 06 E1       ROR    $E1
 EC4D: 5A          DECB
 EC4E: 26 F5       BNE    $EC45
 EC50: 35 C0       PULS   U,PC
-EC52: EC 65       LDD    $5,S
-EC54: EC 6A       LDD    $A,S
-EC56: EC 6F       LDD    $F,S
-EC58: EC 74       LDD    -$C,S
-EC5A: EC 79       LDD    -$7,S
-EC5C: EC 7E       LDD    -$2,S
-EC5E: EC 83       LDD    ,--X
-EC60: 66 40       ROR    $0,U
-EC62: 00 00       NEG    $00
-EC64: 59          ROLB
-EC65: 40          NEGA
-EC66: 40          NEGA
-EC67: 33 00       LEAU   $0,X
-EC69: 4C          INCA
-EC6A: 19          DAA
-EC6B: 40          NEGA
-EC6C: 00 33       NEG    $33
-EC6E: 66 00       ROR    $0,X
-EC70: 40          NEGA
-EC71: 0C 6E       INC    $6E
-EC73: 4C          INCA
-EC74: 33 33       LEAU   -$D,Y
-EC76: 33 80       LEAU   ,X+
-EC78: 00 00       NEG    $00
-EC7A: 33 19       LEAU   -$7,X
-EC7C: 80 19       SUBA   #$19
-EC7E: 00 40       NEG    copy_of_dsw1_0040
-EC80: 19          DAA
-EC81: 80 19       SUBA   #$19
+
 EC83: BD 8D FC    JSR    $8DFC
 EC86: EC 06       LDD    $6,X
 EC88: ED 36       STD    -$A,Y
@@ -15924,7 +15896,10 @@ FEEB: 26 F2       BNE    $FEDF
 FEED: 32 62       LEAS   $2,S
 FEEF: 39          RTS
 
-l_fef0:
+; < pushed on U: value to divide
+; < D: divisor
+; > D: remainder of (U)/D
+remainder_fef0:
 FEF0: 34 06       PSHS   D
 FEF2: C6 10       LDB    #$10
 FEF4: 34 04       PSHS   B
