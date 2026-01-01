@@ -239,7 +239,7 @@ jump_table_6188:
 	.word	$523F 
 	.word	$5347 
 	.word	$52FB 
-	.word	$53A3 
+	.word	copy_highscores_53a3
 	.word	$53F4 
 	.word	$52B9 
 	.word	$54E3 
@@ -2411,6 +2411,7 @@ jump_table_7151:
 78A1: 8D DF       BSR    $7882
 78A3: 8D 01       BSR    $78A6
 78A5: 39          RTS
+
 78A6: D6 21       LDB    $21
 78A8: C5 3F       BITB   #$3F
 78AA: 26 20       BNE    $78CC
@@ -2421,7 +2422,7 @@ jump_table_7151:
 78B3: 8E 21 EF    LDX    #$21EF
 78B6: 10 8E 00 0A LDY    #$000A
 78BA: C6 03       LDB    #$03
-78BC: BD 50 51    JSR    $5051		; [bank_3]
+78BC: BD 50 51    JSR    write_one_digit_to_screen_5051		; [bank_3]
 78BF: D6 0A       LDB    $0A
 78C1: 26 09       BNE    $78CC
 78C3: C6 02       LDB    #$02
@@ -2430,6 +2431,7 @@ jump_table_7151:
 78C8: D7 0B       STB    $0B
 78CA: D7 0E       STB    $0E
 78CC: 39          RTS
+
 78CD: D6 0B       LDB    $0B
 78CF: 58          ASLB
 78D0: CE 78 D5    LDU    #jump_table_78d5

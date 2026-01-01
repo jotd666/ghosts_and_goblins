@@ -190,14 +190,16 @@ else:
 
 # now gather all cluts used by letter/digit tiles, logging probably
 # missed some
-##used_cluts = set()
-##for atc in alphanum_tile_codes:
-##    cluts = tile_cluts.get(atc)
-##    if cluts:
-##        used_cluts.update(cluts)
-### now set cluts for all alphanum tiles
-##for atc in alphanum_tile_codes:
-##    tile_cluts[atc] = sorted(used_cluts)
+
+alphanum_tile_codes = list(range(0,10)) + list(range(ord('A'),ord('Z'))) + list(range(ord('a'),ord('z')))
+used_cluts = set()
+for atc in alphanum_tile_codes:
+    cluts = fg_tile_cluts.get(atc)
+    if cluts:
+        used_cluts.update(cluts)
+# now set cluts for all alphanum tiles
+for atc in alphanum_tile_codes:
+    fg_tile_cluts[atc] = sorted(used_cluts)
 
 
 def apply_color_replacement(sprite_set_list,quantized):

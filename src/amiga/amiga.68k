@@ -405,7 +405,7 @@ _user:
 	moveq	#0x40,d2	| sprite X start
 0:
 	move.w	d2,d0
-	moveq	#0,d1
+	move.w	#0x10,d1
 	jbsr	store_sprite_pos
 	add.w	#64,d2		| advance X
 	

@@ -1,3 +1,5 @@
+high_score_table_1518 = $1518
+
 clear_screen_and_show_status_4800:
 4800: 8E 20 00    LDX    #$2000
 4803: 10 8E 00 20 LDY    #$0020
@@ -117,7 +119,7 @@ l_5025:
 5035: AE E4       LDX    ,S
 5037: 86 04       LDA    #$04
 5039: 97 FC       STA    $FC
-503B: 8D 14       BSR    $5051
+503B: 8D 14       BSR    write_one_digit_to_screen_5051
 503D: 0A FC       DEC    $FC
 503F: 26 FA       BNE    $503B
 5041: 35 10       PULS   X
@@ -129,7 +131,7 @@ l_5025:
 504D: 4A          DECA
 504E: 26 F7       BNE    $5047
 5050: 39          RTS
-l_5051:
+write_one_digit_to_screen_5051:
 5051: A6 A4       LDA    ,Y
 5053: 44          LSRA
 5054: 44          LSRA
@@ -138,8 +140,8 @@ l_5051:
 5057: 8D 02       BSR    $505B
 5059: A6 A0       LDA    ,Y+
 505B: 84 0F       ANDA   #$0F
-505D: E7 89 04 00 STB    $0400,X
-5061: A7 80       STA    ,X+
+505D: E7 89 04 00 STB    $0400,X		; [video_address]
+5061: A7 80       STA    ,X+		; [video_address]
 5063: 39          RTS
 5064: 34 10       PSHS   X
 5066: 36 06       PSHU   D
@@ -436,11 +438,11 @@ l_5347:
 5394: E7 A0       STB    ,Y+	; [video_address]
 5396: 20 F2       BRA    $538A
 5398: 39          RTS
-l_53a3:
+copy_highscores_53a3:
 53A3: 34 40       PSHS   U
 53A5: C6 10       LDB    #$10
 53A7: BD 48 9B    JSR    $489B
-53AA: 10 8E 15 18 LDY    #$1518
+53AA: 10 8E 15 18 LDY    #high_score_table_1518
 53AE: CE 20 CB    LDU    #$20CB
 53B1: 30 C4       LEAX   ,U
 53B3: 86 0A       LDA    #$0A
@@ -467,7 +469,7 @@ l_53a3:
 
 53E1: 86 03       LDA    #$03
 53E3: 34 02       PSHS   A			; do it 3 times
-53E5: A6 A0       LDA    ,Y+		; [bank_address]
+53E5: A6 A0       LDA    ,Y+		; source in RAM
 53E7: E7 89 04 00 STB    $0400,X	; [video_address]
 53EB: A7 80       STA    ,X+	; [video_address]
 53ED: 6A E4       DEC    ,S			; count one iteration
@@ -1236,7 +1238,7 @@ jump_table_5a96:
 5AAC: ED 2E       STD    $E,Y
 5AAE: 0C 08       INC    $08
 5AB0: 39          RTS
-5AB1: 8E 15 18    LDX    #$1518
+5AB1: 8E 15 18    LDX    #high_score_table_1518
 5AB4: BD 5A E3    JSR    $5AE3
 5AB7: 25 12       BCS    $5ACB
 5AB9: 6C A4       INC    ,Y
@@ -1295,7 +1297,7 @@ jump_table_5a96:
 5B1B: 26 F8       BNE    $5B15
 5B1D: E6 21       LDB    $1,Y
 5B1F: 58          ASLB
-5B20: 8E 15 18    LDX    #$1518
+5B20: 8E 15 18    LDX    #high_score_table_1518
 5B23: EF 85       STU    B,X
 5B25: 8E 00 68    LDX    #$0068
 5B28: EC 81       LDD    ,X++

@@ -1,14 +1,14 @@
-- 16 credits wtf! $50a7: adca   ,-x bad convert
-- highscore table wrong chars: wrong memory 
+- converter: error on everything ",s"
 - 52C3 U wrong value
+- player 1 score 0, top score 10000 missing scores
 - redo division: FED8
-- wrong palette for spear: is that dynamic: re-dump
-- trap write to screen 2000-3000: implement 4800 status load front tiles/sprite layer test
 - use audio mixer for that one!
 - fix 5025 push using movem do 2 separate pushes (probably OK)
 - find the "background" color in sprite pics to be able to rip sprites with non-black
   background else we're stuck
 
+- fg tiles color reduction is too violent, maybe do a manual reduction
+  or dynamic color change between scores and in-game
 
 block constant palette refresh:
 

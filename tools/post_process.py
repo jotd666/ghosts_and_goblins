@@ -111,6 +111,13 @@ for i,line in enumerate(lines):
     elif address in {0x5c41,0x5241}:
         line = change_instruction("GET_REG_ADDRESS\t0,d5",lines,i) + "\tsubq.w\t#1,d5\n\tmove.b\td1,-(a0)   | [...]\n"
 
+    elif address == 0x5025:
+        # remove movem because afterwards the registers are restored individually
+        # plus it's slightly faster, but it was indeed equivalent
+        line = change_instruction("move.l\td2,-(sp)",lines,i) + "\tmove.l\td1,-(sp)   | [...]\n"
+    elif address == 0x5035:
+        # manual read of d2 value from the stack
+        line = change_instruction("move.l\t(sp),d2",lines,i)
     lines[i] = line
 
 with open(source_dir / f"{bankname}.68k","w") as fw:
@@ -122,7 +129,7 @@ l_489b
 l_48bd
 l_5022
 l_5025
-l_5051
+write_one_digit_to_screen_5051
 l_54ff
 l_5bdd
 l_511e
@@ -130,7 +137,7 @@ l_513b
 l_523f
 l_5347
 l_52fb
-l_53a3
+copy_highscores_53a3
 l_53f4
 l_52b9
 l_54e3

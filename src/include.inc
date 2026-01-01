@@ -539,13 +539,14 @@ get_address:
 	rts
 
 get_bank_address:
-	cmp.l	#0x6000,a0
-	jcs		0f
 	cmp.w	#0x4000,a0
-	jcc		0f
+	jcs		0f			| lower than 0x4000: error
+	cmp.l	#0x6000,a0
+	jcs		1f			| lower than 0x6000: OK
+0:
 	jbsr	osd_get_last_known_pc
 	BREAKPOINT	"get_bank_address out of 0x4000-0x5FFF range, PC in D6"	
-0:
+1:
 	GET_UNCHECKED_BANK_ADDRESS_FUNC
 	rts
 
