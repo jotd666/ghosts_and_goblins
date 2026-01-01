@@ -153,7 +153,7 @@ l_5347
 l_52fb
 copy_highscores_53a3
 l_53f4
-l_52b9
+compute_and_display_time_52b9
 l_54e3
 l_5910
 l_5180
@@ -203,7 +203,8 @@ for i,line in enumerate(lines):
             lines[j] = ""
         line = """\tGET_REG_ADDRESS\t0,d4   | get pushed address
 \tMOVE_W_TO_REG\ta0,d6   | put to scratch register
-\tdivu\td6,d1   | divide
+\tdivu\td1,d6   | divide
+\texg\td1,d6
 \tclr.w\td1     | forget the result, we just need remainder
 \tswap\td1      | remainder
 """

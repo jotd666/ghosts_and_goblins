@@ -2646,7 +2646,6 @@ level2_interrupt:
 
 	.ifne	OPT_ENABLE_LOGGING
 log_used_tiles:
-	move.b	#0,0x110
 	* scan the whole screen, see what was updated
 	* main screen
 	

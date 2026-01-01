@@ -241,7 +241,7 @@ jump_table_6188:
 	.word	$52FB 
 	.word	copy_highscores_53a3
 	.word	$53F4 
-	.word	$52B9 
+	.word	compute_and_display_time_52b9 
 	.word	$54E3 
 	.word	$5910
 	.word	$5180
@@ -357,10 +357,10 @@ read_dip_switches_622c:
 62E9: BD 63 81    JSR    $6381
 62EC: 33 41       LEAU   $1,U
 62EE: 32 7E       LEAS   -$2,S
-62F0: C6 04       LDB    #$04
+62F0: C6 04       LDB    #$04	; loop 4 times
 62F2: E7 61       STB    $1,S
 62F4: C6 08       LDB    #$08
-62F6: E7 E4       STB    ,S
+62F6: E7 E4       STB    ,S		; loop 8 times
 62F8: 8D 45       BSR    $633F
 62FA: 6A E4       DEC    ,S
 62FC: 26 FA       BNE    $62F8

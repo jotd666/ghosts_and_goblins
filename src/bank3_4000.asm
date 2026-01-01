@@ -344,7 +344,7 @@ l_523f:
 5290: 0A FC       DEC    $FC
 5292: 26 E3       BNE    $5277
 5294: 39          RTS
-l_52b9:
+compute_and_display_time_52b9:
 52B9: C6 26       LDB    #$26
 52BB: BD 48 9B    JSR    $489B
 52BE: 9E AA       LDX    time_left_00aa		; total time

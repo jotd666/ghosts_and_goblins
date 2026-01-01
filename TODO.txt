@@ -1,12 +1,12 @@
-- 52C3 U wrong value
+- 52C3 U wrong value: still try to trace 52C3->6307
 - redo division: FED8
 - use audio mixer for that one!
-- fix 5025 push using movem do 2 separate pushes (probably OK)
 - find the "background" color in sprite pics to be able to rip sprites with non-black
   background else we're stuck
 
 - fg tiles color reduction is too violent, maybe do a manual reduction
-  or dynamic color change between scores and in-game
+  or dynamic color change between scores and in-game, try to keep the
+  maximum of different colors on the bottom status
 
 block constant palette refresh:
 

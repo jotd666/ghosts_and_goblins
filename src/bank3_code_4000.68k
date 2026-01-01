@@ -15,7 +15,7 @@
 	.global	l_52fb
 	.global	copy_highscores_53a3
 	.global	l_53f4
-	.global	l_52b9
+	.global	compute_and_display_time_52b9
 	.global	l_54e3
 	.global	l_5910
 	.global	l_5180
@@ -396,14 +396,15 @@ l_5064:
 	LOG_REGS	5066   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$5066: pshu   d]
 	sub.l	a0,d4
-	move.W	d1,-(a0)                        	| [$5066: pshu   d]
+	subq	#2,a0
+	MOVE_W_FROM_REG	d1,a0                         	| [$5066: pshu   d]
 	add.l	a0,d4
 	LOG_REGS	5068   | added by add_reg_log.py
 	move.b	#0x10,d1                        	| [$5068: ldb    #$10]
 	LOG_REGS	506a   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$506a: pshu   b]
 	sub.l	a0,d4
-	move.W	d1,-(a0)                        	| [$506a: pshu   b]
+	move.b	d1,-(a0)                        	| [$506a: pshu   b]
 	add.l	a0,d4
 	LOG_REGS	506c   | added by add_reg_log.py
 	moveq	#0,d0                            	| [$506c: clra]
@@ -412,12 +413,14 @@ l_5064:
 	LOG_REGS	506e   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$506e: pshu   d]
 	sub.l	a0,d4
-	move.W	d1,-(a0)                        	| [$506e: pshu   d]
+	subq	#2,a0
+	MOVE_W_FROM_REG	d1,a0                         	| [$506e: pshu   d]
 	add.l	a0,d4
+	MAKE_D                                 	| [...]
 	LOG_REGS	5070   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$5070: pshu   a]
 	sub.l	a0,d4
-	move.W	d0,-(a0)                        	| [$5070: pshu   a]
+	move.b	d0,-(a0)                        	| [$5070: pshu   a]
 	add.l	a0,d4
 	LOG_REGS	5072   | added by add_reg_log.py
 	move.w	d4,d3                           	| [$5072: leay   $3,u]
@@ -940,7 +943,7 @@ l_5277:
 	jne	l_5277                             	| [$5292: bne    $5277]
 	LOG_REGS	5294   | added by add_reg_log.py
 	rts                                    	| [$5294: rts]
-l_52b9:
+compute_and_display_time_52b9:
 	LOG_REGS	52b9   | added by add_reg_log.py
 	move.b	#0x26,d1                        	| [$52b9: ldb    #$26]
 	LOG_REGS	52bb   | added by add_reg_log.py
@@ -954,7 +957,8 @@ l_52b9:
 	LOG_REGS	52c3   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$52c3: pshu   x] U should be around $280
 	sub.l	a0,d4
-	move.W	d2,-(a0)                        	| [$52c3: pshu   x] U should be around $280
+	subq	#2,a0
+	MOVE_W_FROM_REG	d2,a0                         	| [$52c3: pshu   x] U should be around $280
 	add.l	a0,d4
 	LOG_REGS	52c5   | added by add_reg_log.py
 	jbsr	remainder_fef0                    	| [$52c5: jsr    remainder_fef0]
@@ -965,7 +969,11 @@ l_52b9:
 	LOG_REGS	52ca   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$52ca: pulu   d]
 	sub.l	a0,d4
-	movem.W	(a0)+,d1                       	| [$52ca: pulu   d]
+	MOVE_W_TO_REG	a0,d1                         	| [$52ca: pulu   d]
+	addq	#2,a0
+	PUSH_SR                                	| [...]
+	MAKE_D                                 	| [...]
+	POP_SR                                 	| [...]
 	add.l	a0,d4
 	LOG_REGS	52cc   | added by add_reg_log.py
 	move.w	#0x20a2,d2                      	| [$52cc: ldx    #$20a2]
