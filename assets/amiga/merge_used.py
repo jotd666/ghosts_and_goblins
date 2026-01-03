@@ -35,3 +35,4 @@ def merge(used_name,nb_items,nb_cluts):
             f.write(contents)
 
 merge("fg_used_tiles",0x400,16)
+merge("bg_used_tiles",0x400,8)

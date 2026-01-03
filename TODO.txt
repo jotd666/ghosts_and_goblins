@@ -1,3 +1,4 @@
+- log tiles (per level)
 - big issue 9088 reading error Y=0 should be not zero
 - redo division: FED8
 - find the "background" color in sprite pics to be able to rip sprites with non-black

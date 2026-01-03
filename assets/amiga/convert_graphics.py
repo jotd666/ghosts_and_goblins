@@ -148,6 +148,7 @@ def add_tile(table,index,cluts=[0],merge_cluts=True):
 
 sprite_cluts = {}
 fg_tile_cluts = {}
+bg_tile_cluts = {}
 
 ##try:
 ##    with open(used_graphics_dir / "used_sprites","rb") as f:
@@ -159,37 +160,37 @@ fg_tile_cluts = {}
 ##except OSError:
 ##    print("Cannot find used_sprites")
 
-# some tiles are hard to display... We know they are there, we force them
-# instead of trying to trigger them by playing to death :)
-##add_tile(sprite_cluts,0x163,cluts=[0xA,0xB])  # 1000 and 2000 points
-##for i in list(range(0x21,0x24)) + [0x1DE,0x1DF]:
-##    add_tile(sprite_cluts,i,cluts=[0])  # add mole with 2000,4000,8000 points, plus plane with 3000 points
-##
-##player_cluts = [1,2]  # only 2 players supported: less memory
-### for all player frames with all player "races" (sorry)
-##for index,name in sprite_names.items():
-##    if "player" in name:
-##        add_tile(sprite_cluts,index,cluts=player_cluts)
-##        if index in player_sprite_pairs:
-##            cluts_to_set = player_cluts+[9] if "swimming" in name else player_cluts
-##
-##            add_tile(sprite_cluts,index+1,cluts=cluts_to_set,merge_cluts=False)
-### we should remove the other cluts 3 & 4 just in case it has been logged at some point
+
 if all_tile_cluts:
     tile_cluts = None
 else:
     try:
         with open(used_graphics_dir / "fg_used_tiles","rb") as f:
             for index in range(FG_NB_TILES):
-                d = f.read(16)
+                d = f.read(FG_NB_CLUTS)
                 cluts = [i for i,c in enumerate(d) if c]
                 if cluts:
                     add_tile(fg_tile_cluts,index,cluts=cluts)
     except OSError:
         pass
 
+if all_tile_cluts:
+    tile_cluts = None
+else:
+    try:
+        with open(used_graphics_dir / "bg_used_tiles","rb") as f:
+            for index in range(BG_NB_TILES):
+                d = f.read(BG_NB_CLUTS)
+                cluts = [i for i,c in enumerate(d) if c]
+                if cluts:
+                    add_tile(bg_tile_cluts,index,cluts=cluts)
+    except OSError:
+        pass
+
 # now gather all cluts used by letter/digit tiles, logging probably
 # missed some
+# some tiles are hard to display... We know they are there, we force them
+# instead of trying to trigger them by playing to death :)
 
 alphanum_tile_codes = list(range(0,10)) + list(range(ord('A'),ord('Z'))) + list(range(ord('a'),ord('z')))
 used_cluts = set()
@@ -275,12 +276,16 @@ if dump_it:
         with open(dump_dir / "used_fg_tiles.json","w") as f:
             fg_tile_cluts_dict = {hex(k):[hex(x) for x in v] for k,v in fg_tile_cluts.items() if v}
             json.dump(fg_tile_cluts_dict,f,indent=2)
+        with open(dump_dir / "used_bg_tiles.json","w") as f:
+            bg_tile_cluts_dict = {hex(k):[hex(x) for x in v] for k,v in bg_tile_cluts.items() if v}
+            json.dump(bg_tile_cluts_dict,f,indent=2)
 
 
 
 
 sprite_sheet_dict = {i:Image.open(sheets_path / "sprites" / f"pal_{i:02x}.png") for i in range(SPRITE_NB_CLUTS)}
 fg_tile_sheet_dict = {i:Image.open(sheets_path / "fg_tiles" / f"pal_{i:02x}.png") for i in range(FG_NB_CLUTS)}
+bg_tile_sheet_dict = {i:Image.open(sheets_path / "bg_tiles" / f"pal_{i:02x}.png") for i in range(BG_NB_CLUTS)}
 
 fg_tile_palette = set()
 fg_tile_set_list = []
@@ -303,6 +308,26 @@ fg_tile_palette = sorted(set(fg_replacement_dict.values()))
 print(f"Used fg tile colors: {len(fg_tile_palette)}")
 
 fg_tile_palette += (16-len(fg_tile_palette)) * [(0x10,0x20,0x30)]
+
+bg_tile_palette = set()
+bg_tile_set_list = []
+
+for i,tsd in bg_tile_sheet_dict.items():
+    tp,tile_set = load_tileset(tsd,i,16,16,"bg_tiles",dump_dir,dump=dump_it,
+    cluts=bg_tile_cluts,
+    name_dict=None)
+    bg_tile_set_list.append(tile_set)
+    bg_tile_palette.update(tp)
+
+if len(bg_tile_palette)>32:
+    print(f"Too many colors in bg tiles ({len(bg_tile_palette)}), quantizing")
+    bg_replacement_dict = quantize_palette(bg_tile_palette,"background_tiles",32,transparent=None,dump_it=dump_it)
+    apply_color_replacement(bg_tile_set_list,bg_replacement_dict)
+    bg_tile_palette = sorted(set(bg_replacement_dict.values()))
+else:
+    bg_tile_palette = sorted(bg_tile_palette)
+
+print(f"Used bg tile colors: {len(bg_tile_palette)}")
 
 sprite_palette = set()
 sprite_set_list = [[] for _ in range(16)]
@@ -357,7 +382,7 @@ plane_orientations = [("standard",lambda x:x),
 ("mirror",ImageOps.mirror),
 ("flip_mirror",lambda x:ImageOps.flip(ImageOps.mirror(x)))]
 
-def read_tileset(img_set_list,palette,plane_orientation_flags,cache,is_bob):
+def read_tileset(img_set_list,palette,plane_orientation_flags,cache,is_bob,nb_cluts):
     next_cache_id = 1
     tile_table = []
     for n,img_set in enumerate(img_set_list):
@@ -427,7 +452,7 @@ def read_tileset(img_set_list,palette,plane_orientation_flags,cache,is_bob):
 
         tile_table.append(tile_entry)
 
-    new_tile_table = [[[] for _ in range(16)] for _ in range(len(tile_table[0]))]
+    new_tile_table = [[[] for _ in range(nb_cluts)] for _ in range(len(tile_table[0]))]
 
     # reorder/transpose. We have 16 * 256 we need 256 * 16
     for i,u in enumerate(tile_table):
@@ -437,7 +462,8 @@ def read_tileset(img_set_list,palette,plane_orientation_flags,cache,is_bob):
     return new_tile_table
 
 tile_plane_cache = {}
-fg_tile_table = read_tileset(fg_tile_set_list,fg_tile_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False)
+fg_tile_table = read_tileset(fg_tile_set_list,fg_tile_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=FG_NB_CLUTS)
+bg_tile_table = read_tileset(bg_tile_set_list,bg_tile_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=BG_NB_CLUTS)
 
 bob_plane_cache = {}
 

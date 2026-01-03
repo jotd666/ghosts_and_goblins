@@ -48,7 +48,7 @@ FG_TILE_NB_CLUTS_POW = 4
 FG_TILE_NB_CLUTS = 1<<FG_TILE_NB_CLUTS_POW
 FG_TILE_COUNT = 0x400
 * wrongo
-BG_TILE_NB_CLUTS_POW = 4
+BG_TILE_NB_CLUTS_POW = 3
 BG_TILE_NB_CLUTS = 1<<BG_TILE_NB_CLUTS_POW
 BG_TILE_COUNT = 0x400
 NB_SPRITES = 0x800
@@ -864,7 +864,8 @@ _vblank:
 	move.b	#1,flip_flop
 23:
 	.ifne	OPT_ENABLE_LOGGING
-	jbsr	log_used_tiles
+	jbsr	log_used_fg_tiles
+	jbsr	log_used_bg_tiles
 	jbsr	log_used_sprites
 	.endif
 3:
@@ -2647,14 +2648,30 @@ level2_interrupt:
 
 
 	.ifne	OPT_ENABLE_LOGGING
-log_used_tiles:
+log_used_fg_tiles:
 	* scan the whole screen, see what was updated
 	* main screen
-	
+
 	GET_MEMORY_START_AND_DP
 	lea		(FG_SCREEN_TILE_ADDRESS,a6),a5
 	lea		(FG_SCREEN_COLOR_ADDRESS,a6),a4
 	lea		fg_tile_log_table,a0
+	move	#(1<<FG_TILE_NB_CLUTS_POW)-1,d4		| clut mask
+	move	#FG_TILE_NB_CLUTS_POW,d5		| nb clut pow
+	jra		log_any_tiles
+	
+log_used_bg_tiles:
+	* scan the whole screen, see what was updated
+	* main screen
+
+	GET_MEMORY_START_AND_DP
+	lea		(BG_SCREEN_TILE_ADDRESS,a6),a5
+	lea		(BG_SCREEN_COLOR_ADDRESS,a6),a4
+	lea		bg_tile_log_table,a0
+	move	#(1<<BG_TILE_NB_CLUTS_POW)-1,d4		| clut mask
+	move	#BG_TILE_NB_CLUTS_POW,d5		| nb clut pow
+
+log_any_tiles:
 	move.w	#0x800-1,d7
 0:
 	
@@ -2671,10 +2688,10 @@ log_used_tiles:
 	lsl.w	#2,d3
 	add.w	d3,d2	| extended tile code
 	move.b	d1,d3	| attribute + tile msbits
-	and.w	#0xF,d3	| clut
+	and.w	d4,d3	| clut masked
 
 	| remove flip/mirror
-	lsl.l	#FG_TILE_NB_CLUTS_POW,d2			| tile code * NB_CLUTS (long!)
+	lsl.l	d5,d2			| tile code * NB_CLUTS (long!)
 	add.l	d3,d2			| add clut
 	st.b	(a0,d2.l)
 20:
@@ -3283,6 +3300,11 @@ osd_dump_logs:
 	lea		fg_tile_log_table,a1
 	lea		fg_tile_log_name(pc),a0
 	move.l	#FG_TILE_LOG_LENGTH,d0
+	jbsr	resload_SaveFile(a2)
+	
+	lea		bg_tile_log_table,a1
+	lea		bg_tile_log_name(pc),a0
+	move.l	#BG_TILE_LOG_LENGTH,d0
 	jbsr	resload_SaveFile(a2)
 	
 ;	lea		sprite_log_table,a1

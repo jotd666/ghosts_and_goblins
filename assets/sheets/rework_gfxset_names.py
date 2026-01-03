@@ -2,7 +2,7 @@ import glob,os,re,pathlib
 
 gfx_dir = "."
 
-for sn,ttype,colors in ((0,"fg_tiles",16),(2,"sprites",4),):
+for sn,ttype,colors in ((0,"fg_tiles",16),(1,"bg_tiles",8),(2,"sprites",4),):
     outdir = pathlib.Path(gfx_dir) / ttype
     outdir.mkdir(exist_ok=True)
 
