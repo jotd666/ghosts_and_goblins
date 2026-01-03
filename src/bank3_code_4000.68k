@@ -961,7 +961,7 @@ compute_and_display_time_52b9:
 	MOVE_W_FROM_REG	d2,a0                         	| [$52c3: pshu   x] U should be around $280
 	add.l	a0,d4
 	LOG_REGS	52c5   | added by add_reg_log.py
-	jbsr	remainder_fef0                    	| [$52c5: jsr    remainder_fef0]
+	jbsr	divmod_fef0                       	| [$52c5: jsr    divmod_fef0]
 	MAKE_D                                 	| [...]
 	LOG_REGS	52c8   | added by add_reg_log.py
 	GET_DP_ADDRESS	0xfc                    	| [$52c8: std    $fc]

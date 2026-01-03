@@ -350,7 +350,7 @@ compute_and_display_time_52b9:
 52BE: 9E AA       LDX    time_left_00aa		; total time
 52C0: CC 00 3C    LDD    #$003C		; 60 seconds
 52C3: 36 10       PSHU   X			; U should be around $280
-52C5: BD FE F0    JSR    remainder_fef0
+52C5: BD FE F0    JSR    divmod_fef0
 52C8: DD FC       STD    $FC
 52CA: 37 06       PULU   D
 52CC: 8E 20 A2    LDX    #$20A2

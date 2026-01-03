@@ -346,7 +346,7 @@ read_dip_switches_622c:
 62D3: 5C          INCB
 62D4: 1F 01       TFR    D,X
 62D6: 9F FE       STX    $FE
-62D8: E6 84       LDB    ,X
+62D8: E6 84       LDB    ,X			; [bank_address]
 62DA: D7 FC       STB    $FC
 62DC: 58          ASLB
 62DD: 8E 42 00    LDX    #$4200
@@ -369,6 +369,7 @@ read_dip_switches_622c:
 6303: 26 EF       BNE    $62F4
 6305: 32 62       LEAS   $2,S
 6307: 35 C0       PULS   U,PC
+
 6309: 86 02       LDA    #$02
 630B: 97 D9       STA    bankswitch_copy_d9
 630D: B7 3E 00    STA    bankswitch_3e00
@@ -396,6 +397,7 @@ read_dip_switches_622c:
 6339: 6A 61       DEC    $1,S
 633B: 26 EF       BNE    $632C
 633D: 35 86       PULS   D,PC
+
 633F: C6 00       LDB    #$00
 6341: D7 D9       STB    bankswitch_copy_d9
 6343: F7 3E 00    STB    bankswitch_3e00
@@ -5095,7 +5097,7 @@ l_7a14:
 9080: 10 AE 84    LDY    ,X
 9083: 10 AF 03    STY    $3,X
 9086: 31 A6       LEAY   A,Y
-9088: E6 3F       LDB    -$1,Y
+9088: E6 3F       LDB    -$1,Y			; [bank_address]
 908A: 2A 05       BPL    $9091
 908C: 10 AE A4    LDY    ,Y
 908F: C4 7F       ANDB   #$7F
@@ -9751,13 +9753,13 @@ C110: 10 8E 4D 09 LDY    #$4D09
 C114: 10 AE A5    LDY    B,Y
 C117: 10 AF 88 18 STY    $18,X
 C11B: EC 22       LDD    $2,Y
-C11D: BD FE F0    JSR    remainder_fef0
+C11D: BD FE F0    JSR    divmod_fef0
 C120: 10 AE C4    LDY    ,U
 C123: 86 7F       LDA    #$7F
 C125: 5F          CLRB
 C126: ED C4       STD    ,U
 C128: 1F 20       TFR    Y,D
-C12A: BD FE F0    JSR    remainder_fef0
+C12A: BD FE F0    JSR    divmod_fef0
 C12D: A6 C4       LDA    ,U
 C12F: A7 88 15    STA    $15,X
 C132: C6 00       LDB    #$00
@@ -15899,7 +15901,7 @@ FEEF: 39          RTS
 ; < pushed on U: value to divide
 ; < D: divisor
 ; > D: remainder of (U)/D
-remainder_fef0:
+divmod_fef0:
 FEF0: 34 06       PSHS   D
 FEF2: C6 10       LDB    #$10
 FEF4: 34 04       PSHS   B

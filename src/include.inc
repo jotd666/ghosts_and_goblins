@@ -572,6 +572,10 @@ multiply_ab:
 	moveq	#0,d6		| disable
 	jbsr	osd_cpu_logging_control	
 	.endm	
+	.macro	REENABLE_LOG_REGS
+	moveq	#2,d6		| enable
+	jbsr	osd_cpu_logging_control	
+	.endm
 
 	
 	* to trace at some virtual PCs, insert this macro

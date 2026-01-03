@@ -205,8 +205,9 @@ for i,line in enumerate(lines):
 \tMOVE_W_TO_REG\ta0,d6   | put to scratch register
 \tdivu\td1,d6   | divide
 \texg\td1,d6
-\tclr.w\td1     | forget the result, we just need remainder
-\tswap\td1      | remainder
+\tmove.w\td1,(a0) | store the result of the division
+\tclr.w\td1     | clear the result
+\tswap\td1      | swap to get the remainder
 """
 
     # skip RAM/ROM check
@@ -351,6 +352,10 @@ for i,line in enumerate(lines):
         line += "\tZERO_MSW\td1\n"
         line += "\tZERO_MSW\td2\n"
 
+    if address == 0x633d:
+        # PULS D,PC to pop the stack then return to the caller (we were using target stack before)
+        line = change_instruction("addq\t#2,d5",lines,i,False)
+
     # game uses $E2 to save/restore stack. but we don't need to save it
     # we use another scratch register
     if "unsupported instruction sts" in line:
@@ -396,7 +401,7 @@ l_7a00
 l_7a0a
 l_7a14
 l_7958
-remainder_fef0""".splitlines():
+divmod_fef0""".splitlines():
         fw.write(f"\t.global\t{gs}\n")
     fw.write("\n")
 

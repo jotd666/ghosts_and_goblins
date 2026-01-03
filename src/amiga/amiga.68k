@@ -42,7 +42,7 @@ CURRENT_SPRITE_SIZE = 4
 
 SCORE_FILE_SIZE = 0x23		| wrong
 
-LOG_BUFFER_SIZE = 0x8000
+LOG_BUFFER_SIZE = 0x40000
 
 FG_TILE_NB_CLUTS_POW = 4
 FG_TILE_NB_CLUTS = 1<<FG_TILE_NB_CLUTS_POW
@@ -3204,9 +3204,19 @@ osd_get_last_known_pc:
 	rts
 	
 	
-* < D6: 0 disable, 1 enable
+* < D6: 0 disable, 1 enable, 2 reenable (restore state before disable)
+* 2 is useful because you can 1) disable and 2) reenable
+* if was not already enabled, reenable will do nothing
 osd_cpu_logging_control:
+	cmp.b	#2,d6
+	jeq		1f
+	* 0 or 1: save previous state
+	move.b	cpu_log_enable,cpu_log_prev_state
 	move.b	d6,cpu_log_enable
+	rts
+1:
+	* 2: put previous state
+	move.b	cpu_log_prev_state,cpu_log_enable
 	rts
 	
 	.macro	CHECK_ZERO_MSW	reg
@@ -3597,6 +3607,8 @@ _end_of_ng_code:
 log_ptr:
 	.long	log_buffer
 cpu_log_enable:
+	.word	0
+cpu_log_prev_state:
 	.word	0
 	.endif
 

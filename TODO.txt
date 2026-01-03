@@ -1,6 +1,5 @@
 - 52C3 U wrong value: still try to trace 52C3->6307
 - redo division: FED8
-- use audio mixer for that one!
 - find the "background" color in sprite pics to be able to rip sprites with non-black
   background else we're stuck
 
