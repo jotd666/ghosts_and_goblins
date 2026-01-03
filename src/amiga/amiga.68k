@@ -402,7 +402,7 @@ _user:
 	lea		hw_sprite_pointers,a0
 	lea		HW_SpriteYTable_256,a1
 	moveq	#3,d7
-	moveq	#0x40,d2	| sprite X start
+	moveq	#0x48,d2	| sprite X start
 0:
 	move.w	d2,d0
 	move.w	#0x10,d1
@@ -682,10 +682,12 @@ demo_game:
 0:
 	move.l	(a0)+,(a1)+
 	dbf		d0,0b
-	* install bank 0 in 0x4000, we may as well use that space
+	* install bank 4 in 0x4000, we may as well use that space
+	* plus it allows simpler code ex at 9088 where game accesses
+	* ROM or bank ROM in bank 4
 
 	GET_MEMORY_START_AND_DP
-	jbsr	install_bank_0
+	jbsr	install_bank_4
 	
 	
 	.ifndef	RELEASE
@@ -718,16 +720,16 @@ dump_and_quit:
 
 	
 * < A6: memory base
-install_bank_0:
+install_bank_4:
 	movem.l	a0/a1/d0,-(a7)
-	lea	bank0_4000,a0
+	lea	bank4_4000,a0
 	lea		(0x4000,a6),a1
 	move.w	#0x7FF,d0
 0:
 	move.l	(a0)+,(a1)+
 	dbf		d0,0b
 	
-	move.l	a6,bank_table	| first entry is RAM base
+	move.l	a6,bank_table+4*4	| first entry is RAM base
 	move.l	a6,bank_base
 	movem.l	(a7)+,a0/a1/d0
 	
@@ -1679,11 +1681,11 @@ start_process_1_plane:
 bank_base:
 	.long	0
 bank_table:
-	.long	0
+	.long	bank0_4000-0x4000
 	.long	bank1_4000-0x4000
 	.long	bank2_4000-0x4000
 	.long	bank3_4000-0x4000
-	.long	bank4_4000-0x4000
+	.long	0  | bank4_4000-0x4000
 	
 bob_previous_positions_1:
 	.fill NB_TARGET_SPRITES*PREVIOUS_SPRITE_SIZE , 1 , -1

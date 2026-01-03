@@ -379,6 +379,26 @@
 	GET_ADDRESS_FUNC
 	.endm
 
+	.macro	GET_SELECT_ADDRESS_FUNC
+	* checks address, slower but can auto-select rom or bank
+	cmp.w	#0x6000,a0
+	jcc		1f
+	GET_BANK_ADDRESS_FUNC
+1:
+	GET_ADDRESS_FUNC
+2:	
+	.endm
+	
+	.macro GET_REG_SELECT_ADDRESS	offset,reg
+	.ifeq	\offset
+	move.l	\reg,a0
+	.else
+	lea	\offset,a0
+	add.l	\reg,a0
+	.endif
+	GET_SELECT_ADDRESS_FUNC
+	.endm
+
 
 	.macro GET_REG_INDIRECT_ADDRESS	offset,reg
 	GET_REG_ADDRESS	\offset,\reg
@@ -397,6 +417,12 @@
 	move.l	\reg,a0
 	add.l	\reg2,a0
 	GET_ADDRESS_FUNC
+	.endm
+
+	.macro GET_REG_SELECT_ADDRESS_FROM_REG	reg,reg2
+	move.l	\reg,a0
+	add.l	\reg2,a0
+	GET_SELECT_ADDRESS_FUNC
 	.endm
 
 	.macro GET_ADDRESS	offset
@@ -568,7 +594,7 @@ multiply_ab:
 	moveq	#1,d6		| enable
 	jbsr	osd_cpu_logging_control	
 	.endm
-	.macro	DISABLE_REGS_LOG
+	.macro	DISABLE_LOG_REGS
 	moveq	#0,d6		| disable
 	jbsr	osd_cpu_logging_control	
 	.endm	

@@ -49,7 +49,13 @@ def handle_special_addresses(lines,i):
                 line = remove_instruction(lines,i)
             lines[i+1] = remove_instruction(lines,i+1)
 
-    if "[video_address" in line:
+    if "[unchecked_address" in line:
+        # give me the original instruction
+        line = line.replace("_ADDRESS","_UNCHECKED_ADDRESS")
+    elif "[select_address" in line:
+        # slower but rarely fails
+        line = line.replace("_ADDRESS","_SELECT_ADDRESS")
+    elif "[video_address" in line:
         # give me the original instruction
         line = line.replace("_ADDRESS","_UNCHECKED_ADDRESS")
         # if it's a write, insert a "VIDEO_DIRTY" macro after the write
@@ -235,6 +241,8 @@ for i,line in enumerate(lines):
         line = change_instruction("addq.w\t#4*2,sp   | pop up both d1 pushes",lines,i)
     elif address == 0xff0e:
         line = change_instruction("add.w\t#4*3,sp   | pop up 3 dx pushes",lines,i)
+
+
     ###################################################
     # 2 table of tables to rework almost completely
     # this mixes with table rework and is quite a mess but works
@@ -346,7 +354,7 @@ for i,line in enumerate(lines):
             line = remove_error(line,True)
 
     # PULS
-    if address in {0x662e,0x663e,0x66a8,0x66b8,0x672d,0x673d,0x666f,0x667d} and "movem" in line:
+    if address in {0x662e,0x663e,0x66a8,0x66b8,0x672d,0x673d,0x666f,0x667d,0x66f0,0x66fe} and "movem" in line:
         # change wrong movem. It matches some ROM data structure
         line = change_instruction("movem.w\t(a3)+,d1-d2  | same order than PULS we're lucky",lines,i)
         line += "\tZERO_MSW\td1\n"
@@ -355,6 +363,13 @@ for i,line in enumerate(lines):
     if address == 0x633d:
         # PULS D,PC to pop the stack then return to the caller (we were using target stack before)
         line = change_instruction("addq\t#2,d5",lines,i,False)
+    elif address == 0x8dfa:
+        # PULS D,PC to pop D value, not a problem pops B twice
+        # better check it when it happens
+        line = change_instruction('BREAKPOINT "8DFA"',lines,i,False)
+    elif address in {0x69c9,0x7880}:
+        # change long pop to just pop stack
+        line = change_instruction("addq\t#2,sp",lines,i,False)
 
     # game uses $E2 to save/restore stack. but we don't need to save it
     # we use another scratch register

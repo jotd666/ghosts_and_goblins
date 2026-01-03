@@ -1,4 +1,4 @@
-- 52C3 U wrong value: still try to trace 52C3->6307
+- big issue 9088 reading error Y=0 should be not zero
 - redo division: FED8
 - find the "background" color in sprite pics to be able to rip sprites with non-black
   background else we're stuck

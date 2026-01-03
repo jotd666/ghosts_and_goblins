@@ -123,7 +123,7 @@ end_of_memory_test_607d:
 60A7: ED 81       STD    ,X++
 60A9: 8C 01 3F    CMPX   #$013F
 60AC: 23 F7       BLS    $60A5
-60AE: 34 40       PSHS   U
+60AE: 34 40       PSHS   U			; save U
 60B0: 8E 03 00    LDX    #$0300
 60B3: 33 88 20    LEAU   $20,X
 60B6: 10 8E 00 40 LDY    #$0040
@@ -132,7 +132,7 @@ end_of_memory_test_607d:
 60BF: E7 C0       STB    ,U+
 60C1: 31 3F       LEAY   -$1,Y
 60C3: 26 F8       BNE    $60BD
-60C5: 35 40       PULS   U
+60C5: 35 40       PULS   U		; restore U saved at 60AE
 60C7: 8E 1E 00    LDX    #$1E00
 60CA: 10 8E 01 80 LDY    #$0180
 60CE: 86 F8       LDA    #$F8
@@ -324,7 +324,8 @@ read_dip_switches_622c:
 62A6: A6 86       LDA    A,X
 62A8: 97 57       STA    $57
 62AA: 39          RTS
-62AB: 34 40       PSHS   U
+
+62AB: 34 40       PSHS   U			; save U 
 62AD: 9E 6C       LDX    $6C
 62AF: C6 02       LDB    #$02
 62B1: D7 D9       STB    bankswitch_copy_d9
@@ -368,7 +369,7 @@ read_dip_switches_622c:
 6301: 6A 61       DEC    $1,S
 6303: 26 EF       BNE    $62F4
 6305: 32 62       LEAS   $2,S
-6307: 35 C0       PULS   U,PC
+6307: 35 C0       PULS   U,PC		; restore U saved at 62AB
 
 6309: 86 02       LDA    #$02
 630B: 97 D9       STA    bankswitch_copy_d9
@@ -844,7 +845,7 @@ update_some_palette_671c:
 6830: 6F 05       CLR    $5,X
 6832: 34 10       PSHS   X
 6834: BD 79 50    JSR    $7950
-6837: 35 90       PULS   X,PC
+6837: 35 90       PULS   X,PC		; X saved at 6832
 6839: 6C 84       INC    ,X
 683B: 6C 01       INC    $1,X
 683D: A6 01       LDA    $1,X
@@ -1046,7 +1047,8 @@ fill_screen_with_h_6883:
 69C3: 86 00       LDA    #$00
 69C5: 35 81       PULS   CC,PC
 69C7: 1C FE       ANDCC  #$FE
-69C9: 35 84       PULS   B,PC
+69C9: 35 84       PULS   B,PC	; just pop the stack, no CC restore, B was not saved
+
 69CB: DC 22       LDD    $22
 69CD: 10 93 24    CMPD   $24
 69D0: 27 18       BEQ    $69EA
@@ -2393,7 +2395,7 @@ jump_table_7151:
 787B: 27 02       BEQ    $787F
 787D: 35 81       PULS   CC,PC
 787F: 4F          CLRA
-7880: 35 84       PULS   B,PC
+7880: 35 84       PULS   B,PC	; pops stack, do not restore CC
 7882: D6 46       LDB    $46
 7884: DA 48       ORB    $48
 7886: C5 30       BITB   #$30
@@ -4742,10 +4744,10 @@ l_7a14:
 8CC0: BD 8D D2    JSR    $8DD2
 8CC3: 10 AF 7E    STY    -$2,S
 8CC6: DD E8       STD    $E8
-8CC8: E6 A9 04 00 LDB    $0400,Y
+8CC8: E6 A9 04 00 LDB    $0400,Y	; [video_address]
 8CCC: C4 C0       ANDB   #$C0
 8CCE: 26 10       BNE    $8CE0
-8CD0: E6 A4       LDB    ,Y
+8CD0: E6 A4       LDB    ,Y			; [video_address]
 8CD2: 10 8E 42 C0 LDY    #$42C0
 8CD6: A6 A5       LDA    B,Y
 8CD8: 27 06       BEQ    $8CE0
@@ -4766,12 +4768,12 @@ l_7a14:
 8CF5: 84 03       ANDA   #$03
 8CF7: 10 8E 28 00 LDY    #$2800
 8CFB: 31 AB       LEAY   D,Y
-8CFD: E6 A9 04 00 LDB    $0400,Y
+8CFD: E6 A9 04 00 LDB    $0400,Y	; [video_address]
 8D01: C4 C0       ANDB   #$C0
 8D03: 26 10       BNE    $8D15
-8D05: E6 A4       LDB    ,Y
+8D05: E6 A4       LDB    ,Y			; [video_address]
 8D07: 10 8E 42 C0 LDY    #$42C0
-8D0B: A6 A5       LDA    B,Y
+8D0B: A6 A5       LDA    B,Y		; [bank_address]
 8D0D: 27 06       BEQ    $8D15
 8D0F: E6 A5       LDB    B,Y
 8D11: D0 E9       SUBB   $E9
@@ -4787,11 +4789,11 @@ l_7a14:
 8D23: 83 00 08    SUBD   #$0008
 8D26: DD EE       STD    $EE
 8D28: BD 8D D2    JSR    $8DD2
-8D2B: E6 A9 04 00 LDB    $0400,Y
+8D2B: E6 A9 04 00 LDB    $0400,Y	; [video_address]
 8D2F: C4 C0       ANDB   #$C0
 8D31: 26 14       BNE    $8D47
 8D33: DD E8       STD    $E8
-8D35: E6 A4       LDB    ,Y
+8D35: E6 A4       LDB    ,Y	; [video_address]
 8D37: 10 8E 43 C0 LDY    #$43C0
 8D3B: 31 A5       LEAY   B,Y
 8D3D: 6D A4       TST    ,Y
@@ -4824,50 +4826,7 @@ l_7a14:
 8D76: 39          RTS
 8D77: 1A 01       ORCC   #$01
 8D79: 39          RTS
-8D7A: 00 10       NEG    $10
-8D7C: 00 10       NEG    $10
-8D7E: 00 10       NEG    $10
-8D80: 00 20       NEG    $20
-8D82: 00 20       NEG    $20
-8D84: 00 10       NEG    $10
-8D86: 00 10       NEG    $10
-8D88: 00 20       NEG    $20
-8D8A: 00 30       NEG    $30
-8D8C: 00 30       NEG    $30
-8D8E: 00 30       NEG    $30
-8D90: 00 10       NEG    $10
-8D92: 00 40       NEG    copy_of_dsw1_0040
-8D94: 00 40       NEG    copy_of_dsw1_0040
-8D96: 00 40       NEG    copy_of_dsw1_0040
-8D98: 00 10       NEG    $10
-8D9A: 00 10       NEG    $10
-8D9C: 00 30       NEG    $30
-8D9E: 00 30       NEG    $30
-8DA0: 00 20       NEG    $20
-8DA2: 00 10       NEG    $10
-8DA4: 00 40       NEG    copy_of_dsw1_0040
-8DA6: 00 08       NEG    $08
-8DA8: 00 08       NEG    $08
-8DAA: 00 08       NEG    $08
-8DAC: 00 10       NEG    $10
-8DAE: 00 10       NEG    $10
-8DB0: 00 08       NEG    $08
-8DB2: 00 08       NEG    $08
-8DB4: 00 10       NEG    $10
-8DB6: 00 18       NEG    $18
-8DB8: 00 18       NEG    $18
-8DBA: 00 18       NEG    $18
-8DBC: 00 08       NEG    $08
-8DBE: 00 20       NEG    $20
-8DC0: 00 20       NEG    $20
-8DC2: 00 20       NEG    $20
-8DC4: 00 08       NEG    $08
-8DC6: 00 08       NEG    $08
-8DC8: 00 18       NEG    $18
-8DCA: 00 18       NEG    $18
-8DCC: 00 10       NEG    $10
-8DCE: 00 08       NEG    $08
-8DD0: 00 20       NEG    $20
+
 8DD2: DC EE       LDD    $EE
 8DD4: C4 0F       ANDB   #$0F
 8DD6: 34 04       PSHS   B
@@ -5097,9 +5056,9 @@ l_7a14:
 9080: 10 AE 84    LDY    ,X
 9083: 10 AF 03    STY    $3,X
 9086: 31 A6       LEAY   A,Y
-9088: E6 3F       LDB    -$1,Y			; [bank_address]
+9088: E6 3F       LDB    -$1,Y		; [select_address] can be bank 4 or higher ROM
 908A: 2A 05       BPL    $9091
-908C: 10 AE A4    LDY    ,Y
+908C: 10 AE A4    LDY    ,Y			; [select_address] can be bank 4 or higher ROM
 908F: C4 7F       ANDB   #$7F
 9091: E7 02       STB    $2,X
 9093: 10 AF 84    STY    ,X
@@ -13490,24 +13449,24 @@ E31B: 6E D6       JMP    [A,U]	; [indirect_jump]
 E325: 6F 1E       CLR    -$2,X
 E327: CE 56 67    LDU    #$5667
 E32A: E6 05       LDB    $5,X
-E32C: A6 C5       LDA    B,U
+E32C: A6 C5       LDA    B,U	; [bank_address]
 E32E: A7 1F       STA    -$1,X
 E330: CE 56 6D    LDU    #$566D
 E333: E6 05       LDB    $5,X
 E335: 58          ASLB
-E336: EE C5       LDU    B,U
+E336: EE C5       LDU    B,U	; [bank_address]
 E338: E6 12       LDB    -$E,X
 E33A: 58          ASLB
-E33B: EE C5       LDU    B,U
+E33B: EE C5       LDU    B,U	; [bank_address]
 E33D: EF 84       STU    ,X
 E33F: EF 03       STU    $3,X
 E341: CE 56 E0    LDU    #$56E0
 E344: E6 05       LDB    $5,X
 E346: 58          ASLB
-E347: EE C5       LDU    B,U
+E347: EE C5       LDU    B,U	; [bank_address]
 E349: E6 12       LDB    -$E,X
 E34B: 58          ASLB
-E34C: EC C5       LDD    B,U
+E34C: EC C5       LDD    B,U	; [bank_address]
 E34E: ED 1C       STD    -$4,X
 E350: EC 19       LDD    -$7,X
 E352: ED 0B       STD    $B,X
@@ -13524,10 +13483,10 @@ E364: 6E D5       JMP    [B,U]	; [indirect_jump]
 E36C: E6 05       LDB    $5,X
 E36E: CE 57 B6    LDU    #$57B6
 E371: 58          ASLB
-E372: EE C5       LDU    B,U
+E372: EE C5       LDU    B,U	; [bank_address]
 E374: E6 12       LDB    -$E,X
 E376: 58          ASLB
-E377: EE C5       LDU    B,U
+E377: EE C5       LDU    B,U	; [select_address]
 E379: EF 06       STU    $6,X
 E37B: 4F          CLRA
 E37C: 5F          CLRB
@@ -13705,9 +13664,9 @@ E4E2: C6 02       LDB    #$02
 E4E4: E1 13       CMPB   -$D,X
 E4E6: 27 04       BEQ    $E4EC
 E4E8: 8D 06       BSR    $E4F0
-E4EA: 35 90       PULS   X,PC
+E4EA: 35 90       PULS   X,PC		; X saved at e4dd
 E4EC: 8D 0F       BSR    $E4FD
-E4EE: 35 90       PULS   X,PC
+E4EE: 35 90       PULS   X,PC		; X saved at e4dd
 E4F0: EC 1A       LDD    -$6,X
 E4F2: E3 42       ADDD   $2,U
 E4F4: ED 1A       STD    -$6,X
@@ -14252,8 +14211,8 @@ E98E: 4F          CLRA
 E98F: 58          ASLB
 E990: 49          ROLA
 E991: CE 4F CE    LDU    #$4FCE
-E994: EE CB       LDU    D,U
-E996: E6 C0       LDB    ,U+
+E994: EE CB       LDU    D,U	; [bank_address]
+E996: E6 C0       LDB    ,U+	; [bank_address]
 E998: 27 07       BEQ    $E9A1
 E99A: E7 1A       STB    -$6,X
 E99C: EF 16       STU    -$A,X
@@ -14574,7 +14533,7 @@ EC49: A7 A4       STA    ,Y
 EC4B: 06 E1       ROR    $E1
 EC4D: 5A          DECB
 EC4E: 26 F5       BNE    $EC45
-EC50: 35 C0       PULS   U,PC
+EC50: 35 C0       PULS   U,PC	; U saved at ec33
 
 EC83: BD 8D FC    JSR    $8DFC
 EC86: EC 06       LDD    $6,X
