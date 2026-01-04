@@ -380,10 +380,13 @@
 	.endm
 
 	.macro	GET_SELECT_ADDRESS_FUNC
-	* checks address, slower but can auto-select rom or bank
+	* checks address, slower but can auto-select rom, ram or bank
 	cmp.w	#0x6000,a0
 	jcc		1f
+	cmp.w	#0x4000,a0
+	jcs		1f
 	GET_BANK_ADDRESS_FUNC
+	jra		2f
 1:
 	GET_ADDRESS_FUNC
 2:	
@@ -404,6 +407,12 @@
 	GET_REG_ADDRESS	\offset,\reg
 	READ_BE_WORD	a0
 	GET_ADDRESS_FUNC
+	.endm
+
+	.macro GET_REG_INDIRECT_BANK_ADDRESS	offset,reg
+	GET_REG_ADDRESS	\offset,\reg
+	READ_BE_WORD	a0
+	GET_BANK_ADDRESS_FUNC
 	.endm
 
 	.macro    GET_REG_REG_INDIRECT_ADDRESS reg1,reg2

@@ -1,6 +1,5 @@
 - log tiles (per level): with zone filtering (first level only upper part)
-- big issue 9088 reading error Y=0 should be not zero
-- redo division: FED8
+- division by zero at some point, see what it does on real code FED8
 - find the "background" color in sprite pics to be able to rip sprites with non-black
   background else we're stuck
 

@@ -201,7 +201,16 @@ for i,line in enumerate(lines):
     # remove divide code, replace by breakpoint ATM
 
     if 0xfed8 == address:
-        line = '\tBREAKPOINT "implement divide"\n'
+        #line = '\tBREAKPOINT "implement divide"\n'
+        line = """\tand.w\t#0xFF,d1
+\tdivu\td1,d0
+\tswap\td0
+\tmove.w\td0,d1
+\tclr.w\td0
+\tswap\td0
+\texg\td1,d0
+\trts
+"""
         for j in range(i+1,len(lines)):
             if "feef" in lines[j]:
                 break
@@ -314,12 +323,12 @@ for i,line in enumerate(lines):
 
     ### U and S stack management need some complete change!!
     if address in {0x6326,0xfeed,0x6305} and ("sub" in line or "add" in line):
-        lines[i-1] = remove_error(lines[i-1])
+        lines[i-1] = remove_error(lines[i-1],ignore_missing=True)
 
     if address in {0x6305,0x6623,0x6664,0x669d,0x66e9,0x6726} and "move." in line:
         # let leas -2,S slide, it's used as local storage, linked to D5
         # also remove handled part where they're using the S and U to decode data
-        lines[i-1] = remove_error(lines[i-1])
+        lines[i-1] = remove_error(lines[i-1],ignore_missing=True)
 
 
     # change target stack usage by host stack usage when needed
@@ -366,21 +375,17 @@ for i,line in enumerate(lines):
     if address == 0x633d:
         # PULS D,PC to pop the stack then return to the caller (we were using target stack before)
         line = change_instruction("addq\t#2,d5",lines,i,False)
-    elif address == 0x8dfa:
-        # PULS D,PC to pop D value, not a problem pops B twice
-        # better check it when it happens
-        line = change_instruction('BREAKPOINT "8DFA"',lines,i,False)
+##    elif address == 0x8dfa:
+##        # PULS D,PC to pop D value, not a problem pops B twice
+##        # better check it when it happens
+##        line = change_instruction('BREAKPOINT "8DFA"',lines,i,False)
     elif address in {0x69c9,0x7880}:
         # change long pop to just pop stack
         line = change_instruction("addq\t#2,sp",lines,i,False)
 
-    # game uses $E2 to save/restore stack. but we don't need to save it
-    # we use another scratch register
-    if "unsupported instruction sts" in line:
-        line = remove_instruction(lines,i)
-    if address in {0x6652,0x668F,0x66CC,0x6710,0x6751}:
-        line = remove_instruction(lines,i)
-        lines[i+1] = remove_instruction(lines,i+1)
+    # game uses $E2 to save/restore stack. we know
+    if "review stack" in line:
+        line = remove_error(line)
 
     # here it pushes B on stack and decreases the stack memory directly!!
     if address == 0x68df:
@@ -389,6 +394,14 @@ for i,line in enumerate(lines):
     if address == 0x68f3:
         # change loop count register
         line = change_instruction("subq.b\t#1,d7",lines,i)
+
+    if address == 0x65C4:
+        line = change_instruction("REENABLE_LOG_REGS",lines,i)
+    elif address == 0x65fa:
+        line = "\tDISABLE_LOG_REGS\n"+line
+    elif address == 0xE36C:
+        pass
+        #line = "\tENABLE_LOG_REGS\n"+line
 
     ### end of stack management change
 
