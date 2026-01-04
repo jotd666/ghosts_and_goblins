@@ -47,10 +47,17 @@ def remove_code(pattern,lines,i):
 dreg_dict = {'a':'d0','b':'d1'}
 areg_dict = {'x':'a2','y':'a3','u':'a4'}
 
+jtre = re.compile("#jump_table_(\w+)")
+
 def process_jump_table(line):
-    if "#jump_table_" in line:
+    m = jtre.search(line)
+    if m:
         # move.w  #jump_table...,dX => lea jump_table...,aX works as X ranges from 2 to 4
-        line = line.replace("move.w\t#","lea\t").replace(",d",",a")
+        # in debug mode, leave register address
+        line2 = line.replace("jump_table_","0x")
+        line = f"""\t.ifndef\tRELEASE
+{line2}\t.endif
+""" + line.replace("move.w\t#","lea\t").replace(",d",",a")
 
     if "indirect j" in line:
         # grab original code in comments, dirty but works as long as converter

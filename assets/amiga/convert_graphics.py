@@ -382,8 +382,8 @@ plane_orientations = [("standard",lambda x:x),
 ("mirror",ImageOps.mirror),
 ("flip_mirror",lambda x:ImageOps.flip(ImageOps.mirror(x)))]
 
-def read_tileset(img_set_list,palette,plane_orientation_flags,cache,is_bob,nb_cluts):
-    next_cache_id = 1
+def read_tileset(img_set_list,palette,plane_orientation_flags,cache,is_bob,nb_cluts,next_cache_id = 1):
+
     tile_table = []
     for n,img_set in enumerate(img_set_list):
         tile_entry = []
@@ -459,11 +459,11 @@ def read_tileset(img_set_list,palette,plane_orientation_flags,cache,is_bob,nb_cl
         for j,v in enumerate(u):
             new_tile_table[j][i] = v
 
-    return new_tile_table
+    return new_tile_table,next_cache_id
 
 tile_plane_cache = {}
-fg_tile_table = read_tileset(fg_tile_set_list,fg_tile_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=FG_NB_CLUTS)
-bg_tile_table = read_tileset(bg_tile_set_list,bg_tile_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=BG_NB_CLUTS)
+fg_tile_table,next_cache_id = read_tileset(fg_tile_set_list,fg_tile_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=FG_NB_CLUTS)
+bg_tile_table,_ = read_tileset(bg_tile_set_list,bg_tile_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=BG_NB_CLUTS,next_cache_id=next_cache_id)
 
 bob_plane_cache = {}
 

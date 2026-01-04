@@ -170,6 +170,11 @@ l_5975""".splitlines():
 
     fw.writelines(lines)
 
+zd1d2 = """\tZERO_MSW\td1
+\tZERO_MSW\td2
+\tMAKE_A
+"""
+
 with open(source_dir / f"{gamename}.s") as f:
     lines = list(f)
 
@@ -233,7 +238,7 @@ for i,line in enumerate(lines):
         # direct jump
          line = change_instruction("move.l\t(a2,d6.w),a2",lines,i) + "\tjsr\t(a2)\n"
     elif address in {0x6626,0x66a0,0x6729}:
-        line = "\tlea\t(a0,d5.w),a3   | change fake stack\n"+line
+        line = "\tlea\t(a6,d5.w),a3   | change fake stack\n"+line
     elif address in {0x6667,0x66ec}:
         # same as above, but reading from current bank (bank 3)
         line = "\tlea\t(a1,d5.w),a3   | change fake stack, bank memory\n"+line
@@ -333,21 +338,19 @@ for i,line in enumerate(lines):
 
 
     # PULU movem that is actually a data read
-    if address in {0x6638,0x6648,0x6677,0x66b2,0x66c2,0x66f8,
-    0x6706,0x6737,0x6747,0x6685,0x6DC7,0x6db2}:
+    if address in {0x6638,0x6677,0x66b2,0x66c2,0x66f8,
+    0x6706,0x6747,0x6685,0x6DC7,0x6db2}:
         if "movem" in line:
             # change wrong movem. It matches some ROM data structure
             line = change_instruction("movem.w\t(a0)+,d1-d2  | same order than PULU we're lucky",lines,i)
-            line += "\tZERO_MSW\td1\n"
-            line += "\tZERO_MSW\td2\n"
+            line += zd1d2
 
     if address in {0x728f}:
         if "movem" in line:
             # change wrong movem. It matches some ROM data structure
             line = change_instruction("movem.w\t(a0)+,d1-d3  | same order than PULU we're lucky",lines,i)
-            line += "\tZERO_MSW\td1\n"
-            line += "\tZERO_MSW\td2\n"
-            line += "\tZERO_MSW\td3\n"
+            line += "\tZERO_MSW\td3\n" + zd1d2
+
 
     # we know we handled all pshu properly, remove the errors
     if "review pshu instruction" in line or "review pulu instruction" in line:
@@ -357,8 +360,8 @@ for i,line in enumerate(lines):
     if address in {0x662e,0x663e,0x66a8,0x66b8,0x672d,0x673d,0x666f,0x667d,0x66f0,0x66fe} and "movem" in line:
         # change wrong movem. It matches some ROM data structure
         line = change_instruction("movem.w\t(a3)+,d1-d2  | same order than PULS we're lucky",lines,i)
-        line += "\tZERO_MSW\td1\n"
-        line += "\tZERO_MSW\td2\n"
+        line += zd1d2
+
 
     if address == 0x633d:
         # PULS D,PC to pop the stack then return to the caller (we were using target stack before)

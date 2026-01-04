@@ -1826,7 +1826,10 @@ l_5623:
 	OP_R_ON_DP_ADDRESS	move,0x05,d1         | [$5636: ldb    $05]
 	LOG_REGS	5638   | added by add_reg_log.py
 	asl.b	#1,d1                            	| [$5638: aslb]
+	.ifndef	RELEASE
 	LOG_REGS	5639   | added by add_reg_log.py
+	move.w	#0x563e,d2             	| [$5639: ldx    #0x563e]
+	.endif
 	lea	jump_table_563e,a2             	| [$5639: ldx    #jump_table_563e]
 	LOG_REGS	563c   | added by add_reg_log.py
 	JMP_B_INDEXED	a2  | [$563c: jmp    [b,x]] [indirect_jump]
@@ -1863,7 +1866,10 @@ l_5655:
 	OP_R_ON_DP_ADDRESS	move,0x08,d1         | [$5655: ldb    $08]
 	LOG_REGS	5657   | added by add_reg_log.py
 	asl.b	#1,d1                            	| [$5657: aslb]
+	.ifndef	RELEASE
 	LOG_REGS	5658   | added by add_reg_log.py
+	move.w	#0x5692,d2             	| [$5658: ldx    #0x5692]
+	.endif
 	lea	jump_table_5692,a2             	| [$5658: ldx    #jump_table_5692]
 	LOG_REGS	565b   | added by add_reg_log.py
 	JSR_B_INDEXED	a2  | [$565b: jsr    [b,x]] [indirect_jump]
@@ -1938,7 +1944,10 @@ l_5698:
 	OP_R_ON_DP_ADDRESS	move,0x0b,d1         | [$5698: ldb    $0b]
 	LOG_REGS	569a   | added by add_reg_log.py
 	asl.b	#1,d1                            	| [$569a: aslb]
+	.ifndef	RELEASE
 	LOG_REGS	569b   | added by add_reg_log.py
+	move.w	#0x56a0,d2             	| [$569b: ldx    #0x56a0]
+	.endif
 	lea	jump_table_56a0,a2             	| [$569b: ldx    #jump_table_56a0]
 	LOG_REGS	569e   | added by add_reg_log.py
 	JMP_B_INDEXED	a2  | [$569e: jmp    [b,x]] [indirect_jump]
@@ -2523,7 +2532,10 @@ l_58d8:
 	OP_R_ON_DP_ADDRESS	move,0x0b,d1         | [$58d8: ldb    $0b]
 	LOG_REGS	58da   | added by add_reg_log.py
 	asl.b	#1,d1                            	| [$58da: aslb]
+	.ifndef	RELEASE
 	LOG_REGS	58db   | added by add_reg_log.py
+	move.w	#0x58e0,d2             	| [$58db: ldx    #0x58e0]
+	.endif
 	lea	jump_table_58e0,a2             	| [$58db: ldx    #jump_table_58e0]
 	LOG_REGS	58de   | added by add_reg_log.py
 	JMP_B_INDEXED	a2  | [$58de: jmp    [b,x]] [indirect_jump]
@@ -2814,7 +2826,10 @@ l_59c0:
 	OP_R_ON_DP_ADDRESS	move,0x0b,d1         | [$59c0: ldb    $0b]
 	LOG_REGS	59c2   | added by add_reg_log.py
 	asl.b	#1,d1                            	| [$59c2: aslb]
+	.ifndef	RELEASE
 	LOG_REGS	59c3   | added by add_reg_log.py
+	move.w	#0x59c8,d2             	| [$59c3: ldx    #0x59c8]
+	.endif
 	lea	jump_table_59c8,a2             	| [$59c3: ldx    #jump_table_59c8]
 	LOG_REGS	59c6   | added by add_reg_log.py
 	JMP_B_INDEXED	a2  | [$59c6: jmp    [b,x]] [indirect_jump]
@@ -3072,7 +3087,10 @@ l_5a7e:
 	OP_R_ON_DP_ADDRESS	move,0x08,d1         | [$5a8e: ldb    $08]
 	LOG_REGS	5a90   | added by add_reg_log.py
 	asl.b	#1,d1                            	| [$5a90: aslb]
+	.ifndef	RELEASE
 	LOG_REGS	5a91   | added by add_reg_log.py
+	move.w	#0x5a96,d2             	| [$5a91: ldx    #0x5a96]
+	.endif
 	lea	jump_table_5a96,a2             	| [$5a91: ldx    #jump_table_5a96]
 	LOG_REGS	5a94   | added by add_reg_log.py
 	JMP_B_INDEXED	a2  | [$5a94: jmp    [b,x]] [indirect_jump]
@@ -3320,7 +3338,10 @@ l_5b25:
 	OP_R_ON_DP_ADDRESS	move,0x08,d1         | [$5b41: ldb    $08]
 	LOG_REGS	5b43   | added by add_reg_log.py
 	asl.b	#1,d1                            	| [$5b43: aslb]
+	.ifndef	RELEASE
 	LOG_REGS	5b44   | added by add_reg_log.py
+	move.w	#0x5b49,d2             	| [$5b44: ldx    #0x5b49]
+	.endif
 	lea	jump_table_5b49,a2             	| [$5b44: ldx    #jump_table_5b49]
 	LOG_REGS	5b47   | added by add_reg_log.py
 	JMP_B_INDEXED	a2  | [$5b47: jmp    [b,x]] [indirect_jump]
@@ -3358,7 +3379,10 @@ l_5b63:
 	OP_R_ON_DP_ADDRESS	move,0x0b,d1         | [$5b63: ldb    $0b]
 	LOG_REGS	5b65   | added by add_reg_log.py
 	asl.b	#1,d1                            	| [$5b65: aslb]
+	.ifndef	RELEASE
 	LOG_REGS	5b66   | added by add_reg_log.py
+	move.w	#0x5b6b,d2             	| [$5b66: ldx    #0x5b6b]
+	.endif
 	lea	jump_table_5b6b,a2             	| [$5b66: ldx    #jump_table_5b6b]
 	LOG_REGS	5b69   | added by add_reg_log.py
 	JMP_B_INDEXED	a2  | [$5b69: jmp    [b,x]] [indirect_jump]
@@ -3435,7 +3459,10 @@ l_5b94:
 	LOG_REGS	5ba5   | added by add_reg_log.py
 	rts                                    	| [$5ba5: rts]
 l_5ba6:
+	.ifndef	RELEASE
 	LOG_REGS	5ba6   | added by add_reg_log.py
+	move.w	#0x5bca,d4             	| [$5ba6: ldu    #0x5bca]
+	.endif
 	lea	jump_table_5bca,a4             	| [$5ba6: ldu    #jump_table_5bca]
 	LOG_REGS	5ba9   | added by add_reg_log.py
 	GET_REG_ADDRESS	0xc,d3                 	| [$5ba9: ldb    $c,y]
@@ -3513,7 +3540,10 @@ l_5bf2:
 l_5bf3:
 	LOG_REGS	5bf3   | added by add_reg_log.py
 	jbsr	l_5ddd                            	| [$5bf3: jsr    $5ddd]
+	.ifndef	RELEASE
 	LOG_REGS	5bf6   | added by add_reg_log.py
+	move.w	#0x5bce,d4             	| [$5bf6: ldu    #0x5bce]
+	.endif
 	lea	jump_table_5bce,a4             	| [$5bf6: ldu    #jump_table_5bce]
 	LOG_REGS	5bf9   | added by add_reg_log.py
 	GET_ADDRESS	0x157e                     	| [$5bf9: ldb    $157e]
