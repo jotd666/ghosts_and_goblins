@@ -15881,7 +15881,8 @@ FF0C: 26 EA       BNE    $FEF8
 FF0E: 32 63       LEAS   $3,S
 FF10: 39          RTS
 
-; FFFF is not really FFFF but address is bogus
+; below FFFF is not really FFFF but address is bogus
+; FFFF tells post processing to zap the symbol
 	; from bank 4
 jump_table_4540:
 	.word	$EF4A 
@@ -15902,6 +15903,10 @@ jump_table_4544:
 	.word	$D518
 	.word	$DAD9 
 	.word	$DE18
+    .word	$FFFF	; bogus (0)
+	.word	$DEB0
+	.word	$DEB0
+	.word	$DFC7
 
 jump_table_4788:
 	.word	$A246
@@ -15912,7 +15917,7 @@ jump_table_4788:
 	.word	$A264
 	.word	$A2AA
 	.word	$A2ED
-	jump_table_639e:
+jump_table_639e:
 	dc.w	$63ac	; $639e
 	dc.w	$63b3	; $63a0
 	dc.w	$6424	; $63a2
@@ -16142,7 +16147,7 @@ jump_table_9c42:
 	dc.w	$9bfb	; $9c48
 	dc.w	$9c12	; $9c4a
 	dc.w	$9c27	; $9c4c
-	dc.w	$ffff	; $9c4e
+	dc.w	$ffff	; $9c4e	bogus
 jump_table_9cc8:
 	dc.w	$9cd4	; $9cc8
 	dc.w	$9d0b	; $9cca

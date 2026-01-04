@@ -972,7 +972,7 @@ compute_and_display_time_52b9:
 	MOVE_W_TO_REG	a0,d1                         	| [$52ca: pulu   d]
 	addq	#2,a0
 	PUSH_SR                                	| [...]
-	MAKE_D                                 	| [...]
+	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	add.l	a0,d4
 	LOG_REGS	52cc   | added by add_reg_log.py
