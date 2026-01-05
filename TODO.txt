@@ -1,3 +1,4 @@
+- implement insert coin / start game: rip sprites from that part
 - log tiles (per level): with zone filtering (first level only upper part)
 - division by zero at some point, see what it does on real code FED8
 - find the "background" color in sprite pics to be able to rip sprites with non-black

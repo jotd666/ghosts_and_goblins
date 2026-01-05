@@ -18,6 +18,11 @@
 ;	map(0x4000, 0x5fff).bankr(m_mainbank);
 ;	map(0x6000, 0xffff).rom();
 
+;  palette layout
+;	GFXDECODE_ENTRY( "chars",   0, charlayout,   0x80, 16 ) // colors 0x80-0xbf
+;	GFXDECODE_ENTRY( "tiles",   0, tilelayout,   0x00,  8 ) // colors 0x00-0x3f
+;	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0x40,  4 ) // colors 0x40-0x7f
+	
 bankswitch_3e00 = $3e00
 bankswitch_copy_d9 = $d9
 weapon_type_0073 = $73
@@ -34,6 +39,8 @@ dsw2_3004 = $3004
 copy_of_dsw1_0040 = $40
 copy_of_dsw2_0041 = $41
 task_pointer_0012 = $12
+sprite_ram_1e00 = $1e00
+sprite_ram_end_1f80 = $1f80
 
 ; horrible code when it comes to jump tables
 ; there are more than 200+ jump tables, that had to be
@@ -43,9 +50,9 @@ task_pointer_0012 = $12
 ; jump to 607D to skip ram/rom checks
 reset_6000:
 6000: 1A 50       ORCC   #$50		; disable interrupts
-6002: 8E 1E 00    LDX    #$1E00
+6002: 8E 1E 00    LDX    #sprite_ram_1e00
 6005: 10 8E 00 60 LDY    #$0060
-6009: CC F8 F8    LDD    #$F8F8
+6009: CC F8 F8    LDD    #$F8F8		; put invalid info in sprite ram
 600C: ED 81       STD    ,X++
 600E: ED 81       STD    ,X++
 6010: 31 3F       LEAY   -$1,Y
@@ -133,7 +140,8 @@ end_of_memory_test_607d:
 60C1: 31 3F       LEAY   -$1,Y
 60C3: 26 F8       BNE    $60BD
 60C5: 35 40       PULS   U		; restore U saved at 60AE
-60C7: 8E 1E 00    LDX    #$1E00
+; put F8 (invalid) sprite information in sprite ram
+60C7: 8E 1E 00    LDX    #sprite_ram_1e00
 60CA: 10 8E 01 80 LDY    #$0180
 60CE: 86 F8       LDA    #$F8
 60D0: A7 80       STA    ,X+
@@ -933,7 +941,7 @@ fill_screen_with_h_6883:
 
 68DF: C6 18       LDB    #$18		; number of times to loop
 68E1: 34 44       PSHS   U,B		; pushed on stack (urgh!)
-68E3: CE 1F 80    LDU    #$1F80
+68E3: CE 1F 80    LDU    #sprite_ram_end_1f80
 68E6: CC F8 F8    LDD    #$F8F8
 68E9: 1F 01       TFR    D,X
 68EB: 31 84       LEAY   ,X

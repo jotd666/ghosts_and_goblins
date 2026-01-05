@@ -50,7 +50,34 @@ group_sprite_pairs = player_sprite_pairs
 
 def get_sprite_names():
 
-    rval = {}
+    rval = {i:"armored_arthur" for i in list(range(0,0x30))+[0x36,0x37,0x3E,0x3F]}
+
+    rval.update({i+0x100:"underwear_arthur" for i in rval})
+
+    atl = list(range(0x150,0x154))+list(range(0x158,0x15C))
+    rval.update({i:"arthur_top_ladder" for i in atl})
+    rval.update({i+4:"arthur_top_ladder_underwear" for i in atl})
+
+    rval.update({i:"arthur_losing_armor" for i in [0x130,0x131,0x138,0x139]})
+
+    rval[0x132] = "armor"
+    rval[0x134] = "blank"
+    rval[0x132] = "armor"
+    rval[0x13D] = "armor"
+
+    #rval.update({i:"armored_arthur" for i in range()})
+
+    rval.update({i:"ice_platform" for i in range(0x160,0x163)})
+    rval.update({i:"earth_platform" for i in range(0x168,0x16A)})
+    rval.update({i:"small_goblin" for i in range(0xF0,0xF6)})
+    rval.update({i:"small_goblin" for i in range(0xF8,0x100)})
+    rval.update({i:"big_devil" for i in range(0x280,0x29B)})
+    rval.update({i:"big_devil" for i in range(0x2A0,0x2A6)})
+    rval.update({i:"big_devil" for i in range(0x2B0,0x2B6)})
+    rval.update({i:"big_devil" for i in range(0x2A8,0x2AD)})
+
+    rval.update({i:"boss" for i in range(0x2C0,0x300)})
+
     return rval
 
 def get_mirror_sprites():

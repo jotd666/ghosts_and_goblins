@@ -1068,6 +1068,34 @@ blit_background:
 	rts
 
 
+*void gng_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+*{
+*	uint8_t *buffered_spriteram = m_spriteram->buffer();
+*	gfx_element *gfx = m_gfxdecode->gfx(2);
+*
+*	for (int offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
+*	{
+*		uint8_t attributes = buffered_spriteram[offs + 1];
+*		int sx = buffered_spriteram[offs + 3] - 0x100 * (attributes & 0x01);
+*		int sy = buffered_spriteram[offs + 2];
+*		int flipx = attributes & 0x04;
+*		int flipy = attributes & 0x08;
+*
+*		if (flip_screen())
+*		{
+*			sx = 240 - sx;
+*			sy = 240 - sy;
+*			flipx = !flipx;
+*			flipy = !flipy;
+*		}
+*
+*		gfx->transpen(bitmap,cliprect,
+*				buffered_spriteram[offs] + ((attributes << 2) & 0x300),
+*				(attributes >> 4) & 3,
+*				flipx, flipy,
+*				sx + 128, sy + 6, 15);
+*	}
+*}
 
 really_update_sprites:
 	rts
