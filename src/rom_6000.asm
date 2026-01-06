@@ -234,27 +234,7 @@ mainloop_6160:
 6183: 48          ASLA					; times 2
 6184: 24 DA       BCC    mainloop_6160	; branch if positive
 6186: 20 F7       BRA    $617F			; loop until positive
-; from bank 3 (and main bank when >=$6000)
-jump_table_6188:
-	.word	clear_screen_and_show_status_4800
-	.word	$485C
-	.word	$489B 
-	.word	$48BD 
-	.word	$5022
-	.word	$511E
-	.word	$62AB
-	.word	$513B   
-	.word	$523F 
-	.word	$5347 
-	.word	$52FB 
-	.word	copy_highscores_53a3
-	.word	$53F4 
-	.word	compute_and_display_time_52b9 
-	.word	$54E3 
-	.word	$5910
-	.word	$5180
-	.word	$5975
-	.word	$6B46
+
 
 
 
@@ -407,6 +387,7 @@ read_dip_switches_622c:
 633B: 26 EF       BNE    $632C
 633D: 35 86       PULS   D,PC
 
+; set bank 0
 633F: C6 00       LDB    #$00
 6341: D7 D9       STB    bankswitch_copy_d9
 6343: F7 3E 00    STB    bankswitch_3e00
@@ -420,6 +401,7 @@ read_dip_switches_622c:
 634E: 49          ROLA
 634F: D3 FC       ADDD   $FC
 6351: 1F 02       TFR    D,Y
+; set bank 1
 6353: C6 01       LDB    #$01
 6355: D7 D9       STB    bankswitch_copy_d9
 6357: F7 3E 00    STB    bankswitch_3e00
@@ -436,6 +418,7 @@ read_dip_switches_622c:
 6371: A6 27       LDA    $7,Y		; [bank_address]
 6373: ED C9 04 20 STD    $0420,U		; [video_address]
 6377: 39          RTS
+
 6378: 86 40       LDA    #$40
 637A: 3D          MUL
 637B: 8E 40 00    LDX    #$4000
@@ -1629,8 +1612,9 @@ fill_screen_with_h_6883:
 6F12: 26 F8       BNE    $6F0C
 6F14: 39          RTS
 
+; set bank 3, reached when starting game
 70E3: C6 03       LDB    #$03
-70E5: F7 3E 00    STB    $3E00
+70E5: F7 3E 00    STB    bankswitch_3e00
 70E8: 96 05       LDA    $05
 70EA: 48          ASLA
 70EB: 8E 70 F1    LDX    #jump_table_70f1
@@ -1669,28 +1653,13 @@ fill_screen_with_h_6883:
 7137: 6E 95       JMP    [B,X]	; [special_indirect_jump]
 
 table_of_jump_tables_7139:
-	.word	jump_table_714b     ; 7139
-	.word	jump_table_714b 	   ; 713b
-	.word	jump_table_714b 	   ; 713d
-	.word	jump_table_714b     ; 713f
-	.word	jump_table_714b 	   ; 7141
-	.word	jump_table_714b 	   ; 7143
-	.word	jump_table_7151 	   ; 7145
-	
-jump_table_7147:
-	.word	$7159	   ; 7147
-	.word	$7180	   ; 7149
-
-jump_table_714b:
-	.word	$7197    ; 714b
-	.word	$71ac    ; 714d
-	.word	$71c7    ; 714f
-jump_table_7151:
-	.word	$7197    ; 7151
-	.word	$71ac    ; 7153
-	.word	$71fa    ; 7155
-	.word	$732a    ; 7157
-
+	dc.w	jump_table_714b     ; $7139
+	dc.w	jump_table_714b 	   ; $713b
+	dc.w	jump_table_714b 	   ; $713d
+	dc.w	jump_table_714b     ; $713f
+	dc.w	jump_table_714b 	   ; $7141
+	dc.w	jump_table_714b 	   ; $7143
+	dc.w	jump_table_7151 	   ; $7145	
 
 7159: BD 7A 39    JSR    $7A39
 715C: CC 01 1A    LDD    #$011A
@@ -6121,40 +6090,15 @@ l_7a14:
 9C97: 39          RTS
 
 table_of_jump_tables_9c98:
-	.word	jump_table_9ca4
-	.word	jump_table_9e31
-	.word	jump_table_9e6d
-	.word	jump_table_9e94
-	.word	jump_table_9ed3
-	.word	jump_table_a066
+	dc.w	jump_table_9ca4
+	dc.w	jump_table_9e31
+	dc.w	jump_table_9e6d
+	dc.w	jump_table_9e94
+	dc.w	jump_table_9ed3
+	dc.w	jump_table_a066
 	
-jump_table_9ca4:
-	.word	$9CAC
-	.word	$9CC2
-	.word	$9D75
-	.word	$9E8B
-	
-jump_table_9e31:
-    .word	$9E39 
-	.word	$9E63 
-	.word	$9D75 
-	.word	$9E8B 
-	   
-jump_table_9e6d:
-	.word	$9CAC
-	.word	$9E75
-	.word	$9D75
-	.word	$9E8B
-	
-jump_table_9e94:
-jump_table_9ed3:
-	.word	$9CAC 
-	.word	$9E9C 
-	.word	$9D75 
-	.word	$9E8B 
 
-	 
-jump_table_a066:
+ 
 9CAC: C6 00       LDB    #$00
 9CAE: E7 1F       STB    -$1,X
 9CB0: 8D 03       BSR    $9CB5
@@ -6459,6 +6403,15 @@ A043: 10 26 FF 6E LBNE   $9FB5
 A047: 6F 88 1C    CLR    $1C,X
 A04A: 5F          CLRB
 A04B: 39          RTS
+
+A06E: 58          ASLB
+A06F: CE A0 74    LDU    #jump_table_a074
+A072: 6E D5       JMP    [B,U]        ; [indirect_jump]
+
+
+A078: 7A 05 29    DEC    $0529
+A07B: 7E 9E 8B    JMP    $9E8B
+
 A0A6: C6 04       LDB    #$04
 A0A8: F7 3E 00    STB    bankswitch_3e00
 A0AB: 8E 08 90    LDX    #$0890
@@ -12861,11 +12814,6 @@ DE26: EC 13       LDD    -$D,X
 DE28: 48          ASLA
 DE29: 6E D6       JMP    [A,U]	; [indirect_jump]
 
-jump_table_542a:
-	.word	$DE2B 
-	.word	$DE5A 
-	.word	$DEA2 
-	.word	$DEA5
 
 DE2B: CE 54 F7    LDU    #$54F7
 DE2E: E6 C4       LDB    ,U		; [bank_address]
@@ -13972,27 +13920,8 @@ E79A: 58          ASLB
 ; picking bonus
 E79B: 6E D5       JMP    [B,U]	; [indirect_jump]
 
-jump_table_5a66:
-	.word	$E79E 
-	.word	$E7B2 
-	.word	$E7B2 
-	.word	$E7B2
-	.word	$E7B2
-	.word	$E7B2
-	.word	$E7C2
-	.word	$E7C2
-	.word	$E7C2
-	.word	$E7C2
-	.word	$E7C2
-	.word	$E7C2 
-	.word	$E7C2
-	.word	$E7E9
-	.word	$E7E9
-	.word	$E7E9
-	.word	$E7E9
-	.word	$E7E9 
-	.word	$E7E9
-	.word	$E7E9
+
+
 
 
 E79D: 39          RTS
@@ -15265,10 +15194,10 @@ F8AC: C0 02       SUBB   #$02
 F8AE: 25 F9       BCS    $F8A9
 F8B0: D7 29       STB    $29
 F8B2: EE 03       LDU    $3,X
-F8B4: EC C4       LDD    ,U		; [bank_address]
+F8B4: EC C4       LDD    ,U		; [select_address]
 F8B6: DA E4       ORB    $E4
 F8B8: ED A4       STD    ,Y
-F8BA: A6 42       LDA    $2,U		; [bank_address]
+F8BA: A6 42       LDA    $2,U		; [select_address]
 F8BC: ED 24       STD    $4,Y
 F8BE: D6 E7       LDB    $E7
 F8C0: 50          NEGB
@@ -15876,38 +15805,63 @@ FF10: 39          RTS
 ; FFFF tells post processing to zap the symbol
 	; from bank 4
 jump_table_4540:
-	.word	$EF4A 
-	.word	$DDB9 
+	dc.w	$EF4A	; $4540
+	dc.w	$DDB9	; $4542
 jump_table_4544:
-	.word	$A0DB 
-	.word	$A44A 
-	.word	$A89C 
-	.word	$AFFC
-	.word	$B146 
-	.word	$B64E 
-	.word	$BED5 
-	.word	$C3A3 
-	.word	$C4EA 
-	.word	$CC45 
-	.word	$CF36
-	.word	$D2DD 
-	.word	$D518
-	.word	$DAD9 
-	.word	$DE18
-    .word	$FFFF	; bogus (0)
-	.word	$DEB0
-	.word	$DEB0
-	.word	$DFC7
-
+	dc.w	$A0DB	; $4544
+	dc.w	$A44A	; $4546
+	dc.w	$A89C	; $4548
+	dc.w	$AFFC	; $454a
+	dc.w	$B146	; $454c
+	dc.w	$B64E	; $454e
+	dc.w	$BED5	; $4550
+	dc.w	$C3A3	; $4552
+	dc.w	$C4EA	; $4554
+	dc.w	$CC45	; $4556
+	dc.w	$CF36	; $4558
+	dc.w	$D2DD	; $455a
+	dc.w	$D518	; $455c
+	dc.w	$DAD9	; $455e
+	dc.w	$DE18	; $4560
+    	dc.w	$FFFF	; $4562
+	dc.w	$DEB0	; $4564
+	dc.w	$DEB0	; $4566
+	dc.w	$DFC7	; $4568
 jump_table_4788:
-	.word	$A246
-	.word	$A264
-	.word	$A2AA
-	.word	$A2D3
-	.word	$A246
-	.word	$A264
-	.word	$A2AA
-	.word	$A2ED
+	dc.w	$A246	; $4788
+	dc.w	$A264	; $478a
+	dc.w	$A2AA	; $478c
+	dc.w	$A2D3	; $478e
+	dc.w	$A246	; $4790
+	dc.w	$A264	; $4792
+	dc.w	$A2AA	; $4794
+	dc.w	$A2ED	; $4796
+jump_table_542a:
+	dc.w	$DE2B	; $542a
+	dc.w	$DE5A	; $542c
+	dc.w	$DEA2	; $542e
+	dc.w	$DEA5	; $5430
+jump_table_5a66:
+	dc.w	$E79E	; $5a66
+	dc.w	$E7B2	; $5a68
+	dc.w	$E7B2	; $5a6a
+	dc.w	$E7B2	; $5a6c
+	dc.w	$E7B2	; $5a6e
+	dc.w	$E7B2	; $5a70
+	dc.w	$E7C2	; $5a72
+	dc.w	$E7C2	; $5a74
+	dc.w	$E7C2	; $5a76
+	dc.w	$E7C2	; $5a78
+	dc.w	$E7C2	; $5a7a
+	dc.w	$E7C2	; $5a7c
+	dc.w	$E7C2	; $5a7e
+	dc.w	$E7E9	; $5a80
+	dc.w	$E7E9	; $5a82
+	dc.w	$E7E9	; $5a84
+	dc.w	$E7E9	; $5a86
+	dc.w	$E7E9	; $5a88
+	dc.w	$E7E9	; $5a8a
+	dc.w	$E7E9	; $5a8c
 jump_table_639e:
 	dc.w	$63ac	; $639e
 	dc.w	$63b3	; $63a0
@@ -16278,6 +16232,14 @@ jump_table_abd7:
 	dc.w	$ac0d	; $abd9
 	dc.w	$ac25	; $abdb
 	dc.w	$ac33	; $abdd
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
 jump_table_abc7:
 	dc.w	$acf4	; $abc7
 	dc.w	$ad09	; $abc9
@@ -16780,6 +16742,14 @@ jump_table_eae8:
 	dc.w	$eb08	; $eb02
 	dc.w	$eb34	; $eb04
 	dc.w	$eb34	; $eb06
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
 jump_table_eac8:
 	dc.w	$eb43	; $eac8
 	dc.w	$eb43	; $eaca
@@ -16891,133 +16861,265 @@ jump_table_fe8b:
 	dc.w	$febe	; $fe9d
 	dc.w	$fea3	; $fe9f
 	dc.w	$febe	; $fea1
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
 jump_table_80b1:
-	.word	$80B7
-	.word	$8119
-	.word	$8132
+	dc.w	$80B7	; $80b1
+	dc.w	$8119	; $80b3
+	dc.w	$8132	; $80b5
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
 jump_table_7829:
-	.word	$783a
-	.word	$7833
+	dc.w	$783a	; $7829
+	dc.w	$7833	; $782b
+jump_table_9ca4:
+	dc.w	$9CAC	; $9ca4
+	dc.w	$9CC2	; $9ca6
+	dc.w	$9D75	; $9ca8
+	dc.w	$9E8B	; $9caa
+jump_table_9e31:
+    dc.w	$9E39	; $9e31
+	dc.w	$9E63	; $9e33
+	dc.w	$9D75	; $9e35
+	dc.w	$9E8B	; $9e37
+jump_table_9e6d:
+	dc.w	$9CAC	; $9e6d
+	dc.w	$9E75	; $9e6f
+	dc.w	$9D75	; $9e71
+	dc.w	$9E8B	; $9e73
+jump_table_9e94:
+jump_table_9ed3:
+	dc.w	$9CAC	; $9ed3
+	dc.w	$9E9C	; $9ed5
+	dc.w	$9D75	; $9ed7
+	dc.w	$9E8B	; $9ed9
+jump_table_a066:
+	dc.w	$9CAC	; $a066
+	dc.w	$A06E	; $a068
+	dc.w	$9D75	; $a06a
+	dc.w	$A078	; $a06c
+	dc.w	$ffff	; $a06e 58CEbogus
+	dc.w	$ffff	; $a070 A074bogus
+	dc.w	$ffff	; $a072 6ED5bogus
+jump_table_a074:
+	dc.w	$9CD4	; $a074
+	dc.w	$9EB8	; $a076
 	
-jump_table_a0e3:
-	.word	$A0EB
-	.word	$A1BF 
-	.word	$A3E1 
-	.word	$A40B
-	.word	$ffff
-	.word	$ffff
-	.word	$ffff
-	.word	$ffff
-	.word	$ffff
-	.word	$ffff
 	
-jump_table_ac4e:
-	.word	$AC56
-	.word	$AC8C
-	.word	$ACA7
-	.word	$ACBC
-	.word	$ffff
-	.word	$ffff
-	.word	$ffff
-	.word	$ffff
-	.word	$ffff
-	.word	$ffff
 
+
+jump_table_a0e3:
+	dc.w	$A0EB	; $a0e3
+	dc.w	$A1BF	; $a0e5
+	dc.w	$A3E1	; $a0e7
+	dc.w	$A40B	; $a0e9
+jump_table_ac4e:
+	dc.w	$AC56	; $ac4e
+	dc.w	$AC8C	; $ac50
+	dc.w	$ACA7	; $ac52
+	dc.w	$ACBC	; $ac54
 jump_table_b15e:
-	.word	$B164 
-	.word	$B1C5 
-	.word	$B1C5
-	.word	$ffff
-	.word	$ffff
-	.word	$ffff
-	.word	$ffff
-	.word	$ffff
-	.word	$ffff
+	dc.w	$B164	; $b15e
+	dc.w	$B1C5	; $b160
+	dc.w	$B1C5	; $b162
 jump_table_b609:
-	.word	$B60F
-	.word	$E85B
-	.word	$B618
-	.word	$ffff
-	.word	$ffff
-	.word	$ffff
-	.word	$ffff
-	.word	$ffff
-	.word	$ffff
-	
+	dc.w	$B60F	; $b609
+	dc.w	$E85B	; $b60b
+	dc.w	$B618	; $b60d
+	dc.w	$ffff	; $b60f
+	dc.w	$ffff	; $b611
+	dc.w	$ffff	; $b613
+	dc.w	$ffff	; $b615
 jump_table_e988:
-	.word	$e98c	; $e988
-	.word	$e9a8	; $e98a
+	dc.w	$e98c	; $e988
+	dc.w	$e9a8	; $e98a
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
 jump_table_e6a8:
-	.word	$e6ac	; $e6a8
-	.word	$e6cb	; $e6aa
+	dc.w	$e6ac	; $e6a8
+	dc.w	$e6cb	; $e6aa
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
 jump_table_e4b1:
-	.word	$e4b5	; $e4b1
-	.word	$e4c0	; $e4b3
+	dc.w	$e4b5	; $e4b1
+	dc.w	$e4c0	; $e4b3
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
 jump_table_daef:
-	.word	$daf3	; $daef
-	.word	$db29	; $daf1
+	dc.w	$daf3	; $daef
+	dc.w	$db29	; $daf1
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
 jump_table_d71e:
-	.word	$d728	; $d71e
-	.word	$d73d	; $d720
-	.word	$d797	; $d722
-	.word	$d7b9	; $d724
-	.word	$d7c0	; $d726
+	dc.w	$d728	; $d71e
+	dc.w	$d73d	; $d720
+	dc.w	$d797	; $d722
+	dc.w	$d7b9	; $d724
+	dc.w	$d7c0	; $d726
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
 jump_table_d530:
-	.word	$d536	; $d530
-	.word	$d64b	; $d532
-	.word	$d690	; $d534
+	dc.w	$d536	; $d530
+	dc.w	$d64b	; $d532
+	dc.w	$d690	; $d534
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
 jump_table_b664:
-	.word	$b66c	; $b664
-	.word	$b67d	; $b666
-	.word	$b6d5	; $b668
-	.word	$b734	; $b66a
+	dc.w	$b66c	; $b664
+	dc.w	$b67d	; $b666
+	dc.w	$b6d5	; $b668
+	dc.w	$b734	; $b66a
 jump_table_c3eb:
-	.word	$c3ef	; $c3eb
-	.word	$c3f8	; $c3ed
+	dc.w	$c3ef	; $c3eb
+	dc.w	$c3f8	; $c3ed
 jump_table_d3e5:
-	.word	$d3eb	; $d3e5
-	.word	$d436	; $d3e7
-	.word	$d47e	; $d3e9
+	dc.w	$d3eb	; $d3e5
+	dc.w	$d436	; $d3e7
+	dc.w	$d47e	; $d3e9
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
 jump_table_a60e:
-	.word	$a612	; $a60e
-	.word	$a618	; $a610
+	dc.w	$a612	; $a60e
+	dc.w	$a618	; $a610
 jump_table_a658:
-	.word	$a65c	; $a658
-	.word	$a661	; $a65a
+	dc.w	$a65c	; $a658
+	dc.w	$a661	; $a65a
 jump_table_a824:
-	.word	$a828	; $a824
-	.word	$a833	; $a826
+	dc.w	$a828	; $a824
+	dc.w	$a833	; $a826
 jump_table_a851:
-	.word	$a828	; $a851
-	.word	$a833	; $a853
+	dc.w	$a828	; $a851
+	dc.w	$a833	; $a853
 jump_table_a8b4:
-	.word	$a8ba	; $a8b4
-	.word	$a8f9	; $a8b6
-	.word	$a91c	; $a8b8
+	dc.w	$a8ba	; $a8b4
+	dc.w	$a8f9	; $a8b6
+	dc.w	$a91c	; $a8b8
 jump_table_bf57:
-	.word	$bf5f	; $bf57
-	.word	$bf64	; $bf59
-	.word	$bf95	; $bf5b
-	.word	$bf9d	; $bf5d
+	dc.w	$bf5f	; $bf57
+	dc.w	$bf64	; $bf59
+	dc.w	$bf95	; $bf5b
+	dc.w	$bf9d	; $bf5d
 jump_table_c500:
-	.word	$c504	; $c500
-	.word	$c569	; $c502
+	dc.w	$c504	; $c500
+	dc.w	$c569	; $c502
 jump_table_cc5b:
-	.word	$cc5f	; $cc5b
-	.word	$cc70	; $cc5d
+	dc.w	$cc5f	; $cc5b
+	dc.w	$cc70	; $cc5d
 jump_table_ccb2:
-	.word	$ccb8	; $ccb2
-	.word	$cce3	; $ccb4
-	.word	$cced	; $ccb6
+	dc.w	$ccb8	; $ccb2
+	dc.w	$cce3	; $ccb4
+	dc.w	$cced	; $ccb6
 jump_table_cf4c:
-	.word	$cf50	; $cf4c
-	.word	$cf9a	; $cf4e
+	dc.w	$cf50	; $cf4c
+	dc.w	$cf9a	; $cf4e
 jump_table_d2f3:
-	.word	$d2f7	; $d2f3
-	.word	$d37a	; $d2f5
+	dc.w	$d2f7	; $d2f3
+	dc.w	$d37a	; $d2f5
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
 jump_table_7792:
-	.word	$7796	; $7792
-	.word	$779d	; $7794
+	dc.w	$7796	; $7792
+	dc.w	$779d	; $7794
 jump_table_beed:
-	.word	$bef1	; $beed
-	.word	$bf1e	; $beef	
+	dc.w	$bef1	; $beed
+	dc.w	$bf1e	; $beef	
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+jump_table_6188:
+	dc.w	clear_screen_and_show_status_4800	; $6188
+	dc.w	$485C	; $618a
+	dc.w	$489B	; $618c from bank 3 
+	dc.w	$48BD	; $618e from bank 3 
+	dc.w	$5022	; $6190 from bank 3 
+	dc.w	$511E	; $6192 from bank 3 
+	dc.w	$62AB	; $6194
+	dc.w	$513B	; $6196 from bank 3 
+	dc.w	$523F	; $6198 from bank 3 
+	dc.w	$5347	; $619a from bank 3 
+	dc.w	$52FB	; $619c all <$6000 from bank 3 ofc
+	dc.w	copy_highscores_53a3	; $619e
+	dc.w	$53F4	; $61a0
+	dc.w	compute_and_display_time_52b9	; $61a2
+	dc.w	$54E3	; $61a4
+	dc.w	$5910	; $61a6
+	dc.w	$5180	; $61a8
+	dc.w	$5975	; $61aa
+	dc.w	$6B46	; $61ac
+jump_table_7147:
+	dc.w	$7159	   ; 7147
+	dc.w	$7180	   ; 7149
+jump_table_714b:
+	dc.w	$7197    ; 714b
+	dc.w	$71ac    ; 714d
+	dc.w	$71c7    ; 714f
+jump_table_7151:
+	dc.w	$7197    ; 7151
+	dc.w	$71ac    ; 7153
+	dc.w	$71fa    ; 7155
+	dc.w	$732a    ; 7157	

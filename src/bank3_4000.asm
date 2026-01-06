@@ -478,13 +478,15 @@ copy_highscores_53a3:
 53F1: 35 82       PULS   A,PC
 
 53F3: 39          RTS
+
+; when game starts
 l_53f4:
 53F4: 96 28       LDA    $28
 53F6: 27 FB       BEQ    $53F3
 53F8: 34 40       PSHS   U
 53FA: 10 8E 54 57 LDY    #$5457
 53FE: 58          ASLB
-53FF: 10 AE A5    LDY    B,Y
+53FF: 10 AE A5    LDY    B,Y		; [bank_address]
 5402: 96 6B       LDA    $6B
 5404: AB A2       ADDA   ,-Y
 5406: 19          DAA
@@ -532,8 +534,8 @@ l_54e3:
 54EC: 10 8E 04 00 LDY    #$0400
 54F0: 86 00       LDA    #$00
 54F2: 5F          CLRB
-54F3: A7 80       STA    ,X+
-54F5: E7 C0       STB    ,U+
+54F3: A7 80       STA    ,X+	; [video_address]
+54F5: E7 C0       STB    ,U+	; [video_address]
 54F7: 31 3F       LEAY   -$1,Y
 54F9: 26 F8       BNE    $54F3
 54FB: 0F F0       CLR    $F0
@@ -990,6 +992,7 @@ jump_table_56a0:
 58C8: C6 3F       LDB    #$3F
 58CA: BD 79 58    JSR    $7958
 58CD: 5F          CLRB
+l_58ce:
 58CE: BD 79 58    JSR    $7958
 58D1: F6 05 01    LDB    $0501
 58D4: BD 79 1D    JSR    $791D

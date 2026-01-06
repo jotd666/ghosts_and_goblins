@@ -149,11 +149,11 @@ SPRITE_CODE = 0
 SPRITE_ATTRIBUTES = 1
 SPRITE_SIZEOF = 4
 
-BIT_COIN1 = 0
-BIT_COIN2 = 1
+BIT_COIN1 = 6
+BIT_COIN2 = 7
 
-BIT_START_1P = 7
-BIT_START_2P = 7
+BIT_START_1P = 0
+BIT_START_2P = 1
 
 BIT_LEFT = 1
 BIT_RIGHT = 0
@@ -2629,18 +2629,28 @@ osd_read_dsw2:
 	
 osd_read_system:
 	st.b	d0
-*	movem.l	a0/d1,-(a7)
-*	lea		keyboard_table(pc),a0
-*	tst.b	(5,a0)		| "5" key like in MAME
-*	beq.b	0f
-*	st.b	detect_controllers
-*	bclr	#BIT_COIN1,d0
-*0:
-*	tst.b	(6,a0)		| "6" key like in MAME
-*	beq.b	0f
-*	st.b	detect_controllers
-*	bclr	#BIT_COIN2,d0
-*0:	
+	movem.l	a0/d1,-(a7)
+	lea		keyboard_table(pc),a0
+	tst.b	(5,a0)		| "5" key like in MAME
+	beq.b	0f
+	st.b	detect_controllers
+	bclr	#BIT_COIN1,d0
+0:
+	tst.b	(6,a0)		| "6" key like in MAME
+	beq.b	0f
+	st.b	detect_controllers
+	bclr	#BIT_COIN2,d0
+0:	
+	tst.b	(1,a0)		| "1" key like in MAME
+	beq.b	0f
+	st.b	detect_controllers
+	bclr	#BIT_START_1P,d0
+0:	
+	tst.b	(2,a0)		| "2" key like in MAME
+	beq.b	0f
+	st.b	detect_controllers
+	bclr	#BIT_START_2P,d0
+0:	
 *
 *	jbsr		is_game_playing
 *	jne	1f
@@ -2654,7 +2664,7 @@ osd_read_system:
 *0:
 *
 *1:	
-*	movem.l	(a7)+,a0/d1
+	movem.l	(a7)+,a0/d1
 	rts
 
 	

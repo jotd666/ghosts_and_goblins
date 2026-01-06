@@ -16,6 +16,7 @@
 	.global	copy_highscores_53a3
 	.global	l_53f4
 	.global	compute_and_display_time_52b9
+	.global	l_58ce
 	.global	l_54e3
 	.global	l_5910
 	.global	l_5180
@@ -1311,6 +1312,8 @@ l_53e5:
 l_53f3:
 	LOG_REGS	53f3   | added by add_reg_log.py
 	rts                                    	| [$53f3: rts]
+
+* when game starts
 l_53f4:
 	LOG_REGS	53f4   | added by add_reg_log.py
 	OP_R_ON_DP_ADDRESS	move,0x28,d0         | [$53f4: lda    $28]
@@ -1326,7 +1329,7 @@ l_53f4:
 	move.b	d1,d6                           	| [...] as byte
 	DO_EXTB	d6                             	| [...] with sign extension
 	LOG_REGS	53ff   | added by add_reg_log.py
-	GET_REG_ADDRESS_FROM_REG	d6,d3         	| [$53ff: ldy    b,y]
+	GET_REG_BANK_ADDRESS_FROM_REG	d6,d3         	| [$53ff: ldy    b,y] [bank_address]
 	MOVE_W_TO_REG	a0,d3                         	| [...]
 	LOG_REGS	5402   | added by add_reg_log.py
 	OP_R_ON_DP_ADDRESS	move,0x6b,d0         | [$5402: lda    $6b]
@@ -1440,13 +1443,15 @@ l_54e3:
 	moveq	#0,d1                            	| [$54f2: clrb]
 l_54f3:
 	LOG_REGS	54f3   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d2                   	| [$54f3: sta    ,x+]
+	GET_REG_UNCHECKED_ADDRESS	0,d2                   	| [$54f3: sta    ,x+] [video_address]
 	addq.w	#1,d2                           	| [...]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	54f5   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d4                   	| [$54f5: stb    ,u+]
+	GET_REG_UNCHECKED_ADDRESS	0,d4                   	| [$54f5: stb    ,u+] [video_address]
 	addq.w	#1,d4                           	| [...]
 	move.b	d1,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	LOG_REGS	54f7   | added by add_reg_log.py
 	subq.w	#0x1,d3                         	| [$54f7: leay   -$1,y]
 	LOG_REGS	54f9   | added by add_reg_log.py
@@ -2518,6 +2523,7 @@ l_58c8:
 	jbsr	l_7958                            	| [$58ca: jsr    $7958]
 	LOG_REGS	58cd   | added by add_reg_log.py
 	moveq	#0,d1                            	| [$58cd: clrb]
+l_58ce:
 	LOG_REGS	58ce   | added by add_reg_log.py
 	jbsr	l_7958                            	| [$58ce: jsr    $7958]
 	LOG_REGS	58d1   | added by add_reg_log.py

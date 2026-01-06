@@ -160,6 +160,7 @@ l_52fb
 copy_highscores_53a3
 l_53f4
 compute_and_display_time_52b9
+l_58ce
 l_54e3
 l_5910
 l_5180
@@ -399,9 +400,9 @@ for i,line in enumerate(lines):
         line = change_instruction("REENABLE_LOG_REGS",lines,i)
     elif address == 0x65fa:
         line = "\tDISABLE_LOG_REGS\n"+line
-    elif address == 0xE36C:
+    elif address == 0x633F:
         pass
-        #line = "\tENABLE_LOG_REGS\n"+line
+        line = "\tENABLE_LOG_REGS\n"+line
 
     ### end of stack management change
 
