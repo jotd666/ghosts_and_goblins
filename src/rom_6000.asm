@@ -41,6 +41,8 @@ copy_of_dsw2_0041 = $41
 task_pointer_0012 = $12
 sprite_ram_1e00 = $1e00
 sprite_ram_end_1f80 = $1f80
+counter_8_bit_0021 = $21
+background_screen_location_006c = $6C
 
 ; horrible code when it comes to jump tables
 ; there are more than 200+ jump tables, that had to be
@@ -313,14 +315,17 @@ read_dip_switches_622c:
 62A8: 97 57       STA    $57
 62AA: 39          RTS
 
+; each time coin is inserted, this is called to display a different
+; background pic showing parts of level 1
+change_background_pic_62ab:
 62AB: 34 40       PSHS   U			; save U 
-62AD: 9E 6C       LDX    $6C
+62AD: 9E 6C       LDX    background_screen_location_006c
 62AF: C6 02       LDB    #$02
 62B1: D7 D9       STB    bankswitch_copy_d9
 62B3: F7 3E 00    STB    bankswitch_3e00
 62B6: E6 84       LDB    ,X		; [bank_address]
 62B8: 8D 4F       BSR    $6309
-62BA: DC 6C       LDD    $6C
+62BA: DC 6C       LDD    background_screen_location_006c
 62BC: 5A          DECB
 62BD: 1F 01       TFR    D,X
 62BF: C6 02       LDB    #$02
@@ -331,7 +336,7 @@ read_dip_switches_622c:
 62CA: C6 02       LDB    #$02
 62CC: D7 D9       STB    bankswitch_copy_d9
 62CE: F7 3E 00    STB    bankswitch_3e00
-62D1: DC 6C       LDD    $6C
+62D1: DC 6C       LDD    background_screen_location_006c
 62D3: 5C          INCB
 62D4: 1F 01       TFR    D,X
 62D6: 9F FE       STX    $FE
@@ -342,7 +347,7 @@ read_dip_switches_622c:
 62E0: AE 85       LDX    B,X			; [bank_address]
 62E2: D6 FC       LDB    $FC
 62E4: 9F FC       STX    $FC
-62E6: BD 63 78    JSR    $6378
+62E6: BD 63 78    JSR    compute_bank_address_from_b_6378
 62E9: BD 63 81    JSR    $6381
 62EC: 33 41       LEAU   $1,U
 62EE: 32 7E       LEAS   -$2,S
@@ -371,7 +376,7 @@ read_dip_switches_622c:
 631A: AE 8B       LDX    D,X		; [bank_address]
 631C: D6 FC       LDB    $FC
 631E: 9F FC       STX    $FC
-6320: 8D 56       BSR    $6378
+6320: 8D 56       BSR    compute_bank_address_from_b_6378
 6322: 8D 5D       BSR    $6381
 6324: 33 41       LEAU   $1,U
 6326: 32 7E       LEAS   -$2,S
@@ -419,11 +424,15 @@ read_dip_switches_622c:
 6373: ED C9 04 20 STD    $0420,U		; [video_address]
 6377: 39          RTS
 
+; < B: index
+; > X: $4000+B*$40
+compute_bank_address_from_b_6378:
 6378: 86 40       LDA    #$40
 637A: 3D          MUL
 637B: 8E 40 00    LDX    #$4000
-637E: 30 8B       LEAX   D,X		; [bank_address]
+637E: 30 8B       LEAX   D,X
 6380: 39          RTS
+
 6381: CE 28 0F    LDU    #$280F
 6384: D6 FF       LDB    $FF
 6386: C5 01       BITB   #$01
@@ -533,7 +542,7 @@ read_dip_switches_622c:
 646D: BD 69 09    JSR    $6909
 6470: 39          RTS
 6471: E6 05       LDB    $5,X
-6473: 96 21       LDA    $21
+6473: 96 21       LDA    counter_8_bit_0021
 6475: 84 08       ANDA   #$08
 6477: 26 01       BNE    $647A
 6479: 5F          CLRB
@@ -568,7 +577,7 @@ irq_65c4:
 65FA: 3B          RTI
 
 update_a_palette_65fb:
-65FB: D6 21       LDB    $21
+65FB: D6 21       LDB    counter_8_bit_0021
 65FD: C4 03       ANDB   #$03		; index of bank index
 65FF: 8E 66 0D    LDX    #$660D		; in this table
 6602: A6 85       LDA    B,X
@@ -1148,13 +1157,13 @@ fill_screen_with_h_6883:
 6AC5: C1 01       CMPB   #$01
 6AC7: 22 0A       BHI    $6AD3
 6AC9: 8E 40 00    LDX    #$4000
-6ACC: 9F 6C       STX    $6C
+6ACC: 9F 6C       STX    background_screen_location_006c
 6ACE: BD 6C 65    JSR    $6C65
 6AD1: 20 17       BRA    $6AEA
-6AD3: 9F 6C       STX    $6C
+6AD3: 9F 6C       STX    background_screen_location_006c
 6AD5: BD 6C 65    JSR    $6C65
 6AD8: 8E 40 0B    LDX    #$400B
-6ADB: 9F 6C       STX    $6C
+6ADB: 9F 6C       STX    background_screen_location_006c
 6ADD: 8E 05 10    LDX    #$0510
 6AE0: CC 0B 80    LDD    #$0B80
 6AE3: ED 16       STD    -$A,X
@@ -1186,7 +1195,7 @@ fill_screen_with_h_6883:
 6B25: 0C 08       INC    $08
 6B27: 0F 0B       CLR    $0B
 6B29: 39          RTS
-6B2A: D6 21       LDB    $21
+6B2A: D6 21       LDB    counter_8_bit_0021
 6B2C: C5 1F       BITB   #$1F
 6B2E: 26 0B       BNE    $6B3B
 6B30: C4 20       ANDB   #$20
@@ -1238,11 +1247,12 @@ fill_screen_with_h_6883:
 6B8E: 0D F0    TST    $F0
 6B90: 26 63    BNE    $6BF5
 6B92: 8E 6B 86    LDX    #$6B86
-6B95: D6 21       LDB    $21
-6B97: C4 03       ANDB   #$03
+; pick a random location (4 choices) to display on "start game" screen
+6B95: D6 21       LDB    counter_8_bit_0021
+6B97: C4 03       ANDB   #$03		; random
 6B99: 58          ASLB
 6B9A: EC 85       LDD    B,X
-6B9C: DD 6C       STD    $6C
+6B9C: DD 6C       STD    background_screen_location_006c
 6B9E: CC 06 00    LDD    #$0600
 6BA1: BD 69 09    JSR    $6909
 6BA4: C6 01       LDB    #$01
@@ -1285,7 +1295,7 @@ fill_screen_with_h_6883:
 6C00: 0F 08       CLR    $08
 6C02: 39          RTS
 6C03: 8E 40 00    LDX    #$4000
-6C06: 9F 6C       STX    $6C
+6C06: 9F 6C       STX    background_screen_location_006c
 6C08: C6 01       LDB    #$01
 6C0A: D7 73       STB    weapon_type_0073		; set lance as weapon
 6C0C: 96 57       LDA    $57
@@ -1394,7 +1404,7 @@ fill_screen_with_h_6883:
 6D34: 58          ASLB
 6D35: 3A          ABX
 6D36: EC 84       LDD    ,X
-6D38: DD 6C       STD    $6C
+6D38: DD 6C       STD    background_screen_location_006c
 6D3A: 83 40 00    SUBD   #$4000
 6D3D: DD 91       STD    $91
 6D3F: E6 02       LDB    $2,X
@@ -1712,7 +1722,7 @@ table_of_jump_tables_7139:
 71C1: FD 15 95    STD    $1595
 71C4: 0C 0B       INC    $0B
 71C6: 39          RTS
-71C7: 96 21       LDA    $21
+71C7: 96 21       LDA    counter_8_bit_0021
 71C9: 85 1F       BITA   #$1F
 71CB: 26 0F       BNE    $71DC
 71CD: C6 23       LDB    #$23
@@ -1735,7 +1745,7 @@ table_of_jump_tables_7139:
 71F3: D6 80       LDB    $80
 71F5: 10 27 F1 9D LBEQ   $6396
 71F9: 39          RTS
-71FA: 96 21       LDA    $21
+71FA: 96 21       LDA    counter_8_bit_0021
 71FC: 85 1F       BITA   #$1F
 71FE: 26 0F       BNE    $720F
 7200: C6 23       LDB    #$23
@@ -2393,7 +2403,7 @@ table_of_jump_tables_7139:
 78A3: 8D 01       BSR    $78A6
 78A5: 39          RTS
 
-78A6: D6 21       LDB    $21
+78A6: D6 21       LDB    counter_8_bit_0021
 78A8: C5 3F       BITB   #$3F
 78AA: 26 20       BNE    $78CC
 78AC: 96 0A       LDA    $0A
@@ -2644,7 +2654,7 @@ l_7a14:
 7AF0: D7 DE       STB    $DE
 7AF2: 0F 72       CLR    starting_level_0072
 7AF4: CC 40 00    LDD    #$4000
-7AF7: DD 6C       STD    $6C
+7AF7: DD 6C       STD    background_screen_location_006c
 7AF9: CC 06 00    LDD    #$0600
 7AFC: BD 69 09    JSR    $6909
 7AFF: CC 00 60    LDD    #$0060
@@ -2838,7 +2848,7 @@ l_7a14:
 7D07: 20 3A       BRA    $7D43
 7D09: 6A 88 14    DEC    $14,X
 7D0C: 10 27 00 90 LBEQ   $7DA0
-7D10: D6 21       LDB    $21
+7D10: D6 21       LDB    counter_8_bit_0021
 7D12: C4 03       ANDB   #$03
 7D14: 26 05       BNE    $7D1B
 7D16: EC 84       LDD    ,X
@@ -2848,7 +2858,7 @@ l_7a14:
 7D1E: 20 F8       BRA    $7D18
 7D20: 6A 88 14    DEC    $14,X
 7D23: 27 08       BEQ    $7D2D
-7D25: D6 21       LDB    $21
+7D25: D6 21       LDB    counter_8_bit_0021
 7D27: C4 02       ANDB   #$02
 7D29: 26 EB       BNE    $7D16
 7D2B: 20 EE       BRA    $7D1B
@@ -2942,7 +2952,7 @@ l_7a14:
 7E04: CC 01 00    LDD    #$0100
 7E07: DD D4       STD    $D4
 7E09: CC 41 5F    LDD    #$415F
-7E0C: DD 6C       STD    $6C
+7E0C: DD 6C       STD    background_screen_location_006c
 7E0E: CC 06 00    LDD    #$0600
 7E11: BD 69 09    JSR    $6909
 7E14: C6 0E       LDB    #$0E
@@ -3110,7 +3120,7 @@ l_7a14:
 
 
 7F95: 10 AE 0B    LDY    $B,X
-7F98: D6 21       LDB    $21
+7F98: D6 21       LDB    counter_8_bit_0021
 7F9A: C4 0F       ANDB   #$0F
 7F9C: 26 16       BNE    $7FB4
 7F9E: C6 60       LDB    #$60
@@ -3256,7 +3266,7 @@ l_7a14:
 80D6: C6 10       LDB    #$10
 80D8: E7 84       STB    ,X
 80DA: E7 01       STB    $1,X
-80DC: DC 6C       LDD    $6C
+80DC: DC 6C       LDD    background_screen_location_006c
 80DE: ED 08       STD    $8,X
 80E0: ED 0A       STD    $A,X
 80E2: ED 1E       STD    -$2,X
@@ -3264,7 +3274,7 @@ l_7a14:
 80E6: 1F 98       TFR    B,A
 80E8: 5F          CLRB
 80E9: ED 16       STD    -$A,X
-80EB: DC 6C       LDD    $6C
+80EB: DC 6C       LDD    background_screen_location_006c
 80ED: 58          ASLB
 80EE: 49          ROLA
 80EF: 58          ASLB
@@ -3335,7 +3345,7 @@ l_7a14:
 8179: E6 0F       LDB    $F,X
 817B: E7 0E       STB    $E,X
 817D: EC 1E       LDD    -$2,X
-817F: DD 6C       STD    $6C
+817F: DD 6C       STD    background_screen_location_006c
 8181: EC 0A       LDD    $A,X
 8183: ED 08       STD    $8,X
 8185: D6 BB       LDB    $BB
@@ -3386,54 +3396,54 @@ l_7a14:
 81E7: E6 02       LDB    $2,X
 81E9: C5 01       BITB   #$01
 81EB: 10 26 00 C5 LBNE   $82B4
-81EF: DC 6C       LDD    $6C
+81EF: DC 6C       LDD    background_screen_location_006c
 81F1: CB 01       ADDB   #$01
 81F3: C4 1F       ANDB   #$1F
 81F5: 34 04       PSHS   B
 81F7: D6 6D       LDB    $6D
 81F9: C4 E0       ANDB   #$E0
 81FB: EA E0       ORB    ,S+
-81FD: 96 6C       LDA    $6C
+81FD: 96 6C       LDA    background_screen_location_006c
 81FF: C3 00 20    ADDD   #$0020
 8202: 84 01       ANDA   #$01
 8204: 34 02       PSHS   A
-8206: 96 6C       LDA    $6C
+8206: 96 6C       LDA    background_screen_location_006c
 8208: 84 FE       ANDA   #$FE
 820A: AA E0       ORA    ,S+
 820C: 1F 03       TFR    D,U
 820E: 8D 7E       BSR    $828E
 8210: 10 8E 03 A0 LDY    #$03A0
 8214: 8D 4C       BSR    $8262
-8216: DC 6C       LDD    $6C
+8216: DC 6C       LDD    background_screen_location_006c
 8218: CB 01       ADDB   #$01
 821A: C4 1F       ANDB   #$1F
 821C: 34 04       PSHS   B
 821E: D6 6D       LDB    $6D
 8220: C4 E0       ANDB   #$E0
 8222: EA E0       ORB    ,S+
-8224: 96 6C       LDA    $6C
+8224: 96 6C       LDA    background_screen_location_006c
 8226: C3 00 00    ADDD   #$0000
 8229: 84 01       ANDA   #$01
 822B: 34 02       PSHS   A
-822D: 96 6C       LDA    $6C
+822D: 96 6C       LDA    background_screen_location_006c
 822F: 84 FE       ANDA   #$FE
 8231: AA E0       ORA    ,S+
 8233: 1F 03       TFR    D,U
 8235: 8D 57       BSR    $828E
 8237: 10 8E 03 90 LDY    #$0390
 823B: 8D 25       BSR    $8262
-823D: DC 6C       LDD    $6C
+823D: DC 6C       LDD    background_screen_location_006c
 823F: CB 01       ADDB   #$01
 8241: C4 1F       ANDB   #$1F
 8243: 34 04       PSHS   B
 8245: D6 6D       LDB    $6D
 8247: C4 E0       ANDB   #$E0
 8249: EA E0       ORB    ,S+
-824B: 96 6C       LDA    $6C
+824B: 96 6C       LDA    background_screen_location_006c
 824D: C3 FF E0    ADDD   #$FFE0
 8250: 84 01       ANDA   #$01
 8252: 34 02       PSHS   A
-8254: 96 6C       LDA    $6C
+8254: 96 6C       LDA    background_screen_location_006c
 8256: 84 FE       ANDA   #$FE
 8258: AA E0       ORA    ,S+
 825A: 1F 03       TFR    D,U
@@ -3485,54 +3495,54 @@ l_7a14:
 82B0: 4F          CLRA
 82B1: 33 CB       LEAU   D,U
 82B3: 39          RTS
-82B4: DC 6C       LDD    $6C
+82B4: DC 6C       LDD    background_screen_location_006c
 82B6: CB 01       ADDB   #$01
 82B8: C4 1F       ANDB   #$1F
 82BA: 34 04       PSHS   B
 82BC: D6 6D       LDB    $6D
 82BE: C4 E0       ANDB   #$E0
 82C0: EA E0       ORB    ,S+
-82C2: 96 6C       LDA    $6C
+82C2: 96 6C       LDA    background_screen_location_006c
 82C4: C3 00 20    ADDD   #$0020
 82C7: 84 01       ANDA   #$01
 82C9: 34 02       PSHS   A
-82CB: 96 6C       LDA    $6C
+82CB: 96 6C       LDA    background_screen_location_006c
 82CD: 84 FE       ANDA   #$FE
 82CF: AA E0       ORA    ,S+
 82D1: 1F 03       TFR    D,U
 82D3: 8D B9       BSR    $828E
 82D5: 10 8E 03 A0 LDY    #$03A0
 82D9: 8D 4D       BSR    $8328
-82DB: DC 6C       LDD    $6C
+82DB: DC 6C       LDD    background_screen_location_006c
 82DD: CB 01       ADDB   #$01
 82DF: C4 1F       ANDB   #$1F
 82E1: 34 04       PSHS   B
 82E3: D6 6D       LDB    $6D
 82E5: C4 E0       ANDB   #$E0
 82E7: EA E0       ORB    ,S+
-82E9: 96 6C       LDA    $6C
+82E9: 96 6C       LDA    background_screen_location_006c
 82EB: C3 00 00    ADDD   #$0000
 82EE: 84 01       ANDA   #$01
 82F0: 34 02       PSHS   A
-82F2: 96 6C       LDA    $6C
+82F2: 96 6C       LDA    background_screen_location_006c
 82F4: 84 FE       ANDA   #$FE
 82F6: AA E0       ORA    ,S+
 82F8: 1F 03       TFR    D,U
 82FA: 8D 92       BSR    $828E
 82FC: 10 8E 03 90 LDY    #$0390
 8300: 8D 26       BSR    $8328
-8302: DC 6C       LDD    $6C
+8302: DC 6C       LDD    background_screen_location_006c
 8304: CB 01       ADDB   #$01
 8306: C4 1F       ANDB   #$1F
 8308: 34 04       PSHS   B
 830A: D6 6D       LDB    $6D
 830C: C4 E0       ANDB   #$E0
 830E: EA E0       ORB    ,S+
-8310: 96 6C       LDA    $6C
+8310: 96 6C       LDA    background_screen_location_006c
 8312: C3 FF E0    ADDD   #$FFE0
 8315: 84 01       ANDA   #$01
 8317: 34 02       PSHS   A
-8319: 96 6C       LDA    $6C
+8319: 96 6C       LDA    background_screen_location_006c
 831B: 84 FE       ANDA   #$FE
 831D: AA E0       ORA    ,S+
 831F: 1F 03       TFR    D,U
@@ -3595,18 +3605,18 @@ l_7a14:
 838C: E7 02       STB    $2,X
 838E: C5 0F       BITB   #$0F
 8390: 26 2B       BNE    $83BD
-8392: DC 6C       LDD    $6C
+8392: DC 6C       LDD    background_screen_location_006c
 8394: CB 01       ADDB   #$01
 8396: C4 1F       ANDB   #$1F
 8398: 34 04       PSHS   B
 839A: D6 6D       LDB    $6D
 839C: C4 E0       ANDB   #$E0
 839E: EA E0       ORB    ,S+
-83A0: 96 6C       LDA    $6C
+83A0: 96 6C       LDA    background_screen_location_006c
 83A2: C3 00 00    ADDD   #$0000
 83A5: 84 01       ANDA   #$01
 83A7: 34 02       PSHS   A
-83A9: 96 6C       LDA    $6C
+83A9: 96 6C       LDA    background_screen_location_006c
 83AB: 84 FE       ANDA   #$FE
 83AD: AA E0       ORA    ,S+
 83AF: ED 1E       STD    -$2,X
@@ -3706,54 +3716,54 @@ l_7a14:
 846E: E6 03       LDB    $3,X
 8470: C5 01       BITB   #$01
 8472: 10 26 00 AA LBNE   $8520
-8476: DC 6C       LDD    $6C
+8476: DC 6C       LDD    background_screen_location_006c
 8478: CB FF       ADDB   #$FF
 847A: C4 1F       ANDB   #$1F
 847C: 34 04       PSHS   B
 847E: D6 6D       LDB    $6D
 8480: C4 E0       ANDB   #$E0
 8482: EA E0       ORB    ,S+
-8484: 96 6C       LDA    $6C
+8484: 96 6C       LDA    background_screen_location_006c
 8486: C3 00 20    ADDD   #$0020
 8489: 84 01       ANDA   #$01
 848B: 34 02       PSHS   A
-848D: 96 6C       LDA    $6C
+848D: 96 6C       LDA    background_screen_location_006c
 848F: 84 FE       ANDA   #$FE
 8491: AA E0       ORA    ,S+
 8493: 1F 03       TFR    D,U
 8495: 8D 57       BSR    $84EE
 8497: 10 8E 03 A0 LDY    #$03A0
 849B: BD 82 62    JSR    $8262
-849E: DC 6C       LDD    $6C
+849E: DC 6C       LDD    background_screen_location_006c
 84A0: CB FF       ADDB   #$FF
 84A2: C4 1F       ANDB   #$1F
 84A4: 34 04       PSHS   B
 84A6: D6 6D       LDB    $6D
 84A8: C4 E0       ANDB   #$E0
 84AA: EA E0       ORB    ,S+
-84AC: 96 6C       LDA    $6C
+84AC: 96 6C       LDA    background_screen_location_006c
 84AE: C3 00 00    ADDD   #$0000
 84B1: 84 01       ANDA   #$01
 84B3: 34 02       PSHS   A
-84B5: 96 6C       LDA    $6C
+84B5: 96 6C       LDA    background_screen_location_006c
 84B7: 84 FE       ANDA   #$FE
 84B9: AA E0       ORA    ,S+
 84BB: 1F 03       TFR    D,U
 84BD: 8D 2F       BSR    $84EE
 84BF: 10 8E 03 90 LDY    #$0390
 84C3: BD 82 62    JSR    $8262
-84C6: DC 6C       LDD    $6C
+84C6: DC 6C       LDD    background_screen_location_006c
 84C8: CB FF       ADDB   #$FF
 84CA: C4 1F       ANDB   #$1F
 84CC: 34 04       PSHS   B
 84CE: D6 6D       LDB    $6D
 84D0: C4 E0       ANDB   #$E0
 84D2: EA E0       ORB    ,S+
-84D4: 96 6C       LDA    $6C
+84D4: 96 6C       LDA    background_screen_location_006c
 84D6: C3 FF E0    ADDD   #$FFE0
 84D9: 84 01       ANDA   #$01
 84DB: 34 02       PSHS   A
-84DD: 96 6C       LDA    $6C
+84DD: 96 6C       LDA    background_screen_location_006c
 84DF: 84 FE       ANDA   #$FE
 84E1: AA E0       ORA    ,S+
 84E3: 1F 03       TFR    D,U
@@ -3787,54 +3797,54 @@ l_7a14:
 851A: C3 40 00    ADDD   #$4000
 851D: 1F 03       TFR    D,U
 851F: 39          RTS
-8520: DC 6C       LDD    $6C
+8520: DC 6C       LDD    background_screen_location_006c
 8522: CB FF       ADDB   #$FF
 8524: C4 1F       ANDB   #$1F
 8526: 34 04       PSHS   B
 8528: D6 6D       LDB    $6D
 852A: C4 E0       ANDB   #$E0
 852C: EA E0       ORB    ,S+
-852E: 96 6C       LDA    $6C
+852E: 96 6C       LDA    background_screen_location_006c
 8530: C3 00 20    ADDD   #$0020
 8533: 84 01       ANDA   #$01
 8535: 34 02       PSHS   A
-8537: 96 6C       LDA    $6C
+8537: 96 6C       LDA    background_screen_location_006c
 8539: 84 FE       ANDA   #$FE
 853B: AA E0       ORA    ,S+
 853D: 1F 03       TFR    D,U
 853F: 8D AD       BSR    $84EE
 8541: 10 8E 03 A0 LDY    #$03A0
 8545: BD 83 28    JSR    $8328
-8548: DC 6C       LDD    $6C
+8548: DC 6C       LDD    background_screen_location_006c
 854A: CB FF       ADDB   #$FF
 854C: C4 1F       ANDB   #$1F
 854E: 34 04       PSHS   B
 8550: D6 6D       LDB    $6D
 8552: C4 E0       ANDB   #$E0
 8554: EA E0       ORB    ,S+
-8556: 96 6C       LDA    $6C
+8556: 96 6C       LDA    background_screen_location_006c
 8558: C3 00 00    ADDD   #$0000
 855B: 84 01       ANDA   #$01
 855D: 34 02       PSHS   A
-855F: 96 6C       LDA    $6C
+855F: 96 6C       LDA    background_screen_location_006c
 8561: 84 FE       ANDA   #$FE
 8563: AA E0       ORA    ,S+
 8565: 1F 03       TFR    D,U
 8567: 8D 85       BSR    $84EE
 8569: 10 8E 03 90 LDY    #$0390
 856D: BD 83 28    JSR    $8328
-8570: DC 6C       LDD    $6C
+8570: DC 6C       LDD    background_screen_location_006c
 8572: CB FF       ADDB   #$FF
 8574: C4 1F       ANDB   #$1F
 8576: 34 04       PSHS   B
 8578: D6 6D       LDB    $6D
 857A: C4 E0       ANDB   #$E0
 857C: EA E0       ORB    ,S+
-857E: 96 6C       LDA    $6C
+857E: 96 6C       LDA    background_screen_location_006c
 8580: C3 FF E0    ADDD   #$FFE0
 8583: 84 01       ANDA   #$01
 8585: 34 02       PSHS   A
-8587: 96 6C       LDA    $6C
+8587: 96 6C       LDA    background_screen_location_006c
 8589: 84 FE       ANDA   #$FE
 858B: AA E0       ORA    ,S+
 858D: 1F 03       TFR    D,U
@@ -3873,18 +3883,18 @@ l_7a14:
 85D1: C4 0F       ANDB   #$0F
 85D3: C1 0C       CMPB   #$0C
 85D5: 26 2B       BNE    $8602
-85D7: DC 6C       LDD    $6C
+85D7: DC 6C       LDD    background_screen_location_006c
 85D9: CB FF       ADDB   #$FF
 85DB: C4 1F       ANDB   #$1F
 85DD: 34 04       PSHS   B
 85DF: D6 6D       LDB    $6D
 85E1: C4 E0       ANDB   #$E0
 85E3: EA E0       ORB    ,S+
-85E5: 96 6C       LDA    $6C
+85E5: 96 6C       LDA    background_screen_location_006c
 85E7: C3 00 00    ADDD   #$0000
 85EA: 84 01       ANDA   #$01
 85EC: 34 02       PSHS   A
-85EE: 96 6C       LDA    $6C
+85EE: 96 6C       LDA    background_screen_location_006c
 85F0: 84 FE       ANDA   #$FE
 85F2: AA E0       ORA    ,S+
 85F4: ED 1E       STD    -$2,X
@@ -5045,7 +5055,7 @@ l_7a14:
 909A: D6 AD       LDB    $AD
 909C: 27 0C       BEQ    $90AA
 909E: CE A6 31    LDU    #$A631
-90A1: D6 21       LDB    $21
+90A1: D6 21       LDB    counter_8_bit_0021
 90A3: 54          LSRB
 90A4: 24 02       BCC    $90A8
 90A6: EE 84       LDU    ,X
@@ -5511,7 +5521,7 @@ l_7a14:
 94D4: BD 94 02    JSR    $9402
 94D7: BD 95 10    JSR    $9510
 94DA: BD 91 D1    JSR    $91D1
-94DD: D6 21       LDB    $21
+94DD: D6 21       LDB    counter_8_bit_0021
 94DF: C4 3F       ANDB   #$3F
 94E1: 26 03       BNE    $94E6
 94E3: 6A 88 18    DEC    $18,X
@@ -5537,7 +5547,7 @@ l_7a14:
 950B: BD 99 0D    JSR    $990D
 950E: 5F          CLRB
 950F: 39          RTS
-9510: D6 21       LDB    $21
+9510: D6 21       LDB    counter_8_bit_0021
 9512: 5A          DECB
 9513: C4 1F       ANDB   #$1F
 9515: 10 27 E4 C4 LBEQ   $79DD
@@ -5812,7 +5822,7 @@ l_7a14:
 999D: 39          RTS
 999E: 6A 88 10    DEC    $10,X
 99A1: 27 11       BEQ    $99B4
-99A3: 96 21       LDA    $21
+99A3: 96 21       LDA    counter_8_bit_0021
 99A5: 84 02       ANDA   #$02
 99A7: 27 05       BEQ    $99AE
 99A9: CC A6 31    LDD    #$A631
@@ -6419,7 +6429,7 @@ A0AE: C6 28       LDB    #$28
 A0B0: D7 E0       STB    $E0
 A0B2: E6 10       LDB    -$10,X
 A0B4: 27 1D       BEQ    $A0D3
-A0B6: D6 21       LDB    $21
+A0B6: D6 21       LDB    counter_8_bit_0021
 A0B8: DB E0       ADDB   $E0
 A0BA: C4 03       ANDB   #$03
 A0BC: 26 03       BNE    $A0C1
@@ -6428,7 +6438,7 @@ A0C1: E6 05       LDB    $5,X
 A0C3: 58          ASLB
 A0C4: CE 45 44    LDU    #jump_table_4544
 A0C7: AD D5       JSR    [B,U]        ; [indirect_jump]
-A0C9: D6 21       LDB    $21
+A0C9: D6 21       LDB    counter_8_bit_0021
 A0CB: C4 01       ANDB   #$01
 A0CD: 58          ASLB
 A0CE: CE 45 40    LDU    #jump_table_4540
@@ -6458,7 +6468,7 @@ A102: ED 88 12    STD    task_pointer_0012,X
 A105: ED 88 1E    STD    $1E,X
 A108: E7 08       STB    $8,X
 A10A: E7 0A       STB    $A,X
-A10C: D6 21       LDB    $21
+A10C: D6 21       LDB    counter_8_bit_0021
 A10E: DB E0       ADDB   $E0
 A110: C4 07       ANDB   #$07
 A112: E7 06       STB    $6,X
@@ -6480,7 +6490,7 @@ A133: 54          LSRB
 A134: 54          LSRB
 A135: 33 C5       LEAU   B,U
 A137: 96 E0       LDA    $E0
-A139: 9B 21       ADDA   $21
+A139: 9B 21       ADDA   counter_8_bit_0021
 A13B: 84 03       ANDA   #$03
 A13D: 26 02       BNE    $A141
 A13F: 33 42       LEAU   $2,U
@@ -6548,7 +6558,7 @@ A1C0: CE A1 C5    LDU    #jump_table_a1c5
 A1C3: 6E D5       JMP    [B,U]        ; [indirect_jump]
 
 A1CB: D6 E0       LDB    $E0
-A1CD: DB 21       ADDB   $21
+A1CD: DB 21       ADDB   counter_8_bit_0021
 A1CF: C5 7F       BITB   #$7F
 A1D1: 26 03       BNE    $A1D6
 A1D3: BD 79 C4    JSR    $79C4
@@ -6573,7 +6583,7 @@ A1FE: 8D 03       BSR    $A203
 A200: 7E 8F 62    JMP    $8F62
 A203: E6 06       LDB    $6,X
 A205: 27 2E       BEQ    $A235
-A207: D6 21       LDB    $21
+A207: D6 21       LDB    counter_8_bit_0021
 A209: DB E0       ADDB   $E0
 A20B: C4 0F       ANDB   #$0F
 A20D: 26 26       BNE    $A235
@@ -6749,7 +6759,7 @@ A375: 48          ASLA
 A376: CE A3 7B    LDU    #jump_table_a37b
 A379: 6E D6       JMP    [A,U]        ; [indirect_jump]
 
-A37F: D6 21       LDB    $21
+A37F: D6 21       LDB    counter_8_bit_0021
 A381: DB E0       ADDB   $E0
 A383: 5C          INCB
 A384: C4 0F       ANDB   #$0F
@@ -7006,7 +7016,7 @@ A5A6: ED 14       STD    -$C,X
 A5A8: 39          RTS
 A5A9: CE A5 B9    LDU    #$A5B9
 A5AC: D6 E0       LDB    $E0
-A5AE: DB 21       ADDB   $21
+A5AE: DB 21       ADDB   counter_8_bit_0021
 A5B0: C4 07       ANDB   #$07
 A5B2: E6 C5       LDB    B,U
 A5B4: E7 0F       STB    $F,X
@@ -7047,7 +7057,7 @@ A60C: 6E D5       JMP    [B,U]        ; [indirect_jump]
 A612: C6 1E       LDB    #$1E
 A614: E7 0B       STB    $B,X
 A616: 6C 15       INC    -$B,X
-A618: D6 21       LDB    $21
+A618: D6 21       LDB    counter_8_bit_0021
 A61A: 54          LSRB
 A61B: 24 07       BCC    $A624
 A61D: CC A6 31    LDD    #$A631
@@ -7218,7 +7228,7 @@ A7B1: 27 05       BEQ    $A7B8
 A7B3: A7 1E       STA    -$2,X
 A7B5: 6A 15       DEC    -$B,X
 A7B7: 39          RTS
-A7B8: D6 21       LDB    $21
+A7B8: D6 21       LDB    counter_8_bit_0021
 A7BA: C5 3F       BITB   #$3F
 A7BC: 26 03       BNE    $A7C1
 A7BE: BD 79 FB    JSR    $79FB
@@ -7423,7 +7433,7 @@ A9A9: CC 03 00    LDD    #$0300
 A9AC: ED 14       STD    -$C,X
 A9AE: 39          RTS
 
-AB4B: D6 21       LDB    $21
+AB4B: D6 21       LDB    counter_8_bit_0021
 AB4D: DB E0       ADDB   $E0
 AB4F: C4 1F       ANDB   #$1F
 AB51: 26 03       BNE    $AB56
@@ -7911,7 +7921,7 @@ B036: 39          RTS
 B077: 58          ASLB    
 B078: CE B0 89    LDU    #jump_table_b089
 B07B: AD D5       JSR    [B,U]	; [indirect_jump]
-B07D: D6 21       LDB    $21
+B07D: D6 21       LDB    counter_8_bit_0021
 B07F: 5C          INCB
 B080: C4 1F       ANDB   #$1F
 B082: 10 26 DE DC LBNE   $8F62
@@ -8524,7 +8534,7 @@ B6E9: E7 10       STB    -$10,X
 B6EB: CC 00 F0    LDD    #$00F0
 B6EE: ED 88 10    STD    $10,X
 B6F1: 6C 15       INC    -$B,X
-B6F3: D6 21       LDB    $21
+B6F3: D6 21       LDB    counter_8_bit_0021
 B6F5: C5 0F       BITB   #$0F
 B6F7: 26 0F       BNE    $B708
 B6F9: C5 10       BITB   #$10
@@ -8563,7 +8573,7 @@ B741: EC 16       LDD    -$A,X
 B743: 10 93 A0    CMPD   $A0
 B746: 2D 02       BLT    $B74A
 B748: 6C 1E       INC    -$2,X
-B74A: D6 21       LDB    $21
+B74A: D6 21       LDB    counter_8_bit_0021
 B74C: DB E0       ADDB   $E0
 B74E: C4 03       ANDB   #$03
 B750: 58          ASLB
@@ -8797,7 +8807,7 @@ B96D: E6 C0       LDB    ,U+		; [bank_address]
 B96F: E7 07       STB    $7,X
 B971: EF 88 1A    STU    $1A,X
 B974: 39          RTS
-B975: D6 21       LDB    $21
+B975: D6 21       LDB    counter_8_bit_0021
 B977: 5A          DECB
 B978: C4 07       ANDB   #$07
 B97A: 26 19       BNE    $B995
@@ -8857,7 +8867,7 @@ B9E4: ED 14       STD    -$C,X
 B9E6: 39          RTS
 B9E7: E6 0D       LDB    $D,X
 B9E9: 26 10       BNE    $B9FB
-B9EB: D6 21       LDB    $21
+B9EB: D6 21       LDB    counter_8_bit_0021
 B9ED: 5C          INCB
 B9EE: C4 1F       ANDB   #$1F
 B9F0: 26 09       BNE    $B9FB
@@ -8888,7 +8898,7 @@ BA43: E6 0D       LDB    $D,X
 BA45: 58          ASLB
 BA46: EC C5       LDD    B,U
 BA48: ED 1C       STD    -$4,X
-BA4A: D6 21       LDB    $21
+BA4A: D6 21       LDB    counter_8_bit_0021
 BA4C: DB E0       ADDB   $E0
 BA4E: C4 07       ANDB   #$07
 BA50: CE BA 2D    LDU    #$BA2D
@@ -9055,7 +9065,7 @@ BBCA: E6 0E       LDB    $E,X
 BBCC: 26 02       BNE    $BBD0
 BBCE: 88 01       EORA   #$01
 BBD0: A7 0A       STA    $A,X
-BBD2: D6 21       LDB    $21
+BBD2: D6 21       LDB    counter_8_bit_0021
 BBD4: DB E0       ADDB   $E0
 BBD6: C4 07       ANDB   #$07
 BBD8: CE BB EC    LDU    #$BBEC
@@ -9096,7 +9106,7 @@ BC2E: 68 10       ASL    -$10,X
 BC30: C6 0A       LDB    #$0A
 BC32: E7 09       STB    $9,X
 BC34: 6C 15       INC    -$B,X
-BC36: D6 21       LDB    $21
+BC36: D6 21       LDB    counter_8_bit_0021
 BC38: C5 03       BITB   #$03
 BC3A: 26 1B       BNE    $BC57
 BC3C: EE 84       LDU    ,X
@@ -9112,7 +9122,7 @@ BC51: C6 0A       LDB    #$0A
 BC53: E7 09       STB    $9,X
 BC55: 6C 15       INC    -$B,X
 BC57: 39          RTS
-BC58: D6 21       LDB    $21
+BC58: D6 21       LDB    counter_8_bit_0021
 BC5A: C5 03       BITB   #$03
 BC5C: 26 17       BNE    $BC75
 BC5E: EE 84       LDU    ,X
@@ -9154,7 +9164,7 @@ BCAD: E6 0D       LDB    $D,X
 BCAF: 58          ASLB
 BCB0: EC C5       LDD    B,U
 BCB2: ED 1C       STD    -$4,X
-BCB4: D6 21       LDB    $21
+BCB4: D6 21       LDB    counter_8_bit_0021
 BCB6: DB E0       ADDB   $E0
 BCB8: C4 07       ANDB   #$07
 BCBA: CE BA 2D    LDU    #$BA2D
@@ -9183,7 +9193,7 @@ BCED: 6C 15       INC    -$B,X
 BCEF: 39          RTS
 BCF0: BD B8 7E    JSR    $B87E
 BCF3: 25 2A       BCS    $BD1F
-BCF5: D6 21       LDB    $21
+BCF5: D6 21       LDB    counter_8_bit_0021
 BCF7: C5 07       BITB   #$07
 BCF9: 10 26 D3 77 LBNE   $9074
 BCFD: 6C 15       INC    -$B,X
@@ -9197,7 +9207,7 @@ BD0C: BD B8 5A    JSR    $B85A
 BD0F: E6 0A       LDB    $A,X
 BD11: 2A 03       BPL    $BD16
 BD13: BD 90 74    JSR    $9074
-BD16: D6 21       LDB    $21
+BD16: D6 21       LDB    counter_8_bit_0021
 BD18: C4 3F       ANDB   #$3F
 BD1A: 26 02       BNE    $BD1E
 BD1C: 6C 15       INC    -$B,X
@@ -9503,7 +9513,7 @@ BFC3: 39          RTS
 BFC4: 6A 88 13    DEC    $13,X
 BFC7: 27 F1       BEQ    $BFBA
 BFC9: 39          RTS
-BFCA: 96 21       LDA    $21
+BFCA: 96 21       LDA    counter_8_bit_0021
 BFCC: 84 7F       ANDA   #$7F
 BFCE: 81 7F       CMPA   #$7F
 BFD0: 26 07       BNE    $BFD9
@@ -9817,7 +9827,7 @@ C2C6: E7 88 16    STB    $16,X
 C2C9: 20 05       BRA    $C2D0
 C2CB: C6 03       LDB    #$03
 C2CD: E7 88 16    STB    $16,X
-C2D0: D6 21       LDB    $21
+C2D0: D6 21       LDB    counter_8_bit_0021
 C2D2: C4 03       ANDB   #$03
 C2D4: CE C3 0C    LDU    #$C30C
 C2D7: E6 C5       LDB    B,U
@@ -9992,7 +10002,7 @@ C472: 7E C4 7A    JMP    $C47A
 C475: 86 03       LDA    #$03
 C477: A7 13       STA    -$D,X
 C479: 39          RTS
-C47A: 96 21       LDA    $21
+C47A: 96 21       LDA    counter_8_bit_0021
 C47C: 84 02       ANDA   #$02
 C47E: 27 05       BEQ    $C485
 C480: CC A6 31    LDD    #$A631
@@ -10092,7 +10102,7 @@ C550: EF 88 18    STU    $18,X
 C553: C6 0A       LDB    #$0A
 C555: E7 88 16    STB    $16,X
 C558: CE 4D 65    LDU    #$4D65
-C55B: D6 21       LDB    $21
+C55B: D6 21       LDB    counter_8_bit_0021
 C55D: DB E0       ADDB   $E0
 C55F: C4 03       ANDB   #$03
 C561: E6 C5       LDB    B,U	; [bank_address]
@@ -10125,7 +10135,7 @@ C5A0: DC A2       LDD    $A2
 C5A2: C3 00 40    ADDD   #$0040
 C5A5: A3 19       SUBD   -$7,X
 C5A7: 2B 13       BMI    $C5BC
-C5A9: D6 21       LDB    $21
+C5A9: D6 21       LDB    counter_8_bit_0021
 C5AB: 5C          INCB
 C5AC: C4 0F       ANDB   #$0F
 C5AE: 26 0C       BNE    $C5BC
@@ -10192,7 +10202,7 @@ C63C: CC 05 00    LDD    #$0500
 C63F: ED 14       STD    -$C,X
 C641: 39          RTS
 
-C696: D6 21       LDB    $21                                        
+C696: D6 21       LDB    counter_8_bit_0021                                        
 C698: DB E0       ADDB   $E0                                        
 C69A: 5C          INCB                                              
 C69B: C4 03       ANDB   #$03
@@ -10236,7 +10246,7 @@ C6EE: 6C 15       INC    -$B,X
 C6F0: BD C7 5D    JSR    $C75D
 C6F3: E6 1E       LDB    -$2,X
 C6F5: 27 0F       BEQ    $C706
-C6F7: D6 21       LDB    $21
+C6F7: D6 21       LDB    counter_8_bit_0021
 C6F9: 5C          INCB
 C6FA: C4 1F       ANDB   #$1F
 C6FC: 26 03       BNE    $C701
@@ -10597,7 +10607,7 @@ CA4E: ED 88 1C    STD    $1C,X
 CA51: CC CA 26    LDD    #$CA26
 CA54: ED 1C       STD    -$4,X
 CA56: 6C 15       INC    -$B,X
-CA58: D6 21       LDB    $21
+CA58: D6 21       LDB    counter_8_bit_0021
 CA5A: 5C          INCB
 CA5B: C4 0F       ANDB   #$0F
 CA5D: 26 03       BNE    $CA62
@@ -10624,7 +10634,7 @@ CA8C: E6 15       LDB    -$B,X
 CA8E: 58          ASLB
 CA8F: CE CA A4    LDU    #jump_table_caa4
 CA92: AD D5       JSR    [B,U]	; [indirect_jump]
-CA94: D6 21       LDB    $21
+CA94: D6 21       LDB    counter_8_bit_0021
 CA96: 5C          INCB
 CA97: C4 1F       ANDB   #$1F
 CA99: 26 03       BNE    $CA9E
@@ -11240,12 +11250,12 @@ D02C: 2D 06       BLT    $D034
 D02E: CC 02 00    LDD    #$0200
 D031: ED 14       STD    -$C,X
 D033: 39          RTS
-D034: D6 21       LDB    $21
+D034: D6 21       LDB    counter_8_bit_0021
 D036: 5C          INCB
 D037: C4 1F       ANDB   #$1F
 D039: 26 03       BNE    $D03E
 D03B: BD 79 92    JSR    $7992
-D03E: D6 21       LDB    $21
+D03E: D6 21       LDB    counter_8_bit_0021
 D040: 5C          INCB
 D041: C4 0F       ANDB   #$0F
 D043: 26 17       BNE    $D05C
@@ -11389,7 +11399,7 @@ D17F: BD A4 27    JSR    $A427
 D182: E6 1E       LDB    -$2,X
 D184: C0 02       SUBB   #$02
 D186: E7 1E       STB    -$2,X
-D188: D6 21       LDB    $21
+D188: D6 21       LDB    counter_8_bit_0021
 D18A: 5C          INCB
 D18B: C4 0F       ANDB   #$0F
 D18D: 26 03       BNE    $D192
@@ -11583,7 +11593,7 @@ D32E: ED 13       STD    -$D,X
 D330: E7 15       STB    -$B,X
 D332: 39          RTS
 D333: CE D3 47    LDU    #$D347
-D336: D6 21       LDB    $21
+D336: D6 21       LDB    counter_8_bit_0021
 D338: DB E0       ADDB   $E0
 D33A: C4 0F       ANDB   #$0F
 D33C: E6 C5       LDB    B,U
@@ -11673,7 +11683,7 @@ D3FE: E7 1E       STB    -$2,X
 D400: CE 51 3E    LDU    #$513E
 D403: BD 90 6B    JSR    $906B
 D406: CE D4 2E    LDU    #$D42E
-D409: D6 21       LDB    $21
+D409: D6 21       LDB    counter_8_bit_0021
 D40B: DB E0       ADDB   $E0
 D40D: C4 07       ANDB   #$07
 D40F: A6 C5       LDA    B,U
@@ -11721,7 +11731,7 @@ D467: 10 93 A0    CMPD   $A0
 D46A: 23 02       BLS    $D46E
 D46C: 6C 15       INC    -$B,X
 D46E: 39          RTS
-D46F: D6 21       LDB    $21
+D46F: D6 21       LDB    counter_8_bit_0021
 D471: 54          LSRB
 D472: 24 09       BCC    $D47D
 D474: 6A 0A       DEC    $A,X
@@ -12087,7 +12097,7 @@ D79A: 96 72       LDA    starting_level_0072
 D79C: 81 05       CMPA   #$05
 D79E: 27 03       BEQ    $D7A3
 D7A0: CE D7 B1    LDU    #$D7B1
-D7A3: D6 21       LDB    $21
+D7A3: D6 21       LDB    counter_8_bit_0021
 D7A5: DB E0       ADDB   $E0
 D7A7: C4 03       ANDB   #$03
 D7A9: E6 C5       LDB    B,U
@@ -12107,7 +12117,7 @@ D7C2: C3 00 20    ADDD   #$0020
 D7C5: A3 19       SUBD   -$7,X
 D7C7: 2B 24       BMI    $D7ED
 D7C9: C1 05       CMPB   #$05		; [useless]
-D7CB: D6 21       LDB    $21
+D7CB: D6 21       LDB    counter_8_bit_0021
 D7CD: 5C          INCB
 D7CE: C4 0F       ANDB   #$0F
 D7D0: 26 1B       BNE    $D7ED
@@ -12124,7 +12134,7 @@ D7E8: 27 03       BEQ    $D7ED
 D7EA: 5A          DECB
 D7EB: 26 F5       BNE    $D7E2
 D7ED: 39          RTS
-D7EE: D6 21       LDB    $21
+D7EE: D6 21       LDB    counter_8_bit_0021
 D7F0: 5C          INCB
 D7F1: C4 7F       ANDB   #$7F
 D7F3: 26 12       BNE    $D807
@@ -12304,7 +12314,7 @@ D988: 93 A2       SUBD   $A2
 D98A: C3 00 48    ADDD   #$0048
 D98D: 10 83 00 90 CMPD   #$0090
 D991: 22 ED       BHI    $D980
-D993: D6 21       LDB    $21
+D993: D6 21       LDB    counter_8_bit_0021
 D995: 5C          INCB
 D996: C4 1F       ANDB   #$1F
 D998: 26 E6       BNE    $D980
@@ -12494,7 +12504,7 @@ DB3A: CC 01 00    LDD    #$0100
 DB3D: ED 13       STD    -$D,X
 DB3F: E7 15       STB    -$B,X
 DB41: 39          RTS
-DB42: D6 21       LDB    $21
+DB42: D6 21       LDB    counter_8_bit_0021
 DB44: DB E0       ADDB   $E0
 DB46: C4 1F       ANDB   #$1F
 DB48: 26 03       BNE    $DB4D
@@ -12804,7 +12814,7 @@ DE10: 31 A8 40    LEAY   $40,Y
 DE13: 0A E1       DEC    $E1
 DE15: 26 BC       BNE    $DDD3
 DE17: 39          RTS
-DE18: D6 21       LDB    $21
+DE18: D6 21       LDB    counter_8_bit_0021
 DE1A: DB E0       ADDB   $E0
 DE1C: C4 0F       ANDB   #$0F
 DE1E: 26 03       BNE    $DE23
@@ -12841,7 +12851,7 @@ DE58: 39          RTS
 DE59: 39          RTS
 DE5A: E6 11       LDB    -$F,X
 DE5C: 27 FB       BEQ    $DE59
-DE5E: D6 21       LDB    $21
+DE5E: D6 21       LDB    counter_8_bit_0021
 DE60: 5C          INCB
 DE61: C4 1F       ANDB   #$1F
 DE63: 26 27       BNE    $DE8C
@@ -12881,7 +12891,7 @@ DEA7: ED 10       STD    -$10,X
 DEA9: ED 13       STD    -$D,X
 DEAB: E7 15       STB    -$B,X
 DEAD: 7E 8E 0C    JMP    $8E0C
-DEB0: D6 21       LDB    $21
+DEB0: D6 21       LDB    counter_8_bit_0021
 DEB2: DB E0       ADDB   $E0
 DEB4: C4 0F       ANDB   #$0F
 DEB6: 26 03       BNE    $DEBB
@@ -13008,7 +13018,7 @@ DFBE: ED 10       STD    -$10,X
 DFC0: ED 13       STD    -$D,X
 DFC2: E7 15       STB    -$B,X
 DFC4: 7E 8E 0C    JMP    $8E0C
-DFC7: D6 21       LDB    $21
+DFC7: D6 21       LDB    counter_8_bit_0021
 DFC9: DB E0       ADDB   $E0
 DFCB: C4 0F       ANDB   #$0F
 DFCD: 26 03       BNE    $DFD2
@@ -13036,7 +13046,7 @@ E002: 54          LSRB
 E003: 54          LSRB
 E004: 54          LSRB
 E005: EE C5       LDU    B,U
-E007: 96 21       LDA    $21
+E007: 96 21       LDA    counter_8_bit_0021
 E009: 9B E0       ADDA   $E0
 E00B: 84 03       ANDA   #$03
 E00D: E6 C6       LDB    A,U
@@ -13342,7 +13352,7 @@ E2B9: D7 E0       STB    $E0
 E2BB: E6 10       LDB    -$10,X
 E2BD: 27 0E       BEQ    $E2CD
 E2BF: D6 E0       LDB    $E0
-E2C1: DB 21       ADDB   $21
+E2C1: DB 21       ADDB   counter_8_bit_0021
 E2C3: C4 0F       ANDB   #$0F
 E2C5: 26 03       BNE    $E2CA
 E2C7: BD 8E 41    JSR    $8E41
@@ -13456,7 +13466,7 @@ E3BA: 25 02       BCS    $E3BE
 E3BC: 6C 15       INC    -$B,X
 E3BE: 39          RTS
 E3BF: BD 90 74    JSR    $9074
-E3C2: D6 21       LDB    $21
+E3C2: D6 21       LDB    counter_8_bit_0021
 E3C4: 54          LSRB
 E3C5: 24 32       BCC    $E3F9
 E3C7: E6 11       LDB    -$F,X
@@ -13743,7 +13753,7 @@ E617: D7 E0       STB    $E0
 E619: E6 10       LDB    -$10,X
 E61B: 27 0E       BEQ    $E62B
 E61D: D6 E0       LDB    $E0
-E61F: DB 21       ADDB   $21
+E61F: DB 21       ADDB   counter_8_bit_0021
 E621: C4 0F       ANDB   #$0F
 E623: 26 03       BNE    $E628
 E625: BD 8E 41    JSR    $8E41
@@ -14539,7 +14549,7 @@ ED22: ED 13       STD    -$D,X
 ED24: ED 10       STD    -$10,X
 ED26: 39          RTS
 ED27: BD ED 58    JSR    $ED58
-ED2A: D6 21       LDB    $21
+ED2A: D6 21       LDB    counter_8_bit_0021
 ED2C: C4 3F       ANDB   #$3F
 ED2E: 26 27       BNE    $ED57
 ED30: DC AA       LDD    time_00aa
@@ -14583,7 +14593,7 @@ ED87: 39          RTS
 
 ED96: D6 28       LDB    $28
 ED98: 27 2A       BEQ    $EDC4
-ED9A: D6 21       LDB    $21
+ED9A: D6 21       LDB    counter_8_bit_0021
 ED9C: C5 07       BITB   #$07
 ED9E: 26 24       BNE    $EDC4
 EDA0: D6 90       LDB    $90
@@ -14635,7 +14645,7 @@ EDFC: 53          COMB
 EDFD: 39          RTS
 EDFE: 5F          CLRB
 EDFF: 39          RTS
-EE00: D6 21       LDB    $21
+EE00: D6 21       LDB    counter_8_bit_0021
 EE02: C5 07       BITB   #$07
 EE04: 27 01       BEQ    $EE07
 EE06: 39          RTS
@@ -14674,7 +14684,7 @@ EE53: 4A          DECA
 EE54: 26 F4       BNE    $EE4A
 EE56: 39          RTS
 
-EEB9: D6 21       LDB    $21
+EEB9: D6 21       LDB    counter_8_bit_0021
 EEBB: 26 12       BNE    $EECF
 EEBD: 96 20       LDA    $20
 EEBF: 54          LSRB
@@ -14716,7 +14726,7 @@ EF12: EC 84       LDD    ,X
 EF14: ED 03       STD    $3,X
 EF16: 39          RTS
 EF17: 8D EE       BSR    $EF07
-EF19: D6 21       LDB    $21
+EF19: D6 21       LDB    counter_8_bit_0021
 EF1B: 54          LSRB
 EF1C: 25 06       BCS    $EF24
 EF1E: BD F0 FB    JSR    $F0FB
@@ -15329,7 +15339,7 @@ F9C8: E7 A8 23    STB    $23,Y
 F9CB: AA 41       ORA    $1,U
 F9CD: A7 A8 19    STA    $19,Y
 F9D0: A7 A8 1D    STA    $1D,Y
-F9D3: A7 A8 21    STA    $21,Y
+F9D3: A7 A8 21    STA    counter_8_bit_0021,Y
 F9D6: 31 A8 24    LEAY   $24,Y
 F9D9: 39          RTS
 F9DA: D6 29       LDB    $29
@@ -15452,7 +15462,7 @@ FAE5: E7 A8 27    STB    $27,Y
 FAE8: E7 A8 2B    STB    $2B,Y
 FAEB: E7 A8 2F    STB    $2F,Y
 FAEE: AA 41       ORA    $1,U
-FAF0: A7 A8 21    STA    $21,Y
+FAF0: A7 A8 21    STA    counter_8_bit_0021,Y
 FAF3: A7 A8 25    STA    $25,Y
 FAF6: A7 A8 29    STA    $29,Y
 FAF9: A7 A8 2D    STA    $2D,Y
@@ -15626,7 +15636,7 @@ FC59: D7 E0       STB    $E0
 FC5B: 8E 13 D0    LDX    #$13D0
 FC5E: E6 10       LDB    -$10,X
 FC60: 27 0E       BEQ    $FC70
-FC62: D6 21       LDB    $21
+FC62: D6 21       LDB    counter_8_bit_0021
 FC64: DB E0       ADDB   $E0
 FC66: C4 03       ANDB   #$03
 FC68: 26 03       BNE    $FC6D
@@ -17098,7 +17108,7 @@ jump_table_6188:
 	dc.w	$48BD	; $618e from bank 3 
 	dc.w	$5022	; $6190 from bank 3 
 	dc.w	$511E	; $6192 from bank 3 
-	dc.w	$62AB	; $6194
+	dc.w	change_background_pic_62ab	; $6194
 	dc.w	$513B	; $6196 from bank 3 
 	dc.w	$523F	; $6198 from bank 3 
 	dc.w	$5347	; $619a from bank 3 
@@ -17111,15 +17121,24 @@ jump_table_6188:
 	dc.w	$5180	; $61a8
 	dc.w	$5975	; $61aa
 	dc.w	$6B46	; $61ac
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+	dc.w	$ffff   ; bogus auto-insert
+
 jump_table_7147:
-	dc.w	$7159	   ; 7147
-	dc.w	$7180	   ; 7149
+	dc.w	$7159	   ; $7147
+	dc.w	$7180	   ; $7149
 jump_table_714b:
-	dc.w	$7197    ; 714b
-	dc.w	$71ac    ; 714d
-	dc.w	$71c7    ; 714f
+	dc.w	$7197    ; $714b
+	dc.w	$71ac    ; $714d
+	dc.w	$71c7    ; $714f
 jump_table_7151:
-	dc.w	$7197    ; 7151
-	dc.w	$71ac    ; 7153
-	dc.w	$71fa    ; 7155
-	dc.w	$732a    ; 7157	
+	dc.w	$7197    ; $7151
+	dc.w	$71ac    ; $7153
+	dc.w	$71fa    ; $7155
+	dc.w	$732a    ; $7157	

@@ -1,4 +1,6 @@
+- 6B95: if time % 4 == 3 then $6C <= 4006 and bank error, else ok!!
 - implement insert coin / start game: rip sprites from that part
+- log fg tiles by Y
 - log tiles (per level): with zone filtering (first level only upper part)
 - division by zero at some point, see what it does on real code FED8
 - find the "background" color in sprite pics to be able to rip sprites with non-black

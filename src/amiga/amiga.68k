@@ -2631,13 +2631,16 @@ osd_read_system:
 	st.b	d0
 	movem.l	a0/d1,-(a7)
 	lea		keyboard_table(pc),a0
-	tst.b	(5,a0)		| "5" key like in MAME
-	beq.b	0f
+	tst.b	coin1_requested
+	jeq		0f
+	subq.b	#1,coin1_requested
 	st.b	detect_controllers
 	bclr	#BIT_COIN1,d0
 0:
-	tst.b	(6,a0)		| "6" key like in MAME
+
+	tst.b	coin2_requested
 	beq.b	0f
+	subq.b	#1,coin2_requested
 	st.b	detect_controllers
 	bclr	#BIT_COIN2,d0
 0:	
@@ -2798,6 +2801,18 @@ handle_keyboard:
     seq (a0,d0.w)       | updates keyboard table
     jne   2f     | we don't care about key release
 	
+	* to insert a credit, game needs a short pulse
+	* so maintaining the key too long would fail. But too
+	* short would not work either. 10 ticks seems to work
+	cmp.b	#5,d0	| "5" key like in MAME
+	bne.b	0f
+	move.b	#10,coin1_requested
+0:
+	cmp.b	#6,d0	| "5" key like in MAME
+	bne.b	0f
+	move.b	#10,coin2_requested
+0:
+	tst.b	(6,a0)		| "6" key like in MAME
 	cmp.b	#55,d0		| "M" key
 	jne		0f
 	eor.b	#1,no_main_tune
@@ -3439,7 +3454,10 @@ difficulty_dsw:
 
 detect_controllers:
 	.byte	0
-
+coin1_requested:
+	.byte	0
+coin2_requested:
+	.byte	0
 music_playing:
 	.byte	0
 dont_store_blitted_coords:
