@@ -319,6 +319,8 @@ read_dip_switches_622c:
 ; background pic showing parts of level 1
 change_background_pic_62ab:
 62AB: 34 40       PSHS   U			; save U 
+; there are 4 possible background screen locations picked at random
+; 4000: start, 4004, 400A: forest, 4006: ground/river
 62AD: 9E 6C       LDX    background_screen_location_006c
 62AF: C6 02       LDB    #$02
 62B1: D7 D9       STB    bankswitch_copy_d9
@@ -410,17 +412,18 @@ change_background_pic_62ab:
 6353: C6 01       LDB    #$01
 6355: D7 D9       STB    bankswitch_copy_d9
 6357: F7 3E 00    STB    bankswitch_3e00
-635A: E6 A4       LDB    ,Y		; [bank_address]
-635C: A6 21       LDA    $1,Y		; [bank_address]
+; this part will need optimization
+635A: E6 A4       LDB    ,Y		; [select_address]
+635C: A6 21       LDA    $1,Y		; [select_address]
 635E: ED C3       STD    ,--U		; [video_address]
-6360: E6 22       LDB    $2,Y		; [bank_address]
-6362: A6 23       LDA    $3,Y		; [bank_address]
+6360: E6 22       LDB    $2,Y		; [select_address]
+6362: A6 23       LDA    $3,Y		; [select_address]
 6364: ED C8 20    STD    $20,U		; [video_address]
-6367: E6 24       LDB    $4,Y		; [bank_address]
-6369: A6 25       LDA    $5,Y		; [bank_address]
+6367: E6 24       LDB    $4,Y		; [select_address]
+6369: A6 25       LDA    $5,Y		; [select_address]
 636B: ED C9 04 00 STD    $0400,U		; [video_address]
-636F: E6 26       LDB    $6,Y		; [bank_address]
-6371: A6 27       LDA    $7,Y		; [bank_address]
+636F: E6 26       LDB    $6,Y		; [select_address]
+6371: A6 27       LDA    $7,Y		; [select_address]
 6373: ED C9 04 20 STD    $0420,U		; [video_address]
 6377: 39          RTS
 

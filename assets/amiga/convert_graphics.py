@@ -476,6 +476,8 @@ bob_plane_cache = {}
 with open(src_dir / "palette.68k","w") as f:
     f.write("fg_tile_palette:\n")
     bitplanelib.palette_dump(fg_tile_palette,f,bitplanelib.PALETTE_FORMAT_ASMGNU)
+    f.write("bg_tile_palette:\n")
+    bitplanelib.palette_dump(bg_tile_palette,f,bitplanelib.PALETTE_FORMAT_ASMGNU)
 
 ##gs_array = [0]*NB_SPRITES
 ##for i in group_sprite_pairs:
@@ -485,39 +487,33 @@ with open(src_dir / "palette.68k","w") as f:
 ##    f.write("* 1: do not display unless mirrored\n")
 ##    bitplanelib.dump_asm_bytes(gs_array,f,mit_format=True)
 
+def dump_tile_layer(tile_table,prefix):
 
-with open(src_dir / "graphics_aga.68k","w") as f:
-    f.write("\t.global\tfg_character_table\n")
-    f.write("\t.global\tbob_table\n")
-    f.write("\t.global\thws_table\n")
-
-    f.write("fg_character_table:\n")
-
-    for i,tile_entry in enumerate(fg_tile_table):
+    for i,tile_entry in enumerate(tile_table):
         f.write("\t.long\t")
         if tile_entry and any(tile_entry):
-            f.write(f"tile_{i:02x}")
+            f.write(f"{prefix}_tile_{i:02x}")
         else:
             f.write("0")
         f.write("\n")
 
-    for i,tile_entry in enumerate(fg_tile_table):
+    for i,tile_entry in enumerate(tile_table):
         if tile_entry and any(tile_entry):
-            f.write(f"tile_{i:02x}:\n")
+            f.write(f"{prefix}_tile_{i:02x}:\n")
             for j,t in enumerate(tile_entry):
                 f.write("\t.long\t")
                 if t:
-                    f.write(f"tile_{i:02x}_{j:02x}")
+                    f.write(f"{prefix}_tile_{i:02x}_{j:02x}")
                 else:
                     f.write("0")
                 f.write("\n")
 
 
-    for i,tile_entry in enumerate(fg_tile_table):
+    for i,tile_entry in enumerate(tile_table):
         if tile_entry and any(tile_entry):
             for j,t in enumerate(tile_entry):
                 if t:
-                    name = f"tile_{i:02x}_{j:02x}"
+                    name = f"{prefix}_tile_{i:02x}_{j:02x}"
 
                     f.write(f"{name}:\n")
                     for orientation,_ in plane_orientations:
@@ -537,6 +533,20 @@ with open(src_dir / "graphics_aga.68k","w") as f:
                         else:
                             for _ in range(nb_planes):
                                 f.write("\t.long\t0\n")
+
+
+with open(src_dir / "graphics_aga.68k","w") as f:
+    f.write("\t.global\tfg_character_table\n")
+    f.write("\t.global\tbg_character_table\n")
+    f.write("\t.global\tbob_table\n")
+    f.write("\t.global\thws_table\n")
+
+    f.write("fg_character_table:\n")
+
+    dump_tile_layer(fg_tile_table,"fg")
+
+    f.write("bg_character_table:\n")
+    dump_tile_layer(bg_tile_table,"bg")
 
 
 

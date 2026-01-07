@@ -47,11 +47,11 @@ LOG_BUFFER_SIZE = 0x400000
 FG_TILE_NB_CLUTS_POW = 4
 FG_TILE_NB_CLUTS = 1<<FG_TILE_NB_CLUTS_POW
 FG_TILE_COUNT = 0x400
-* wrongo
+
 BG_TILE_NB_CLUTS_POW = 3
 BG_TILE_NB_CLUTS = 1<<BG_TILE_NB_CLUTS_POW
 BG_TILE_COUNT = 0x400
-NB_SPRITES = 0x800
+NB_SPRITES = 0x400
 
 HW_SPRITE_BUFFER_SIZE = (2*8*256+16*2)
 
@@ -114,6 +114,7 @@ OPT_AGA_MODE=0
 
 * a plane of attached sprites	
 NB_FG_PLANES = 4
+NB_BG_PLANES = NB_PLAYFIELD_PLANES
 
 TOTAL_NB_COLORS = 1<<NB_PLAYFIELD_PLANES
 FG_NB_BYTES_PER_ROW = 0x20
@@ -445,6 +446,11 @@ _user:
 	lea		fg_tile_palette,a0
 	move.l	color_copper_pointers+TOTAL_NB_COLORS*4,a1	| entries 64-80
 	move.w	#16,d0
+	jbsr	load_palette
+	
+	lea		bg_tile_palette,a0
+	move.l	color_copper_pointers,a1	| entries 64-80
+	move.w	#TOTAL_NB_COLORS,d0
 	jbsr	load_palette
 	
 	
@@ -2093,12 +2099,12 @@ osd_video_byte_dirty:
 	jpl		0f
 	add.w	#FG_SCREEN_TILE_ADDRESS,d7
 	BREAKPOINT	"write videoram out of range (D7)"
-	jra		osd_w_videoram_out		| sprite memory: out
+	jra		osd_w_videoram_out
 0:
 	.endif
 	
 	cmp.w	#BG_SCREEN_TILE_ADDRESS,d7
-	jcc		osd_w_videoram_out		| TEMP ATM only foreground
+	jcc		bg_tile
 	
 	and.w	#0x3FF,d7
 
@@ -2114,6 +2120,19 @@ osd_w_videoram_out:
 	movem.l	(a7)+,d0-d7/a0-a2
 	OSD_EXIT
 	rts	
+	
+bg_tile:
+	and.w	#0x3FF,d7
+
+	lea		(FG_SCREEN_TILE_ADDRESS,a6),a0
+	move.b	(a0,d7.w),d0
+	lea		(FG_SCREEN_COLOR_ADDRESS,a6),a0
+	move.b	(a0,d7.w),d1
+
+	jbsr	update_bg_tile
+
+	jra		osd_w_videoram_out
+	
 	
 	.macro	COPY_TILE8_PLANE_ROW
 	move.b	d0,(offset,a1)  | buffer
@@ -2134,7 +2153,282 @@ osd_w_videoram_out:
 
 cache_bg_tiles_address:
 	rts
+
+
+* < D7: 0-0x400 address
+* < D0: tile code
+* < D1: color code
+
+
+update_bg_tile:	
+	moveq	#0,d2			| mask up to 255
+	move.b	d0,d2			| tile code
+	moveq	#0,d3
+	move.b	d1,d3			| CLUT & tile code & flags
+
+	and.w	#0xC0,d3
+	add.w	d3,d3
+	add.w	d3,d2			| full tile code
+	and.w	#7,d1			| tile color
 	
+	* compute address
+	move.w	d7,d0
+	lsr.w	#5,d0	| divide by 0x20
+	add.w	d0,d0	| 16 pixels
+	move.w	d7,d1
+	and.w	#0x1F,d1	| modulus 0x20
+	lsl.w	#4,d1	| 16 pixels
+	
+	* updating bitplanes
+	move.l	#BG_SCREEN_PLANE_SIZE,d5
+	move.w	#NB_BG_PLANES-1,d4
+	.ifeq	OPT_ENABLE_DOUBLE_BUFFERING
+	move.l		playfield_displayed_screen_ptr,a1
+	.else 
+	* double buffering
+	lea		playfield_displayed_screen_ptr,a1
+	lea		playfield_drawed_screen_ptr,a4
+	.endif
+	
+	lea		mulBG_NB_BYTES_PER_ROW_table,A2
+	.ifdef	NO68020
+	add.w	d1,d1
+	move.w	(a2,d1.w),d1
+	.else
+	move.w	(a2,d1.w*2),d1
+	.endif
+	add.w	d1,d0
+	add.w	d0,a1
+
+	lea		background_restore_buffer,a3
+	add.w	d0,a3
+
+	
+	*cmp.b	#0x20,d2
+	*jeq		11f				| optim: blank tile
+	lea		bg_character_table,a0
+	.ifdef	NO68020
+	add.w	d2,d2
+	add.w	d2,d2	
+	move.l	(a0,d2.w),d0		| tile pointer
+	.else
+	move.l	(a0,d2.w*4),d0		| tile pointer
+	.endif
+	.ifdef	RELEASE
+	jeq		11f					| clear tile, no error (release)
+	.else
+	jne		12f
+	add.w	#BG_SCREEN_TILE_ADDRESS,d7
+	lsr.w	#2,d2
+	move.w	#0xF0F,_custom+color
+	jra		11f
+12:
+	.endif
+	move.l	d0,a2
+	move.b	d3,d1
+	and.w	#0x7,d3
+	.ifdef	NO68020
+	add.w	d3,d3
+	add.w	d3,d3
+	move.l	(a2,d3.w),d0			| pointer on tile bitplanes for that CLUT
+	.else
+	move.l	(a2,d3.w*4),d0			| pointer on tile bitplanes for that CLUT	
+	.endif
+	.ifdef	RELEASE
+	jeq		11f						| not necessarily a problem
+	.else
+	jne		12f
+	add.w	#BG_SCREEN_TILE_ADDRESS,d7
+	lsr.w	#2,d2
+	lsr.w	#2,d3
+	move.w	#0xF0F,_custom+color
+	jra		11f
+	.endif
+12:
+	move.l	d0,a2					| pointer on bitplanes
+
+
+*	* should we print the tile once or twice?
+*	tst.b	d6
+*	jeq		20f		| just once
+*	* do it twice. Preserve useful registers
+*	movem.l	a1/a2,-(a7)
+*	jbsr		standard_tile
+*	movem.l	(a7)+,a1/a2
+*	* draw the same thing more to the right
+*	add.w	#64,a1
+*	move.w	#NB_TILE_PLANES-1,d4
+*20:
+	
+	.macro	COPY_TILE16_PLANE_ROW
+	move.w	d0,(offset,a1)  | buffer
+	move.w	d0,(offset,a3)  | restore buffer
+	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
+	move.w	d0,(offset,a4)	| second buffer
+	.endif
+	.endm
+	
+	.macro	CLEAR_TILE16_PLANE
+	.set	offset,0
+	.rept	8
+	clr.w	(offset,a1)
+	clr.w	(offset,a3)  | restore buffer
+	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
+	clr.w	(offset,a4)	| second buffer
+	.endif
+	.set	offset,offset+BG_NB_BYTES_PER_ROW
+	.endr	
+	.endm
+	
+*	.macro	COPY_TILE_PLANE_ROW_BACKBUFFER
+*	COPY_TILE_PLANE_ROW
+*	move.b	d0,(offset,a3)  | backbuffer
+*	.endm
+*	
+*	.macro	CLEAR_TILE_PLANE_BACKBUFFER
+*	.set	offset,0
+*	.rept	8
+*	clr.b	(offset,a1)
+*	clr.b	(offset,a3)
+*	.set	offset,offset+BG_NB_BYTES_PER_ROW
+*	.endr	
+*	.endm
+	
+	.macro	TILE16_NEXT_PLANE
+	add.w	d5,a1
+	.ifdef	OCS_VERSION
+	add.w	d5,a3
+	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
+	add.w	d5,a4
+	.endif
+	.endif
+	.endm
+	
+* made more complex by 4 tile orientations + the fact that the last
+* tile bitplane should not be copied into the backbuffer as sprites
+* only use 4 planes
+standard_tile16:
+
+	* just copy
+
+4:
+	move.l	(a2)+,d0		| next plane
+	jeq		5f
+	move.l	d0,a0
+	.set	offset,0
+	.rept	8
+	move.w	(a0)+,d0
+	COPY_TILE16_PLANE_ROW
+	.set	offset,offset+BG_NB_BYTES_PER_ROW
+	.endr
+41:
+	TILE16_NEXT_PLANE
+	dbf		d4,4b
+	
+0:
+	rts
+5:
+	CLEAR_TILE16_PLANE
+	jra		41b
+
+
+flipped_tile16:	
+4:
+	move.l	(a2)+,d0		| next plane
+	jeq		5f
+	move.l	d0,a0
+	.set	offset,8*BG_NB_BYTES_PER_ROW
+	.rept	8
+	.set	offset,offset-BG_NB_BYTES_PER_ROW
+	move.w	(a0)+,d0
+	COPY_TILE16_PLANE_ROW
+	.endr
+41:
+	TILE16_NEXT_PLANE
+	dbf		d4,4b
+	
+0:
+	rts
+
+	CLEAR_TILE16_PLANE
+	jra		41b
+	
+mirror_tile16:
+	lea		mirror_bits(pc),a4
+	moveq	#0,d1
+4:
+	move.l	(a2)+,d0		| next plane
+	jeq		5f
+	move.l	d0,a0
+	.set	offset,0
+	.rept	8
+	move.b	(a0)+,d1
+	move.b	(a4,d1.w),d0	| mirror
+	* not working, needs 16 bit mirror
+	COPY_TILE16_PLANE_ROW
+
+	.set	offset,offset+BG_NB_BYTES_PER_ROW
+	.endr
+41:
+	TILE16_NEXT_PLANE
+	dbf		d4,4b
+	
+
+0:
+	rts
+1:
+
+5:
+	CLEAR_TILE16_PLANE
+	jra		41b
+	
+mirror_flipped_tile16:
+	lea		mirror_bits(pc),a4
+	moveq	#0,d1
+4:
+	move.l	(a2)+,d0		| next plane
+	jeq		5f
+	move.l	d0,a0
+	.set	offset,8*BG_NB_BYTES_PER_ROW
+	.rept	8
+	.set	offset,offset-BG_NB_BYTES_PER_ROW
+	move.b	(a0)+,d1
+	move.b	(a4,d1.w),d0	| mirror
+	* not working, needs 16 bit mirror
+	COPY_TILE16_PLANE_ROW
+
+	.endr
+41:
+	TILE16_NEXT_PLANE
+	dbf		d4,4b
+
+0:
+	rts
+
+5:
+	CLEAR_TILE16_PLANE
+	jra		41b
+
+	* clear tile
+
+11:
+111:
+	CLEAR_TILE16_PLANE
+	TILE16_NEXT_PLANE
+	dbf		d4,111b
+2:
+	rts
+
+mirror_jump_table:
+	.long	standard_tile16
+	.long	mirror_tile16
+	.long	flipped_tile16
+	.long	mirror_flipped_tile16
+	
+mirror_bits:
+	.include "mirror_bits.68k"
+
+
 * bruteforce all possible x/y combinations
 * d2: 0: no X swap, 1: X swap (for scrolling maps)
 cache_fg_tiles_address:
