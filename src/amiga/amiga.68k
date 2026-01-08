@@ -114,7 +114,7 @@ OPT_AGA_MODE=0
 
 * a plane of attached sprites	
 NB_FG_PLANES = 4
-NB_BG_PLANES = NB_PLAYFIELD_PLANES
+NB_BG_PLANES = 5
 
 TOTAL_NB_COLORS = 1<<NB_PLAYFIELD_PLANES
 FG_NB_BYTES_PER_ROW = 0x20
@@ -2103,7 +2103,7 @@ osd_video_byte_dirty:
 0:
 	.endif
 	
-	cmp.w	#BG_SCREEN_TILE_ADDRESS,d7
+	cmp.w	#BG_SCREEN_TILE_ADDRESS-FG_SCREEN_TILE_ADDRESS,d7
 	jcc		bg_tile
 	
 	and.w	#0x3FF,d7
@@ -2124,9 +2124,9 @@ osd_w_videoram_out:
 bg_tile:
 	and.w	#0x3FF,d7
 
-	lea		(FG_SCREEN_TILE_ADDRESS,a6),a0
+	lea		(BG_SCREEN_TILE_ADDRESS,a6),a0
 	move.b	(a0,d7.w),d0
-	lea		(FG_SCREEN_COLOR_ADDRESS,a6),a0
+	lea		(BG_SCREEN_COLOR_ADDRESS,a6),a0
 	move.b	(a0,d7.w),d1
 
 	jbsr	update_bg_tile
@@ -2160,16 +2160,18 @@ cache_bg_tiles_address:
 * < D1: color code
 
 
-update_bg_tile:	
+update_bg_tile:
 	moveq	#0,d2			| mask up to 255
 	move.b	d0,d2			| tile code
 	moveq	#0,d3
 	move.b	d1,d3			| CLUT & tile code & flags
 
-	and.w	#0xC0,d3
-	add.w	d3,d3
-	add.w	d3,d2			| full tile code
-	and.w	#7,d1			| tile color
+	move.w	d3,d4
+	and.w	#0xC0,d4
+	add.w	d4,d4
+	add.w	d4,d4
+	add.w	d4,d2			| full tile code
+
 	
 	* compute address
 	move.w	d7,d0
@@ -2180,14 +2182,19 @@ update_bg_tile:
 	lsl.w	#4,d1	| 16 pixels
 	
 	* updating bitplanes
+	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
 	move.l	#BG_SCREEN_PLANE_SIZE,d5
+	.else
+	move.w	#BG_SCREEN_PLANE_SIZE,d5
+	.endif
+	
 	move.w	#NB_BG_PLANES-1,d4
+	move.l		playfield_drawed_screen_ptr,a1
 	.ifeq	OPT_ENABLE_DOUBLE_BUFFERING
-	move.l		playfield_displayed_screen_ptr,a1
 	.else 
 	* double buffering
-	lea		playfield_displayed_screen_ptr,a1
-	lea		playfield_drawed_screen_ptr,a4
+	move.l		playfield_displayed_screen_ptr,a4
+
 	.endif
 	
 	lea		mulBG_NB_BYTES_PER_ROW_table,A2
@@ -2225,7 +2232,6 @@ update_bg_tile:
 12:
 	.endif
 	move.l	d0,a2
-	move.b	d3,d1
 	and.w	#0x7,d3
 	.ifdef	NO68020
 	add.w	d3,d3
@@ -2247,18 +2253,6 @@ update_bg_tile:
 12:
 	move.l	d0,a2					| pointer on bitplanes
 
-
-*	* should we print the tile once or twice?
-*	tst.b	d6
-*	jeq		20f		| just once
-*	* do it twice. Preserve useful registers
-*	movem.l	a1/a2,-(a7)
-*	jbsr		standard_tile
-*	movem.l	(a7)+,a1/a2
-*	* draw the same thing more to the right
-*	add.w	#64,a1
-*	move.w	#NB_TILE_PLANES-1,d4
-*20:
 	
 	.macro	COPY_TILE16_PLANE_ROW
 	move.w	d0,(offset,a1)  | buffer
@@ -2270,7 +2264,7 @@ update_bg_tile:
 	
 	.macro	CLEAR_TILE16_PLANE
 	.set	offset,0
-	.rept	8
+	.rept	16
 	clr.w	(offset,a1)
 	clr.w	(offset,a3)  | restore buffer
 	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
@@ -2295,12 +2289,19 @@ update_bg_tile:
 *	.endm
 	
 	.macro	TILE16_NEXT_PLANE
+	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
+	add.l	d5,a1
+	add.l	d5,a3
+	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
+	add.l	d5,a4
+	.endif
+	.else
 	add.w	d5,a1
-	.ifdef	OCS_VERSION
 	add.w	d5,a3
 	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
 	add.w	d5,a4
 	.endif
+	
 	.endif
 	.endm
 	
@@ -2316,7 +2317,7 @@ standard_tile16:
 	jeq		5f
 	move.l	d0,a0
 	.set	offset,0
-	.rept	8
+	.rept	16
 	move.w	(a0)+,d0
 	COPY_TILE16_PLANE_ROW
 	.set	offset,offset+BG_NB_BYTES_PER_ROW
@@ -2338,7 +2339,7 @@ flipped_tile16:
 	jeq		5f
 	move.l	d0,a0
 	.set	offset,8*BG_NB_BYTES_PER_ROW
-	.rept	8
+	.rept	16
 	.set	offset,offset-BG_NB_BYTES_PER_ROW
 	move.w	(a0)+,d0
 	COPY_TILE16_PLANE_ROW
@@ -2361,7 +2362,7 @@ mirror_tile16:
 	jeq		5f
 	move.l	d0,a0
 	.set	offset,0
-	.rept	8
+	.rept	16
 	move.b	(a0)+,d1
 	move.b	(a4,d1.w),d0	| mirror
 	* not working, needs 16 bit mirror
@@ -2390,7 +2391,7 @@ mirror_flipped_tile16:
 	jeq		5f
 	move.l	d0,a0
 	.set	offset,8*BG_NB_BYTES_PER_ROW
-	.rept	8
+	.rept	16
 	.set	offset,offset-BG_NB_BYTES_PER_ROW
 	move.b	(a0)+,d1
 	move.b	(a4,d1.w),d0	| mirror
@@ -2421,6 +2422,9 @@ mirror_flipped_tile16:
 
 mirror_jump_table:
 	.long	standard_tile16
+	.long	standard_tile16
+	.long	standard_tile16
+	.long	standard_tile16  | temp!!
 	.long	mirror_tile16
 	.long	flipped_tile16
 	.long	mirror_flipped_tile16
@@ -2689,8 +2693,6 @@ set_bobs_bitplanes:
 	
 	* set bitplanes
 	moveq	#0,d0
-	
-
 	move.w	scroll_y,d0
 	jpl		0f
 	moveq	#0,d0
@@ -2732,7 +2734,7 @@ set_bobs_bitplanes:
 	BREAKPOINT	"negative plane size!"
 10:
 	.endif
-	
+2:
     move.l	playfield_displayed_screen_ptr(pc),a0
 	add.l	d0,a0		| X/Y scroll offset (long!)
 	move.l	a0,d0		| first bitplane screen pointer
@@ -4091,7 +4093,9 @@ debug_color:
 	dc.l	-2
 	
 
-
+* ATM no x scroll
+fine_x_scroll_value:
+	.word	0
 
 	
 	* main copperlist
@@ -4107,7 +4111,6 @@ bobs_bitplanes:
 	DECL_BITPLANES	0,NB_PLAYFIELD_PLANES
 
 	.word	bplcon1
-fine_x_scroll_value:
 	.word	0
 	
 game_sprites:

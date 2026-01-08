@@ -322,15 +322,17 @@ for i,tsd in bg_tile_sheet_dict.items():
 if len(bg_tile_palette)>32:
     print(f"Too many colors in bg tiles ({len(bg_tile_palette)}), quantizing")
     bg_replacement_dict = quantize_palette(bg_tile_palette,"background_tiles",32,transparent=None,dump_it=dump_it)
-    apply_color_replacement(bg_tile_set_list,bg_replacement_dict)
     bg_tile_palette = sorted(set(bg_replacement_dict.values()))
+    apply_color_replacement(bg_tile_set_list,bg_replacement_dict)
 else:
     bg_tile_palette = sorted(bg_tile_palette)
+
+bg_tile_palette += (32-len(bg_tile_palette)) * [(0x10,0x20,0x30)]
 
 print(f"Used bg tile colors: {len(bg_tile_palette)}")
 
 sprite_palette = set()
-sprite_set_list = [[] for _ in range(16)]
+sprite_set_list = [[] for _ in range(SPRITE_NB_CLUTS)]
 hw_sprite_set_list = []
 
 sprite_dump_dir = dump_dir / "sprites"
@@ -415,12 +417,12 @@ def read_tileset(img_set_list,palette,plane_orientation_flags,cache,is_bob,nb_cl
                             bitplane_data = bitplanelib.palette_image2raw(wtile,None,palette,generate_mask=True,mask_color=magenta)
                             # add sprite data if eligible: player frame, not mirrored
 
-                            if i in possible_hw_sprites:
-                                # using original, uncropped bitplane data
-                                bitplane_sprite_data = bitplanelib.palette_image2attached_sprites(orig_wtile,None,palette,
-                                sprite_fmode=2,with_control_words=True)
-                                # void the blitter data
-                                bitplane_data = b''
+##                            if i in possible_hw_sprites:
+##                                # using original, uncropped bitplane data
+##                                bitplane_sprite_data = bitplanelib.palette_image2attached_sprites(orig_wtile,None,palette,
+##                                sprite_fmode=2,with_control_words=True)
+##                                # void the blitter data
+##                                bitplane_data = b''
                         else:
                             # 4 planes, no mask
                             height = 8

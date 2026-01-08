@@ -1,5 +1,5 @@
 - make bg tiles display
-- start game: game seems to lock up
+- start game: game seems to lock up 6330-635E somewhere
 - log fg tiles by Y
 - log tiles (per level): with zone filtering (first level only upper part)
 - division by zero at some point, see what it does on real code FED8
@@ -9,6 +9,7 @@
 - fg tiles color reduction is too violent, maybe do a manual reduction
   or dynamic color change between scores and in-game, try to keep the
   maximum of different colors on the bottom status
+- update bg tiles do that using dirty not by brutal refresh as it's done twice (color+tilecode)
 
 block constant palette refresh:
 
