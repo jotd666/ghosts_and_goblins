@@ -1,5 +1,5 @@
 from PIL import Image,ImageOps
-import os,sys,bitplanelib
+import os,sys,bitplanelib,math
 
 from shared import *
 
@@ -126,10 +126,6 @@ dump=False,name_dict=None,cluts=None,tile_number=0,is_bob=False):
 
 all_tile_cluts = False
 
-
-nb_planes = 4
-
-nb_colors = 32
 
 
 
@@ -385,6 +381,7 @@ plane_orientations = [("standard",lambda x:x),
 ("flip_mirror",lambda x:ImageOps.flip(ImageOps.mirror(x)))]
 
 def read_tileset(img_set_list,palette,plane_orientation_flags,cache,is_bob,nb_cluts,next_cache_id = 1):
+    nb_planes = int(math.log2(len(palette)))
 
     tile_table = []
     for n,img_set in enumerate(img_set_list):

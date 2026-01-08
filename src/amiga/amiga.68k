@@ -2232,6 +2232,10 @@ update_bg_tile:
 12:
 	.endif
 	move.l	d0,a2
+	move.w	d3,d1		| save attributes
+	lsr.w	#4,d1
+	and.w	#3,d1		| mirror/flip
+	
 	and.w	#0x7,d3
 	.ifdef	NO68020
 	add.w	d3,d3
@@ -2305,6 +2309,13 @@ update_bg_tile:
 	.endif
 	.endm
 	
+	lea		mirror_jump_table,a0
+	add.w	d1,d1
+	add.w	d1,d1
+	move.l	(a0,d1.w),a0
+	jsr		(a0)
+	
+	rts
 * made more complex by 4 tile orientations + the fact that the last
 * tile bitplane should not be copied into the backbuffer as sprites
 * only use 4 planes
@@ -2365,6 +2376,10 @@ mirror_tile16:
 	.rept	16
 	move.b	(a0)+,d1
 	move.b	(a4,d1.w),d0	| mirror
+	ror.w	#8,d0
+	move.b	(a0)+,d1
+	move.b	(a4,d1.w),d0	| mirror
+	ror.w	#8,d0
 	* not working, needs 16 bit mirror
 	COPY_TILE16_PLANE_ROW
 
@@ -2422,9 +2437,6 @@ mirror_flipped_tile16:
 
 mirror_jump_table:
 	.long	standard_tile16
-	.long	standard_tile16
-	.long	standard_tile16
-	.long	standard_tile16  | temp!!
 	.long	mirror_tile16
 	.long	flipped_tile16
 	.long	mirror_flipped_tile16
