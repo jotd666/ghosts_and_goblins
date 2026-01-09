@@ -53,9 +53,12 @@ BG_TILE_NB_CLUTS = 1<<BG_TILE_NB_CLUTS_POW
 BG_TILE_COUNT = 0x400
 NB_SPRITES = 0x400
 
+SPRITE_NB_CLUTS_POW = 2
+SPRITE_NB_CLUTS = 1<<SPRITE_NB_CLUTS_POW
+
 HW_SPRITE_BUFFER_SIZE = (2*8*256+16*2)
 
-SPRITE_LOG_LENGTH = 0x1000
+SPRITE_LOG_LENGTH = NB_SPRITES*SPRITE_NB_CLUTS
 FG_TILE_LOG_LENGTH = FG_TILE_NB_CLUTS*FG_TILE_COUNT
 BG_TILE_LOG_LENGTH = BG_TILE_NB_CLUTS*BG_TILE_COUNT
 
@@ -83,10 +86,10 @@ SPRITE_ADDRESS = 0x1E00  | to 0x1FFF
 * RAMs have 4 bytes per sprite, only the order
 * and some bits differ
 
-TARGET_SPRITE_Y = 0
+TARGET_SPRITE_Y = 2
 TARGET_SPRITE_X = 3
 TARGET_SPRITE_ATTRIBUTES = 1
-TARGET_SPRITE_CODE = 2
+TARGET_SPRITE_CODE = 0
 TARGET_SPRITE_SIZEOF = 4
 
 	.ifdef	RELEASE
@@ -3061,33 +3064,28 @@ log_used_sprites:
 	lea	sprite_log_table,a0
 	moveq	#0,d7
 0:
+	cmp.b	#0xF8,(TARGET_SPRITE_Y,a5,d7.w)
+	jeq		1f			| not active
 	moveq	#0,d2
 	moveq	#0,d1
 	moveq	#0,d0
 	move.b	(TARGET_SPRITE_CODE,a5,d7.w),d0
 	move.b	(TARGET_SPRITE_ATTRIBUTES,a5,d7.w),d1
 	move.b	d1,d2
-	and.b	#0x7,d2
-	lsl.w	#8,d2
-	add.w	d2,d0			| extended sprite code
-	moveq	#0,d2
-	move.b	d1,d2
-	and.b	#0x38,d2
-	lsr.b	#3,d2			| color
-
-
+	* extended tile code
+	lsl.w	#2,d2
+	and.w	#0x300,d2
+	add.w	d2,d0
+	lsr.b	#4,d1
+	and.w	#SPRITE_NB_CLUTS-1,d1
 	
-	lsl.l	#FG_TILE_NB_CLUTS_POW,d0			| sprite code * NB_CLUTS (long!)
-	add.l	d2,d0			| add clut
-	btst	#7,d1
-	jeq		20f
-	bset.b	#1,(a0,d0.l)		| Y double size
-	jra		21f
-20:
-	bset.b	#0,(a0,d0.l)
-21:
+	lsl.l	#SPRITE_NB_CLUTS_POW,d0			| sprite code * NB_CLUTS (long!)
+	add.l	d1,d0			| add clut
+
+	st.b	(a0,d0.l)
+1:
 	addq	#TARGET_SPRITE_SIZEOF,d7
-	cmp.w	#NB_TARGET_SPRITES*4,d7
+	cmp.w	#NB_TARGET_SPRITES*TARGET_SPRITE_SIZEOF,d7
 	jne		0b
 	rts
 	.endif
@@ -3687,10 +3685,10 @@ osd_dump_logs:
 	move.l	#BG_TILE_LOG_LENGTH,d0
 	jbsr	resload_SaveFile(a2)
 	
-;	lea		sprite_log_table,a1
-;	lea		sprite_log_name(pc),a0
-;	move.l	#SPRITE_LOG_LENGTH,d0
-;	jbsr	resload_SaveFile(a2)
+	lea		sprite_log_table,a1
+	lea		sprite_log_name(pc),a0
+	move.l	#SPRITE_LOG_LENGTH,d0
+	jbsr	resload_SaveFile(a2)
 	
     movem.l (a7)+,d0-a6
 	move.w	(a7)+,SR

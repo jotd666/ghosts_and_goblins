@@ -64,7 +64,8 @@ def doit(binname):
         if name=="blank":
             continue
 
-        #sx += 128
+        sx += 128
+        sx += 128
         sy += 6
 
         used_sprites.add(tile_code)

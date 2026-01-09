@@ -1,17 +1,23 @@
-- make bg tiles display
-- start game: game seems to lock up 6330-635E somewhere
-- log fg tiles by Y
+- 6346: during intro, check if bank address or somewhere else
+  (else error bank error)
+- devil_takes_girl_7d80 yet to reach
+- log sprites (start, seem to work)
+- one of the "start" pic looks wrong
+- start game: game seems to lock up 6330-635E somewhere: reverse startup phase
 - log tiles (per level): with zone filtering (first level only upper part)
 - division by zero at some point, see what it does on real code FED8
 - find the "background" color in sprite pics to be able to rip sprites with non-black
   background else we're stuck
-
+- contexts using tile palette values or current level values
+- use 16-bit table for mirror
 - fg tiles color reduction is too violent, maybe do a manual reduction
   or dynamic color change between scores and in-game, try to keep the
   maximum of different colors on the bottom status
 - update bg tiles do that using dirty not by brutal refresh as it's done twice (color+tilecode)
+- fg layer: isolate frame+weapon+lives (everything non-letter on the bottom), use dynamic palette
 
-block constant palette refresh:
 
 bpset 65fb,,{PC=xxx;g}
 
+
+block constant palette refresh??

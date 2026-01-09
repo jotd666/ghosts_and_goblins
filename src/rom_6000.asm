@@ -26,7 +26,7 @@
 bankswitch_3e00 = $3e00
 bankswitch_copy_d9 = $d9
 weapon_type_0073 = $73
-starting_level_0072 = $72
+current_level_0072 = $72
 armour_flag_00ac = $ac
 nb_lives_0060 = $60
 time_00aa = $aa
@@ -43,7 +43,12 @@ sprite_ram_1e00 = $1e00
 sprite_ram_end_1f80 = $1f80
 counter_8_bit_0021 = $21
 background_screen_location_006c = $6C
-
+global_state_0002 = $2
+sub_state_0005 = $5
+sub_sub_state_0008 = $8
+sub_sub_sub_state_000b = $b
+game_intro_played_0071 = $71
+	
 ; horrible code when it comes to jump tables
 ; there are more than 200+ jump tables, that had to be
 ; semi-automatically fixed, with the lot of de-synced
@@ -231,6 +236,8 @@ mainloop_6160:
 6178: 97 D9       STA    bankswitch_copy_d9
 617A: B7 3E 00    STA    bankswitch_3e00
 617D: AD 84       JSR    ,X			; [direct_jump] to bank 3
+; active wait until something is requested
+; during this time, only the irq runs
 617F: 9E 12       LDX    task_pointer_0012
 6181: EC 84       LDD    ,X				; get action number
 6183: 48          ASLA					; times 2
@@ -487,7 +494,7 @@ compute_bank_address_from_b_6378:
 63F3: A6 C4       LDA    ,U
 63F5: 26 E9       BNE    $63E0
 63F7: BD 68 DF    JSR    $68DF
-63FA: 96 72       LDA    starting_level_0072
+63FA: 96 72       LDA    current_level_0072
 63FC: 81 04       CMPA   #$04
 63FE: 24 1B       BCC    $641B
 6400: 8E 1E 14    LDX    #$1E14
@@ -524,7 +531,7 @@ compute_bank_address_from_b_6378:
 6444: 25 02       BCS    $6448
 6446: 6C 13       INC    -$D,X
 6448: 39          RTS
-6449: 96 72       LDA    starting_level_0072
+6449: 96 72       LDA    current_level_0072
 644B: 81 04       CMPA   #$04
 644D: 25 03       BCS    $6452
 644F: BD 64 00    JSR    $6400
@@ -571,8 +578,9 @@ irq_65c4:
 65E5: BD 62 74    JSR    $6274
 65E8: C6 03       LDB    #$03
 65EA: F7 3E 00    STB    bankswitch_3e00
-65ED: D6 02       LDB    $02
+65ED: D6 02       LDB    global_state_0002
 65EF: 58          ASLB
+; only 3 states: 1: game not in play, 2: game in play
 65F0: 8E 65 BC    LDX    #jump_table_65bc
 65F3: AD 95       JSR    [B,X]		; [indirect_jump]
 65F5: D6 D9       LDB    bankswitch_copy_d9
@@ -861,7 +869,8 @@ update_some_palette_671c:
 684A: DD 22       STD    $22
 684C: 6F 01       CLR    $1,X
 684E: 39          RTS
-684F: D6 05       LDB    $05
+
+684F: D6 05       LDB    sub_state_0005
 6851: 58          ASLB
 6852: 8E 68 57    LDX    #jump_table_6857
 6855: 6E 95       JMP    [B,X]	; [indirect_jump]
@@ -883,7 +892,7 @@ update_some_palette_671c:
 687A: C6 01       LDB    #$01
 687C: D7 DE       STB    $DE
 687E: D7 DF       STB    $DF
-6880: 0C 05       INC    $05
+6880: 0C 05       INC    sub_state_0005
 6882: 39          RTS
 
 fill_screen_with_h_6883:
@@ -896,7 +905,7 @@ fill_screen_with_h_6883:
 6893: 23 F5       BLS    $688A
 6895: CC 00 B4    LDD    #$00B4
 6898: DD 03       STD    $03
-689A: 0C 05       INC    $05
+689A: 0C 05       INC    sub_state_0005
 689C: 39          RTS
 
 689D: 9E 03       LDX    $03
@@ -912,7 +921,7 @@ fill_screen_with_h_6883:
 68B0: BD 69 09    JSR    $6909
 68B3: CC 00 00    LDD    #$0000
 68B6: BD 69 09    JSR    $6909
-68B9: 0C 05       INC    $05
+68B9: 0C 05       INC    sub_state_0005
 68BB: 39          RTS
 68BC: D6 F0       LDB    $F0
 68BE: 26 1E       BNE    $68DE
@@ -923,15 +932,15 @@ fill_screen_with_h_6883:
 68C6: DD 06       STD    $06
 68C8: DD 09       STD    $09
 68CA: DD 0C       STD    $0C
-68CC: D7 05       STB    $05
-68CE: D7 08       STB    $08
-68D0: D7 0B       STB    $0B
+68CC: D7 05       STB    sub_state_0005
+68CE: D7 08       STB    sub_sub_state_0008
+68D0: D7 0B       STB    sub_sub_sub_state_000b
 68D2: D7 0E       STB    $0E
 68D4: C6 03       LDB    #$03
 68D6: 96 0F       LDA    $0F
 68D8: 26 02       BNE    $68DC
 68DA: C6 01       LDB    #$01
-68DC: D7 02       STB    $02
+68DC: D7 02       STB    global_state_0002
 68DE: 39          RTS
 
 68DF: C6 18       LDB    #$18		; number of times to loop
@@ -990,7 +999,9 @@ fill_screen_with_h_6883:
 6949: 39          RTS
 694A: 0A 4D       DEC    $4D
 694C: 39          RTS
-694D: 96 05       LDA    $05
+
+game_not_playing_694d:
+694D: 96 05       LDA    sub_state_0005
 694F: 48          ASLA
 6950: 8E 69 5A    LDX    #jump_table_695a
 6953: AD 96       JSR    [A,X]		; [indirect_jump]
@@ -1024,12 +1035,12 @@ fill_screen_with_h_6883:
 6990: DD 06       STD    $06
 6992: DD 09       STD    $09
 6994: DD 0C       STD    $0C
-6996: 0F 05       CLR    $05
-6998: 0F 08       CLR    $08
-699A: 0F 0B       CLR    $0B
+6996: 0F 05       CLR    sub_state_0005
+6998: 0F 08       CLR    sub_sub_state_0008
+699A: 0F 0B       CLR    sub_sub_sub_state_000b
 699C: 0F 0E       CLR    $0E
 699E: C6 02       LDB    #$02
-69A0: D7 02       STB    $02
+69A0: D7 02       STB    global_state_0002
 69A2: 39          RTS
 69A3: 1A 01       ORCC   #$01
 69A5: 34 01       PSHS   CC
@@ -1061,9 +1072,9 @@ fill_screen_with_h_6883:
 69DA: CC 05 00    LDD    #$0500
 69DD: BD 69 09    JSR    $6909
 69E0: C6 04       LDB    #$04
-69E2: D7 05       STB    $05
-69E4: 0F 08       CLR    $08
-69E6: 0F 0B       CLR    $0B
+69E2: D7 05       STB    sub_state_0005
+69E4: 0F 08       CLR    sub_sub_state_0008
+69E6: 0F 0B       CLR    sub_sub_sub_state_000b
 69E8: 0F 0E       CLR    $0E
 69EA: 39          RTS
 69EB: C6 01       LDB    #$01
@@ -1072,9 +1083,11 @@ fill_screen_with_h_6883:
 69F1: CC 87 CD    LDD    #$87CD
 69F4: FD 00 6E    STD    >$006E
 69F7: 0F 70       CLR    $70
-69F9: 0C 05       INC    $05
+69F9: 0C 05       INC    sub_state_0005
 69FB: 39          RTS
-69FC: D6 08       LDB    $08
+
+display_title_69fc:
+69FC: D6 08       LDB    sub_sub_state_0008
 69FE: 58          ASLB
 69FF: 8E 6A 04    LDX    #jump_table_6a04
 6A02: 6E 95       JMP    [B,X]		; [indirect_jump]
@@ -1099,16 +1112,18 @@ fill_screen_with_h_6883:
 6A35: BD 69 09    JSR    $6909
 6A38: CC 00 F0    LDD    #$00F0
 6A3B: DD 06       STD    $06
-6A3D: 0C 08       INC    $08
+6A3D: 0C 08       INC    sub_sub_state_0008
 6A3F: 39          RTS
 6A40: 9E 06       LDX    $06
 6A42: 30 1F       LEAX   -$1,X
 6A44: 9F 06       STX    $06
 6A46: 26 04       BNE    $6A4C
-6A48: 0C 05       INC    $05
-6A4A: 0F 08       CLR    $08
+6A48: 0C 05       INC    sub_state_0005
+6A4A: 0F 08       CLR    sub_sub_state_0008
 6A4C: 39          RTS
-6A4D: D6 08       LDB    $08
+
+display_high_scores_6a4d:
+6A4D: D6 08       LDB    sub_sub_state_0008
 6A4F: 58          ASLB
 6A50: 8E 6A 55    LDX    #jump_table_6a55
 6A53: 6E 95       JMP    [B,X]	; [indirect_jump]
@@ -1117,7 +1132,7 @@ fill_screen_with_h_6883:
 6A5E: BD 69 09    JSR    $6909
 6A61: C6 01       LDB    #$01
 6A63: D7 F0       STB    $F0
-6A65: 0C 08       INC    $08
+6A65: 0C 08       INC    sub_sub_state_0008
 6A67: 39          RTS
 6A68: D6 F0       LDB    $F0
 6A6A: 26 13       BNE    $6A7F
@@ -1127,21 +1142,23 @@ fill_screen_with_h_6883:
 6A75: BD 69 09    JSR    $6909
 6A78: CC 01 2C    LDD    #$012C
 6A7B: DD 06       STD    $06
-6A7D: 0C 08       INC    $08
+6A7D: 0C 08       INC    sub_sub_state_0008
 6A7F: 39          RTS
 6A80: 9E 06       LDX    $06
 6A82: 30 1F       LEAX   -$1,X
 6A84: 9F 06       STX    $06
 6A86: 26 04       BNE    $6A8C
-6A88: 0C 05       INC    $05
-6A8A: 0F 08       CLR    $08
+6A88: 0C 05       INC    sub_state_0005
+6A8A: 0F 08       CLR    sub_sub_state_0008
 6A8C: 39          RTS
-6A8D: D6 08       LDB    $08
+
+attract_mode_6a8d:
+6A8D: D6 08       LDB    sub_sub_state_0008
 6A8F: 58          ASLB
 6A90: 8E 6A 95    LDX    #jump_table_6a95
 6A93: 6E 95       JMP    [B,X]	; [indirect_jump]
  
-6A9D: D6 0B       LDB    $0B
+6A9D: D6 0B       LDB    sub_sub_sub_state_000b
 6A9F: 58          ASLB
 6AA0: 8E 6A A5    LDX    #jump_table_6aa5
 6AA3: 6E 95       JMP    [B,X]	; [indirect_jump]
@@ -1173,10 +1190,10 @@ fill_screen_with_h_6883:
 6AE5: CC 00 40    LDD    #$0040
 6AE8: ED 19       STD    -$7,X
 6AEA: BD 72 83    JSR    $7283
-6AED: 0C 0B       INC    $0B
+6AED: 0C 0B       INC    sub_sub_sub_state_000b
 6AEF: 39          RTS
 
-6AF8: 96 72    LDA    starting_level_0072
+6AF8: 96 72    LDA    current_level_0072
 6AFA: 81 06    CMPA   #$06
 6AFC: 27 0C       BEQ    $6B0A
 6AFE: BD 80 A0    JSR    $80A0
@@ -1187,7 +1204,7 @@ fill_screen_with_h_6883:
 6B0A: 8E 06 40    LDX    #$0640
 6B0D: 5F          CLRB
 6B0E: BD 8F 84    JSR    $8F84
-6B11: 0C 0B       INC    $0B
+6B11: 0C 0B       INC    sub_sub_sub_state_000b
 6B13: 39          RTS
 6B14: BD 6C 9C    JSR    $6C9C
 6B17: BD 68 DF    JSR    $68DF
@@ -1195,8 +1212,8 @@ fill_screen_with_h_6883:
 6B1D: BD 69 09    JSR    $6909
 6B20: CC 03 84    LDD    #$0384
 6B23: DD 06       STD    $06
-6B25: 0C 08       INC    $08
-6B27: 0F 0B       CLR    $0B
+6B25: 0C 08       INC    sub_sub_state_0008
+6B27: 0F 0B       CLR    sub_sub_sub_state_000b
 6B29: 39          RTS
 6B2A: D6 21       LDB    counter_8_bit_0021
 6B2C: C5 1F       BITB   #$1F
@@ -1212,21 +1229,23 @@ fill_screen_with_h_6883:
 6B40: 30 1F       LEAX   -$1,X
 6B42: 9F 06       STX    $06
 6B44: 26 02       BNE    $6B48
-6B46: 0C 08       INC    $08
+6B46: 0C 08       INC    sub_sub_state_0008
 6B48: 39          RTS
 6B49: 5F          CLRB
-6B4A: D7 08       STB    $08
-6B4C: D7 0B       STB    $0B
+6B4A: D7 08       STB    sub_sub_state_0008
+6B4C: D7 0B       STB    sub_sub_sub_state_000b
 6B4E: D7 0E       STB    $0E
-6B50: 0C 05       INC    $05
+6B50: 0C 05       INC    sub_state_0005
 6B52: DC 22       LDD    $22
 6B54: 26 07       BNE    $6B5D
 6B56: D6 51       LDB    $51
 6B58: 26 03       BNE    $6B5D
 6B5A: 5F          CLRB
-6B5B: D7 05       STB    $05
+6B5B: D7 05       STB    sub_state_0005
 6B5D: 39          RTS
-6B5E: 96 08       LDA    $08
+
+start_game_screen_6b5e:
+6B5E: 96 08       LDA    sub_sub_state_0008
 6B60: 8E 6B 66    LDX    #jump_table_6b66
 6B63: 48          ASLA
 6B64: 6E 96       JMP    [A,X]	; [indirect_jump]
@@ -1243,7 +1262,7 @@ fill_screen_with_h_6883:
 6B7C: BD 69 09    JSR    $6909
 6B7F: C6 01       LDB    #$01
 6B81: D7 F0       STB    $F0
-6B83: 0C 08       INC    $08
+6B83: 0C 08       INC    sub_sub_state_0008
 6B85: 39          RTS
 6B86: 40          NEGA
 
@@ -1288,14 +1307,14 @@ fill_screen_with_h_6883:
 6BEB: BD 69 09    JSR    $6909
 6BEE: CC 00 F0    LDD    #$00F0
 6BF1: DD 06       STD    $06
-6BF3: 0C 08       INC    $08
+6BF3: 0C 08       INC    sub_sub_state_0008
 6BF5: 39          RTS
 6BF6: 9E 06       LDX    $06
 6BF8: 30 1F       LEAX   -$1,X
 6BFA: 9F 06       STX    $06
 6BFC: 26 04       BNE    $6C02
-6BFE: 0F 05       CLR    $05
-6C00: 0F 08       CLR    $08
+6BFE: 0F 05       CLR    sub_state_0005
+6C00: 0F 08       CLR    sub_sub_state_0008
 6C02: 39          RTS
 6C03: 8E 40 00    LDX    #$4000
 6C06: 9F 6C       STX    background_screen_location_006c
@@ -1304,9 +1323,9 @@ fill_screen_with_h_6883:
 6C0C: 96 57       LDA    $57
 6C0E: 5F          CLRB
 6C0F: DD 61       STD    $61
-6C11: D7 71       STB    $71
+6C11: D7 71       STB    game_intro_played_0071
 6C13: D7 80       STB    $80
-6C15: D7 72       STB    starting_level_0072
+6C15: D7 72       STB    current_level_0072
 6C17: D7 7F       STB    $7F
 6C19: 8D 18       BSR    $6C33
 6C1B: 5F          CLRB
@@ -1402,7 +1421,7 @@ fill_screen_with_h_6883:
 6D2C: D6 81       LDB    $81
 6D2E: 58          ASLB
 6D2F: AE 85       LDX    B,X
-6D31: D6 72       LDB    starting_level_0072
+6D31: D6 72       LDB    current_level_0072
 6D33: 58          ASLB
 6D34: 58          ASLB
 6D35: 3A          ABX
@@ -1531,7 +1550,7 @@ fill_screen_with_h_6883:
 6E3B: C6 02       LDB    #$02
 6E3D: F7 3E 00    STB    bankswitch_3e00
 6E40: CE 4B 00    LDU    #$4B00
-6E43: D6 72       LDB    starting_level_0072
+6E43: D6 72       LDB    current_level_0072
 6E45: 58          ASLB
 6E46: 58          ASLB
 6E47: AE C5       LDX    B,U	; [bank_address]
@@ -1559,7 +1578,7 @@ fill_screen_with_h_6883:
 6E6E: C6 02       LDB    #$02
 6E70: F7 3E 00    STB    bankswitch_3e00
 6E73: CE 4B 00    LDU    #$4B00
-6E76: D6 72       LDB    starting_level_0072
+6E76: D6 72       LDB    current_level_0072
 6E78: 58          ASLB
 6E79: 58          ASLB
 6E7A: 33 C5       LEAU   B,U
@@ -1609,7 +1628,7 @@ fill_screen_with_h_6883:
 6EF2: D7 A4       STB    $A4
 6EF4: DD A5       STD    $A5
 6EF6: 39          RTS
-6EF7: D6 72       LDB    starting_level_0072
+6EF7: D6 72       LDB    current_level_0072
 6EF9: 58          ASLB
 6EFA: CE 6F 15    LDU    #$6F15
 6EFD: EE C5       LDU    B,U
@@ -1625,17 +1644,18 @@ fill_screen_with_h_6883:
 6F12: 26 F8       BNE    $6F0C
 6F14: 39          RTS
 
-; set bank 3, reached when starting game
-70E3: C6 03       LDB    #$03
+
+game_in_play_70e3:
+70E3: C6 03       LDB    #$03	; set bank 3
 70E5: F7 3E 00    STB    bankswitch_3e00
-70E8: 96 05       LDA    $05
+70E8: 96 05       LDA    sub_state_0005
 70EA: 48          ASLA
 70EB: 8E 70 F1    LDX    #jump_table_70f1
 70EE: AD 96       JSR    [A,X]	; [indirect_jump]
 70F0: 39          RTS
 
 
-
+init_new_game_70fb:
 70FB: D6 F0       LDB    $F0
 70FD: 26 15       BNE    $7114
 70FF: C6 01       LDB    #$01
@@ -1645,26 +1665,30 @@ fill_screen_with_h_6883:
 7109: CC 00 00    LDD    #$0000
 710C: BD 69 09    JSR    $6909
 710F: BD 6C 03    JSR    $6C03
-7112: 0C 05       INC    $05
+7112: 0C 05       INC    sub_state_0005	; now run game
 7114: 39          RTS
-7115: D6 08       LDB    $08
+
+run_game_7115:
+7115: D6 08       LDB    sub_sub_state_0008
 7117: 58          ASLB
 7118: 8E 71 1D    LDX    #jump_table_711d
 711B: 6E 95       JMP    [B,X]	; [indirect_jump]
 
-
-7125: 8E 71 47    LDX    #jump_table_7147                                  
-7128: D6 71       LDB    $71
+intro_and_get_ready_7125:
+7125: 8E 71 47    LDX    #jump_table_7147
+; are we just starting the game, or starting a new game?                                  
+7128: D6 71       LDB    game_intro_played_0071
 712A: 27 08       BEQ    $7134
-712C: D6 72       LDB    starting_level_0072
+712C: D6 72       LDB    current_level_0072
 712E: 58          ASLB
-
-712F: 8E 71 39    LDX    #table_of_jump_tables_7139
+712F: 8E 71 39    LDX    #table_of_jump_tables_7139  ; select different table depending on level
 7132: AE 85       LDX    B,X
-7134: D6 0B       LDB    $0B
+; and sub state
+7134: D6 0B       LDB    sub_sub_sub_state_000b
 7136: 58          ASLB
 7137: 6E 95       JMP    [B,X]	; [special_indirect_jump]
 
+; depends on the level, only last level does different
 table_of_jump_tables_7139:
 	dc.w	jump_table_714b     ; $7139
 	dc.w	jump_table_714b 	   ; $713b
@@ -1674,6 +1698,7 @@ table_of_jump_tables_7139:
 	dc.w	jump_table_714b 	   ; $7143
 	dc.w	jump_table_7151 	   ; $7145	
 
+init_game_intro_sequence_7159:
 7159: BD 7A 39    JSR    $7A39
 715C: CC 01 1A    LDD    #$011A
 715F: BD 69 09    JSR    $6909
@@ -1688,21 +1713,24 @@ table_of_jump_tables_7139:
 7174: FD 05 33    STD    $0533
 7177: FD 15 B5    STD    $15B5
 717A: FD 08 83    STD    $0883
-717D: 0C 0B       INC    $0B
+717D: 0C 0B       INC    sub_sub_sub_state_000b
 717F: 39          RTS
 
+run_game_intro_sequence_7180:
 7180: BD 7A 6B    JSR    $7A6B
-7183: D6 71       LDB    $71
+7183: D6 71       LDB    game_intro_played_0071
 7185: 27 0F       BEQ    $7196
 7187: 4F          CLRA
 7188: 5F          CLRB
 7189: FD 15 B5    STD    $15B5
 718C: FD 08 83    STD    $0883
-718F: 0C 08       INC    $08
+718F: 0C 08       INC    sub_sub_state_0008	; intro/map => play
 7191: 5F          CLRB
-7192: D7 0B       STB    $0B
+7192: D7 0B       STB    sub_sub_sub_state_000b
 7194: D7 0E       STB    $0E
 7196: 39          RTS
+
+init_restart_7197:
 7197: BD 7A 24    JSR    $7A24
 719A: CC 01 2C    LDD    #$012C
 719D: DD 09       STD    $09
@@ -1710,8 +1738,10 @@ table_of_jump_tables_7139:
 71A2: BD 69 09    JSR    $6909
 71A5: C6 01       LDB    #$01
 71A7: D7 F0       STB    $F0
-71A9: 0C 0B       INC    $0B
+71A9: 0C 0B       INC    sub_sub_sub_state_000b
 71AB: 39          RTS
+
+continue_restart_71ac:
 71AC: D6 F0       LDB    $F0
 71AE: 26 16       BNE    $71C6
 71B0: C6 01       LDB    #$01
@@ -1723,8 +1753,10 @@ table_of_jump_tables_7139:
 71BF: 4F          CLRA
 71C0: 5F          CLRB
 71C1: FD 15 95    STD    $1595
-71C4: 0C 0B       INC    $0B
+71C4: 0C 0B       INC    sub_sub_sub_state_000b
 71C6: 39          RTS
+
+do_restart_71c7:
 71C7: 96 21       LDA    counter_8_bit_0021
 71C9: 85 1F       BITA   #$1F
 71CB: 26 0F       BNE    $71DC
@@ -1742,12 +1774,14 @@ table_of_jump_tables_7139:
 71E4: CC 03 23    LDD    #$0323
 71E7: DB 27       ADDB   $27
 71E9: BD 69 09    JSR    $6909
-71EC: 0C 08       INC    $08
-71EE: 0F 0B       CLR    $0B
+71EC: 0C 08       INC    sub_sub_state_0008
+71EE: 0F 0B       CLR    sub_sub_sub_state_000b
 71F0: 8E 15 A2    LDX    #$15A2
 71F3: D6 80       LDB    $80
 71F5: 10 27 F1 9D LBEQ   $6396
 71F9: 39          RTS
+
+do_restart_last_level_71fa:
 71FA: 96 21       LDA    counter_8_bit_0021
 71FC: 85 1F       BITA   #$1F
 71FE: 26 0F       BNE    $720F
@@ -1765,7 +1799,7 @@ table_of_jump_tables_7139:
 7217: CC 03 23    LDD    #$0323
 721A: DB 27       ADDB   $27
 721C: BD 69 09    JSR    $6909
-721F: 0C 0B       INC    $0B
+721F: 0C 0B       INC    sub_sub_sub_state_000b
 7221: 8E 15 A2    LDX    #$15A2
 7224: D6 80       LDB    $80
 7226: 10 27 F1 6C LBEQ   $6396
@@ -1777,11 +1811,13 @@ table_of_jump_tables_7139:
 7233: FD 15 B5    STD    $15B5
 7236: FD 08 83    STD    $0883
 7239: 39          RTS
-723A: D6 71       LDB    $71
+723A: D6 71       LDB    game_intro_played_0071
 723C: C1 02       CMPB   #$02
 723E: 10 26 0B 89 LBNE   $7DCB
 7242: 7E 71 87    JMP    $7187
-7245: D6 0B       LDB    $0B
+
+game_playing_7245:
+7245: D6 0B       LDB    sub_sub_sub_state_000b
 7247: 58          ASLB
 7248: 8E 72 4D    LDX    #jump_table_724d
 724B: 6E 95       JMP    [B,X]	; [indirect_jump]
@@ -1820,7 +1856,7 @@ table_of_jump_tables_7139:
 7295: 39          RTS
 7296: BD 6C 9C    JSR    $6C9C
 7299: BD 68 DF    JSR    $68DF
-729C: 0C 0B       INC    $0B
+729C: 0C 0B       INC    sub_sub_sub_state_000b
 729E: 0F 0E       CLR    $0E
 72A0: 39          RTS
 72A1: BD 69 1C    JSR    $691C
@@ -1832,8 +1868,8 @@ table_of_jump_tables_7139:
 72B2: 27 0A       BEQ    $72BE
 72B4: 8D 09       BSR    $72BF
 72B6: C6 03       LDB    #$03
-72B8: D7 08       STB    $08
-72BA: 0F 0B       CLR    $0B
+72B8: D7 08       STB    sub_sub_state_0008
+72BA: 0F 0B       CLR    sub_sub_sub_state_000b
 72BC: 0F 0E       CLR    $0E
 72BE: 39          RTS
 72BF: 96 61       LDA    $61
@@ -1842,10 +1878,13 @@ table_of_jump_tables_7139:
 72C5: 4A          DECA
 72C6: 97 61       STA    $61
 72C8: 39          RTS
-72C9: D6 72       LDB    starting_level_0072
+
+take_a_key_level_complete_72c9:
+72C9: D6 72       LDB    current_level_0072
 72CB: C1 05       CMPB   #$05
 72CD: 10 22 00 9C LBHI   $736D
 72D1: 25 06       BCS    $72D9
+; level 6: only pass if weapon is cross
 72D3: D6 73       LDB    weapon_type_0073
 72D5: C1 03       CMPB   #$03
 72D7: 26 3C       BNE    $7315
@@ -1868,11 +1907,12 @@ table_of_jump_tables_7139:
 7307: BD F7 B3    JSR    $F7B3
 730A: D6 90       LDB    $90
 730C: 27 06       BEQ    $7314
-730E: 0F 0B       CLR    $0B
+730E: 0F 0B       CLR    sub_sub_sub_state_000b
 7310: 0F 0E       CLR    $0E
-7312: 0C 08       INC    $08
+7312: 0C 08       INC    sub_sub_state_0008
 7314: 39          RTS
-7315: D6 0B       LDB    $0B
+
+7315: D6 0B       LDB    sub_sub_sub_state_000b
 7317: 58          ASLB
 7318: CE 73 1D    LDU    #jump_table_731d
 731B: 6E D5       JMP    [B,U]	; [indirect_jump]
@@ -1893,7 +1933,7 @@ table_of_jump_tables_7139:
 734A: ED 89 04 20 STD    $0420,X
 734E: CC 00 F0    LDD    #$00F0
 7351: DD 09       STD    $09
-7353: 0C 0B       INC    $0B
+7353: 0C 0B       INC    sub_sub_sub_state_000b
 7355: 39          RTS
 7356: 86 87       LDA    #$87
 7358: 96 97       LDA    $97
@@ -1902,25 +1942,25 @@ table_of_jump_tables_7139:
 735E: 9F 09       STX    $09
 7360: 26 0A       BNE    $736C
 7362: C6 04       LDB    #$04
-7364: D7 72       STB    starting_level_0072
-7366: 0F 08       CLR    $08
-7368: 0F 0B       CLR    $0B
+7364: D7 72       STB    current_level_0072
+7366: 0F 08       CLR    sub_sub_state_0008
+7368: 0F 0B       CLR    sub_sub_sub_state_000b
 736A: 0F 0E       CLR    $0E
 736C: 39          RTS
 736D: D6 7F       LDB    $7F
 736F: 26 10       BNE    $7381
-7371: D6 71       LDB    $71
+7371: D6 71       LDB    game_intro_played_0071
 7373: 5A          DECB
 7374: 10 26 00 86 LBNE   $73FE
-7378: 0F 72       CLR    starting_level_0072
-737A: 0F 08       CLR    $08
-737C: 0F 0B       CLR    $0B
+7378: 0F 72       CLR    current_level_0072
+737A: 0F 08       CLR    sub_sub_state_0008
+737C: 0F 0B       CLR    sub_sub_sub_state_000b
 737E: 0F 0E       CLR    $0E
 7380: 39          RTS
 7381: D6 7F       LDB    $7F
 7383: C1 02       CMPB   #$02
 7385: 10 26 0B 53 LBNE   $7EDC
-7389: D6 0B       LDB    $0B
+7389: D6 0B       LDB    sub_sub_sub_state_000b
 738B: 58          ASLB
 738C: CE 73 91    LDU    #jump_table_7391
 738F: 6E D5       JMP    [B,U]	; [indirect_jump]
@@ -1931,7 +1971,7 @@ table_of_jump_tables_7139:
 73A2: BD 69 09    JSR    $6909
 73A5: CC 02 1C    LDD    #$021C
 73A8: DD 09       STD    $09
-73AA: 0C 0B       INC    $0B
+73AA: 0C 0B       INC    sub_sub_sub_state_000b
 73AC: 9E 09       LDX    $09
 73AE: 30 1F       LEAX   -$1,X
 73B0: 9F 09       STX    $09
@@ -1942,7 +1982,7 @@ table_of_jump_tables_7139:
 73BD: BD 69 09    JSR    $6909
 73C0: CC 01 A4    LDD    #$01A4
 73C3: DD 09       STD    $09
-73C5: 0C 0B       INC    $0B
+73C5: 0C 0B       INC    sub_sub_sub_state_000b
 73C7: 9E 09       LDX    $09
 73C9: 30 1F       LEAX   -$1,X
 73CB: 9F 09       STX    $09
@@ -1956,14 +1996,14 @@ table_of_jump_tables_7139:
 73E1: BD 69 09    JSR    $6909
 73E4: CC 00 B4    LDD    #$00B4
 73E7: DD 09       STD    $09
-73E9: 0C 0B       INC    $0B
+73E9: 0C 0B       INC    sub_sub_sub_state_000b
 73EB: 9E 09       LDX    $09
 73ED: 30 1F       LEAX   -$1,X
 73EF: 9F 09       STX    $09
 73F1: 26 0A       BNE    $73FD
 73F3: C6 01       LDB    #$01
 73F5: D7 DE       STB    $DE
-73F7: 0F 71       CLR    $71
+73F7: 0F 71       CLR    game_intro_played_0071
 73F9: 0F 7F       CLR    $7F
 73FB: 20 49       BRA    $7446
 73FD: 39          RTS
@@ -1973,7 +2013,7 @@ table_of_jump_tables_7139:
 7407: 8E 05 10    LDX    #$0510
 740A: BD F8 3D    JSR    $F83D
 740D: BD F7 B3    JSR    $F7B3
-7410: D6 0B       LDB    $0B
+7410: D6 0B       LDB    sub_sub_sub_state_000b
 7412: 58          ASLB
 7413: CE 74 18    LDU    #jump_table_7418
 7416: 6E D5       JMP    [B,U]        ; [indirect_jump]
@@ -1989,20 +2029,20 @@ table_of_jump_tables_7139:
 742E: DD 09       STD    $09
 7430: CC 02 2C    LDD    #$022C
 7433: BD 69 09    JSR    $6909
-7436: 0C 0B       INC    $0B
+7436: 0C 0B       INC    sub_sub_sub_state_000b
 7438: DE 09       LDU    $09
 743A: 33 5F       LEAU   -$1,U
 743C: DF 09       STU    $09
 743E: 26 0E       BNE    $744E
 7440: C6 01       LDB    #$01
 7442: D7 7F       STB    $7F
-7444: D7 71       STB    $71
-7446: 0F 72       CLR    starting_level_0072
-7448: 0F 08       CLR    $08
-744A: 0F 0B       CLR    $0B
+7444: D7 71       STB    game_intro_played_0071
+7446: 0F 72       CLR    current_level_0072
+7448: 0F 08       CLR    sub_sub_state_0008
+744A: 0F 0B       CLR    sub_sub_sub_state_000b
 744C: 0F 0E       CLR    $0E
 744E: 39          RTS
-744F: D6 0B       LDB    $0B
+744F: D6 0B       LDB    sub_sub_sub_state_000b
 7451: 58          ASLB
 7452: CE 74 57    LDU    #jump_table_7457
 7455: 6E D5       JMP    [B,U]        ; [indirect_jump]
@@ -2011,11 +2051,11 @@ table_of_jump_tables_7139:
 7468: BD 69 09    JSR    $6909
 746B: 7F 05 53    CLR    $0553
 746E: 7F 05 55    CLR    $0555
-7471: 0C 0B       INC    $0B
+7471: 0C 0B       INC    sub_sub_sub_state_000b
 7473: 7E ED 2A    JMP    $ED2A
 7476: BD 69 1C    JSR    $691C
 7479: BD 90 AB    JSR    $90AB
-747C: D6 72       LDB    starting_level_0072
+747C: D6 72       LDB    current_level_0072
 747E: C1 04       CMPB   #$04
 7480: 24 1C       BCC    $749E
 7482: DC 5A       LDD    $5A
@@ -2026,7 +2066,7 @@ table_of_jump_tables_7139:
 7491: ED 88 11    STD    $11,X
 7494: C6 01       LDB    #$01
 7496: F7 05 53    STB    $0553
-7499: 0C 0B       INC    $0B
+7499: 0C 0B       INC    sub_sub_sub_state_000b
 749B: 7E ED 2A    JMP    $ED2A
 749E: DC 5C       LDD    $5C
 74A0: C3 00 20    ADDD   #$0020
@@ -2053,14 +2093,14 @@ table_of_jump_tables_7139:
 74DF: CC 0C 09    LDD    #$0C09
 74E2: BD 69 09    JSR    $6909
 74E5: F7 05 55    STB    $0555
-74E8: 0C 0B       INC    $0B
+74E8: 0C 0B       INC    sub_sub_sub_state_000b
 74EA: 39          RTS
 74EB: C6 01       LDB    #$01
 74ED: E7 1E       STB    -$2,X
 74EF: C6 32       LDB    #$32
 74F1: E7 88 10    STB    $10,X
 74F4: BD 9A 2F    JSR    $9A2F
-74F7: 0C 0B       INC    $0B
+74F7: 0C 0B       INC    sub_sub_sub_state_000b
 74F9: 39          RTS
 74FA: 6A 88 10    DEC    $10,X
 74FD: 27 09       BEQ    $7508
@@ -2083,22 +2123,22 @@ table_of_jump_tables_7139:
 752A: BD 9A 2F    JSR    $9A2F
 752D: C6 46       LDB    #$46
 752F: E7 88 10    STB    $10,X
-7532: 0C 0B       INC    $0B
+7532: 0C 0B       INC    sub_sub_sub_state_000b
 7534: 39          RTS
 7535: 6A 88 10    DEC    $10,X
 7538: 27 09       BEQ    $7543
 753A: CE 95 53    LDU    #$9553
 753D: BD 94 77    JSR    $9477
 7540: 7E 90 74    JMP    $9074
-7543: D6 72       LDB    starting_level_0072
+7543: D6 72       LDB    current_level_0072
 7545: 5C          INCB
 7546: C1 07       CMPB   #$07
 7548: 25 01       BCS    $754B
 754A: 5F          CLRB
-754B: D7 72       STB    starting_level_0072
+754B: D7 72       STB    current_level_0072
 754D: BD 6C 53    JSR    $6C53
-7550: 0F 08       CLR    $08
-7552: 0F 0B       CLR    $0B
+7550: 0F 08       CLR    sub_sub_state_0008
+7552: 0F 0B       CLR    sub_sub_sub_state_000b
 7554: 0F 0E       CLR    $0E
 7556: 39          RTS
 7557: D6 0E       LDB    $0E
@@ -2131,7 +2171,7 @@ table_of_jump_tables_7139:
 75A3: ED 10       STD    -$10,X
 75A5: C6 00       LDB    #$00
 75A7: E7 1F       STB    -$1,X
-75A9: D6 72       LDB    starting_level_0072
+75A9: D6 72       LDB    current_level_0072
 75AB: 58          ASLB
 75AC: CE 75 C0    LDU    #$75C0
 75AF: EC C5       LDD    B,U
@@ -2170,7 +2210,7 @@ table_of_jump_tables_7139:
 7620: 0C 0E       INC    $0E
 7622: 39          RTS
 
-7625: D6 72       LDB    starting_level_0072
+7625: D6 72       LDB    current_level_0072
 7627: CE 76 3C    LDU    #$763C
 762A: 58          ASLB
 762B: EC C5       LDD    B,U
@@ -2197,7 +2237,7 @@ table_of_jump_tables_7139:
 7665: A6 A4       LDA    ,Y
 7667: E6 A0       LDB    ,Y+
 7669: DD E4       STD    $E4
-766B: D6 72       LDB    starting_level_0072
+766B: D6 72       LDB    current_level_0072
 766D: 26 0C       BNE    $767B
 766F: CE 77 52    LDU    #$7752
 7672: E6 88 12    LDB    task_pointer_0012,X
@@ -2233,14 +2273,14 @@ table_of_jump_tables_7139:
 76B7: 26 4A       BNE    $7703
 76B9: C6 05       LDB    #$05
 76BB: D7 E3       STB    $E3
-76BD: D6 72       LDB    starting_level_0072
+76BD: D6 72       LDB    current_level_0072
 76BF: C1 04       CMPB   #$04
 76C1: 25 05       BCS    $76C8
 76C3: 8E 21 B2    LDX    #$21B2
 76C6: 20 03       BRA    $76CB
 76C8: 8E 22 92    LDX    #$2292
 76CB: CE 77 04    LDU    #$7704
-76CE: D6 72       LDB    starting_level_0072
+76CE: D6 72       LDB    current_level_0072
 76D0: 86 0A       LDA    #$0A
 76D2: 3D          MUL
 76D3: 33 CB       LEAU   D,U
@@ -2257,7 +2297,7 @@ table_of_jump_tables_7139:
 76EE: E7 80       STB    ,X+
 76F0: 0A E3       DEC    $E3
 76F2: 26 F4       BNE    $76E8
-76F4: D6 72       LDB    starting_level_0072
+76F4: D6 72       LDB    current_level_0072
 76F6: CE 77 40    LDU    #$7740
 76F9: 58          ASLB
 76FA: 33 C5       LEAU   B,U
@@ -2266,7 +2306,8 @@ table_of_jump_tables_7139:
 7701: 0C 0E       INC    $0E
 7703: 39          RTS
 
-777C: D6 0B       LDB    $0B
+player_dead_777c:
+777C: D6 0B       LDB    sub_sub_sub_state_000b
 777E: 58          ASLB
 777F: 8E 77 84    LDX    #jump_table_7784
 7782: 6E 95       JMP    [B,X]        ; [indirect_jump]
@@ -2291,21 +2332,21 @@ table_of_jump_tables_7139:
 77B0: BD 69 09    JSR    $6909
 77B3: CC 00 F0    LDD    #$00F0
 77B6: DD 09       STD    $09
-77B8: 0C 0B       INC    $0B
+77B8: 0C 0B       INC    sub_sub_sub_state_000b
 77BA: 39          RTS
 77BB: C6 02       LDB    #$02
-77BD: D7 0B       STB    $0B
+77BD: D7 0B       STB    sub_sub_sub_state_000b
 77BF: 39          RTS
 77C0: 9E 09       LDX    $09
 77C2: 30 1F       LEAX   -$1,X
 77C4: 9F 09       STX    $09
 77C6: 26 03       BNE    $77CB
-77C8: 0C 0B       INC    $0B
+77C8: 0C 0B       INC    sub_sub_sub_state_000b
 77CA: 39          RTS
 77CB: 39          RTS
 77CC: 5F          CLRB
-77CD: D7 08       STB    $08
-77CF: D7 0B       STB    $0B
+77CD: D7 08       STB    sub_sub_state_0008
+77CF: D7 0B       STB    sub_sub_sub_state_000b
 77D1: D7 0E       STB    $0E
 77D3: D6 60       LDB    nb_lives_0060
 77D5: 27 10       BEQ    $77E7
@@ -2315,10 +2356,10 @@ table_of_jump_tables_7139:
 77DE: 27 02       BEQ    $77E2
 77E0: 8D 0A       BSR    $77EC
 77E2: C6 01       LDB    #$01
-77E4: D7 05       STB    $05
+77E4: D7 05       STB    sub_state_0005
 77E6: 39          RTS
 77E7: C6 02       LDB    #$02
-77E9: D7 05       STB    $05
+77E9: D7 05       STB    sub_state_0005
 77EB: 39          RTS
 77EC: D6 27       LDB    $27
 77EE: C8 01       EORB   #$01
@@ -2338,19 +2379,19 @@ table_of_jump_tables_7139:
 780E: 31 3F       LEAY   -$1,Y
 7810: 26 F4       BNE    $7806
 7812: 39          RTS
-7813: D6 08       LDB    $08
+7813: D6 08       LDB    sub_sub_state_0008
 7815: 58          ASLB
 7816: CE 78 1B    LDU    #jump_table_781b
 7819: 6E D5       JMP    [B,U]        ; [indirect_jump]
 
-7821: D6 0B       LDB    $0B
+7821: D6 0B       LDB    sub_sub_sub_state_000b
 7823: 58          ASLB
 7824: CE 78 29    LDU    #jump_table_7829
 7827: 6E D5       JMP    [B,U]        ; [indirect_jump]
 
 7833: D6 F0       LDB    $F0
 7835: 26 02       BNE    $7839
-7837: 0C 0B       INC    $0B
+7837: 0C 0B       INC    sub_sub_sub_state_000b
 7839: 39          RTS
 783A: BD 68 DF    JSR    $68DF
 783D: BD 79 46    JSR    $7946
@@ -2359,20 +2400,20 @@ table_of_jump_tables_7139:
 7845: D7 F0       STB    $F0
 7847: CC 01 1A    LDD    #$011A
 784A: BD 69 09    JSR    $6909
-784D: 0C 0B       INC    $0B
+784D: 0C 0B       INC    sub_sub_sub_state_000b
 784F: 39          RTS
 7850: C6 01       LDB    #$01
 7852: D7 F0       STB    $F0
 7854: CC 0E 00    LDD    #$0E00
 7857: BD 69 09    JSR    $6909
-785A: 0C 0B       INC    $0B
+785A: 0C 0B       INC    sub_sub_sub_state_000b
 785C: 39          RTS
 785D: CC 02 25    LDD    #$0225
 7860: BD 69 09    JSR    $6909
 7863: C6 10       LDB    #$10
 7865: D7 0A       STB    $0A
-7867: 0C 08       INC    $08
-7869: 0F 0B       CLR    $0B
+7867: 0C 08       INC    sub_sub_state_0008
+7869: 0F 0B       CLR    sub_sub_sub_state_000b
 786B: 39          RTS
 786C: 53          COMB
 786D: 34 01       PSHS   CC
@@ -2397,9 +2438,9 @@ table_of_jump_tables_7139:
 7892: 9F 22       STX    $22
 7894: BD 6C 33    JSR    $6C33
 7897: C6 02       LDB    #$02
-7899: D7 08       STB    $08
+7899: D7 08       STB    sub_sub_state_0008
 789B: 5F          CLRB
-789C: D7 0B       STB    $0B
+789C: D7 0B       STB    sub_sub_sub_state_000b
 789E: D7 0E       STB    $0E
 78A0: 39          RTS
 78A1: 8D DF       BSR    $7882
@@ -2420,13 +2461,13 @@ table_of_jump_tables_7139:
 78BF: D6 0A       LDB    $0A
 78C1: 26 09       BNE    $78CC
 78C3: C6 02       LDB    #$02
-78C5: D7 08       STB    $08
+78C5: D7 08       STB    sub_sub_state_0008
 78C7: 5F          CLRB
-78C8: D7 0B       STB    $0B
+78C8: D7 0B       STB    sub_sub_sub_state_000b
 78CA: D7 0E       STB    $0E
 78CC: 39          RTS
 
-78CD: D6 0B       LDB    $0B
+78CD: D6 0B       LDB    sub_sub_sub_state_000b
 78CF: 58          ASLB
 78D0: CE 78 D5    LDU    #jump_table_78d5
 78D3: 6E D5       JMP    [B,U]        ; [indirect_jump]
@@ -2435,15 +2476,15 @@ table_of_jump_tables_7139:
 78DD: D7 F0       STB    $F0
 78DF: CC 01 1A    LDD    #$011A
 78E2: BD 69 09    JSR    $6909
-78E5: 0C 0B       INC    $0B
+78E5: 0C 0B       INC    sub_sub_sub_state_000b
 78E7: 39          RTS
 78E8: C6 01       LDB    #$01
 78EA: D7 F0       STB    $F0
 78EC: CC 0E 00    LDD    #$0E00
 78EF: BD 69 09    JSR    $6909
 78F2: 5F          CLRB
-78F3: D7 08       STB    $08
-78F5: D7 0B       STB    $0B
+78F3: D7 08       STB    sub_sub_state_0008
+78F5: D7 0B       STB    sub_sub_sub_state_000b
 78F7: D7 0E       STB    $0E
 78F9: D6 26       LDB    $26
 78FB: 27 0D       BEQ    $790A
@@ -2451,13 +2492,13 @@ table_of_jump_tables_7139:
 7900: 27 08       BEQ    $790A
 7902: BD 77 EC    JSR    $77EC
 7905: C6 01       LDB    #$01
-7907: D7 05       STB    $05
+7907: D7 05       STB    sub_state_0005
 7909: 39          RTS
 790A: D6 60       LDB    nb_lives_0060
 790C: 26 F7       BNE    $7905
 790E: C6 01       LDB    #$01
-7910: D7 02       STB    $02
-7912: 0F 05       CLR    $05
+7910: D7 02       STB    global_state_0002
+7912: 0F 05       CLR    sub_state_0005
 7914: 39          RTS
 7915: 0D 52       TST    $52
 7917: 26 04       BNE    $791D
@@ -2602,6 +2643,7 @@ l_7a14:
 7A63: 7E 79 15    JMP    $7915
 7A66: C6 3F       LDB    #$3F
 7A68: 7E 79 15    JMP    $7915
+
 7A6B: C6 04       LDB    #$04
 7A6D: F7 3E 00    STB    bankswitch_3e00
 7A70: D6 0E       LDB    $0E
@@ -2609,6 +2651,7 @@ l_7a14:
 7A73: CE 7A 78    LDU    #jump_table_7a78
 7A76: 6E D5       JMP    [B,U]        ; [indirect_jump]
 
+init_intro_sequence_7a7e:
 7A7E: 4F          CLRA
 7A7F: 5F          CLRB
 7A80: DD D4       STD    $D4
@@ -2629,8 +2672,10 @@ l_7a14:
 7A9E: 7F 05 2A    CLR    $052A
 7AA1: 0C 0E       INC    $0E
 7AA3: 39          RTS
+
+run_intro_sequence_7aa4:
 7AA4: 8E 05 10    LDX    #$0510
-7AA7: 8D 33       BSR    $7ADC
+7AA7: 8D 33       BSR    init_game_and_intro_scenery_7adc
 7AA9: 8E 15 C2    LDX    #$15C2
 7AAC: BD 7C 42    JSR    $7C42
 7AAF: 8E 08 90    LDX    #$0890
@@ -2641,6 +2686,7 @@ l_7a14:
 7ABE: 8E 05 40    LDX    #$0540
 7AC1: BD F8 3D    JSR    $F83D
 7AC4: 7E F7 B3    JMP    $F7B3
+
 7AC7: BD F7 88    JSR    $F788
 7ACA: 8E 05 10    LDX    #$0510
 7ACD: BD F8 3D    JSR    $F83D
@@ -2648,16 +2694,18 @@ l_7a14:
 7AD3: BD F8 3D    JSR    $F83D
 7AD6: 8E 08 90    LDX    #$0890
 7AD9: 7E F8 3D    JMP    $F83D
+
+; done at each tick during intro, not only at start
+init_game_and_intro_scenery_7adc:
 7ADC: EC 13       LDD    -$D,X
 7ADE: 48          ASLA
 7ADF: CE 7A E4    LDU    #$7AE4
-
 7AEC: C6 01       LDB    #$01
-7AEE: D7 AC       STB    armour_flag_00ac
+7AEE: D7 AC       STB    armour_flag_00ac	; gives armour
 7AF0: D7 DE       STB    $DE
-7AF2: 0F 72       CLR    starting_level_0072
+7AF2: 0F 72       CLR    current_level_0072		; level 1
 7AF4: CC 40 00    LDD    #$4000
-7AF7: DD 6C       STD    background_screen_location_006c
+7AF7: DD 6C       STD    background_screen_location_006c	; shows a fixed scenery in the fields
 7AF9: CC 06 00    LDD    #$0600
 7AFC: BD 69 09    JSR    $6909
 7AFF: CC 00 60    LDD    #$0060
@@ -2670,6 +2718,7 @@ l_7a14:
 7B0F: E7 88 14    STB    $14,X
 7B12: CC 7B 2B    LDD    #$7B2B
 7B15: 7E 7D 43    JMP    $7D43
+
 7B18: C6 01       LDB    #$01
 7B1A: E7 1F       STB    -$1,X
 7B1C: CC 00 40    LDD    #$0040
@@ -2710,6 +2759,7 @@ l_7a14:
 7B82: CC 02 00    LDD    #$0200
 7B85: ED 13       STD    -$D,X
 7B87: 39          RTS
+
 7B88: CE 7B 8E    LDU    #jump_table_7b8e
 7B8B: 58          ASLB
 7B8C: 6E D5       JMP    [B,U]        ; [indirect_jump]
@@ -2782,14 +2832,18 @@ l_7a14:
 7C38: ED 13       STD    -$D,X
 7C3A: 0C 0E       INC    $0E
 7C3C: 39          RTS
+
+mark_intro_as_played_7c3d:
 7C3D: C6 01       LDB    #$01
-7C3F: D7 71       STB    $71
+7C3F: D7 71       STB    game_intro_played_0071
 7C41: 39          RTS
+
 7C42: E6 13       LDB    -$D,X
 7C44: 58          ASLB
 7C45: CE 7C 4A    LDU    #jump_table_7c4a
 7C48: 6E D5       JMP    [B,U]        ; [indirect_jump]
 
+init_intro_7c54:
 7C54: CC 00 70    LDD    #$0070
 7C57: ED 16       STD    -$A,X
 7C59: BD 7B 18    JSR    $7B18
@@ -2797,16 +2851,21 @@ l_7a14:
 7C5E: E7 88 15    STB    $15,X
 7C61: CC 7C 72    LDD    #$7C72
 7C64: 7E 7D 43    JMP    $7D43
+
+and_they_were_happy_until_7c67:
 7C67: 6A 88 15    DEC    $15,X
 7C6A: 26 56       BNE    $7CC2
 7C6C: CC 7C 75    LDD    #$7C75
 7C6F: 7E 7D 43    JMP    $7D43
 
+screen_darkens_7c8e:
 7C8E: F6 05 2A    LDB    $052A
 7C91: 27 2F       BEQ    $7CC2
 7C93: CC 7C 78    LDD    #$7C78
 7C96: 6F 02       CLR    $2,X
 7C98: 7E 7D 43    JMP    $7D43
+
+devil_disappears_7c9b:
 7C9B: 4F          CLRA
 7C9C: 5F          CLRB
 7C9D: ED 10       STD    -$10,X
@@ -2897,6 +2956,8 @@ l_7a14:
 7D7A: F7 05 2A    STB    $052A
 7D7D: 6C 14       INC    -$C,X
 7D7F: 39          RTS
+
+devil_takes_girl_7d80:
 7D80: CE 7D 4E    LDU    #$7D4E
 7D83: BD 94 77    JSR    $9477
 7D86: 33 42       LEAU   $2,U
@@ -3012,7 +3073,7 @@ l_7a14:
 7E91: CC 0A 4E    LDD    #$0A4E
 7E94: ED 19       STD    -$7,X
 7E96: C6 02       LDB    #$02
-7E98: D7 71       STB    $71
+7E98: D7 71       STB    game_intro_played_0071
 7E9A: CC 01 1A    LDD    #$011A
 7E9D: BD 69 09    JSR    $6909
 7EA0: 8E 08 90    LDX    #$0890
@@ -3050,7 +3111,7 @@ l_7a14:
 7EF0: 8E 05 10    LDX    #$0510
 7EF3: BD F8 3D    JSR    $F83D
 7EF6: 7E F7 B3    JMP    $F7B3
-7EF9: 96 0B       LDA    $0B
+7EF9: 96 0B       LDA    sub_sub_sub_state_000b
 7EFB: 48          ASLA
 7EFC: CE 7F 01    LDU    #jump_table_7f01
 7EFF: 6E D6       JMP    [A,U]        ; [indirect_jump]
@@ -3059,7 +3120,7 @@ l_7a14:
 7F06: 5F          CLRB
 7F07: ED 13       STD    -$D,X
 7F09: FD 15 B5    STD    $15B5
-7F0C: 0C 0B       INC    $0B
+7F0C: 0C 0B       INC    sub_sub_sub_state_000b
 7F0E: 39          RTS
 7F0F: A6 13       LDA    -$D,X
 7F11: 48          ASLA
@@ -3138,7 +3199,7 @@ l_7a14:
 7FB4: 39          RTS
 7FB5: C6 02       LDB    #$02
 7FB7: D7 7F       STB    $7F
-7FB9: 0F 0B       CLR    $0B
+7FB9: 0F 0B       CLR    sub_sub_sub_state_000b
 7FBB: 39          RTS
 7FBC: 96 0E       LDA    $0E
 7FBE: 48          ASLA
@@ -5970,8 +6031,8 @@ l_7a14:
 9B51: 7E 9B EA    JMP    $9BEA
 9B54: 01 00       NEG    $00
 9B56: 08 00       ASL    $00
-9B58: 08 02       ASL    $02
-9B5A: 00 08       NEG    $08
+9B58: 08 02       ASL    global_state_0002
+9B5A: 00 08       NEG    sub_sub_state_0008
 9B5C: FF F8 03    STU    $F803
 9B5F: FF F8 FF    STU    $F8FF
 9B62: F8 04 FF    EORB   $04FF
@@ -6787,8 +6848,8 @@ A3A9: A1 C5       CMPA   B,U
 A3AB: 24 02       BCC    $A3AF
 A3AD: 6C A4       INC    ,Y
 A3AF: 39          RTS
-A3B0: 01 02       NEG    $02
-A3B2: 04 05       LSR    $05
+A3B0: 01 02       NEG    global_state_0002
+A3B2: 04 05       LSR    sub_state_0005
 A3B4: D6 A7       LDB    $A7
 A3B6: 27 28       BEQ    $A3E0
 A3B8: 34 20       PSHS   Y
@@ -7616,7 +7677,7 @@ ACEB: EF 1C       STU    -$4,X
 ACED: 6C 15       INC    -$B,X
 ACEF: 39          RTS
 ACF0: 08 00       ASL    $00
-ACF2: 00 08       NEG    $08
+ACF2: 00 08       NEG    sub_sub_state_0008
 ACF4: 6A 07       DEC    $7,X
 ACF6: 26 10       BNE    $AD08
 ACF8: A6 1E       LDA    -$2,X
@@ -10298,7 +10359,7 @@ C75C: 39          RTS
 C75D: A6 88 12    LDA    task_pointer_0012,X
 C760: 81 02       CMPA   #$02
 C762: 27 17       BEQ    $C77B
-C764: 96 72       LDA    starting_level_0072
+C764: 96 72       LDA    current_level_0072
 C766: 81 01       CMPA   #$01
 C768: 27 29       BEQ    $C793
 C76A: DC 5A       LDD    $5A
@@ -10388,7 +10449,7 @@ C83B: BD 68 F9    JSR    $68F9
 C83E: C4 03       ANDB   #$03
 C840: E6 C5       LDB    B,U
 C842: E7 88 13    STB    $13,X
-C845: 96 72       LDA    starting_level_0072
+C845: 96 72       LDA    current_level_0072
 C847: 81 05       CMPA   #$05
 C849: 27 19       BEQ    $C864
 C84B: 81 01       CMPA   #$01
@@ -10426,7 +10487,7 @@ C893: 10 83 01 00 CMPD   #$0100
 C897: 10 22 C7 D9 LBHI   $9074
 C89B: 6C 15       INC    -$B,X
 C89D: 39          RTS
-C89E: 00 02       NEG    $02
+C89E: 00 02       NEG    global_state_0002
 C8A0: 04 00       LSR    $00
 C8A2: 01 00       NEG    $00
 C8A4: 00 03       NEG    $03
@@ -10828,7 +10889,7 @@ CC32: 96 B5       LDA    $B5
 CC34: 27 02       BEQ    $CC38
 CC36: 0A B5       DEC    $B5
 CC38: BD 8E 0C    JSR    $8E0C
-CC3B: D6 72       LDB    starting_level_0072
+CC3B: D6 72       LDB    current_level_0072
 CC3D: C1 05       CMPB   #$05
 CC3F: 27 03       BEQ    $CC44
 CC41: 7E E8 44    JMP    $E844
@@ -12017,7 +12078,7 @@ D6D6: A6 0D       LDA    $D,X
 D6D8: 48          ASLA
 D6D9: CE D7 06    LDU    #jump_table_d706
 D6DC: AD D6       JSR    [A,U]	; [indirect_jump]
-D6DE: D6 72       LDB    starting_level_0072
+D6DE: D6 72       LDB    current_level_0072
 D6E0: C1 02       CMPB   #$02
 D6E2: 27 21       BEQ    $D705
 D6E4: EC 16       LDD    -$A,X
@@ -12093,10 +12154,10 @@ D78B: 0A 0F       DEC    $0F
 D78D: 0A 00       DEC    $00
 D78F: 0A 01       DEC    $01
 D791: 0A 07       DEC    $07
-D793: 0A 08       DEC    $08
+D793: 0A 08       DEC    sub_sub_state_0008
 D795: 00 00       NEG    $00
 D797: CE D7 B5    LDU    #$D7B5
-D79A: 96 72       LDA    starting_level_0072
+D79A: 96 72       LDA    current_level_0072
 D79C: 81 05       CMPA   #$05
 D79E: 27 03       BEQ    $D7A3
 D7A0: CE D7 B1    LDU    #$D7B1
@@ -12107,9 +12168,9 @@ D7A9: E6 C5       LDB    B,U
 D7AB: E7 88 11    STB    $11,X
 D7AE: 6C 15       INC    -$B,X
 D7B0: 39          RTS
-D7B1: 03 02       COM    $02
-D7B3: 03 02       COM    $02
-D7B5: 05 02       LSR    $02
+D7B1: 03 02       COM    global_state_0002
+D7B3: 03 02       COM    global_state_0002
+D7B5: 05 02       LSR    global_state_0002
 D7B7: 05 04       LSR    $04
 D7B9: E6 11       LDB    -$F,X
 D7BB: 27 02       BEQ    $D7BF
@@ -12158,7 +12219,7 @@ D814: 7E A4 27    JMP    $A427
 D817: 39          RTS
 D818: 6A 0A       DEC    $A,X
 D81A: 26 FB       BNE    $D817
-D81C: 96 72       LDA    starting_level_0072
+D81C: 96 72       LDA    current_level_0072
 D81E: 81 05       CMPA   #$05
 D820: 27 42       BEQ    $D864
 D822: D6 EB       LDB    $EB
@@ -12248,7 +12309,7 @@ D8E0: ED 26       STD    $6,Y
 D8E2: 86 01       LDA    #$01
 D8E4: A7 A8 18    STA    $18,Y
 D8E7: 39          RTS
-D8E8: D6 72       LDB    starting_level_0072
+D8E8: D6 72       LDB    current_level_0072
 D8EA: C1 05       CMPB   #$05
 D8EC: 27 1C       BEQ    $D90A
 D8EE: CE D9 47    LDU    #$D947
@@ -12457,7 +12518,7 @@ DAC6: 96 B5       LDA    $B5
 DAC8: 27 02       BEQ    $DACC
 DACA: 0A B5       DEC    $B5
 DACC: BD 8E 0C    JSR    $8E0C
-DACF: D6 72       LDB    starting_level_0072
+DACF: D6 72       LDB    current_level_0072
 DAD1: C1 05       CMPB   #$05
 DAD3: 27 03       BEQ    $DAD8
 DAD5: 7E E8 44    JMP    $E844
@@ -13959,7 +14020,7 @@ E7C7: E6 12       LDB    -$E,X
 E7C9: C1 0C       CMPB   #$0C
 E7CB: 27 06       BEQ    $E7D3
 E7CD: 4A          DECA
-E7CE: D6 72       LDB    starting_level_0072
+E7CE: D6 72       LDB    current_level_0072
 E7D0: 26 01       BNE    $E7D3
 E7D2: 4A          DECA
 E7D3: 48          ASLA
@@ -13992,7 +14053,7 @@ E808: 0C 04       INC    $04
 E80A: E9 28       ADCB   $8,Y
 E80C: 0C 07       INC    $07
 E80E: E9 2C       ADCB   $C,Y
-E810: 0C 08       INC    $08
+E810: 0C 08       INC    sub_sub_state_0008
 E812: E9 30       ADCB   -$10,Y
 E814: 0C 09       INC    $09
 E816: E9 34       ADCB   -$C,Y
@@ -14021,14 +14082,14 @@ E841: E7 15       STB    -$B,X
 E843: 39          RTS
 E844: 0A B6       DEC    $B6
 E846: 26 12       BNE    $E85A
-E848: 96 72       LDA    starting_level_0072
+E848: 96 72       LDA    current_level_0072
 E84A: 81 06       CMPA   #$06
 E84C: 27 03       BEQ    $E851
 E84E: BD 7A 66    JSR    $7A66
 E851: C6 02       LDB    #$02
-E853: D7 08       STB    $08
+E853: D7 08       STB    sub_sub_state_0008
 E855: 4F          CLRA
-E856: 97 0B       STA    $0B
+E856: 97 0B       STA    sub_sub_sub_state_000b
 E858: 97 0E       STA    $0E
 E85A: 39          RTS
 E85B: E6 15       LDB    -$B,X
@@ -14307,7 +14368,7 @@ EB0A: C5 02       BITB   #$02
 EB0C: 27 26       BEQ    $EB34
 EB0E: A6 04       LDA    $4,X
 EB10: CE EB 3C    LDU    #$EB3C
-EB13: D6 72       LDB    starting_level_0072
+EB13: D6 72       LDB    current_level_0072
 EB15: A0 C5       SUBA   B,U
 EB17: 97 E5       STA    $E5
 EB19: 10 8E EF 2D LDY    #$EF2D
@@ -14426,7 +14487,7 @@ EBFE: 8B 15       ADDA   #$15
 EC00: 97 7E       STA    $7E
 EC02: 25 04       BCS    $EC08
 EC04: C6 06       LDB    #$06
-EC06: DB 72       ADDB   starting_level_0072
+EC06: DB 72       ADDB   current_level_0072
 EC08: 39          RTS
 EC09: 10 8E EF 2D LDY    #$EF2D
 EC0D: D6 73       LDB    weapon_type_0073
@@ -14450,11 +14511,11 @@ EC2A: 4C          INCA
 EC2B: 1F 89       TFR    A,B
 EC2D: 39          RTS
 EC2E: C6 0D       LDB    #$0D
-EC30: DB 72       ADDB   starting_level_0072
+EC30: DB 72       ADDB   current_level_0072
 EC32: 39          RTS
 EC33: 34 40       PSHS   U
 EC35: CE EC 52    LDU    #$EC52
-EC38: D6 72       LDB    starting_level_0072
+EC38: D6 72       LDB    current_level_0072
 EC3A: 58          ASLB
 EC3B: EE C5       LDU    B,U
 EC3D: 10 8E 00 7D LDY    #$007D
@@ -14576,7 +14637,7 @@ ED5A: 58          ASLB
 ED5B: 8E ED 60    LDX    #jump_table_ed60
 ED5E: 6E 95       JMP    [B,X]	; [indirect_jump]
 
-ED64: D6 72       LDB    starting_level_0072
+ED64: D6 72       LDB    current_level_0072
 ED66: 58          ASLB
 ED67: 8E ED 88    LDX    #$ED88
 ED6A: 30 85       LEAX   B,X
@@ -14584,7 +14645,7 @@ ED6C: DC 9C       LDD    $9C
 ED6E: 10 A3 84    CMPD   ,X
 ED71: 23 14       BLS    $ED87
 ED73: 8E 6E BB    LDX    #$6EBB
-ED76: D6 72       LDB    starting_level_0072
+ED76: D6 72       LDB    current_level_0072
 ED78: 58          ASLB
 ED79: EC 85       LDD    B,X
 ED7B: DD AA       STD    time_00aa
@@ -14655,7 +14716,7 @@ EE06: 39          RTS
 EE07: C4 18       ANDB   #$18
 EE09: 54          LSRB
 EE0A: 54          LSRB
-EE0B: 96 72       LDA    starting_level_0072
+EE0B: 96 72       LDA    current_level_0072
 EE0D: 48          ASLA
 EE0E: CE EE 13    LDU    #jump_table_ee13
 EE11: 6E D6       JMP    [A,U]	; [indirect_jump]
@@ -14699,7 +14760,7 @@ EEC9: 23 02       BLS    $EECD
 EECB: 86 3F       LDA    #$3F
 EECD: DD 9A       STD    $9A
 EECF: 39          RTS
-EED0: D6 72       LDB    starting_level_0072
+EED0: D6 72       LDB    current_level_0072
 EED2: 58          ASLB
 EED3: 8E EE D8    LDX    #jump_table_eed8
 EED6: 6E 95       JMP    [B,X]	; [indirect_jump]
@@ -15100,7 +15161,7 @@ F79E: BD F7 FB    JSR    $F7FB
 F7A1: BD F7 CF    JSR    $F7CF
 F7A4: BD F8 11    JSR    $F811
 F7A7: BD F7 C3    JSR    $F7C3
-F7AA: D6 72       LDB    starting_level_0072
+F7AA: D6 72       LDB    current_level_0072
 F7AC: C1 06       CMPB   #$06
 F7AE: 26 03       BNE    $F7B3
 F7B0: BD F7 C9    JSR    $F7C9
@@ -15885,8 +15946,8 @@ jump_table_639e:
 	dc.w	$6455	; $63aa
 jump_table_65bc:
 	dc.w	$684f	; $65bc
-	dc.w	$694d	; $65be
-	dc.w	$70e3	; $65c0
+	dc.w	game_not_playing_694d	; $65be
+	dc.w	game_in_play_70e3	; $65c0
 jump_table_6611:
 	dc.w	update_tiles_palette_6619	; $6611
 	dc.w	update_sprites_palette_6693	; $6613
@@ -15899,10 +15960,10 @@ jump_table_6857:
 	dc.w	$68bc	; $685d
 jump_table_695a:
 	dc.w	$69eb	; $695a
-	dc.w	$69fc	; $695c
-	dc.w	$6a4d	; $695e
-	dc.w	$6a8d	; $6960
-	dc.w	$6b5e	; $6962
+	dc.w	display_title_69fc	; $695c
+	dc.w	display_high_scores_6a4d	; $695e
+	dc.w	attract_mode_6a8d	; $6960
+	dc.w	start_game_screen_6b5e	; $6962
 	dc.w	$d622	; $6964
 	dc.w	$da23	; $6966
 	dc.w	$da51	; $6968
@@ -15927,13 +15988,13 @@ jump_table_6b66:
 	dc.w	$6b8e	; $6b68
 	dc.w	$6bf6	; $6b6a
 jump_table_70f1:
-	dc.w	$70fb	; $70f1
-	dc.w	$7115	; $70f3
+	dc.w	init_new_game_70fb	; $70f1
+	dc.w	run_game_7115	; $70f3
 jump_table_711d:
-	dc.w	$7125	; $711d
-	dc.w	$7245	; $711f
-	dc.w	$72c9	; $7121
-	dc.w	$777c	; $7123
+	dc.w	intro_and_get_ready_7125	; $711d
+	dc.w	game_playing_7245	; $711f
+	dc.w	take_a_key_level_complete_72c9	; $7121
+	dc.w	player_dead_777c	; $7123
 jump_table_724d:
 	dc.w	$7251	; $724d
 	dc.w	$72a1	; $724f
@@ -15985,9 +16046,9 @@ jump_table_78d5:
 	dc.w	$7833	; $78d7
 	dc.w	$78e8	; $78d9
 jump_table_7a78:
-	dc.w	$7a7e	; $7a78
-	dc.w	$7aa4	; $7a7a
-	dc.w	$7c3d	; $7a7c
+	dc.w	init_intro_sequence_7a7e	; $7a78
+	dc.w	run_intro_sequence_7aa4	; $7a7a
+	dc.w	mark_intro_as_played_7c3d	; $7a7c
 jump_table_7b36:
 	dc.w	$7b4a	; $7b36
 	dc.w	$7b64	; $7b38
@@ -16004,11 +16065,11 @@ jump_table_7bd8:
 	dc.w	$7c19	; $7bde
 	dc.w	$7c2e	; $7be0
 jump_table_7c4a:
-	dc.w	$7c54	; $7c4a
-	dc.w	$7c67	; $7c4c
-	dc.w	$7c8e	; $7c4e
-	dc.w	$7d80	; $7c50
-	dc.w	$7c9b	; $7c52
+	dc.w	init_intro_7c54	; $7c4a
+	dc.w	and_they_were_happy_until_7c67	; $7c4c
+	dc.w	screen_darkens_7c8e	; $7c4e
+	dc.w	devil_takes_girl_7d80	; $7c50
+	dc.w	devil_disappears_7c9b	; $7c52
 jump_table_7ca8:
 	dc.w	$7cac	; $7ca8
 	dc.w	$7cba	; $7caa
@@ -16022,9 +16083,9 @@ jump_table_7cd6:
 	dc.w	$7daa	; $7ce2
 jump_table_7d58:
 	dc.w	$7d5c	; $7d58
-	dc.w	$7d80	; $7d5a
+	dc.w	devil_takes_girl_7d80	; $7d5a
 jump_table_7dd8:
-	dc.w	$7a7e	; $7dd8
+	dc.w	init_intro_sequence_7a7e	; $7dd8
 	dc.w	$7ddc	; $7dda
 jump_table_7dfb:
 	dc.w	$7e01	; $7dfb
@@ -17134,14 +17195,14 @@ jump_table_6188:
 	dc.w	$ffff   ; bogus auto-insert
 
 jump_table_7147:
-	dc.w	$7159	   ; $7147
-	dc.w	$7180	   ; $7149
+	dc.w	init_game_intro_sequence_7159	   ; $7147 game intro with princess
+	dc.w	run_game_intro_sequence_7180	   ; $7149
 jump_table_714b:
-	dc.w	$7197    ; $714b
-	dc.w	$71ac    ; $714d
-	dc.w	$71c7    ; $714f
+	dc.w	init_restart_7197    ; $714b for all levels except last
+	dc.w	continue_restart_71ac    ; $714d
+	dc.w	do_restart_71c7    ; $714f
 jump_table_7151:
-	dc.w	$7197    ; $7151
-	dc.w	$71ac    ; $7153
-	dc.w	$71fa    ; $7155
-	dc.w	$732a    ; $7157	
+	dc.w	init_restart_7197    ; $7151 for last level
+	dc.w	continue_restart_71ac    ; $7153
+	dc.w	do_restart_last_level_71fa    ; $7155
+	dc.w	$ffff    ; contains 732a but prob. bogus    ; $7157	
