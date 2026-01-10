@@ -17,7 +17,7 @@ used_sprite_cluts_file = this_dir / "used_sprite_cluts.json"
 fg_used_tile_cluts_file = this_dir / "fg_used_tile_cluts.json"
 used_graphics_dir = this_dir / "used_graphics"
 
-NB_SPRITES = 0x100
+SPRITE_NB_TILES = 0x400
 FG_NB_TILES = 0x400
 FG_NB_CLUTS = 16
 BG_NB_TILES = 0x400
@@ -48,11 +48,35 @@ player_sprite_pairs = set()
 
 group_sprite_pairs = player_sprite_pairs
 
+
+def add_tile(table,index,cluts=[0],merge_cluts=True):
+    if isinstance(index,range):
+        pass
+    elif not isinstance(index,(list,tuple)):
+        index = [index]
+    for idx in index:
+        cluts = list(cluts)
+        if idx in table and merge_cluts:
+            cluts += table[idx]
+        table[idx] = sorted(set(cluts))
+
+
+
+def read_used_tiles(used_tiles_name,tile_cluts,nb_tiles,nb_cluts):
+    with open(used_graphics_dir / used_tiles_name,"rb") as f:
+        for index in range(nb_tiles):
+            d = f.read(nb_cluts)
+            cluts = [i for i,c in enumerate(d) if c]
+            if cluts:
+                add_tile(tile_cluts,index,cluts=cluts)
+
+
 def get_sprite_names():
 
     rval = {i:"armored_arthur" for i in list(range(0,0x30))+[0x36,0x37,0x3E,0x3F]}
 
     rval.update({i+0x100:"underwear_arthur" for i in rval})
+    rval[0x26E] = rval[0x26F] = rval[0x266] = rval[0x267] = "lying_arthur"
 
     atl = list(range(0x150,0x154))+list(range(0x158,0x15C))
     rval.update({i:"arthur_top_ladder" for i in atl})
@@ -64,6 +88,8 @@ def get_sprite_names():
     rval[0x134] = "blank"
     rval[0x132] = "armor"
     rval[0x13D] = "armor"
+    rval[0x23C] = rval[0x23D] = "princess"
+    rval[0x233] = rval[0x234] = "princess"
 
     #rval.update({i:"armored_arthur" for i in range()})
 

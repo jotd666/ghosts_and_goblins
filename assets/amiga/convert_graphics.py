@@ -131,57 +131,16 @@ all_tile_cluts = False
 
 
 
-def add_tile(table,index,cluts=[0],merge_cluts=True):
-    if isinstance(index,range):
-        pass
-    elif not isinstance(index,(list,tuple)):
-        index = [index]
-    for idx in index:
-        cluts = list(cluts)
-        if idx in table and merge_cluts:
-            cluts += table[idx]
-        table[idx] = sorted(set(cluts))
 
 sprite_cluts = {}
 fg_tile_cluts = {}
 bg_tile_cluts = {}
 
-##try:
-##    with open(used_graphics_dir / "used_sprites","rb") as f:
-##        for index in range(NB_SPRITES):
-##            d = f.read(16)
-##            cluts = [i for i,c in enumerate(d) if c]
-##            if cluts:
-##                add_tile(sprite_cluts,index,cluts=cluts)
-##except OSError:
-##    print("Cannot find used_sprites")
 
+read_used_tiles("fg_used_tiles",fg_tile_cluts,FG_NB_TILES,FG_NB_CLUTS)
+read_used_tiles("bg_used_tiles",bg_tile_cluts,BG_NB_TILES,BG_NB_CLUTS)
+read_used_tiles("used_sprites",sprite_cluts,SPRITE_NB_TILES,SPRITE_NB_CLUTS)
 
-if all_tile_cluts:
-    tile_cluts = None
-else:
-    try:
-        with open(used_graphics_dir / "fg_used_tiles","rb") as f:
-            for index in range(FG_NB_TILES):
-                d = f.read(FG_NB_CLUTS)
-                cluts = [i for i,c in enumerate(d) if c]
-                if cluts:
-                    add_tile(fg_tile_cluts,index,cluts=cluts)
-    except OSError:
-        pass
-
-if all_tile_cluts:
-    tile_cluts = None
-else:
-    try:
-        with open(used_graphics_dir / "bg_used_tiles","rb") as f:
-            for index in range(BG_NB_TILES):
-                d = f.read(BG_NB_CLUTS)
-                cluts = [i for i,c in enumerate(d) if c]
-                if cluts:
-                    add_tile(bg_tile_cluts,index,cluts=cluts)
-    except OSError:
-        pass
 
 # now gather all cluts used by letter/digit tiles, logging probably
 # missed some
@@ -282,7 +241,11 @@ if dump_it:
 sprite_sheet_dict = {i:Image.open(sheets_path / "sprites" / f"pal_{i:02x}.png") for i in range(SPRITE_NB_CLUTS)}
 fg_tile_sheet_dict = {i:Image.open(sheets_path / "fg_tiles" / f"pal_{i:02x}.png") for i in range(FG_NB_CLUTS)}
 bg_tile_sheet_dict = {i:Image.open(sheets_path / "bg_tiles" / f"pal_{i:02x}.png") for i in range(BG_NB_CLUTS)}
+sprite_sheet_dict = {i:Image.open(sheets_path / "sprites" / f"pal_{i:02x}.png") for i in range(SPRITE_NB_CLUTS)}
 
+###############
+# foreground
+###############
 fg_tile_palette = set()
 fg_tile_set_list = []
 
@@ -304,6 +267,10 @@ fg_tile_palette = sorted(set(fg_replacement_dict.values()))
 print(f"Used fg tile colors: {len(fg_tile_palette)}")
 
 fg_tile_palette += (16-len(fg_tile_palette)) * [(0x10,0x20,0x30)]
+
+###############
+# background
+###############
 
 bg_tile_palette = set()
 bg_tile_set_list = []
@@ -327,25 +294,31 @@ bg_tile_palette += (32-len(bg_tile_palette)) * [(0x10,0x20,0x30)]
 
 print(f"Used bg tile colors: {len(bg_tile_palette)}")
 
+###############
+# sprites
+###############
+
 sprite_palette = set()
-sprite_set_list = [[] for _ in range(SPRITE_NB_CLUTS)]
-hw_sprite_set_list = []
+sprite_set_list = []
 
-sprite_dump_dir = dump_dir / "sprites"
+for i,tsd in sprite_sheet_dict.items():
+    tp,tile_set = load_tileset(tsd,i,16,16,"sprites",dump_dir,dump=dump_it,
+    cluts=sprite_cluts,
+    name_dict=get_sprite_names(),
+    is_bob=True)
+    sprite_set_list.append(tile_set)
+    sprite_palette.update(tp)
 
-for p in sprite_dump_dir.glob("*"):
-    p.unlink()
-sprite_dump_dir.mkdir(exist_ok=True)
+if len(sprite_palette)>32:
+    print(f"Too many colors in sprite tiles ({len(sprite_palette)}), quantizing")
+    sprite_replacement_dict = quantize_palette(sprite_palette,"sprite_tiles",32,transparent=None,dump_it=dump_it)
+    sprite_palette = sorted(set(sprite_replacement_dict.values()))
+    apply_color_replacement(sprite_set_list,sprite_replacement_dict)
+else:
+    sprite_palette = sorted(sprite_palette)
 
-cluts = sprite_cluts
+sprite_palette += (32-len(sprite_palette)) * [(0x10,0x20,0x30)]
 
-##for clut_index,tsd in sprite_sheet_dict.items():
-##    # BOBs
-##
-##    sp,sprite_set = load_tileset(tsd,clut_index,16,16,"sprites",dump_dir,dump=dump_it,
-##    name_dict=sprite_names,cluts=sprite_cluts,is_bob=True)
-##    sprite_set_list[clut_index] = sprite_set
-##    sprite_palette.update(sp)
 
 
 
@@ -461,13 +434,11 @@ def read_tileset(img_set_list,palette,plane_orientation_flags,cache,is_bob,nb_cl
     return new_tile_table,next_cache_id
 
 tile_plane_cache = {}
+bob_plane_cache = {}
 fg_tile_table,next_cache_id = read_tileset(fg_tile_set_list,fg_tile_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=FG_NB_CLUTS)
 bg_tile_table,_ = read_tileset(bg_tile_set_list,bg_tile_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=BG_NB_CLUTS,next_cache_id=next_cache_id)
+sprite_table,_ = read_tileset(sprite_set_list,sprite_palette,[True,False,False,False],cache=bob_plane_cache, is_bob=True, nb_cluts=SPRITE_NB_CLUTS)
 
-bob_plane_cache = {}
-
-
-#sprite_table = read_tileset(sprite_set_list,full_palette[16:],[True,False,True,False],cache=bob_plane_cache, is_bob=True)
 
 
 
@@ -477,6 +448,8 @@ with open(src_dir / "palette.68k","w") as f:
     bitplanelib.palette_dump(fg_tile_palette,f,bitplanelib.PALETTE_FORMAT_ASMGNU)
     f.write("bg_tile_palette:\n")
     bitplanelib.palette_dump(bg_tile_palette,f,bitplanelib.PALETTE_FORMAT_ASMGNU)
+    f.write("sprite_palette:\n")
+    bitplanelib.palette_dump(sprite_palette,f,bitplanelib.PALETTE_FORMAT_ASMGNU)
 
 ##gs_array = [0]*NB_SPRITES
 ##for i in group_sprite_pairs:
@@ -549,11 +522,15 @@ with open(src_dir / "graphics_aga.68k","w") as f:
 
 
 
+
+
     for k,v in tile_plane_cache.items():
         f.write(f"tile_plane_{v:02d}:")
         dump_asm_bytes(k,f)
 
-    sprite_table = []  # TEMP
+
+    f.write("bob_table:\n")
+
     f.write("bob_table:\n")
     for i,tile_entry in enumerate(sprite_table):
         f.write("\t.long\t")
