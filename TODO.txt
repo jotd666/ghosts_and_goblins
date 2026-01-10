@@ -1,12 +1,16 @@
+- cpu log: control should be able to log with SR=x3xx or SR=x0xx
+  here we want to avoid logging within the interrupt
+- why purple flashes? all chars are logged properly
+- character masks wrong: magenta all over, should work as not DPF: test again!
 - devil_takes_girl_7d80 yet to reach
-- log sprites (start, seem to work)
-- one of the "start" pic looks wrong
+- one of the "start" pic looks wrong: scrolling != 0?
 - start game: game seems to lock up 6330-635E somewhere: reverse startup phase
 - log tiles (per level): with zone filtering (first level only upper part)
+- group sprite tiles
 - division by zero at some point, see what it does on real code FED8
-- find the "background" color in sprite pics to be able to rip sprites with non-black
-  background else we're stuck
-- contexts using tile palette values or current level values
+- contexts using tile palette values or current level values (tile colors?)
+  switch tile palette / tile set when palette matches the level
+  caution: intro screen map has its own palette too
 - use 16-bit table for mirror
 - fg tiles color reduction is too violent, maybe do a manual reduction
   or dynamic color change between scores and in-game, try to keep the

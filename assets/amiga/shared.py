@@ -84,15 +84,37 @@ def get_sprite_names():
 
     rval.update({i:"arthur_losing_armor" for i in [0x130,0x131,0x138,0x139]})
 
+    rval[0x7F] = "coin_bonus"
+    rval[0x8F] = "bag_bonus"
+    rval[0x257] = "star_bonus"
+    rval[0x277] = "king_bonus"
+    rval[0x27F] = "pot"
+
+    rval[0x1b6] = "plant_bullet"
     rval[0x132] = "armor"
     rval[0x134] = "blank"
     rval[0x132] = "armor"
     rval[0x13D] = "armor"
-    rval[0x23C] = rval[0x23D] = "princess"
+    rval[0x90] = rval[0x98] = "earth"
+    rval[0x23B] = rval[0x23C] = rval[0x23D] = "princess"
     rval[0x233] = rval[0x234] = "princess"
 
     #rval.update({i:"armored_arthur" for i in range()})
 
+
+    rval.update({i:"score" for i in range(0x31,0x36)})
+    rval.update({i:"score" for i in range(0x3a,0x3e)})
+    rval.update({i:"frog" for i in range(0x42,0x50)})
+    rval.update({i:"dragon" for i in range(0x240,0x250)})
+    rval.update({i:"skeleton" for i in range(0xa0,0xa8)})
+    rval.update({i:"zombie" for i in range(0xa8,0xc0)})
+    rval.update({i:"bat" for i in range(0xe0,0xe4)})
+    rval.update({i:"bat" for i in range(0xe8,0xec)})
+    rval.update({i:"plant" for i in range(0xd0,0xd5)})
+    rval.update({i:"plant" for i in range(0xd8,0xdd)})
+    rval.update({i:"crow" for i in range(0xc0,0xd0)})
+    rval.update({i:"tombstone" for i in range(0x172,0x178)})
+    rval.update({i:"tombstone" for i in range(0x17A,0x180)})
     rval.update({i:"ice_platform" for i in range(0x160,0x163)})
     rval.update({i:"earth_platform" for i in range(0x168,0x16A)})
     rval.update({i:"small_goblin" for i in range(0xF0,0xF6)})

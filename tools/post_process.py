@@ -396,13 +396,16 @@ for i,line in enumerate(lines):
         # change loop count register
         line = change_instruction("subq.b\t#1,d7",lines,i)
 
-##    if address == 0x65C4:
-##        line = change_instruction("DISABLE_LOG_REGS",lines,i)
-##    elif address == 0x65fa:
-##        line = "\tREENABLE_LOG_REGS\n"+line
+    if address == 0x65C4:
+        line = change_instruction("DISABLE_LOG_REGS",lines,i)
+    elif address == 0x65fa:
+        line = "\tREENABLE_LOG_REGS\n"+line
 ##    elif address == 0x62AB:
 ##        pass
+## force same pic in "start" screen
 ##        line = "\tGET_ADDRESS 0x6C\n\tmove.w #0x4006,(a0)\n\tENABLE_LOG_REGS\n"+line
+    elif address == 0x7c54:
+        line = "\tENABLE_LOG_REGS\n"+line
 
     ### end of stack management change
 

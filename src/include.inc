@@ -76,8 +76,8 @@
 	.endm
 
 	.macro	SEX
-	move.b	d1,d0
-	ext.w	d0
+	ext.w	d1
+	MAKE_A
 	.endm
 
 	.macro	MAKE_D
@@ -179,11 +179,15 @@
 	.macro    JXX_A_INDEXED    inst,reg
 	and.w    #0xFF,d0  | mask 8 bits
 	*CHECK_MAX    d0,\nb_cases
+	move.w	d0,0x112
+	move.l	\reg,0x114
 	\inst    ([\reg,d0.W*2])
 	.endm
 
 	.macro    JXX_B_INDEXED    inst,reg
 	and.w    #0xFF,d1  | mask 8 bits
+	move.w	d1,0x112
+	move.l	\reg,0x114
 	*CHECK_MAX    d1,\nb_cases
 	\inst    ([\reg,d1.W*2])
 	.endm

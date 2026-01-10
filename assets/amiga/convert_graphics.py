@@ -14,7 +14,7 @@ possible_hw_sprites = set()
 # uncomment to disable hw sprites completely
 #possible_hw_sprites = set()
 
-magenta = (254,0,254)
+magenta = (255,0,255)
 
 
 dump_it = True
@@ -87,11 +87,6 @@ dump=False,name_dict=None,cluts=None,tile_number=0,is_bob=False):
             tile_number += 1
 
     if is_bob:
-        # special case for cursor & scores: black should be transparent
-        for idx in [0x31,0x16a,0x163]:
-            tile = tileset_1[idx]
-            if tile:
-                bitplanelib.replace_color(tile,{(0,0,0)},magenta)
 
         # rework & dump grouped / non grouped sprites
         # rework tiles which are grouped
@@ -311,7 +306,7 @@ for i,tsd in sprite_sheet_dict.items():
 
 if len(sprite_palette)>32:
     print(f"Too many colors in sprite tiles ({len(sprite_palette)}), quantizing")
-    sprite_replacement_dict = quantize_palette(sprite_palette,"sprite_tiles",32,transparent=None,dump_it=dump_it)
+    sprite_replacement_dict = quantize_palette(sprite_palette,"sprite_tiles",32,transparent=magenta,dump_it=dump_it)
     sprite_palette = sorted(set(sprite_replacement_dict.values()))
     apply_color_replacement(sprite_set_list,sprite_replacement_dict)
 else:
@@ -322,7 +317,7 @@ sprite_palette += (32-len(sprite_palette)) * [(0x10,0x20,0x30)]
 
 
 
-sprite_palette = sorted(sprite_palette)
+##sprite_palette = sorted(sprite_palette)
 ##magi = sprite_palette.index(magenta)
 ##sprite_palette.pop(magi)
 ### temporary: put magenta as first color to be able to decode the frames properly
@@ -440,8 +435,6 @@ bob_plane_cache = {}
 fg_tile_table,next_cache_id = read_tileset(fg_tile_set_list,fg_tile_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=FG_NB_CLUTS)
 bg_tile_table,_ = read_tileset(bg_tile_set_list,bg_tile_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=BG_NB_CLUTS,next_cache_id=next_cache_id)
 sprite_table,_ = read_tileset(sprite_set_list,empty_32_cols+sprite_palette,[True,False,False,False],cache=bob_plane_cache, is_bob=True, nb_cluts=SPRITE_NB_CLUTS)
-
-
 
 
 
@@ -575,7 +568,7 @@ with open(src_dir / "graphics_aga.68k","w") as f:
                     else:
                         raise Exception(f"height not found for {name}!!")
                     for orientation,_ in plane_orientations:
-                        if orientation in t:
+                        if orientation == "standard":
                             f.write("* orientation={}\n".format(orientation))
                             active_planes = 0
                             bitplanes = t[orientation]["bitplanes"]
@@ -592,12 +585,12 @@ with open(src_dir / "graphics_aga.68k","w") as f:
                                 else:
                                     f.write("0")
                                 f.write("\n")
-                        elif orientation == "mirror":
-                            f.write(f"\t.word\t-1  | no mirror declared\n")
+
 
     f.write("\t.section\t.datachip\n")
 
     for k,v in bob_plane_cache.items():
+        f.write(f"\t.word\t0    | plane {v:02d} orientation\n")
         f.write(f"bob_plane_{v:02d}:")
         dump_asm_bytes(k,f)
 

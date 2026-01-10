@@ -92,6 +92,9 @@ TARGET_SPRITE_ATTRIBUTES = 1
 TARGET_SPRITE_CODE = 0
 TARGET_SPRITE_SIZEOF = 4
 
+MIRROR_BIT = 2
+FLIT_BIT = 3
+
 	.ifdef	RELEASE
 
 OPT_ENABLE_LOGGING = 0           | DO NOT CHANGE THIS
@@ -453,12 +456,12 @@ _user:
 	
 	lea		bg_tile_palette,a0
 	move.l	color_copper_pointers,a1	| entries 0-31
-	move.w	#TOTAL_NB_COLORS,d0
+	move.w	#TOTAL_NB_COLORS/2,d0
 	jbsr	load_palette
 	
 	lea		sprite_palette,a0
-	move.l	color_copper_pointers+TOTAL_NB_COLORS*2,a1	| entries 32-64
-	move.w	#TOTAL_NB_COLORS,d0
+	move.l	color_copper_pointers+TOTAL_NB_COLORS/2*4,a1	| entries 32-64
+	move.w	#TOTAL_NB_COLORS/2,d0
 	jbsr	load_palette
 	
 	
@@ -792,6 +795,9 @@ _nmi:
 	rts
 	
 level3_interrupt:
+	.ifndef	RELEASE
+	move.l	(2,a7),interrupted_code_pc
+	.endif
 	* disable osd context switch
 	* we must not save d5 or change stack from an osd call from an interrupt
 	addq.b	#1,osd_entry_count
@@ -906,6 +912,16 @@ level3_interrupt:
     movem.l (a7)+,d0-d7/a0-a6
 	* enable osd context switch
     subq.b	#1,osd_entry_count
+ 	.ifndef	RELEASE
+	move.l	d0,-(a7)
+	move.l	(6,a7),d0
+	move.l	d0,0x120
+	cmp.l	interrupted_code_pc,d0
+	jeq		4f
+	BREAKPOINT	"interrupt PC value changed!"
+4:
+	move.l	(a7)+,d0
+	.endif
     rte
 	
 	
@@ -1112,42 +1128,41 @@ blit_background:
 *}
 
 really_update_sprites:
-	rts
 
 	***********************
 	* erase previous BOBs *
 	***********************
 	
-	move.l	bob_previous_drawed_sprites(pc),a4
-	lea		_custom,a5
-	
-
-
-	* clear previous positions
-	lea	background_restore_buffer,a0
-	move.l	playfield_drawed_screen_ptr(pc),a1
-	move.w	#NB_TARGET_SPRITES-1,d7
-	WAIT_BLIT
-	move.l	#-1,bltalwm(a5)		| needed for blit_background
-1:
-	move.w	(a4),d0
-	bmi.b	11f		| x=0: inactive
-	move.w	(2,a4),d1
-	cmp.w	#BG_NB_LINES,d1
-	jcc		11f				| too low: discard
-	and.w	#0x1F0,d0		| align on 16 lower bound
-	* clear area where the sprite was
-	move.l	#-1,(a4)+			| ack deletion by setting -1 in X & Y
-	move.w	(a4)+,d4			| height
-	move.w	(a4)+,d2		| width
-				
-	bsr		blit_background
-	dbf		d7,1b	
-	bra.b	12f
-11:
-	addq	#PREVIOUS_SPRITE_SIZE,a4
-	dbf		d7,1b
-12:	
+*	move.l	bob_previous_drawed_sprites(pc),a4
+*	lea		_custom,a5
+*	
+*
+*
+*	* clear previous positions
+*	lea	background_restore_buffer,a0
+*	move.l	playfield_drawed_screen_ptr(pc),a1
+*	move.w	#NB_TARGET_SPRITES-1,d7
+*	WAIT_BLIT
+*	move.l	#-1,bltalwm(a5)		| needed for blit_background
+*1:
+*	move.w	(a4),d0
+*	bmi.b	11f		| x=0: inactive
+*	move.w	(2,a4),d1
+*	cmp.w	#BG_NB_LINES,d1
+*	jcc		11f				| too low: discard
+*	and.w	#0x1F0,d0		| align on 16 lower bound
+*	* clear area where the sprite was
+*	move.l	#-1,(a4)+			| ack deletion by setting -1 in X & Y
+*	move.w	(a4)+,d4			| height
+*	move.w	(a4)+,d2		| width
+*				
+*	bsr		blit_background
+*	dbf		d7,1b	
+*	bra.b	12f
+*11:
+*	addq	#PREVIOUS_SPRITE_SIZE,a4
+*	dbf		d7,1b
+*12:	
 
 
 	*********************
@@ -1155,14 +1170,13 @@ really_update_sprites:
 	*********************
 	
 
-	move.l	bobs_ptr,d0
-	jeq		20f
+
 	GET_MEMORY_START_AND_DP
 	lea		(SPRITE_ADDRESS,a6),a0
 	*lea		mockup,a0
     lea _custom,A5
 	move.l	bob_previous_drawed_sprites(pc),a6
-	move.l		d0,a4
+	lea		bob_table,a4
 	
 	moveq	#NB_TARGET_SPRITES-1,d7
 1:
@@ -1174,16 +1188,13 @@ really_update_sprites:
 	
 compute_sprite_xy_code:
 	moveq	#0,d0
-	* sx = ((m_spriteram[i + 3] + 8) & 0xff) - 7;
+	* attributes = buffered_spriteram[offs + 1]
+	* sx = buffered_spriteram[offs + 3] - 0x100 * (attributes & 0x01)
+
 	move.b	(TARGET_SPRITE_X,a0),d0
-	addq	#8,d0
-	and.w	#0xFF,d0
-	subq	#7,d0
-	* sy = 240 - m_spriteram[i];
 	moveq	#0,d1
 	move.b	(TARGET_SPRITE_Y,a0),d1
-	neg.w	d1
-	add.w	#240,d1
+
 
 	.ifne	SPRITE_Y_CORRECTION
 	add.w	#SPRITE_Y_CORRECTION,d1
@@ -1191,60 +1202,49 @@ compute_sprite_xy_code:
 	.ifne	SPRITE_X_CORRECTION
 	add.w	#SPRITE_X_CORRECTION,d0
 	.endif
+	
+	* tile_code = buffered_spriteram[offs] + ((attributes << 2) & 0x300)
 	moveq	#0,d2
 	move.b	(TARGET_SPRITE_ATTRIBUTES,a0),d2
-	and.b	#7,d2
-	lsl.w	#8,d2
+	and.b	#0xC0,d2
+	lsl.w	#2,d2
 	move.b	(TARGET_SPRITE_CODE,a0),d2
+	
 	rts
 	
 update_one_bob:
 
 	move.l	A0,-(a7)
 	* Y/X = 0xF8 (raw): nothing displayed
-	cmp.l	#0xF80000F8,(a0)
+	cmp.w	#0xF8F8,(a0)
 	jeq		2f
 0:
-
 	jbsr	compute_sprite_xy_code
 		
-
-	* handle vertical grouping (that game imposes)
-	lea		sprite_size_table(pc),a3
-	move.b	(a3,d2.w),d4
-	* code times 2
-	add.w	d2,d2
-	
-	cmp.b	#2,d4
-	jeq		2f			| don't draw second part
-	cmp.b	#1,d4
-	jne		10f
-	* double size: sub 16 from y
-	sub.w	#0x10,d1
-10:
-	* handle custom amiga horizontal grouping (saves a lot of blitter masking)
-	* the table holds several info bits
-	* - if 0, this is a normal sprite, no horizontal grouping (note: we are lucky as 0 is a normal sprite :))
-	* - if >0, this is a grouped sprite, repeats the sprite number in the table, only display if not mirrored
-	* - if <0, this is the other half part of the sprite, only display if mirrored
-	* that's why we negate the value if mirror (saves a lot of combinations) and test if positive in all cases
 	move.b	(TARGET_SPRITE_ATTRIBUTES,a0),d3
-	lea		sprite_group_table(pc),a3
-	move.w	(a3,d2.w),d4
-	jeq		10f			| nothing to do
 
-
-	btst	#6,d3
-	jne		101f
-	* mirror: negate the code
-	neg		d4	
-101:
-	tst		d4
-	jmi		2f		| no need to draw this part, the other part will do it
-	move.w	d4,d2	| get the real sprite code to draw
-	add.w	d2,d2	| code times 2
-10:
-	add.w	d2,d2				| code times 4 now
+***	* handle custom amiga horizontal grouping (saves a lot of blitter masking)
+***	* the table holds several info bits
+***	* - if 0, this is a normal sprite, no horizontal grouping (note: we are lucky as 0 is a normal sprite :))
+***	* - if >0, this is a grouped sprite, repeats the sprite number in the table, only display if not mirrored
+***	* - if <0, this is the other half part of the sprite, only display if mirrored
+***	* that's why we negate the value if mirror (saves a lot of combinations) and test if positive in all cases
+***	lea		sprite_group_table(pc),a3
+***	move.w	(a3,d2.w),d4
+***	jeq		10f			| nothing to do
+***
+***
+***	btst	#6,d3
+***	jne		101f
+***	* mirror: negate the code
+***	neg		d4	
+***101:
+***	tst		d4
+***	jmi		2f		| no need to draw this part, the other part will do it
+***	move.w	d4,d2	| get the real sprite code to draw
+***	add.w	d2,d2	| code times 2
+***10:
+***	add.w	d2,d2				| code times 4 now
 
 *	move.w	d2,-(a7)
 *	lsr.w	#2,d2
@@ -1252,18 +1252,22 @@ update_one_bob:
 *	move.w	d2,0x110
 *	move.w	(a7)+,d2
 	
+	add.w	d2,d2
+	add.w	d2,d2
+
+	move.b	#0,0x110
+	
 	move.l	(a4,d2.w),d4		| get pointer from bob table
 	.ifdef	RELEASE
 	jeq		2f				| can theorically happen as sprite update is not atomic (it could be...)
 	.else
 	jne		100f
 	* in dev mode, break if we try to display a non-existing bob
-	* we have the table (0,1,2) but if we forgot to register a bob
-	* then we could miss out some sprite
+
 	moveq	#0,d2
 	move.b	(TARGET_SPRITE_ATTRIBUTES,a0),d2
-	and.b	#7,d2
-	lsl.w	#8,d2
+	and.b	#0XC0,d2
+	lsl.w	#2,d2
 	move.b	(TARGET_SPRITE_CODE,a0),d2
 	COLOR0_FLASH	0xF00
 	*BREAKPOINT	"unregistered sprite clut (D2=code)"
@@ -1275,8 +1279,10 @@ update_one_bob:
 	move.l	d4,a0
 	moveq	#0,d2
 	move.b	d3,d2
-	and.b	#0x38,d2
-	lsr.w	#1,d2		| attribute times 4
+	lsr.b	#4,d2
+	and.b	#0x3,d2
+	add.w	d2,d2
+	add.w	d2,d2
 	move.l	(a0,d2.w),d4
 	jeq		2f		| invalid clut: can happen in transition phases
 	move.l	d4,a0
@@ -1287,7 +1293,7 @@ update_one_bob:
 *	* mirror
 *	add.w	#((NB_PLAYFIELD_PLANES+1)*4+8),a0
 
-	btst	#6,d3
+	btst	#MIRROR_BIT,d3
 	seq		d3		| convert attribute to boolean 0/ff for mirror_sprite_planes
 
 
@@ -1297,13 +1303,13 @@ update_one_bob:
 	* A0 points on the first bitplane of the bob
 	addq 	#2,a0
 
-	jbsr	mirror_sprite_planes
+	*jbsr	mirror_sprite_planes
 	
 	* BOBs must follow screen scroll
-	add.w	scroll_y,d1
-	add.w	scroll_x_lo,d0
-	add.w	scroll_x_hi,d0
-	and.w	#0x1FF,d0
+	*add.w	scroll_y,d1
+	*add.w	scroll_x_lo,d0
+	*add.w	scroll_x_hi,d0
+	*and.w	#0x1FF,d0
 	
 	* D0 and D1 are already set
 	move.l	(NB_PLAYFIELD_PLANES*4,a0),d2
@@ -1384,7 +1390,7 @@ mirror_sprite_planes:
 	* if required. This is slow but saves memory
 	lea		mirror_table,a1
 	moveq	#0,d2
-	moveq	#NB_PLAYFIELD_PLANES+1-1,d6
+	moveq	#NB_PLAYFIELD_PLANES+1-1,d6   | mirror mask plane too
 	lea		mirror_function_table(pc),a3
 0:
 	move.l	(a0)+,d1		| current plane data
@@ -1573,7 +1579,11 @@ clear_planes_any_blitter_internal:
 	move.l a1,bltdpt(a5)	|destination top left corner
 	move.w  d4,bltsize(a5)	|rectangle size, starts blit
 32:
+	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
+	add.l	#BG_SCREEN_PLANE_SIZE,a1
+	.else
 	add.w	#BG_SCREEN_PLANE_SIZE,a1
+	.endif
 	dbf		d3,3b
 4:
 	rts
@@ -1690,7 +1700,7 @@ blit_planes_any_internal_cookie_cut:
 	move.l	a1,bltcpt(a5)	|pristine background top (bottom) left corner
 	move.l	a1,bltdpt(a5)	|destination top (bottom) left corner
 	move.w  d4,bltsize(a5)	|rectangle size, starts blit
-	add.w		#BG_SCREEN_PLANE_SIZE,a1
+	add.l		#BG_SCREEN_PLANE_SIZE,a1
 	WAIT_BLIT
 	dbf		d3,6b
 7:
@@ -3626,13 +3636,7 @@ osd_log_cpu:
 	CHECK_ZERO_MSW	d3		| Y
 	CHECK_ZERO_MSW	d4		| U
 	CHECK_ZERO_MSW	d5		| S
-	cmp.W	#0x4040,d5
-	jne	0f
-	move.w	(6,a7),d7
-	cmp.w	#0x6755,d7
-	jcs		0f
-	move.b	#0,0x110
-0:
+
 *	check that stack is in RAM
 *   we had to disable it because at some point the game uses
 *   puls/pulu to read data
@@ -3648,6 +3652,13 @@ osd_log_cpu:
 	* check if cpu log is enabled
 	tst.b	cpu_log_enable
 	jeq		445f
+	
+	cmp.w	#0x4817,(10,a7)
+	jne		0f
+	move.b	#1,0x130
+	BREAKPOINT	"4817 logged"
+0:
+
 	move.l	log_ptr,a6
 	move.w	(10,a7),(a6)+	| the PC
 	move.l	d1,-(a7)
@@ -3895,7 +3906,7 @@ scroll_x_lo:
 
 
 color_copper_pointers:
-	.skip	TOTAL_NB_COLORS*4
+	.skip	TOTAL_NB_COLORS*4*4
 osd_entry_count:
 	.byte	0
 player_1_controls:
@@ -3973,8 +3984,7 @@ palette_ptr:
 
 tiles_ptr:
 	.long	0
-bobs_ptr:
-	.long	0
+
 
 
 
@@ -4017,6 +4027,8 @@ _end_of_ng_code:
 
 	.section 	.data
 	.ifndef	RELEASE
+interrupted_code_pc:
+	.long	0
 log_ptr:
 	.long	log_buffer
 cpu_log_enable:
@@ -4193,7 +4205,6 @@ bobs_screen_buffer_2:
 	.skip	BG_SCREEN_SIZE
 	.skip	BG_NB_BYTES_PER_ROW*48
 	.endif
-	
 
 	.skip	8
 

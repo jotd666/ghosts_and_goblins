@@ -2838,7 +2838,7 @@ mark_intro_as_played_7c3d:
 7C3F: D7 71       STB    game_intro_played_0071
 7C41: 39          RTS
 
-7C42: E6 13       LDB    -$D,X
+7C42: E6 13       LDB    -$D,X		; 15B5
 7C44: 58          ASLB
 7C45: CE 7C 4A    LDU    #jump_table_7c4a
 7C48: 6E D5       JMP    [B,U]        ; [indirect_jump]
@@ -2916,8 +2916,10 @@ devil_disappears_7c9b:
 7D16: EC 84       LDD    ,X
 7D18: ED 03       STD    $3,X
 7D1A: 39          RTS
+
 7D1B: CC A6 31    LDD    #$A631
 7D1E: 20 F8       BRA    $7D18
+
 7D20: 6A 88 14    DEC    $14,X
 7D23: 27 08       BEQ    $7D2D
 7D25: D6 21       LDB    counter_8_bit_0021
@@ -2934,7 +2936,7 @@ devil_disappears_7c9b:
 7D40: CC 4C DE    LDD    #$4CDE
 7D43: ED 03       STD    $3,X
 7D45: ED 84       STD    ,X
-7D47: 6C 13       INC    -$D,X
+7D47: 6C 13       INC    -$D,X		; change intro sub-state (15B5)
 7D49: 39          RTS
 
 7D52: 58          ASLB
