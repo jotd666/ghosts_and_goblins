@@ -1,5 +1,3 @@
-- 6346: during intro, check if bank address or somewhere else
-  (else error bank error)
 - devil_takes_girl_7d80 yet to reach
 - log sprites (start, seem to work)
 - one of the "start" pic looks wrong
@@ -20,4 +18,10 @@
 bpset 65fb,,{PC=xxx;g}
 
 
-block constant palette refresh??
+block constant palette refresh: bpset 65fb,,{PC=6655;g}
+
+first color of sprites purple:
+fill $3841,1,$F0
+fill $3941,1,$F0
+
+

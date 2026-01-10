@@ -452,7 +452,12 @@ _user:
 	jbsr	load_palette
 	
 	lea		bg_tile_palette,a0
-	move.l	color_copper_pointers,a1	| entries 64-80
+	move.l	color_copper_pointers,a1	| entries 0-31
+	move.w	#TOTAL_NB_COLORS,d0
+	jbsr	load_palette
+	
+	lea		sprite_palette,a0
+	move.l	color_copper_pointers+TOTAL_NB_COLORS*2,a1	| entries 32-64
 	move.w	#TOTAL_NB_COLORS,d0
 	jbsr	load_palette
 	

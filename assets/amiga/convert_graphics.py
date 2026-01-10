@@ -433,11 +433,13 @@ def read_tileset(img_set_list,palette,plane_orientation_flags,cache,is_bob,nb_cl
 
     return new_tile_table,next_cache_id
 
+empty_32_cols = [(1,1,1)]*len(bg_tile_palette)
+
 tile_plane_cache = {}
 bob_plane_cache = {}
 fg_tile_table,next_cache_id = read_tileset(fg_tile_set_list,fg_tile_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=FG_NB_CLUTS)
 bg_tile_table,_ = read_tileset(bg_tile_set_list,bg_tile_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=BG_NB_CLUTS,next_cache_id=next_cache_id)
-sprite_table,_ = read_tileset(sprite_set_list,sprite_palette,[True,False,False,False],cache=bob_plane_cache, is_bob=True, nb_cluts=SPRITE_NB_CLUTS)
+sprite_table,_ = read_tileset(sprite_set_list,empty_32_cols+sprite_palette,[True,False,False,False],cache=bob_plane_cache, is_bob=True, nb_cluts=SPRITE_NB_CLUTS)
 
 
 
@@ -528,8 +530,6 @@ with open(src_dir / "graphics_aga.68k","w") as f:
         f.write(f"tile_plane_{v:02d}:")
         dump_asm_bytes(k,f)
 
-
-    f.write("bob_table:\n")
 
     f.write("bob_table:\n")
     for i,tile_entry in enumerate(sprite_table):
