@@ -3,9 +3,7 @@
 - enable symmetry
 - erase sprite to get proper intro sequence
 - flag system to avoid re-copying tiles again and again if already correct
-- group sprite tiles 2x even 3x
 - why purple flashes? all chars are logged properly
-- one of the "start" pic looks wrong: scrolling != 0?
 - log tiles (per level): with zone filtering (first level only upper part)
 - division by zero at some point, see what it does on real code FED8
 - contexts using tile palette values or current level values (tile colors?)
@@ -22,11 +20,10 @@
   here we want to avoid logging within the interrupt
 
 
-bpset 65fb,,{PC=xxx;g}
-
+hacks:
 
 block constant palette refresh: bpset 65fb,,{PC=6655;g}
-
+same background tiles when inserting coin: bpset 6b99,,{B=1;g} (B:0-3)
 first color of sprites purple:
 fill $3841,1,$F0
 fill $3941,1,$F0

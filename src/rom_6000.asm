@@ -1273,7 +1273,12 @@ start_game_screen_6b5e:
 6B90: 26 63    BNE    $6BF5
 6B92: 8E 6B 86    LDX    #$6B86
 ; pick a random location (4 choices) to display on "start game" screen
+; all using tiles from level 1
 6B95: D6 21       LDB    counter_8_bit_0021
+; 0: start, small part of hill visible on left
+; 1: start, big part of hill visible on left, with ladder
+; 2: forest, water gap on the right
+; 3: part where we cross the river
 6B97: C4 03       ANDB   #$03		; random
 6B99: 58          ASLB
 6B9A: EC 85       LDD    B,X
