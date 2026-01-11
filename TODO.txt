@@ -1,8 +1,9 @@
 - background tiles are bogus when game starts
 - sprite coords shifted to the left
+- enable symmetry
 - erase sprite to get proper intro sequence
 - flag system to avoid re-copying tiles again and again if already correct
-- group sprite tiles
+- group sprite tiles 2x even 3x
 - why purple flashes? all chars are logged properly
 - one of the "start" pic looks wrong: scrolling != 0?
 - log tiles (per level): with zone filtering (first level only upper part)
@@ -16,6 +17,7 @@
   maximum of different colors on the bottom status
 - update bg tiles do that using dirty not by brutal refresh as it's done twice (color+tilecode)
 - fg layer: isolate frame+weapon+lives (everything non-letter on the bottom), use dynamic palette
+- level tiles & palette should be in a separate file, loadable through whdload or floppy trackloader (use RN?)
 - cpu log: control should be able to log with SR=x3xx or SR=x0xx
   here we want to avoid logging within the interrupt
 
