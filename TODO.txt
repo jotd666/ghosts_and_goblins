@@ -1,5 +1,8 @@
-- background tiles are bogus when game starts
-- sprite coords shifted to the left
+- in-game tiles completely bogus: RE to know when game starts laying out tiles for the level
+- restore grouping, seems to have issues with main character (maybe use mockup 
+  "sprites" in assets
+- parasite sprites
+- crash when dying (should show the map instead) or lockup in 617F loop, no events arrive
 - enable symmetry
 - erase sprite to get proper intro sequence
 - flag system to avoid re-copying tiles again and again if already correct

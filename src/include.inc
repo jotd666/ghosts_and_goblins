@@ -37,9 +37,10 @@
 	* release mode: don't check
 	.macro	GET_ADDRESS_FUNC
 	GET_UNCHECKED_ADDRESS_FUNC
+	.endm
+	
 	.macro	GET_BANK_ADDRESS_FUNC
 	GET_UNCHECKED_BANK_ADDRESS_FUNC
-	.endm
 	.endm
 
 	.else
@@ -536,6 +537,10 @@
 	GET_UNCHECKED_ADDRESS_FUNC
 	.endm
 
+
+
+	.ifndef	RELEASE
+	
 get_address:
 	cmp.w	#0x2000,a0
 	jcs		0f		| below 0x2000: RAM: OK
@@ -587,17 +592,7 @@ get_bank_address:
 
 
 
-multiply_ab:
-	and.w	#0xFF,d0
-	and.w	#0xFF,d1
-	mulu	d0,d1
-	ror.w	#8,d1
-	move.b	d1,d0
-	ror.w	#8,d1
-	rts
 
-
-	.ifndef	RELEASE
 
 	.macro	ENABLE_LOG_REGS
 	moveq	#1,d6		| enable
@@ -630,3 +625,12 @@ multiply_ab:
 	move.w	(a7)+,sr
 	.endm
 	.endif
+
+multiply_ab:
+	and.w	#0xFF,d0
+	and.w	#0xFF,d1
+	mulu	d0,d1
+	ror.w	#8,d1
+	move.b	d1,d0
+	ror.w	#8,d1
+	rts

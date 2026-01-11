@@ -7756,6 +7756,7 @@ AD6D: 58          ASLB
 AD6E: CE AD AC    LDU    #$ADAC
 AD71: EE C5       LDU    B,U
 AD73: 20 13       BRA    $AD88
+
 AD75: 86 05       LDA    #$05
 AD77: A7 07       STA    $7,X
 AD79: A7 08       STA    $8,X
@@ -7783,8 +7784,8 @@ ADA7: ED 03       STD    $3,X
 ADA9: 6F 02       CLR    $2,X
 ADAB: 39          RTS
 
-ADDE: DC A0    LDD    $A0
-ADE0: 83 00 1E SUBD   #$001E
+ADDE: DC A0       LDD    $A0
+ADE0: 83 00 1E    SUBD   #$001E
 ADE3: 10 A3 16    CMPD   -$A,X
 ADE6: 22 15       BHI    $ADFD
 ADE8: C3 00 3C    ADDD   #$003C
@@ -7873,6 +7874,7 @@ AE98: A7 88 11    STA    $11,X
 AE9B: CC 02 00    LDD    #$0200
 AE9E: ED 14       STD    -$C,X
 AEA0: 39          RTS
+
 AEA1: 58          ASLB
 AEA2: CE AE A7    LDU    #jump_table_aea7
 AEA5: 6E D5       JMP    [B,U]        ; [indirect_jump]
@@ -13978,14 +13980,15 @@ E74B: E6 12       LDB    -$E,X
 E74D: 58          ASLB
 E74E: EB 12       ADDB   -$E,X
 E750: 31 C5       LEAY   B,U
-E752: EC A4       LDD    ,Y
+E752: EC A4       LDD    ,Y		; [bank_address]
 E754: ED 84       STD    ,X
 E756: ED 03       STD    $3,X
-E758: E6 22       LDB    $2,Y
+E758: E6 22       LDB    $2,Y		; [bank_address]
 E75A: BD 8E BF    JSR    $8EBF
 E75D: CC 03 00    LDD    #$0300
 E760: ED 14       STD    -$C,X
 E762: 39          RTS
+
 E763: E6 11       LDB    -$F,X
 E765: 27 36       BEQ    $E79D
 E767: BD 90 74    JSR    $9074

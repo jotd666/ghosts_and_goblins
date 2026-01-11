@@ -64,8 +64,7 @@ def doit(binname):
         if name=="blank":
             continue
 
-        sx += 128
-        sx += 128
+        #sx += 128
         sy += 6
 
         used_sprites.add(tile_code)
@@ -83,7 +82,7 @@ def doit(binname):
 
     layer.save(f"{binname}.png")
 
-doit("sprites_amiga")
+doit("sprites")
 
 
 

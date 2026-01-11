@@ -42,7 +42,7 @@ CURRENT_SPRITE_SIZE = 4
 
 SCORE_FILE_SIZE = 0x23		| wrong
 
-LOG_BUFFER_SIZE = 0x400000
+LOG_BUFFER_SIZE = 0x4000
 
 FG_TILE_NB_CLUTS_POW = 4
 FG_TILE_NB_CLUTS = 1<<FG_TILE_NB_CLUTS_POW
@@ -78,7 +78,7 @@ FG_SCREEN_COLOR_ADDRESS = 0x2400
 BG_SCREEN_TILE_ADDRESS = 0x2800
 BG_SCREEN_COLOR_ADDRESS = 0x2C00
 SPRITE_ADDRESS = 0x1E00  | to 0x1FFF
-
+SPRITE_BUFFER_SIZE = 0x100
 
 * if the alloc_sprite & update_sprite routines
 * are reused, changing those offsets can make
@@ -1132,36 +1132,36 @@ really_update_sprites:
 	* erase previous BOBs *
 	***********************
 	
-*	move.l	bob_previous_drawed_sprites(pc),a4
-*	lea		_custom,a5
-*	
-*
-*
-*	* clear previous positions
-*	lea	background_restore_buffer,a0
-*	move.l	playfield_drawed_screen_ptr(pc),a1
-*	move.w	#NB_TARGET_SPRITES-1,d7
-*	WAIT_BLIT
-*	move.l	#-1,bltalwm(a5)		| needed for blit_background
-*1:
-*	move.w	(a4),d0
-*	bmi.b	11f		| x=0: inactive
-*	move.w	(2,a4),d1
-*	cmp.w	#BG_NB_LINES,d1
-*	jcc		11f				| too low: discard
-*	and.w	#0x1F0,d0		| align on 16 lower bound
-*	* clear area where the sprite was
-*	move.l	#-1,(a4)+			| ack deletion by setting -1 in X & Y
-*	move.w	(a4)+,d4			| height
-*	move.w	(a4)+,d2		| width
-*				
-*	bsr		blit_background
-*	dbf		d7,1b	
-*	bra.b	12f
-*11:
-*	addq	#PREVIOUS_SPRITE_SIZE,a4
-*	dbf		d7,1b
-*12:	
+	move.l	bob_previous_drawed_sprites(pc),a4
+	lea		_custom,a5
+	
+
+
+	* clear previous positions
+	lea	background_restore_buffer,a0
+	move.l	playfield_drawed_screen_ptr(pc),a1
+	move.w	#NB_TARGET_SPRITES-1,d7
+	WAIT_BLIT
+	move.l	#-1,bltalwm(a5)		| needed for blit_background
+1:
+	move.w	(a4),d0
+	bmi.b	11f		| x=0: inactive
+	move.w	(2,a4),d1
+	cmp.w	#BG_NB_LINES,d1
+	jcc		11f				| too low: discard
+	and.w	#0x1F0,d0		| align on 16 lower bound
+	* clear area where the sprite was
+	move.l	#-1,(a4)+			| ack deletion by setting -1 in X & Y
+	move.w	(a4)+,d4			| height
+	move.w	(a4)+,d2		| width
+				
+	bsr		blit_background
+	dbf		d7,1b	
+	bra.b	12f
+11:
+	addq	#PREVIOUS_SPRITE_SIZE,a4
+	dbf		d7,1b
+12:	
 
 
 	*********************
@@ -1171,8 +1171,10 @@ really_update_sprites:
 
 
 	GET_MEMORY_START_AND_DP
-	lea		(SPRITE_ADDRESS,a6),a0
+	lea		(SPRITE_ADDRESS+SPRITE_BUFFER_SIZE-CURRENT_SPRITE_SIZE,a6),a0
 	*lea		mockup,a0
+
+
     lea _custom,A5
 	move.l	bob_previous_drawed_sprites(pc),a6
 	lea		bob_table,a4
@@ -1180,9 +1182,9 @@ really_update_sprites:
 	moveq	#NB_TARGET_SPRITES-1,d7
 1:
 	jbsr	update_one_bob
-	addq.w	#CURRENT_SPRITE_SIZE,a0
+	subq.w	#CURRENT_SPRITE_SIZE,a0
 	dbf		d7,1b
-20:
+
 	rts
 	
 compute_sprite_xy_code:
@@ -1215,7 +1217,9 @@ update_one_bob:
 
 	move.l	A0,-(a7)
 	* Y/X = 0xF8 (raw): nothing displayed
-	cmp.w	#0xF8F8,(a0)
+	move.w	(a0),d3
+	jeq		2f
+	cmp.w	#0xF8F8,d3
 	jeq		2f
 0:
 	jbsr	compute_sprite_xy_code
@@ -2255,8 +2259,10 @@ update_bg_tile:
 	.else
 	jne		12f
 	add.w	#BG_SCREEN_TILE_ADDRESS,d7
+	.ifdef	NO68020
 	lsr.w	#2,d2
-	move.w	#0xF0F,_custom+color
+	.endif
+	COLOR0_FLASH	0xF0F
 	jra		11f
 12:
 	.endif
@@ -2280,7 +2286,7 @@ update_bg_tile:
 	add.w	#BG_SCREEN_TILE_ADDRESS,d7
 	lsr.w	#2,d2
 	lsr.w	#2,d3
-	move.w	#0xF0F,_custom+color
+	COLOR0_FLASH	0xFF0
 	jra		11f
 	.endif
 12:
@@ -2602,7 +2608,7 @@ update_fg_tile:
 	lsr.w	#2,d2
 	.endif
 	add.w	#FG_SCREEN_TILE_ADDRESS,d7
-	COLOR0_FLASH	0xF0F
+	COLOR0_FLASH	0x00F
 	*BREAKPOINT	"unregistered game tile (in D2, at address D7)"	
 
 	jra		11f
@@ -3177,34 +3183,35 @@ handle_keyboard:
 	bne.b	0f
 	st.b	cheat_used
 
-	move.w	#0x0FF,_custom+color
+	COLOR0_FLASH	0x0FF
+
 	
 0:
 	cmp.b	#0x51,d0	| F2 key: set score 0-9
 	bne.b	0f
 	st.b	cheat_used
 	
-	move.w	#0x0FF,_custom+color
+	COLOR0_FLASH	0x0FF
 	
 0:
 	cmp.b	#0x52,d0	| F3 key: set score 10-0 and make left side win
 	bne.b	0f
 	st.b	cheat_used
 
-	move.w	#0x0FF,_custom+color
+	COLOR0_FLASH	0x0FF
 	
 0:
 
 	cmp.b	#0x53,d0	| F4 key
 	bne.b	0f
 	st.b	cheat_used
-	move.w	#0x0FF,_custom+color
+	COLOR0_FLASH	0x0FF
 
 0:
 *	cmp.b	#0x54,d0	| F5 key
 *	bne.b	0f
 *	st.b	cheat_used
-*	move.w	#0x0FF,_custom+color
+*	COLOR0_FLASH	0x0FF
 *0:
 *
 10:
@@ -3248,7 +3255,7 @@ handle_keyboard:
 toggle_pause:
 	* pause only within game
 	jbsr		is_game_playing
-	beq.b	0f
+	*beq.b	0f
 	eor.b   #1,pause_flag
 0:
 	rts
@@ -3602,7 +3609,20 @@ get_file_size:
 	* unsupported
 	BREAKPOINT	"non-whdload mode unsupported"
 	rts
-	
+
+
+* zero all registers even 6809 stack pointer
+* (some games use stack pointer manually for auto variables)
+cpu_init:
+	moveq	#0,d0
+	moveq	#0,d1
+	moveq	#0,d2
+	moveq	#0,d3
+	moveq	#0,d4
+	moveq	#0,d5
+	moveq	#0,d6
+	moveq	#0,d7
+	rts	
 	
 	.ifne	OPT_ENABLE_LOGGING
 
@@ -3668,11 +3688,6 @@ osd_log_cpu:
 	tst.b	cpu_log_enable
 	jeq		445f
 	COLOR0_FLASH	0x0F0
-	cmp.w	#0x4817,(10,a7)
-	jne		0f
-	move.b	#1,0x130
-	BREAKPOINT	"4817 logged"
-0:
 
 	move.l	log_ptr,a6
 	move.w	(10,a7),(a6)+	| the PC
@@ -3721,22 +3736,17 @@ osd_dump_logs:
 	move.l	#SPRITE_LOG_LENGTH,d0
 	jbsr	resload_SaveFile(a2)
 	
+	GET_MEMORY_START_AND_DP
+	lea		(SPRITE_ADDRESS,a6),a1
+	lea		sprite_mem_name(pc),a0
+	move.l	#SPRITE_BUFFER_SIZE,d0
+	jbsr	resload_SaveFile(a2)
+	
+	
     movem.l (a7)+,d0-a6
 	move.w	(a7)+,SR
 	rts
 
-* zero all registers even 6809 stack pointer
-* (some games use stack pointer manually for auto variables)
-cpu_init:
-	moveq	#0,d0
-	moveq	#0,d1
-	moveq	#0,d2
-	moveq	#0,d3
-	moveq	#0,d4
-	moveq	#0,d5
-	moveq	#0,d6
-	moveq	#0,d7
-	rts
 
 save_cpu_log:
 	move.l	_resload,a2
@@ -3763,7 +3773,8 @@ bg_tile_log_name:
 	.asciz	"bg_used_tiles"
 sprite_log_name:
 	.asciz	"used_sprites"
-
+sprite_mem_name:
+	.asciz	"sprites"
 	.align	2
 	.endif	
 
