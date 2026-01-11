@@ -1,12 +1,11 @@
-- cpu log: control should be able to log with SR=x3xx or SR=x0xx
-  here we want to avoid logging within the interrupt
-- why purple flashes? all chars are logged properly
-- character masks wrong: magenta all over, should work as not DPF: test again!
-- devil_takes_girl_7d80 yet to reach
-- one of the "start" pic looks wrong: scrolling != 0?
-- start game: game seems to lock up 6330-635E somewhere: reverse startup phase
-- log tiles (per level): with zone filtering (first level only upper part)
+- background tiles are bogus when game starts
+- sprite coords shifted to the left
+- erase sprite to get proper intro sequence
+- flag system to avoid re-copying tiles again and again if already correct
 - group sprite tiles
+- why purple flashes? all chars are logged properly
+- one of the "start" pic looks wrong: scrolling != 0?
+- log tiles (per level): with zone filtering (first level only upper part)
 - division by zero at some point, see what it does on real code FED8
 - contexts using tile palette values or current level values (tile colors?)
   switch tile palette / tile set when palette matches the level
@@ -17,6 +16,8 @@
   maximum of different colors on the bottom status
 - update bg tiles do that using dirty not by brutal refresh as it's done twice (color+tilecode)
 - fg layer: isolate frame+weapon+lives (everything non-letter on the bottom), use dynamic palette
+- cpu log: control should be able to log with SR=x3xx or SR=x0xx
+  here we want to avoid logging within the interrupt
 
 
 bpset 65fb,,{PC=xxx;g}

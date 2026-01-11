@@ -1255,7 +1255,6 @@ update_one_bob:
 	add.w	d2,d2
 	add.w	d2,d2
 
-	move.b	#0,0x110
 	
 	move.l	(a4,d2.w),d4		| get pointer from bob table
 	.ifdef	RELEASE
@@ -3608,13 +3607,19 @@ osd_get_last_known_pc:
 osd_cpu_logging_control:
 	cmp.b	#2,d6
 	jeq		1f
-	* 0 or 1: save previous state
+	* it's essential that we skip a second enable while active
+	* or disable while inactive
+	* else it kills the "reenable" feature, overwriting previous
+	cmp.b	cpu_log_enable,d6
+	jeq		2f		| enabled/disabled twice: skip
+	* 0 or 1: save previous state	
 	move.b	cpu_log_enable,cpu_log_prev_state
 	move.b	d6,cpu_log_enable
 	rts
 1:
-	* 2: put previous state
+	* 2: reenable: put previous state, reenabling if needed
 	move.b	cpu_log_prev_state,cpu_log_enable
+2:
 	rts
 	
 	.macro	CHECK_ZERO_MSW	reg
@@ -3652,7 +3657,7 @@ osd_log_cpu:
 	* check if cpu log is enabled
 	tst.b	cpu_log_enable
 	jeq		445f
-	
+	COLOR0_FLASH	0x0F0
 	cmp.w	#0x4817,(10,a7)
 	jne		0f
 	move.b	#1,0x130

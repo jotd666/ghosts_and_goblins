@@ -42,13 +42,16 @@ task_pointer_0012 = $12
 sprite_ram_1e00 = $1e00
 sprite_ram_end_1f80 = $1f80
 counter_8_bit_0021 = $21
+counter_16_bit_0020 = $20
 background_screen_location_006c = $6C
 global_state_0002 = $2
 sub_state_0005 = $5
 sub_sub_state_0008 = $8
 sub_sub_sub_state_000b = $b
 game_intro_played_0071 = $71
-	
+intro_devil_has_approached_052a = $52a
+intro_devil_appears_flag_0880 = $880
+
 ; horrible code when it comes to jump tables
 ; there are more than 200+ jump tables, that had to be
 ; semi-automatically fixed, with the lot of de-synced
@@ -139,7 +142,7 @@ end_of_memory_test_607d:
 60AC: 23 F7       BLS    $60A5
 60AE: 34 40       PSHS   U			; save U
 60B0: 8E 03 00    LDX    #$0300
-60B3: 33 88 20    LEAU   $20,X
+60B3: 33 88 20    LEAU   counter_16_bit_0020,X
 60B6: 10 8E 00 40 LDY    #$0040
 60BA: CC 10 00    LDD    #$1000
 60BD: A7 80       STA    ,X+
@@ -425,7 +428,7 @@ change_background_pic_62ab:
 635E: ED C3       STD    ,--U		; [video_address]
 6360: E6 22       LDB    $2,Y		; [select_address]
 6362: A6 23       LDA    $3,Y		; [select_address]
-6364: ED C8 20    STD    $20,U		; [video_address]
+6364: ED C8 20    STD    counter_16_bit_0020,U		; [video_address]
 6367: E6 24       LDB    $4,Y		; [select_address]
 6369: A6 25       LDA    $5,Y		; [select_address]
 636B: ED C9 04 00 STD    $0400,U		; [video_address]
@@ -490,7 +493,7 @@ compute_bank_address_from_b_6378:
 63E8: E6 C0       LDB    ,U+
 63EA: E7 89 04 00 STB    $0400,X
 63EE: 20 F2       BRA    $63E2
-63F0: 31 A8 20    LEAY   $20,Y
+63F0: 31 A8 20    LEAY   counter_16_bit_0020,Y
 63F3: A6 C4       LDA    ,U
 63F5: 26 E9       BNE    $63E0
 63F7: BD 68 DF    JSR    $68DF
@@ -566,8 +569,8 @@ irq_65c4:
 65C8: 12          NOP                                               
 65C9: 12          NOP                                               
 65CA: CC 00 01    LDD    #$0001
-65CD: D3 20       ADDD   $20
-65CF: DD 20       STD    $20
+65CD: D3 20       ADDD   counter_16_bit_0020
+65CF: DD 20       STD    counter_16_bit_0020
 65D1: 8D 28       BSR    update_a_palette_65fb
 65D3: BD 67 55    JSR    $6755
 65D6: BD 67 72    JSR    $6772
@@ -1166,7 +1169,7 @@ attract_mode_6a8d:
 6AAB: CC 01 1B    LDD    #$011B
 6AAE: BD 69 09    JSR    $6909
 6AB1: BD 6C 03    JSR    $6C03
-6AB4: D6 20       LDB    $20
+6AB4: D6 20       LDB    counter_16_bit_0020
 6AB6: C4 0C       ANDB   #$0C
 6AB8: 8E 6A F0    LDX    #$6AF0
 6ABB: 54          LSRB
@@ -1499,7 +1502,7 @@ start_game_screen_6b5e:
 6DC2: D7 98       STB    $98
 6DC4: 8E 10 10    LDX    #$1010
 6DC7: 36 10       PSHU   X
-6DC9: 30 88 20    LEAX   $20,X
+6DC9: 30 88 20    LEAX   counter_16_bit_0020,X
 6DCC: 5A          DECB
 6DCD: 26 F8       BNE    $6DC7
 6DCF: DF 96       STU    $96
@@ -1515,7 +1518,7 @@ start_game_screen_6b5e:
 6DE3: ED 14       STD    -$C,X
 6DE5: E7 05       STB    $5,X
 6DE7: 36 10       PSHU   X
-6DE9: 30 88 20    LEAX   $20,X
+6DE9: 30 88 20    LEAX   counter_16_bit_0020,X
 6DEC: 0A E2       DEC    stack_save_00e2
 6DEE: 26 EF       BNE    $6DDF
 6DF0: DF A8       STU    $A8
@@ -1544,7 +1547,7 @@ start_game_screen_6b5e:
 6E2F: E7 19       STB    -$7,X
 6E31: A7 05       STA    $5,X
 6E33: 4C          INCA
-6E34: 30 88 20    LEAX   $20,X
+6E34: 30 88 20    LEAX   counter_16_bit_0020,X
 6E37: 31 3F       LEAY   -$1,Y
 6E39: 26 E8       BNE    $6E23
 6E3B: C6 02       LDB    #$02
@@ -1606,7 +1609,7 @@ start_game_screen_6b5e:
 6EA5: 4F          CLRA
 6EA6: 5F          CLRB
 6EA7: ED 10       STD    -$10,X
-6EA9: ED 88 20    STD    $20,X
+6EA9: ED 88 20    STD    counter_16_bit_0020,X
 6EAC: 39          RTS
 
 6ED0: D6 72       LDB    $72
@@ -1929,7 +1932,7 @@ take_a_key_level_complete_72c9:
 733C: 10 AF 84    STY    ,X
 733F: ED 89 04 00 STD    $0400,X
 7343: 10 AE C4    LDY    ,U
-7346: 10 AF 88 20 STY    $20,X
+7346: 10 AF 88 20 STY    counter_16_bit_0020,X
 734A: ED 89 04 20 STD    $0420,X
 734E: CC 00 F0    LDD    #$00F0
 7351: DD 09       STD    $09
@@ -2255,7 +2258,7 @@ take_a_key_level_complete_72c9:
 768B: DC E4       LDD    $E4
 768D: ED C9 04 00 STD    $0400,U
 7691: ED C9 04 02 STD    $0402,U
-7695: 33 C8 20    LEAU   $20,U
+7695: 33 C8 20    LEAU   counter_16_bit_0020,U
 7698: 0A E2       DEC    stack_save_00e2
 769A: 26 E7       BNE    $7683
 769C: C6 32       LDB    #$32
@@ -2669,7 +2672,7 @@ init_intro_sequence_7a7e:
 7A98: 0A E3       DEC    $E3
 7A9A: 26 F5       BNE    $7A91
 7A9C: 6F 45       CLR    $5,U
-7A9E: 7F 05 2A    CLR    $052A
+7A9E: 7F 05 2A    CLR    intro_devil_has_approached_052a
 7AA1: 0C 0E       INC    $0E
 7AA3: 39          RTS
 
@@ -2699,7 +2702,9 @@ run_intro_sequence_7aa4:
 init_game_and_intro_scenery_7adc:
 7ADC: EC 13       LDD    -$D,X
 7ADE: 48          ASLA
-7ADF: CE 7A E4    LDU    #$7AE4
+7ADF: CE 7A E4    LDU    #jump_table_7ae4
+7AE2: 6E D6       JMP    [A,U]		; [indirect_jump]
+
 7AEC: C6 01       LDB    #$01
 7AEE: D7 AC       STB    armour_flag_00ac	; gives armour
 7AF0: D7 DE       STB    $DE
@@ -2729,6 +2734,7 @@ init_game_and_intro_scenery_7adc:
 7B28: E7 1E       STB    -$2,X
 7B2A: 39          RTS
 
+7B30: 58          ASLB                                                
 7B31: CE 7B 36    LDU    #jump_table_7b36
 7B34: 6E D5       JMP    [B,U]        ; [indirect_jump]
 
@@ -2751,7 +2757,7 @@ init_game_and_intro_scenery_7adc:
 7B6E: 6A 88 14    DEC    $14,X
 7B71: 26 14       BNE    $7B87
 7B73: C6 01       LDB    #$01
-7B75: F7 08 80    STB    $0880
+7B75: F7 08 80    STB    intro_devil_appears_flag_0880
 7B78: BD 7A 5C    JSR    $7A5C
 7B7B: 20 D7       BRA    $7B54
 7B7D: E6 88 1A    LDB    $1A,X
@@ -2855,12 +2861,15 @@ init_intro_7c54:
 and_they_were_happy_until_7c67:
 7C67: 6A 88 15    DEC    $15,X
 7C6A: 26 56       BNE    $7CC2
+; timeout: change state to "screen_darkens_devil_appears_7c8e"
 7C6C: CC 7C 75    LDD    #$7C75
 7C6F: 7E 7D 43    JMP    $7D43
 
-screen_darkens_7c8e:
-7C8E: F6 05 2A    LDB    $052A
+screen_darkens_devil_appears_7c8e:
+7C8E: F6 05 2A    LDB    intro_devil_has_approached_052a
 7C91: 27 2F       BEQ    $7CC2
+; the devil flew right next to the girl, ready to take her
+; timeout: change state to "devil_takes_girl_7d80"
 7C93: CC 7C 78    LDD    #$7C78
 7C96: 6F 02       CLR    $2,X
 7C98: 7E 7D 43    JMP    $7D43
@@ -2870,6 +2879,7 @@ devil_disappears_7c9b:
 7C9C: 5F          CLRB
 7C9D: ED 10       STD    -$10,X
 7C9F: 39          RTS
+
 7CA0: E6 13       LDB    -$D,X
 7CA2: 58          ASLB
 7CA3: CE 7C A8    LDU    #jump_table_7ca8
@@ -2888,7 +2898,9 @@ devil_disappears_7c9b:
 7CC2: 39          RTS
 
 7CC6: E6 10       LDB    -$10,X                                    
-7CC8: 27 F8       BEQ    $7CC2                                     
+7CC8: 27 F8       BEQ    $7CC2     
+; reached here when intro devil appears, and stays active until
+; the end of the intro animation                         
 7CCA: EC 13       LDD    -$D,X                                     
 7CCC: 48          ASLA
 7CCD: 10 8E 7C E4 LDY    #$7CE4
@@ -2955,7 +2967,7 @@ devil_disappears_7c9b:
 7D74: ED 84       STD    ,X
 7D76: 6F 02       CLR    $2,X
 7D78: C6 01       LDB    #$01
-7D7A: F7 05 2A    STB    $052A
+7D7A: F7 05 2A    STB    intro_devil_has_approached_052a
 7D7D: 6C 14       INC    -$C,X
 7D7F: 39          RTS
 
@@ -4594,10 +4606,10 @@ devil_takes_girl_7d80:
 8B28: 31 89 04 00 LEAY   $0400,X
 8B2C: A6 C8 30    LDA    $30,U
 8B2F: A7 A4       STA    ,Y
-8B31: 31 A8 20    LEAY   $20,Y
+8B31: 31 A8 20    LEAY   counter_16_bit_0020,Y
 8B34: A6 C0       LDA    ,U+
 8B36: A7 84       STA    ,X
-8B38: 30 88 20    LEAX   $20,X
+8B38: 30 88 20    LEAX   counter_16_bit_0020,X
 8B3B: 11 83 04 10 CMPU   #$0410
 8B3F: 24 03       BCC    $8B44
 8B41: 5A          DECB
@@ -6180,7 +6192,7 @@ table_of_jump_tables_9c98:
 9CB0: 8D 03       BSR    $9CB5
 9CB2: 7E 9E 40    JMP    $9E40
 9CB5: CC FF FF    LDD    #$FFFF
-9CB8: ED 88 20    STD    $20,X
+9CB8: ED 88 20    STD    counter_16_bit_0020,X
 9CBB: ED 88 22    STD    $22,X
 9CBE: ED 88 24    STD    $24,X
 9CC1: 39          RTS
@@ -6473,7 +6485,7 @@ A038: E7 05       STB    $5,X
 A03A: E7 49       STB    $9,U
 A03C: 53          COMB
 A03D: 39          RTS
-A03E: 33 C8 20    LEAU   $20,U
+A03E: 33 C8 20    LEAU   counter_16_bit_0020,U
 A041: 0A E0       DEC    $E0
 A043: 10 26 FF 6E LBNE   $9FB5
 A047: 6F 88 1C    CLR    $1C,X
@@ -8390,7 +8402,7 @@ B46F: 86 87       LDA    #$87
 B471: C6 87       LDB    #$87
 B473: ED A9 04 20 STD    $0420,Y
 B477: EC C1       LDD    ,U++
-B479: ED A8 20    STD    $20,Y
+B479: ED A8 20    STD    counter_16_bit_0020,Y
 B47C: E6 C0       LDB    ,U+
 B47E: C4 7F       ANDB   #$7F
 B480: E7 88 15    STB    $15,X
@@ -8533,7 +8545,7 @@ B642: 00 60       NEG    nb_lives_0060
 B644: 00 C0       NEG    $C0
 B646: 00 40       NEG    copy_of_dsw1_0040
 B648: 00 80       NEG    $80
-B64A: 00 20       NEG    $20
+B64A: 00 20       NEG    counter_16_bit_0020
 B64C: 00 40       NEG    copy_of_dsw1_0040
 B64E: EC 13       LDD    -$D,X
 B650: 48          ASLA
@@ -8893,7 +8905,7 @@ B996: 00 30       NEG    $30
 B998: 00 40       NEG    copy_of_dsw1_0040
 B99A: 00 28       NEG    $28
 B99C: 00 48       NEG    $48
-B99E: 00 20       NEG    $20
+B99E: 00 20       NEG    counter_16_bit_0020
 B9A0: 00 50       NEG    $50
 B9A2: 00 18       NEG    $18
 B9A4: 00 58       NEG    $58
@@ -11844,7 +11856,7 @@ D4CD: 39          RTS
 D4CE: E6 02       LDB    $2,X
 D4D0: 26 14       BNE    $D4E6
 D4D2: EE 08       LDU    $8,X
-D4D4: E6 C0       LDB    ,U+
+D4D4: E6 C0       LDB    ,U+	; [bank_address]
 D4D6: EF 08       STU    $8,X
 D4D8: BD 8E BF    JSR    $8EBF
 D4DB: 6A 06       DEC    $6,X
@@ -12754,7 +12766,7 @@ DCF7: 6F 02       CLR    $2,X
 DCF9: 39          RTS
 DCFA: 86 01       LDA    #$01
 DCFC: A7 88 12    STA    task_pointer_0012,X
-DCFF: 96 20       LDA    $20
+DCFF: 96 20       LDA    counter_16_bit_0020
 DD01: BD 68 F9    JSR    $68F9
 DD04: C4 03       ANDB   #$03
 DD06: 26 03       BNE    $DD0B
@@ -13423,7 +13435,7 @@ E2C3: C4 0F       ANDB   #$0F
 E2C5: 26 03       BNE    $E2CA
 E2C7: BD 8E 41    JSR    $8E41
 E2CA: BD E3 15    JSR    $E315
-E2CD: 30 88 20    LEAX   $20,X
+E2CD: 30 88 20    LEAX   counter_16_bit_0020,X
 E2D0: 0A E0       DEC    $E0
 E2D2: 26 E7       BNE    $E2BB
 E2D4: 39          RTS
@@ -14304,7 +14316,7 @@ EA39: EC 13       LDD    -$D,X
 EA3B: 48          ASLA
 EA3C: CE EA 49    LDU    #jump_table_ea49
 EA3F: AD D6       JSR    [A,U]	; [indirect_jump]
-EA41: 30 88 20    LEAX   $20,X
+EA41: 30 88 20    LEAX   counter_16_bit_0020,X
 EA44: 0A E0       DEC    $E0
 EA46: 26 ED       BNE    $EA35
 EA48: 39          RTS
@@ -14752,7 +14764,7 @@ EE56: 39          RTS
 
 EEB9: D6 21       LDB    counter_8_bit_0021
 EEBB: 26 12       BNE    $EECF
-EEBD: 96 20       LDA    $20
+EEBD: 96 20       LDA    counter_16_bit_0020
 EEBF: 54          LSRB
 EEC0: 25 0D       BCS    $EECF
 EEC2: DC 9A       LDD    $9A
@@ -15013,7 +15025,7 @@ F43F: 6F 55       CLR    -$B,U
 F441: 33 C8 40    LEAU   $40,U
 F444: 0A E1       DEC    $E1
 F446: 26 C7       BNE    $F40F
-F448: 31 A8 20    LEAY   $20,Y
+F448: 31 A8 20    LEAY   counter_16_bit_0020,Y
 F44B: 0A E0       DEC    $E0
 F44D: 10 26 FF 9D LBNE   $F3EE
 F451: 39          RTS
@@ -15068,7 +15080,7 @@ F591: CC 02 00    LDD    #$0200
 F594: ED 53       STD    -$D,U
 F596: E7 55       STB    -$B,U
 F598: 20 07       BRA    $F5A1
-F59A: 33 C8 20    LEAU   $20,U
+F59A: 33 C8 20    LEAU   counter_16_bit_0020,U
 F59D: 0A E0       DEC    $E0
 F59F: 26 B0       BNE    $F551
 F5A1: 39          RTS
@@ -15128,7 +15140,7 @@ F70C: E7 34       STB    -$C,Y
 F70E: 33 C8 40    LEAU   $40,U
 F711: 0A E1       DEC    $E1
 F713: 26 B6       BNE    $F6CB
-F715: 31 A8 20    LEAY   $20,Y
+F715: 31 A8 20    LEAY   counter_16_bit_0020,Y
 F718: 0A E0       DEC    $E0
 F71A: 26 8E       BNE    $F6AA
 F71C: 39          RTS
@@ -15206,7 +15218,7 @@ F800: D7 EE       STB    $EE
 F802: E6 11       LDB    -$F,X
 F804: 27 03       BEQ    $F809
 F806: BD F8 41    JSR    $F841
-F809: 30 88 20    LEAX   $20,X
+F809: 30 88 20    LEAX   counter_16_bit_0020,X
 F80C: 0A EE       DEC    $EE
 F80E: 26 F2       BNE    $F802
 F810: 39          RTS
@@ -15216,7 +15228,7 @@ F816: D7 EE       STB    $EE
 F818: E6 11       LDB    -$F,X
 F81A: 27 03       BEQ    $F81F
 F81C: BD F8 41    JSR    $F841
-F81F: 30 88 20    LEAX   $20,X
+F81F: 30 88 20    LEAX   counter_16_bit_0020,X
 F822: 0A EE       DEC    $EE
 F824: 26 F2       BNE    $F818
 F826: 39          RTS
@@ -15291,10 +15303,10 @@ F8D4: C0 02       SUBB   #$02
 F8D6: 25 D1       BCS    $F8A9
 F8D8: D7 29       STB    $29
 F8DA: EE 03       LDU    $3,X
-F8DC: EC C4       LDD    ,U		; [bank_address]
+F8DC: EC C4       LDD    ,U		; [select_address]
 F8DE: DA E4       ORB    $E4
 F8E0: ED A4       STD    ,Y
-F8E2: A6 42       LDA    $2,U	; [bank_address]
+F8E2: A6 42       LDA    $2,U	; [select_address]
 F8E4: A7 24       STA    $4,Y
 F8E6: D6 E7       LDB    $E7
 F8E8: 50          NEGB
@@ -15306,7 +15318,7 @@ F8F1: E7 23       STB    $3,Y
 F8F3: C3 00 10    ADDD   #$0010
 F8F6: 84 01       ANDA   #$01
 F8F8: E7 27       STB    $7,Y
-F8FA: AA 41       ORA    $1,U	; [bank_address]
+F8FA: AA 41       ORA    $1,U	; [select_address]
 F8FC: A7 25       STA    $5,Y
 F8FE: 31 28       LEAY   $8,Y
 F900: 39          RTS
@@ -15344,30 +15356,31 @@ F93D: A7 29       STA    $9,Y
 F93F: A7 2D       STA    $D,Y
 F941: 31 A8 10    LEAY   $10,Y
 F944: 39          RTS
+
 F945: D6 29       LDB    $29
 F947: C0 09       SUBB   #$09
 F949: 25 F9       BCS    $F944
 F94B: D7 29       STB    $29
 F94D: EE 03       LDU    $3,X
-F94F: EC C4       LDD    ,U
+F94F: EC C4       LDD    ,U		; [select_address]
 F951: DA E4       ORB    $E4
 F953: ED A4       STD    ,Y
-F955: A6 42       LDA    $2,U
+F955: A6 42       LDA    $2,U		; [select_address]
 F957: ED 24       STD    $4,Y
-F959: A6 43       LDA    $3,U
+F959: A6 43       LDA    $3,U		; [select_address]
 F95B: ED 28       STD    $8,Y
-F95D: A6 44       LDA    $4,U
+F95D: A6 44       LDA    $4,U		; [select_address]
 F95F: A7 2C       STA    $C,Y
-F961: A6 45       LDA    $5,U
+F961: A6 45       LDA    $5,U		; [select_address]
 F963: A7 A8 10    STA    $10,Y
-F966: A6 46       LDA    $6,U
+F966: A6 46       LDA    $6,U		; [select_address]
 F968: A7 A8 14    STA    $14,Y
-F96B: A6 47       LDA    $7,U
+F96B: A6 47       LDA    $7,U		; [select_address]
 F96D: A7 A8 18    STA    $18,Y
-F970: A6 48       LDA    $8,U
+F970: A6 48       LDA    $8,U		; [select_address]
 F972: A7 A8 1C    STA    $1C,Y
-F975: A6 49       LDA    $9,U
-F977: A7 A8 20    STA    $20,Y
+F975: A6 49       LDA    $9,U		; [select_address]
+F977: A7 A8 20    STA    counter_16_bit_0020,Y
 F97A: D6 E7       LDB    $E7
 F97C: 50          NEGB
 F97D: C0 10       SUBB   #$10
@@ -15392,7 +15405,7 @@ F9A7: 97 E4       STA    $E4
 F9A9: E7 2F       STB    $F,Y
 F9AB: E7 A8 13    STB    $13,Y
 F9AE: E7 A8 17    STB    $17,Y
-F9B1: AA 41       ORA    $1,U
+F9B1: AA 41       ORA    $1,U		; [select_address]
 F9B3: A7 2D       STA    $D,Y
 F9B5: A7 A8 11    STA    $11,Y
 F9B8: A7 A8 15    STA    $15,Y
@@ -15402,12 +15415,13 @@ F9C0: 84 01       ANDA   #$01
 F9C2: E7 A8 1B    STB    $1B,Y
 F9C5: E7 A8 1F    STB    $1F,Y
 F9C8: E7 A8 23    STB    $23,Y
-F9CB: AA 41       ORA    $1,U
+F9CB: AA 41       ORA    $1,U		; [select_address]
 F9CD: A7 A8 19    STA    $19,Y
 F9D0: A7 A8 1D    STA    $1D,Y
 F9D3: A7 A8 21    STA    counter_8_bit_0021,Y
 F9D6: 31 A8 24    LEAY   $24,Y
 F9D9: 39          RTS
+
 F9DA: D6 29       LDB    $29
 F9DC: C0 03       SUBB   #$03
 F9DE: 25 3D       BCS    $FA1D
@@ -15465,7 +15479,7 @@ FA46: A7 A8 18    STA    $18,Y
 FA49: A6 48       LDA    $8,U
 FA4B: A7 A8 1C    STA    $1C,Y
 FA4E: A6 49       LDA    $9,U
-FA50: A7 A8 20    STA    $20,Y
+FA50: A7 A8 20    STA    counter_16_bit_0020,Y
 FA53: A6 4A       LDA    $A,U
 FA55: A7 A8 24    STA    $24,Y
 FA58: A6 4B       LDA    $B,U
@@ -15708,7 +15722,7 @@ FC66: C4 03       ANDB   #$03
 FC68: 26 03       BNE    $FC6D
 FC6A: BD 8E 41    JSR    $8E41
 FC6D: BD FC 78    JSR    $FC78
-FC70: 30 88 20    LEAX   $20,X
+FC70: 30 88 20    LEAX   counter_16_bit_0020,X
 FC73: 0A E0       DEC    $E0
 FC75: 26 E7       BNE    $FC5E
 FC77: 39          RTS
@@ -16051,6 +16065,12 @@ jump_table_7a78:
 	dc.w	init_intro_sequence_7a7e	; $7a78
 	dc.w	run_intro_sequence_7aa4	; $7a7a
 	dc.w	mark_intro_as_played_7c3d	; $7a7c
+jump_table_7ae4:
+	dc.w	$7AEC
+	dc.w	$7B30
+	dc.w	$7B88
+	dc.w	$7BD2
+ 
 jump_table_7b36:
 	dc.w	$7b4a	; $7b36
 	dc.w	$7b64	; $7b38
@@ -16069,7 +16089,7 @@ jump_table_7bd8:
 jump_table_7c4a:
 	dc.w	init_intro_7c54	; $7c4a
 	dc.w	and_they_were_happy_until_7c67	; $7c4c
-	dc.w	screen_darkens_7c8e	; $7c4e
+	dc.w	screen_darkens_devil_appears_7c8e	; $7c4e
 	dc.w	devil_takes_girl_7d80	; $7c50
 	dc.w	devil_disappears_7c9b	; $7c52
 jump_table_7ca8:
