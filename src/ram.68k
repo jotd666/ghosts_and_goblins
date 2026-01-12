@@ -46,10 +46,6 @@ ram_start_0000:
 	.long	0
 	.endif
 
-* game uses a 16-bit value, we replace by a longword
-stack_save:
-	.long	0
-
 high_score_beaten:
 	.word	0
 

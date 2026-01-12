@@ -88,7 +88,6 @@ sr3(0x290,0x296)
 group_sprite_quadruplets = sr4(0x2C0,0x300)
 
 
-group_sprite_pairs = {}
 
 def add_tile(table,index,cluts=[0],merge_cluts=True):
     if isinstance(index,range):

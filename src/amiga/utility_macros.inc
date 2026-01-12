@@ -1,6 +1,26 @@
 	.ifndef	UTILITY_MACROS_INC
 UTILITY_MACROS_INC = 1
 	
+	.ifdef	RELEASE
+	.macro	BREAKPOINT comment
+	.endm
+
+	.else
+	
+	* amiga specific
+	.macro	BREAKPOINT comment
+	move.l	a0,-(a7)
+	lea		comment\@(pc),a0
+	jbsr	osd_break
+	move.l	(a7)+,a0
+	jra		next\@
+comment\@:
+	.asciz	"\comment"
+	.align	2
+next\@:
+	.endm
+	.endif
+	
 	.macro	PUSH_INTERRUPT_STATE
 	move.w	_custom+intenar,-(a7)
 	.endm

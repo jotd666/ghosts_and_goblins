@@ -12,7 +12,13 @@
 * (see my burger time 6502 conversion which does that in RELEASE mode)
 
 	.include 	"options.inc"
-
+	.ifdef	__amiga__
+	* to define BREAKPOINT
+	.include 	"amiga/utility_macros.inc"
+	.else
+	.macro	BREAKPOINT	arg
+	.endm
+	.endif
 	
 	.macro	ERROR	arg
 	.warning	"\arg"     | comment out to disable errors
