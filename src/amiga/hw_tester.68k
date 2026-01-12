@@ -740,7 +740,11 @@ demo_game:
 	
 	jbsr	osd_enable_interrupts
 loop:
+	
 	jra	loop
+	
+scroll_x_user:
+	.word	0
 	
 tester_text:
 	.asciz	"Welcome to GNG hw tester"
@@ -915,6 +919,20 @@ tiles_at_start:
 
 
 call_nmi:
+	move.b	player_1_controls,d0
+	btst	#BIT_RIGHT,d0
+	jne		0f
+	* move scrolling left
+	addq	#1,scroll_x_user
+0:
+	btst	#BIT_LEFT,d0
+	jne		0f
+	* move scrolling right
+	subq	#1,scroll_x_user
+0:
+	move.w	scroll_x_user,d0
+
+	move.w	d0,scroll_x
 
 	rts
 	
@@ -952,14 +970,6 @@ level3_interrupt:
 	jmi		0f
 	jbsr	_read_joystick
 	move.l	d0,joypad_1_state
-0:
-	move.l	joypad_2_state(pc),d1
-	move.l	d1,d2
-	moveq	#0,d0
-	move.b	p2_joystick_slot,d0
-	jmi		0f
-	jsr	_read_joystick
-	move.l	d0,joypad_2_state
 0:
 	jbsr	update_controls
 	
@@ -2831,10 +2841,6 @@ set_bobs_bitplanes:
 	* set bitplanes
 	moveq	#0,d0
 	move.w	scroll_y,d0
-	jpl		0f
-	moveq	#0,d0
-	jra		1f			| avoids non-atomic illegal scroll value
-0:
 
 	lea		mulBG_NB_BYTES_PER_ROW_table,a2
 	.ifdef	MC68020
@@ -2844,7 +2850,8 @@ set_bobs_bitplanes:
 	move.w	(a2,d0.w),d0		| compute Y offset
 	.endif
 1:	
-	moveq	#0,d2
+
+	move.w	scroll_x,d2
 	and.w	#0x1FF,d2			| wraps at 0x200!
 
 	lea		scroll_table,a2
@@ -2985,13 +2992,7 @@ update_controls:
 	jbsr	decode_joypad_controls
 	move.b	d0,player_1_controls
 
-	
 
-	moveq	#-1,d0
-
-	move.l	joypad_2_state(pc),d1
-	jbsr	decode_joypad_controls
-	move.b	d0,player_2_controls
 
 	rts
 	
@@ -3728,10 +3729,9 @@ target_usp_value:
 
 scroll_y:
 	.word	0
-scroll_x_hi:
+scroll_x:
 	.word	0
-scroll_x_lo:
-	.word	0
+
 
 
 
