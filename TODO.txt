@@ -1,14 +1,12 @@
-- in-game tiles completely bogus: RE to know when game starts laying out tiles for the level
+- scrolling in HW test
 - restore grouping, seems to have issues with main character (maybe use mockup 
-  "sprites" in assets
-- parasite sprites
+  "sprites" in assets or try/error to ungroup until it works
+- parasite sprites at the bottom
 - crash when dying (should show the map instead) or lockup in 617F loop, no events arrive
 - enable symmetry
-- erase sprite to get proper intro sequence
 - flag system to avoid re-copying tiles again and again if already correct
-- why purple flashes? all chars are logged properly
+- remove purple/yellow flashe
 - log tiles (per level): with zone filtering (first level only upper part)
-- division by zero at some point, see what it does on real code FED8
 - contexts using tile palette values or current level values (tile colors?)
   switch tile palette / tile set when palette matches the level
   caution: intro screen map has its own palette too

@@ -7064,7 +7064,7 @@ A557: E7 08       STB    $8,X
 A559: DB E0       ADDB   $E0
 A55B: C4 0F       ANDB   #$0F
 A55D: CE 49 AA    LDU    #$49AA
-A560: A6 C5       LDA    B,U
+A560: A6 C5       LDA    B,U		; [bank_address]
 A562: A7 0C       STA    $C,X
 A564: C4 07       ANDB   #$07
 A566: E7 0D       STB    $D,X
@@ -14055,12 +14055,12 @@ E7D3: 48          ASLA
 E7D4: 48          ASLA
 E7D5: CE 5A 8E    LDU    #$5A8E
 E7D8: 33 C6       LEAU   A,U
-E7DA: EC C4       LDD    ,U
+E7DA: EC C4       LDD    ,U		; [bank_address]
 E7DC: ED 84       STD    ,X
 E7DE: ED 03       STD    $3,X
 E7E0: C6 02       LDB    #$02
 E7E2: E7 1F       STB    -$1,X
-E7E4: EC 42       LDD    $2,U
+E7E4: EC 42       LDD    $2,U		; [bank_address]
 E7E6: 7E 69 09    JMP    $6909
 E7E9: BD 79 88    JSR    $7988
 E7EC: CE E8 06    LDU    #$E806

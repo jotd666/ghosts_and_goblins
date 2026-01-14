@@ -162,10 +162,10 @@ BIT_COIN2 = 7
 BIT_START_1P = 0
 BIT_START_2P = 1
 
-BIT_LEFT = 1
+BIT_UP = 3
 BIT_RIGHT = 0
-BIT_UP = 2
-BIT_DOWN = 3
+BIT_LEFT = 1
+BIT_DOWN = 2
 BIT_FIRE_1 = 4
 BIT_FIRE_2 = 5
 
@@ -1235,7 +1235,6 @@ update_one_bob:
 0:
 	jbsr	compute_sprite_xy_code
 		
-	move.b	(TARGET_SPRITE_ATTRIBUTES,a0),d3
 
 	* handle custom amiga horizontal grouping (saves a lot of blitter masking)
 	* the table holds several info bits
@@ -1262,7 +1261,6 @@ update_one_bob:
 	add.w	d2,d2				| code times 2
 	move.w	(a3,d2.w),d4
 	jeq		10f			| nothing to do, normal tile
-	move.b	#0,0x110
 	* double/triple/quadruple, whatever
 	btst	#14,d4
 	jne		2f		| center tile, never draw
@@ -1311,13 +1309,13 @@ update_one_bob:
 	move.l	d4,a0
 
 	
-*	btst	#6,d3
-*	jne		101f
-*	* mirror
+*	btst	#MIRROR_BIT,d3
+*	jeq		101f
+*	* pre-computed mirror bitplanes, can't afford that here
 *	add.w	#((NB_PLAYFIELD_PLANES+1)*4+8),a0
 
 	btst	#MIRROR_BIT,d3
-	seq		d3		| convert attribute to boolean 0/ff for mirror_sprite_planes
+	sne		d3		| convert attribute to boolean 0/ff for mirror_sprite_planes
 
 
 	move.w	(a0)+,d4		| height
@@ -1326,7 +1324,7 @@ update_one_bob:
 	* A0 points on the first bitplane of the bob
 	addq 	#2,a0
 
-	*jbsr	mirror_sprite_planes
+	jbsr	mirror_sprite_planes
 	
 	* BOBs must follow screen scroll
 	*add.w	scroll_y,d1
@@ -2822,7 +2820,7 @@ osd_debug_hook:
 	
 
 osd_read_p1_inputs:
-	st.B	d0
+	move.b	 player_1_controls,d0
 	rts
 
 	move.b	player_1_controls,d0
@@ -2848,25 +2846,7 @@ osd_read_p2_inputs:
 	st.B	d0
 	rts
 	
-	move.b	player_2_controls,d0
-	move.l	A0,-(a7)
-	lea		keyboard_table(pc),a0
-	tst.b	(2,a0)		| "2" key like in MAME
-	beq.b	0f
-	bclr	#BIT_START_2P,d0
-0:	
-	jbsr		is_game_playing
-	jne	0f
-	move.l	joypad_1_state,d1
-	* game not playing, we can start with joypad
-	btst	#JPB_BTN_DOWN,d1		| "2" key like in MAME
-	beq.b	0f
-	bclr	#BIT_START_2P,d0
-0:	
 
-	move.l	(a7)+,a0
-	rts
-	
 
 	
 	.ifne	OPT_ENABLE_LOGGING
@@ -2933,11 +2913,6 @@ update_controls:
 
 	
 
-	moveq	#-1,d0
-
-	move.l	joypad_2_state(pc),d1
-	jbsr	decode_joypad_controls
-	move.b	d0,player_2_controls
 
 	rts
 	
@@ -3948,8 +3923,6 @@ color_copper_pointers:
 osd_entry_count:
 	.byte	0
 player_1_controls:
-	.byte	0
-player_2_controls:
 	.byte	0
 flip_flop:
 	.byte	0

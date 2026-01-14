@@ -1313,7 +1313,7 @@ l_53f3:
 	LOG_REGS	53f3   | added by add_reg_log.py
 	rts                                    	| [$53f3: rts]
 
-* when game starts
+* when game starts scoring probably
 l_53f4:
 	LOG_REGS	53f4   | added by add_reg_log.py
 	OP_R_ON_DP_ADDRESS	move,0x28,d0         | [$53f4: lda    $28]
@@ -1335,7 +1335,7 @@ l_53f4:
 	OP_R_ON_DP_ADDRESS	move,0x6b,d0         | [$5402: lda    $6b]
 	subq.w	#1,d3                           	| [...]
 	LOG_REGS	5404   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d3                   	| [$5404: adda   ,-y]
+	GET_REG_SELECT_ADDRESS	0,d3                   	| [$5404: adda   ,-y] [select_address]
 	CLR_XC_FLAGS
 	move.b	(a0),d6	| [...]
 	abcd	d6,d0	| [...]
@@ -1345,7 +1345,7 @@ l_53f4:
 	OP_R_ON_DP_ADDRESS	move,0x6a,d0         | [$5409: lda    $6a]
 	subq.w	#1,d3                           	| [...]
 	LOG_REGS	540b   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d3                   	| [$540b: adca   ,-y]
+	GET_REG_SELECT_ADDRESS	0,d3                   	| [$540b: adca   ,-y] [select_address]
 	move.b	(a0),d6	| [...]
 	abcd	d6,d0	| [...]
 	LOG_REGS	540e   | added by add_reg_log.py
@@ -1354,7 +1354,7 @@ l_53f4:
 	OP_R_ON_DP_ADDRESS	move,0x69,d0         | [$5410: lda    $69]
 	subq.w	#1,d3                           	| [...]
 	LOG_REGS	5412   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d3                   	| [$5412: adca   ,-y]
+	GET_REG_SELECT_ADDRESS	0,d3                   	| [$5412: adca   ,-y] [select_address]
 	move.b	(a0),d6	| [...]
 	abcd	d6,d0	| [...]
 	LOG_REGS	5415   | added by add_reg_log.py
@@ -1363,7 +1363,7 @@ l_53f4:
 	OP_R_ON_DP_ADDRESS	move,0x68,d0         | [$5417: lda    $68]
 	subq.w	#1,d3                           	| [...]
 	LOG_REGS	5419   | added by add_reg_log.py
-	GET_REG_ADDRESS	0,d3                   	| [$5419: adca   ,-y]
+	GET_REG_SELECT_ADDRESS	0,d3                   	| [$5419: adca   ,-y] [select_address]
 	move.b	(a0),d6	| [...]
 	abcd	d6,d0	| [...]
 	LOG_REGS	541c   | added by add_reg_log.py

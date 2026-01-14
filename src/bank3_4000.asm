@@ -480,7 +480,7 @@ copy_highscores_53a3:
 
 53F3: 39          RTS
 
-; when game starts
+; when game starts scoring probably
 l_53f4:
 53F4: 96 28       LDA    $28
 53F6: 27 FB       BEQ    $53F3
@@ -489,19 +489,19 @@ l_53f4:
 53FE: 58          ASLB
 53FF: 10 AE A5    LDY    B,Y		; [bank_address]
 5402: 96 6B       LDA    $6B
-5404: AB A2       ADDA   ,-Y
+5404: AB A2       ADDA   ,-Y		; [select_address]
 5406: 19          DAA
 5407: 97 6B       STA    $6B
 5409: 96 6A       LDA    $6A
-540B: A9 A2       ADCA   ,-Y
+540B: A9 A2       ADCA   ,-Y		; [select_address]
 540D: 19          DAA
 540E: 97 6A       STA    $6A
 5410: 96 69       LDA    $69
-5412: A9 A2       ADCA   ,-Y
+5412: A9 A2       ADCA   ,-Y		; [select_address]
 5414: 19          DAA
 5415: 97 69       STA    $69
 5417: 96 68       LDA    $68
-5419: A9 A2       ADCA   ,-Y
+5419: A9 A2       ADCA   ,-Y		; [select_address]
 541B: 19          DAA
 541C: 97 68       STA    $68
 541E: DC 68       LDD    $68
