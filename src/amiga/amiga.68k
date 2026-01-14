@@ -42,7 +42,7 @@ CURRENT_SPRITE_SIZE = 4
 
 SCORE_FILE_SIZE = 0x23		| wrong
 
-LOG_BUFFER_SIZE = 0x4000
+LOG_BUFFER_SIZE = 0x100000
 
 FG_TILE_NB_CLUTS_POW = 4
 FG_TILE_NB_CLUTS = 1<<FG_TILE_NB_CLUTS_POW
@@ -177,15 +177,18 @@ BIT_FIRE_2 = 5
 	move.w	#\v,_custom+color	
 	.endm
 
-	* this game uses USP & SSP and is sensitive about stack usage
-	* plus it's way better to save S just in case of an osd call
-	* which is interrupted, then calls game irq which uses S
+	* S aka D5 is used a lot in the code as virtual stack, not only
+	* using host 68k SP. So we need to be consistent with its value
+	* specially when the irq is called. Except that if the irq interrupts
+	* an osd call, we need to restore the value of D5 on osd enter, not
+	* the value within osd
 	
 	.macro	OSD_ENTER
 	tst.b	osd_entry_count
 	jne		osd_enter_\@
-	* top entry: save game U register
-	move.w	d5,target_usp_value
+
+	* top entry: save game S register
+	move.w	d5,target_ssp_value
 
 osd_enter_\@:
 	addq.b	#1,osd_entry_count	| increase nesting
@@ -736,7 +739,8 @@ demo_game:
 
 	* enable interrupts. Game doesn't use them
 	* but relies on vbl sync flags
-	jbsr	cpu_init		| zero all registers
+	jbsr	cpu_init		| zero most registers
+	moveq	#0,d5			| D5 too
 	
 	jbsr	cache_fg_tiles_address
 	jbsr	cache_bg_tiles_address
@@ -771,7 +775,7 @@ install_bank_4:
 	rts
 
 call_nmi:
-	* reset most registers
+	* reset most registers (not D5)
 	jbsr	cpu_init
 	* set base for RAM
 	GET_MEMORY_START_AND_DP
@@ -784,8 +788,19 @@ call_nmi:
 	* we have to restore d5 as it was on entering the osd call
 	* restore game S (aka d5) so it's used in the irq
 	* we must not change d5 until game irq has been called
-	move.w	target_usp_value,d5
+	move.w	target_ssp_value,d5
 0:
+
+	swap	d5
+	clr		d5
+	swap 	d5
+	tst.w	d5
+	jne		0f
+	.ifndef	RELEASE
+	BREAKPOINT	"entering game irq with d5/S=0"
+0:
+	.endif
+	
 	jra	irq_65c4
 	
 * just in case some hardware calls nmi
@@ -799,9 +814,10 @@ level3_interrupt:
 	move.l	(2,a7),interrupted_code_pc
 	.endif
 	* disable osd context switch
-	* we must not save d5 or change stack from an osd call from an interrupt
+	* we MUST NOT change d5 or change stack from an osd call from an interrupt
 	addq.b	#1,osd_entry_count
-    	movem.l d0-d7/a0-a6,-(a7)
+    
+	movem.l d0-d7/a0-a6,-(a7)
 	lea		_custom,a5
 	move.w	(intreqr,a5),d0
 	btst	#5,d0
@@ -822,14 +838,7 @@ level3_interrupt:
 	jbsr	_read_joystick
 	move.l	d0,joypad_1_state
 0:
-	move.l	joypad_2_state(pc),d1
-	move.l	d1,d2
-	moveq	#0,d0
-	move.b	p2_joystick_slot,d0
-	jmi		0f
-	jsr	_read_joystick
-	move.l	d0,joypad_2_state
-0:
+
 	jbsr	update_controls
 	
 	move.l	joypad_1_state,d0
@@ -848,10 +857,10 @@ level3_interrupt:
 1:
 	* has to be copper: set sync
 
-	* we're going to ack copper & software/level 5 interrupt now
+	* we're going to ack copper & software interrupt now
 	* do it twice (040/pistorm bug)
-	move.w	#0x14+(1<<11),(intreq,a5)
-	move.w	#0x14+(1<<11),(intreq,a5)
+	move.w	#0x14,(intreq,a5)
+	move.w	#0x14,(intreq,a5)
 
 	tst.b	pause_flag
 	jne	23f
@@ -878,6 +887,8 @@ level3_interrupt:
 	subq.w	#1,delay_timer
 		
 	jbsr	call_nmi
+	
+	* ok now D5 can be used freely
 
 	tst.b	frameskip
 	jeq		0f
@@ -3619,7 +3630,6 @@ cpu_init:
 	moveq	#0,d2
 	moveq	#0,d3
 	moveq	#0,d4
-	moveq	#0,d5
 	moveq	#0,d6
 	moveq	#0,d7
 	rts	
@@ -3665,6 +3675,7 @@ osd_cpu_logging_control:
 
 	
 osd_log_cpu:
+	OSD_ENTER
 	* first, check that registers don't have a wrong longword mask
 	CHECK_ZERO_MSW	d1		| D
 	CHECK_ZERO_MSW	d2		| X
@@ -3711,6 +3722,7 @@ osd_log_cpu:
 	move.l	(a7)+,d1
 445:
 	move.l	(a7)+,a6
+	OSD_EXIT
 	rts
 
 osd_dump_logs:
@@ -3919,7 +3931,7 @@ mid_screen_interrupt_count:
 	.align	2
 system_vbr:
 	.long	0
-target_usp_value:
+target_ssp_value:
 	.word	0
 
 scroll_y:

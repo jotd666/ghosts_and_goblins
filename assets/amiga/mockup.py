@@ -6,7 +6,7 @@ this_dir = os.path.dirname(os.path.abspath(__file__))
 
 tilesdir = os.path.join(this_dir,os.pardir,"sheets","bg_tiles")
 
-with open(os.path.join(this_dir,"tiles_amiga"),"rb") as f:
+with open(os.path.join(this_dir,"bg"),"rb") as f:
     contents = f.read()
 
 

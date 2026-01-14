@@ -327,7 +327,8 @@ read_dip_switches_622c:
 
 ; each time coin is inserted, this is called to display a different
 ; background pic showing parts of level 1
-change_background_pic_62ab:
+; it's also used to setup a new level screen
+change_background_62ab:
 62AB: 34 40       PSHS   U			; save U 
 ; there are 4 possible background screen locations picked at random
 ; 4000: start, 4004, 400A: forest, 4006: ground/river
@@ -367,7 +368,7 @@ change_background_pic_62ab:
 62F2: E7 61       STB    $1,S
 62F4: C6 08       LDB    #$08
 62F6: E7 E4       STB    ,S		; loop 8 times
-62F8: 8D 45       BSR    $633F
+62F8: 8D 45       BSR    write_4_bg_tiles_633f
 62FA: 6A E4       DEC    ,S
 62FC: 26 FA       BNE    $62F8
 62FE: 33 C8 50    LEAU   $50,U
@@ -396,7 +397,7 @@ change_background_pic_62ab:
 632A: E7 61       STB    $1,S
 632C: C6 08       LDB    #$08
 632E: E7 E4       STB    ,S
-6330: 8D 0D       BSR    $633F
+6330: 8D 0D       BSR    write_4_bg_tiles_633f
 6332: 6A E4       DEC    ,S
 6334: 26 FA       BNE    $6330
 6336: 33 C8 50    LEAU   $50,U
@@ -404,6 +405,7 @@ change_background_pic_62ab:
 633B: 26 EF       BNE    $632C
 633D: 35 86       PULS   D,PC
 
+write_4_bg_tiles_633f:
 ; set bank 0
 633F: C6 00       LDB    #$00
 6341: D7 D9       STB    bankswitch_copy_d9
@@ -428,7 +430,7 @@ change_background_pic_62ab:
 635E: ED C3       STD    ,--U		; [video_address]
 6360: E6 22       LDB    $2,Y		; [select_address]
 6362: A6 23       LDA    $3,Y		; [select_address]
-6364: ED C8 20    STD    counter_16_bit_0020,U		; [video_address]
+6364: ED C8 20    STD    $20,U		; [video_address]
 6367: E6 24       LDB    $4,Y		; [select_address]
 6369: A6 25       LDA    $5,Y		; [select_address]
 636B: ED C9 04 00 STD    $0400,U		; [video_address]
@@ -3444,6 +3446,7 @@ devil_takes_girl_7d80:
 8199: DC CA       LDD    $CA
 819B: DD C8       STD    $C8
 819D: 39          RTS
+
 819E: FC 05 06    LDD    $0506
 81A1: A3 16       SUBD   -$A,X
 81A3: 10 83 00 81 CMPD   #$0081
@@ -3475,6 +3478,7 @@ devil_takes_girl_7d80:
 81DE: BD 86 77    JSR    $8677
 81E1: 35 10       PULS   X
 81E3: 7E 83 54    JMP    $8354
+
 81E6: 39          RTS
 81E7: E6 02       LDB    $2,X
 81E9: C5 01       BITB   #$01
@@ -3795,6 +3799,7 @@ devil_takes_girl_7d80:
 8465: BD 86 77    JSR    $8677
 8468: 35 10       PULS   X
 846A: 7E 85 99    JMP    $8599
+
 846D: 39          RTS
 846E: E6 03       LDB    $3,X
 8470: C5 01       BITB   #$01
@@ -4044,8 +4049,7 @@ devil_takes_girl_7d80:
 866E: 90 BB       SUBA   $BB
 8670: 97 BB       STA    $BB
 8672: 39          RTS
-8673: 00 C0       NEG    $C0
-8675: 00 C4       NEG    $C4
+
 8677: CE 86 73    LDU    #$8673
 867A: D6 2A       LDB    $2A
 867C: 58          ASLB
@@ -4058,7 +4062,7 @@ devil_takes_girl_7d80:
 868D: C4 0F       ANDB   #$0F
 868F: 33 C5       LEAU   B,U
 8691: D6 B8       LDB    $B8
-8693: 8D 1C       BSR    $86B1
+8693: 8D 1C       BSR    update_tile_column_86b1
 8695: 11 83 03 B0 CMPU   #$03B0
 8699: 24 28       BCC    $86C3
 869B: C6 20       LDB    #$20
@@ -4071,6 +4075,7 @@ devil_takes_girl_7d80:
 86A9: D6 E6       LDB    $E6
 86AB: 30 01       LEAX   $1,X
 86AD: 31 89 04 00 LEAY   $0400,X
+update_tile_column_86b1:
 86B1: A6 C8 30    LDA    $30,U
 86B4: A7 A2       STA    ,-Y		; [video_address]
 86B6: A6 C0       LDA    ,U+
@@ -4078,8 +4083,9 @@ devil_takes_girl_7d80:
 86BA: 11 83 03 B0 CMPU   #$03B0
 86BE: 24 03       BCC    $86C3
 86C0: 5A          DECB
-86C1: 26 EE       BNE    $86B1
+86C1: 26 EE       BNE    update_tile_column_86b1
 86C3: 39          RTS
+
 86C4: 96 99       LDA    $99
 86C6: 26 21       BNE    $86E9
 86C8: FC 05 09    LDD    $0509
@@ -17202,9 +17208,9 @@ jump_table_6188:
 	dc.w	$48BD	; $618e from bank 3 
 	dc.w	$5022	; $6190 from bank 3 
 	dc.w	$511E	; $6192 from bank 3 
-	dc.w	change_background_pic_62ab	; $6194
+	dc.w	change_background_62ab	; $6194
 	dc.w	$513B	; $6196 from bank 3 
-	dc.w	$523F	; $6198 from bank 3 
+	dc.w	write_framed_weapon_523f	; $6198 from bank 3 
 	dc.w	$5347	; $619a from bank 3 
 	dc.w	$52FB	; $619c all <$6000 from bank 3 ofc
 	dc.w	copy_highscores_53a3	; $619e

@@ -306,16 +306,16 @@ l_5180:
 523B: 5A          DECB
 523C: 26 F4       BNE    $5232
 523E: 39          RTS
-l_523f:
+write_framed_weapon_523f:
 523F: 34 40       PSHS   U
 5241: 34 04       PSHS   B
-5243: 8D 28       BSR    $526D
+5243: 8D 28       BSR    write_weapon_frame_526d
 5245: E6 E0       LDB    ,S+
 5247: 26 22       BNE    $526B
 5249: 8D D8       BSR    $5223
-524B: 8E 23 6F    LDX    #$236F
-524E: CE 52 A5    LDU    #$52A5
-5251: D6 73       LDB    $73
+524B: 8E 23 6F    LDX    #$236F		; address of weapon in frame
+524E: CE 52 A5    LDU    #$52A5		; weapon graphics table
+5251: D6 73       LDB    weapon_type_0073
 5253: 58          ASLB
 5254: 58          ASLB
 5255: 33 C5       LEAU   B,U
@@ -328,7 +328,8 @@ l_523f:
 5267: ED 89 04 20 STD    $0420,X			; [video_address]
 526B: 35 C0       PULS   U,PC
 
-526D: 8E 23 4E    LDX    #$234E
+write_weapon_frame_526d:
+526D: 8E 23 4E    LDX    #$234E		; address of frame (top left)
 5270: CE 52 95    LDU    #$5295
 5273: C6 04       LDB    #$04
 5275: D7 FC       STB    $FC

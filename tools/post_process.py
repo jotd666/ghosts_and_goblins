@@ -154,7 +154,7 @@ l_54ff
 l_5bdd
 l_511e
 l_513b
-l_523f
+write_framed_weapon_523f
 l_5347
 l_52fb
 copy_highscores_53a3
@@ -398,12 +398,15 @@ for i,line in enumerate(lines):
 
 # pattern where logging is required outside the IRQ code
 # entering the IRQ disables logging, and exiting restores previous logging state
-##    if address == 0x65C4:
-##        line = change_instruction("DISABLE_LOG_REGS",lines,i)
-##    elif address == 0x65fa:
-##        line = "\tREENABLE_LOG_REGS\n"+line
-##    elif address == 0xxxxx:  # outside IRQ
-##        line = "\tENABLE_LOG_REGS\n"+line
+    if address == 0x65C4:
+        line = change_instruction("DISABLE_LOG_REGS",lines,i)
+    elif address == 0x65fa:
+        line = "\tREENABLE_LOG_REGS\n"+line
+    elif address == 0x81E7:  # outside IRQ
+        line = """
+    ENABLE_LOG_REGS
+0:
+"""+line
 
 
 # pattern where logging is required in the IRQ code, much simpler
