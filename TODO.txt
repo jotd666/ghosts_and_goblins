@@ -1,3 +1,7 @@
+- patch palette write to detect context change: 6619: skip constant
+  palette write (saves time) if __amiga__, check context change at end of ram palette
+  update in 6692 (also handles fade at start!)
+  
 - scrolling in HW test
 - restore grouping, seems to have issues with main character (maybe use mockup 
   "sprites" in assets or try/error to ungroup until it works
@@ -7,9 +11,6 @@
 - flag system to avoid re-copying tiles again and again if already correct
 - remove purple/yellow flashe
 - log tiles (per level): with zone filtering (first level only upper part)
-- contexts using tile palette values or current level values (tile colors?)
-  switch tile palette / tile set when palette matches the level
-  caution: intro screen map has its own palette too
 - use 16-bit table for mirror
 - fg tiles color reduction is too violent, maybe do a manual reduction
   or dynamic color change between scores and in-game, try to keep the

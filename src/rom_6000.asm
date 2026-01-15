@@ -51,6 +51,9 @@ sub_sub_sub_state_000b = $b
 game_intro_played_0071 = $71
 intro_devil_has_approached_052a = $52a
 intro_devil_appears_flag_0880 = $880
+tiles_palette_in_ram_1632 = $1632
+sprites_palette_in_ram_16B2 = $16B2
+tiles_palette_index_00de = $de
 
 ; horrible code when it comes to jump tables
 ; there are more than 200+ jump tables, that had to be
@@ -170,7 +173,7 @@ end_of_memory_test_607d:
 60EB: 26 F9       BNE    $60E6
 ; copy more stuff from bank #4
 60ED: 8E 40 80    LDX    #$4080
-60F0: 10 8E 16 B2 LDY    #$16B2
+60F0: 10 8E 16 B2 LDY    #sprites_palette_in_ram_16B2
 60F4: C6 80       LDB    #$80
 60F6: A6 80       LDA    ,X+		; [bank_address]
 60F8: A7 A0       STA    ,Y+
@@ -477,7 +480,7 @@ compute_bank_address_from_b_6378:
 63BD: DD D4       STD    $D4
 63BF: CC 01 00    LDD    #$0100
 63C2: DD D6       STD    $D6
-63C4: 8E 16 32    LDX    #$1632
+63C4: 8E 16 32    LDX    #tiles_palette_in_ram_1632
 63C7: CE 65 3C    LDU    #$653C
 63CA: 86 40       LDA    #$40
 63CC: A7 7F       STA    -$1,S
@@ -603,14 +606,14 @@ update_a_palette_65fb:
 660B: 6E 95       JMP    [B,X]	; [indirect_jump]
 
 update_tiles_palette_6619:
-6619: 96 DE       LDA    $DE
-661B: 26 39       BNE    $6656
+6619: 96 DE       LDA    tiles_palette_index_00de
+661B: 26 39       BNE    change_ram_palette_6656
 661D: 10 DF E2    STS    stack_save_00e2	; save current stack
-6620: CE 16 32    LDU    #$1632		; load U
+6620: CE 16 32    LDU    #tiles_palette_in_ram_1632		; load U
 6623: 32 C8 40    LEAS   $40,U		; change stack to U+$40
-6626: 10 8E 38 00 LDY    #$3800
+6626: 10 8E 38 00 LDY    #$3800		; start of palette
 662A: C6 08       LDB    #$08
-662C: D7 E0       STB    $E0		; do it 8 times
+662C: D7 E0       STB    $E0		; do it 8 times (for 64 colors)
 662E: 35 16       PULS   D,X		; get values from new stack
 6630: ED A9 01 00 STD    $0100,Y
 6634: AF A9 01 02 STX    $0102,Y
@@ -628,16 +631,17 @@ update_tiles_palette_6619:
 6652: 10 DE E2    LDS    stack_save_00e2	; restore current stack
 6655: 39          RTS
 
+change_ram_palette_6656:
 6656: 4A          DECA
 6657: 10 DF E2    STS    stack_save_00e2
 665A: 5F          CLRB
-665B: D7 DE       STB    $DE
+665B: D7 DE       STB    tiles_palette_index_00de	; ack change
 665D: 44          LSRA
 665E: 56          RORB
 665F: C3 40 00    ADDD   #$4000
 6662: 1F 03       TFR    D,U
 6664: 32 C8 40    LEAS   $40,U
-6667: 10 8E 16 32 LDY    #$1632
+6667: 10 8E 16 32 LDY    #tiles_palette_in_ram_1632
 666B: C6 08       LDB    #$08
 666D: D7 E0       STB    $E0
 666F: 35 16       PULS   D,X		; [bank_address]
@@ -657,23 +661,24 @@ update_tiles_palette_6619:
 668F: 10 DE E2    LDS    stack_save_00e2
 6692: 39          RTS
 
+; X contains the palette data
 update_sprites_palette_6693:
 6693: 96 DF       LDA    $DF
 6695: 2B 3B       BMI    $66D2
 6697: 10 DF E2    STS    stack_save_00e2
-669A: CE 16 B2    LDU    #$16B2
+669A: CE 16 B2    LDU    #sprites_palette_in_ram_16B2
 669D: 32 C8 40    LEAS   $40,U
-66A0: 10 8E 38 40 LDY    #$3840
-66A4: C6 08       LDB    #$08
+66A0: 10 8E 38 40 LDY    #$3840		; palette registers R & G colors
+66A4: C6 08       LDB    #$08		; 64 colors (8*8)
 66A6: D7 E0       STB    $E0
 66A8: 35 16       PULS   D,X
-66AA: ED A9 01 00 STD    $0100,Y
+66AA: ED A9 01 00 STD    $0100,Y		; write to R/G
 66AE: AF A9 01 02 STX    $0102,Y
 66B2: 37 16       PULU   D,X
-66B4: ED A1       STD    ,Y++
+66B4: ED A1       STD    ,Y++		; write to R/G
 66B6: AF A1       STX    ,Y++
 66B8: 35 16       PULS   D,X
-66BA: ED A9 01 00 STD    $0100,Y
+66BA: ED A9 01 00 STD    $0100,Y	; write to B
 66BE: AF A9 01 02 STX    $0102,Y
 66C2: 37 16       PULU   D,X
 66C4: ED A1       STD    ,Y++
@@ -685,7 +690,7 @@ update_sprites_palette_6693:
 66D1: 39          RTS
 
 66D2: 84 30       ANDA   #$30
-66D4: 10 8E 16 B2 LDY    #$16B2
+66D4: 10 8E 16 B2 LDY    #sprites_palette_in_ram_16B2
 66D8: 31 A6       LEAY   A,Y
 66DA: D6 DF       LDB    $DF
 66DC: C4 0F       ANDB   #$0F
@@ -895,7 +900,7 @@ update_some_palette_671c:
 6875: FD 00 6E    STD    >$006E
 6878: 0F 70       CLR    $70
 687A: C6 01       LDB    #$01
-687C: D7 DE       STB    $DE
+687C: D7 DE       STB    tiles_palette_index_00de
 687E: D7 DF       STB    $DF
 6880: 0C 05       INC    sub_state_0005
 6882: 39          RTS
@@ -919,7 +924,7 @@ fill_screen_with_h_6883:
 68A3: 26 16       BNE    $68BB
 68A5: 4F          CLRA
 68A6: 5F          CLRB
-68A7: DD DE       STD    $DE
+68A7: DD DE       STD    tiles_palette_index_00de
 68A9: C6 01       LDB    #$01
 68AB: D7 F0       STB    $F0
 68AD: CC 04 04    LDD    #$0404
@@ -1288,7 +1293,7 @@ start_game_screen_6b5e:
 6B9E: CC 06 00    LDD    #$0600
 6BA1: BD 69 09    JSR    $6909
 6BA4: C6 01       LDB    #$01
-6BA6: D7 DE       STB    $DE
+6BA6: D7 DE       STB    tiles_palette_index_00de
 6BA8: BD 68 DF    JSR    $68DF
 6BAB: CC 02 07    LDD    #$0207
 6BAE: BD 69 09    JSR    $6909
@@ -1854,10 +1859,10 @@ game_playing_7245:
 727D: BD 8F 84    JSR    $8F84
 7280: 0C 0E       INC    $0E
 7282: 39          RTS
-7283: CE 16 B2    LDU    #$16B2
+7283: CE 16 B2    LDU    #sprites_palette_in_ram_16B2
 7286: 4F          CLRA
 7287: 5F          CLRB
-7288: D7 DE       STB    $DE
+7288: D7 DE       STB    tiles_palette_index_00de
 728A: 1F 02       TFR    D,Y
 728C: 8E 00 20    LDX    #$0020
 728F: 36 26       PSHU   Y,D	; [video_address]
@@ -2012,7 +2017,7 @@ take_a_key_level_complete_72c9:
 73EF: 9F 09       STX    $09
 73F1: 26 0A       BNE    $73FD
 73F3: C6 01       LDB    #$01
-73F5: D7 DE       STB    $DE
+73F5: D7 DE       STB    tiles_palette_index_00de
 73F7: 0F 71       CLR    game_intro_played_0071
 73F9: 0F 7F       CLR    $7F
 73FB: 20 49       BRA    $7446
@@ -2714,7 +2719,7 @@ init_game_and_intro_scenery_7adc:
 
 7AEC: C6 01       LDB    #$01
 7AEE: D7 AC       STB    armour_flag_00ac	; gives armour
-7AF0: D7 DE       STB    $DE
+7AF0: D7 DE       STB    tiles_palette_index_00de
 7AF2: 0F 72       CLR    current_level_0072		; level 1
 7AF4: CC 40 00    LDD    #$4000
 7AF7: DD 6C       STD    background_screen_location_006c	; shows a fixed scenery in the fields
@@ -2751,7 +2756,7 @@ init_game_and_intro_scenery_7adc:
 7B52: ED 1C       STD    -$4,X
 7B54: EE 1C       LDU    -$4,X
 7B56: E6 C0       LDB    ,U+
-7B58: D7 DE       STB    $DE
+7B58: D7 DE       STB    tiles_palette_index_00de
 7B5A: E6 C0       LDB    ,U+
 7B5C: E7 88 14    STB    $14,X
 7B5F: EF 1C       STU    -$4,X
@@ -3041,7 +3046,7 @@ devil_takes_girl_7d80:
 7E0E: CC 06 00    LDD    #$0600
 7E11: BD 69 09    JSR    $6909
 7E14: C6 0E       LDB    #$0E
-7E16: D7 DE       STB    $DE
+7E16: D7 DE       STB    tiles_palette_index_00de
 7E18: CC 00 20    LDD    #$0020
 7E1B: ED 16       STD    -$A,X
 7E1D: CC 00 50    LDD    #$0050
@@ -5031,7 +5036,7 @@ update_tile_column_86b1:
 8F96: E6 06       LDB    $6,X
 8F98: 2A 22       BPL    $8FBC
 8F9A: EC C4       LDD    ,U	; [bank_address]
-8F9C: D7 DE       STB    $DE
+8F9C: D7 DE       STB    tiles_palette_index_00de
 8F9E: DC 91       LDD    $91
 8FA0: 58          ASLB
 8FA1: 49          ROLA
@@ -5050,7 +5055,7 @@ update_tile_column_86b1:
 8FB9: ED 33       STD    -$D,Y
 8FBB: 39          RTS
 8FBC: E6 41       LDB    $1,U	; [bank_address]
-8FBE: D7 DE       STB    $DE
+8FBE: D7 DE       STB    tiles_palette_index_00de
 8FC0: E6 42       LDB    $2,U	; [bank_address]
 8FC2: 2A 04       BPL    $8FC8
 8FC4: A6 06       LDA    $6,X
@@ -11259,7 +11264,7 @@ CF75: 54          LSRB
 CF76: 54          LSRB
 CF77: 54          LSRB
 CF78: EE C5       LDU    B,U	; [bank_address]
-CF7A: E6 C0       LDB    ,U+
+CF7A: E6 C0       LDB    ,U+	; [bank_address] (or select ??)
 CF7C: E7 06       STB    $6,X
 CF7E: EF 07       STU    $7,X
 CF80: CE 50 0A    LDU    #$500A
@@ -13509,8 +13514,8 @@ E34C: EC C5       LDD    B,U	; [bank_address]
 E34E: ED 1C       STD    -$4,X
 E350: EC 19       LDD    -$7,X
 E352: ED 0B       STD    $B,X
-E354: C6 0F       LDB    #$0F
-E356: E7 0A       STB    $A,X
+E354: C6 0F       LDB    #$0F		; number of times required to shoot on grave
+E356: E7 0A       STB    $A,X		; to make wizard appear (which turns you into frog)
 E358: CC 01 00    LDD    #$0100
 E35B: ED 13       STD    -$D,X
 E35D: E7 15       STB    -$B,X
@@ -14425,19 +14430,19 @@ EB46: EE 0E       LDU    $E,X
 EB48: E6 02       LDB    $2,X
 EB4A: 54          LSRB
 EB4B: 25 0E       BCS    $EB5B
-EB4D: EC C1       LDD    ,U++
+EB4D: EC C1       LDD    ,U++	; [bank_address]
 EB4F: D3 9C       ADDD   $9C
 EB51: ED 36       STD    -$A,Y
-EB53: EC C1       LDD    ,U++
+EB53: EC C1       LDD    ,U++	; [bank_address]
 EB55: D3 9E       ADDD   $9E
 EB57: ED 39       STD    -$7,Y
 EB59: 20 08       BRA    $EB63
-EB5B: EC C1       LDD    ,U++
+EB5B: EC C1       LDD    ,U++	; [bank_address]
 EB5D: ED 36       STD    -$A,Y
-EB5F: EC C1       LDD    ,U++
+EB5F: EC C1       LDD    ,U++	; [bank_address]
 EB61: ED 39       STD    -$7,Y
-EB63: E6 C0       LDB    ,U+
-EB65: A6 C0       LDA    ,U+
+EB63: E6 C0       LDB    ,U+	; [bank_address]
+EB65: A6 C0       LDA    ,U+	; [bank_address]
 EB67: A7 1F       STA    -$1,X
 EB69: EF 0E       STU    $E,X
 EB6B: 8D 37       BSR    $EBA4
@@ -14766,7 +14771,7 @@ EE3C: C6 2A       LDB    #$2A
 EE3E: 86 04       LDA    #$04
 EE40: 7E EE 44    JMP    $EE44
 EE43: 39          RTS
-EE44: 10 8E 16 32 LDY    #$1632
+EE44: 10 8E 16 32 LDY    #tiles_palette_in_ram_1632
 EE48: 31 A5       LEAY   B,Y
 EE4A: E6 80       LDB    ,X+
 EE4C: E7 A8 40    STB    $40,Y

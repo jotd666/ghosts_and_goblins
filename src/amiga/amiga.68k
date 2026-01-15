@@ -765,6 +765,16 @@ load_context:
 	rts
 0:
 	movem.l	d0-a6,-(a7)
+	.ifne	OPT_ENABLE_LOGGING
+	* reset logged tiles
+	lea	bg_tile_log_table,a0
+0:
+	clr.l	(a0)+
+	cmp.l	#bg_tile_log_table_end,A0
+	jne	0b
+
+	.endif
+	
 	move.w	d0,current_context
 	lea	context_name_table,A0
 	add.w	d0,d0	

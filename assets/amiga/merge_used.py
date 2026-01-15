@@ -10,7 +10,7 @@ def merge(used_name,nb_items,nb_cluts):
 
 
     # merge sprites with existing file + moves from level 1
-    used_dump = data_dir / used_name
+    used_dump = data_dir / os.path.basename(used_name)
     with open(used_dump,"rb") as f:
         new_contents = f.read()
 
@@ -35,5 +35,5 @@ def merge(used_name,nb_items,nb_cluts):
             f.write(contents)
 
 merge("fg_used_tiles",0x400,16)
-merge("bg_used_tiles",0x400,8)
+merge("level2/bg_used_tiles",0x400,8)
 merge("used_sprites",0x400,4)

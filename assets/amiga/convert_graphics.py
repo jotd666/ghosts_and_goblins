@@ -31,11 +31,11 @@ def dump_asm_bytes(*args,**kwargs):
 
 
 def ensure_empty(d):
-    if os.path.exists(d):
+    if d.exists():
         for f in os.listdir(d):
             os.remove(os.path.join(d,f))
     else:
-        os.makedirs(d)
+        d.mkdir(parents=True)
 
 def load_tileset(image_name,palette_index,width,height,tileset_name,dumpdir,
 dump=False,name_dict=None,cluts=None,tile_number=0,is_bob=False):
@@ -53,7 +53,7 @@ dump=False,name_dict=None,cluts=None,tile_number=0,is_bob=False):
     tileset_1 = []
 
     if dump:
-        dump_subdir = os.path.join(dumpdir,tileset_name)
+        dump_subdir = dumpdir / tileset_name
         if palette_index == 0 and tile_number == 0:
             ensure_empty(dump_subdir)
 
@@ -426,7 +426,7 @@ fg_tile_palette += (16-len(fg_tile_palette)) * [(0x10,0x20,0x30)]
 ###############
 
 context_list = ["map","level1","level2","level3","level4","level5","level6","level7"]
-context_list = ["level1"]
+context_list = ["level1","level2"]
 for context in context_list:
     bg_tile_sheet_dict = {i:Image.open(sheets_path / "bg_tiles" / context / f"pal_{i:02x}.png") for i in range(BG_NB_CLUTS)}
     bg_tile_cluts = {}
@@ -436,7 +436,7 @@ for context in context_list:
     bg_tile_set_list = []
 
     for i,tsd in bg_tile_sheet_dict.items():
-        tp,tile_set = load_tileset(tsd,i,16,16,"bg_tiles",dump_dir,dump=dump_it,
+        tp,tile_set = load_tileset(tsd,i,16,16,pathlib.Path(context) / "bg_tiles",dump_dir,dump=dump_it,
         cluts=bg_tile_cluts,
         name_dict=None)
         bg_tile_set_list.append(tile_set)
