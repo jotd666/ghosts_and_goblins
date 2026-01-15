@@ -1,6 +1,6 @@
 PROGNAME = GhostsNGoblins
-MAIN_AGA = ..\$(PROGNAME)_aga
-MAIN_OCS = ..\$(PROGNAME)_ocs
+MAIN_AGA = ..\data\$(PROGNAME)_aga
+MAIN_OCS = ..\data\$(PROGNAME)_ocs
 AMIGA_SHELL = ..\$(PROGNAME)
 
 ifdef RELEASE_BUILD

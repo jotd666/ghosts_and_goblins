@@ -3,12 +3,12 @@ import os,sys,bitplanelib,subprocess,json,pathlib
 
 this_dir = pathlib.Path(__file__).absolute().parent
 
-data_dir = this_dir / ".." / ".."
+data_dir = this_dir / ".." / ".." / "data"
 
 
 src_dir = this_dir / ".." / ".." / "src" / "amiga"
-
-
+bg_bank_dir = src_dir / "bg_banks"
+bg_bank_dir.mkdir(exist_ok=True)
 
 sheets_path = this_dir / ".." / "sheets"
 dump_dir = this_dir / "dumps"

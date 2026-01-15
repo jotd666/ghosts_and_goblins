@@ -38,6 +38,7 @@ BORDERBLANK = 1
 PREVIOUS_SPRITE_SIZE = 8
 CURRENT_SPRITE_SIZE = 4
 
+BG_TILE_MAX_SIZE = 60000  | possibly less
 
 SCORE_FILE_SIZE = 0x23		| wrong
 
@@ -442,10 +443,6 @@ _user:
 	move.w	#16,d0
 	jbsr	load_palette
 	
-	lea		bg_tile_palette,a0
-	move.l	color_copper_pointers,a1	| entries 0-31
-	move.w	#TOTAL_NB_COLORS/2,d0
-	jbsr	load_palette
 	
 	lea		sprite_palette,a0
 	move.l	color_copper_pointers+TOTAL_NB_COLORS/2*4,a1	| entries 32-64
@@ -2350,7 +2347,7 @@ update_bg_tile:
 	
 	*cmp.b	#0x20,d2
 	*jeq		11f				| optim: blank tile
-	lea		bg_character_table,a0
+	move.l		bg_character_table,a0
 	.ifdef	NO68020
 	add.w	d2,d2
 	add.w	d2,d2	
@@ -3870,6 +3867,10 @@ cpu_log_prev_state:
 
 	.section	.bsspublic
 
+bg_character_table:
+	.long 	0
+bg_character_table_buffer:
+	.skip	BG_TILE_MAX_SIZE
 log_buffer:
 	.skip	LOG_BUFFER_SIZE
 log_buffer_end:
