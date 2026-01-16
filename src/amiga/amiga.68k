@@ -2389,7 +2389,7 @@ update_bg_tile:
 	.ifdef	NO68020
 	lsr.w	#2,d2
 	.endif
-	COLOR0_FLASH	0xF0F
+	**COLOR0_FLASH	0xF0F
 	jra		11f
 12:
 	.endif
@@ -2413,7 +2413,7 @@ update_bg_tile:
 	add.w	#BG_SCREEN_TILE_ADDRESS,d7
 	lsr.w	#2,d2
 	lsr.w	#2,d3
-	COLOR0_FLASH	0xFF0
+	**COLOR0_FLASH	0xFF0
 	jra		11f
 	.endif
 12:
@@ -2736,7 +2736,7 @@ update_fg_tile:
 	lsr.w	#2,d2
 	.endif
 	add.w	#FG_SCREEN_TILE_ADDRESS,d7
-	COLOR0_FLASH	0x00F
+	**COLOR0_FLASH	0x00F
 	*BREAKPOINT	"unregistered game tile (in D2, at address D7)"	
 
 	jra		11f

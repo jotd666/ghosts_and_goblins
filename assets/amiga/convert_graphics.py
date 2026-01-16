@@ -129,6 +129,32 @@ dump=False,name_dict=None,cluts=None,tile_number=0,is_bob=False):
                     tileset_1[right_tile_index] = None  # discard
                     wtile = new_tile
 
+                elif tile_number in group_sprite_quadruplets:
+                    # change wtile, fetch code +1
+                    central_tile_index = tile_number+1
+                    central_tile_1 = tileset_1[central_tile_index]
+                    central_tile_2 = tileset_1[central_tile_index+1]
+                    right_tile_index = central_tile_index+2
+                    right_tile = tileset_1[right_tile_index]
+                    if not central_tile_1:
+                        raise Exception(f"triplet: central tile index 0x{central_tile_index:02x} not found")
+                    if not central_tile_2:
+                        raise Exception(f"triplet: central tile index 0x{central_tile_index+1:02x} not found")
+                    if not right_tile:
+                        raise Exception(f"triplet: right tile index 0x{right_tile_index:02x} not found")
+                    new_tile = Image.new("RGB",(wtile.size[0]*4,wtile.size[1]))
+
+                    new_tile.paste(wtile)
+
+                    new_tile.paste(central_tile_1,(wtile.size[0],0))
+                    new_tile.paste(central_tile_2,(wtile.size[0]*2,0))
+                    new_tile.paste(right_tile,(wtile.size[0]*3,0))
+                    tileset_1[tile_number] = new_tile
+                    tileset_1[central_tile_index] = None  # discard
+                    tileset_1[central_tile_index+1] = None  # discard
+                    tileset_1[right_tile_index] = None  # discard
+                    wtile = new_tile
+
             if dump_it and wtile:
                 img = ImageOps.scale(wtile,5,resample=Image.Resampling.NEAREST)
                 if sprite_names:
