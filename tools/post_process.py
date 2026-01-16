@@ -137,7 +137,6 @@ for i,line in enumerate(lines):
         lines[i-1] = remove_error(lines[i-1],ignore_missing=True)
         lines[i-2] = remove_error(lines[i-2],ignore_missing=True)
 
-
     lines[i] = line
 
 with open(source_dir / f"{bankname}.68k","w") as fw:
@@ -396,6 +395,16 @@ for i,line in enumerate(lines):
     if address == 0x68f3:
         # change loop count register
         line = change_instruction("subq.b\t#1,d7",lines,i)
+    elif address == 0x6692:
+        # palette update: try to change context
+        line = "\tGET_ADDRESS\ttiles_palette_in_ram_1632\n"+change_instruction("jbra\tosd_set_tile_palette",lines,i)
+    elif address in [0xf570]:
+        line = "\ttst.b\tinvincible_flag\n\tjne\tl_f59a\n"+line
+    elif address in [0xf13c]:
+        line = "\ttst.b\tinvincible_flag\n\tjne\tl_f150\n"+line
+##    elif address in {0x661D,0x6697}:
+##        # no need to update palette hardware registers, it takes time for nothing
+##        line = change_instruction("rts",lines,i)
 
 # pattern where logging is required outside the IRQ code
 # entering the IRQ disables logging, and exiting restores previous logging state

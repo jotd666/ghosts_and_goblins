@@ -701,7 +701,9 @@ demo_game:
 	jbsr	cache_fg_tiles_address
 	jbsr	cache_bg_tiles_address
 
-
+	moveq	#0,D0
+	jbsr	load_context
+	
 	GET_MEMORY_START_AND_DP
 	* install frame
 	lea	(0x2040,a6),a0
@@ -759,7 +761,75 @@ display_text:
 1:
 	rts
 	
+
+* < D0: context name
+load_context:
+
+
+	movem.l	d0-a6,-(a7)
+
 	
+	lea	context_name_table,A0
+	add.w	d0,d0	
+	add.w	d0,d0
+	move.l	(a0,d0.w),a0
+	lea		bg_character_table_buffer,a1
+	jbsr	load_file
+	
+	* set palette
+	lea		bg_character_table_buffer,a0
+	move.l	color_copper_pointers,a1	| entries 0-31
+	move.w	#TOTAL_NB_COLORS/2,d0
+	jbsr	load_palette
+	
+	* now relocate file
+	lea		bg_character_table_buffer+64,a0		| skip palette
+	move.l	a0,bg_character_table				| set character table pointer
+	move.l	a0,d0
+	move.w	#0x3FF,d7
+0:
+	move.l	(a0)+,d1
+	jeq		10f
+	add.l	d0,d1
+	move.l 	d1,(-4,a0)
+	move.l	d1,a1
+
+	* relocate pointers on bitplane list in clut table
+	moveq	#BG_TILE_NB_CLUTS-1,d6
+1:
+	move.l	(a1)+,d2
+	jeq		5f
+	add.l	d0,d2
+	move.l	d2,(-4,a1)
+	move.l	d2,a2
+	* relocate pointers on bitplanes
+	moveq	#4,D5	| 5 bitplanes
+2:
+	move.l	(a2)+,d3
+	jeq		4f
+	add.l	d0,d3
+	move.l	d3,(-4,a2)
+4:
+	dbf		D5,2b
+5:
+	dbf		d6,1b
+10:
+	dbf		d7,0b
+	
+
+	movem.l	(a7)+,d0-a6
+	rts
+	
+* < A0: filename
+* < A1: buffer
+load_file:
+	move.l	_resload,d0
+	jeq		0f
+	move.l	d0,a2
+	jbsr	resload_LoadFileDecrunch(a2)
+	rts
+0:
+	illegal	
 install_horiz_frame:
 	move.w	#0xA0A1,(a0)
 	move.w	#0x0E0E,(0x400,a0)
@@ -782,6 +852,8 @@ dump_and_quit:
 
 	illegal
 	.endif
+	
+	.include	"context.68k"
 	
 tiles_at_start:
 .byte  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xaf,0xa8,0xa9,0xab,0x06,0xb0,0x00	|	0x0000

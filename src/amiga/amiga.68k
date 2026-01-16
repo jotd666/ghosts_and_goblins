@@ -212,6 +212,7 @@ osd_enter_\@:
 * osd layer		
 	.global osd_enable_interrupts
 	.global osd_disable_interrupts
+	.global osd_set_tile_palette
 	.global osd_break		| for debug	
 	.global osd_blitz		| for debug
 	.global osd_read_dsw1
@@ -241,7 +242,6 @@ osd_enter_\@:
 	.global	osd_dump_logs
 	.global	osd_log_cpu
 	.global	osd_cpu_logging_control
-	.global	osd_set_irq_return_address
 		
 		
 	.include	"ReadJoypad.i"
@@ -470,6 +470,10 @@ _user:
 	move.l	cheat_flags,d0
 	jeq		1f
 	btst	#0,d0
+	sne		invincible_flag
+	btst	#1,d0
+	sne		infinite_lives_flag
+	btst	#2,d0
 	sne		infinite_time_flag
 	move.b	d0,d1
 	and.b	#3,d1
@@ -733,8 +737,6 @@ demo_game:
 	.endif
 	
 
-	moveq	#0,d0
-	jbsr	load_context
 
 	* enable interrupts. Game doesn't use them
 	* but relies on vbl sync flags
@@ -755,7 +757,36 @@ dump_and_quit:
 	jbsr	osd_dump_logs
 	illegal
 	.endif
+
+* < A0: tile palette in RAM (but shadows hardware palette)
+* format (RGB4) is: offset=$RG, offset+$40=$B0
+osd_set_tile_palette:
+	OSD_ENTER
+	movem.l	d0-d3/a1,-(a7)
+	* re-compose RGBx word to search in palette
+	* if color are at the indicated positions, then we know
+	* for sure what is the palette and thus what is the context
+	move.w	unique_color_index,d0
+	move.b	(a0,d0.w),d2
+	lsl.w	#8,d2
+	move.b	(0x40,a0,d0.w),d2
+	lea		context_data,a1
+	lsr.w	#4,d2
+0:
+	move.w	(a1)+,d0
+	jmi		5f
+	addq	#2,a1
+	cmp.w	d0,d2
+	jne		0b
+	* we recognized our context
+	move.w	(-2,a1),d0
+
 	
+	jbsr	load_context
+5:
+	movem.l	(a7)+,d0-d3/a1
+	OSD_EXIT
+	rts
 
 * < D0: context name
 load_context:
@@ -764,6 +795,7 @@ load_context:
 	* same context: don't load
 	rts
 0:
+	BREAKPOINT 	"load context!"
 	movem.l	d0-a6,-(a7)
 	.ifne	OPT_ENABLE_LOGGING
 	* reset logged tiles

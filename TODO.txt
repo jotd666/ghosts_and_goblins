@@ -1,17 +1,17 @@
-- patch palette write to detect context change: 6619: skip constant
-  palette write (saves time) if __amiga__, check context change at end of ram palette
-  update in 6692 (also handles fade at start!)
-  
-- scrolling in HW test
-- restore grouping, seems to have issues with main character (maybe use mockup 
+- mirror sprite display nothing!
+ - restore grouping, seems to have issues with main character (maybe use mockup 
   "sprites" in assets or try/error to ungroup until it works
+ 
+- debug division routines: plant shoot angles are wrong
+- tombstone easter egg shot seems wrong
+- scrolling in HW test (with level 3 tiles)
 - parasite sprites at the bottom
 - crash when dying (should show the map instead) or lockup in 617F loop, no events arrive
-- enable symmetry
 - flag system to avoid re-copying tiles again and again if already correct
 - remove purple/yellow flashe
 - log tiles (per level): with zone filtering (first level only upper part)
 - use 16-bit table for mirror
+- flame in HUD wrong colors
 - fg tiles color reduction is too violent, maybe do a manual reduction
   or dynamic color change between scores and in-game, try to keep the
   maximum of different colors on the bottom status

@@ -422,11 +422,11 @@ print(f"Used fg tile colors: {len(fg_tile_palette)}")
 fg_tile_palette += (16-len(fg_tile_palette)) * [(0x10,0x20,0x30)]
 
 ###############
-# background: per level
+# background: per level, 1=2
 ###############
 
-context_list = ["map","level1","level2","level3","level4","level5","level6","level7"]
-context_list = ["level1","level2"]
+context_list = ["map","level1","level3","level5","level6"]
+context_list = ["level1","level3","level4","level5","level6","level7"]
 for context in context_list:
     bg_tile_sheet_dict = {i:Image.open(sheets_path / "bg_tiles" / context / f"pal_{i:02x}.png") for i in range(BG_NB_CLUTS)}
     bg_tile_cluts = {}

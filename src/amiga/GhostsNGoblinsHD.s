@@ -37,7 +37,7 @@ _expmem
 _config
 	dc.b	"C1:X:invincible:0;"
 	dc.b	"C1:X:infinite lives:1;"
-	dc.b	"C1:X:invincible to colliding shooters:2;"
+	dc.b	"C1:X:infinite time:2;"
 	dc.b	"C1:X:cheat keys:4;"
 	dc.b	"C2:X:25 Hz update:0;"
 
