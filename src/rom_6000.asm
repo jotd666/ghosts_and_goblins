@@ -760,7 +760,7 @@ update_some_palette_671c:
 6759: F7 3D 00    STB    $3D00
 675C: DC D4       LDD    scroll_x_value_00d4
 675E: B7 3B 09    STA    $3B09
-6761: F7 3B 08    STB    scroll_x_register_3b08
+6761: F7 3B 08    STB    scroll_x_register_3b08	; hardware is in little endian
 6764: DC D6       LDD    scroll_y_value_00d6
 6766: 43          COMA
 6767: 53          COMB
@@ -2273,12 +2273,12 @@ take_a_key_level_complete_72c9:
 767F: EE 84       LDU    ,X
 7681: 33 5C       LEAU   -$4,U
 7683: EC A1       LDD    ,Y++
-7685: ED C4       STD    ,U
+7685: ED C4       STD    ,U		; [video_address]
 7687: EC A1       LDD    ,Y++
-7689: ED 42       STD    $2,U
+7689: ED 42       STD    $2,U		; [video_address]
 768B: DC E4       LDD    $E4
-768D: ED C9 04 00 STD    $0400,U
-7691: ED C9 04 02 STD    $0402,U
+768D: ED C9 04 00 STD    $0400,U		; [video_address]
+7691: ED C9 04 02 STD    $0402,U		; [video_address]
 7695: 33 C8 20    LEAU   counter_16_bit_0020,U
 7698: 0A E2       DEC    stack_save_00e2
 769A: 26 E7       BNE    $7683
@@ -8802,7 +8802,7 @@ B85E: EE 88 16    LDU    $16,X
 B861: EC C1       LDD    ,U++		; [bank_address]
 B863: 26 04       BNE    $B869
 B865: EE C4       LDU    ,U		; [bank_address]
-B867: EC C1       LDD    ,U++
+B867: EC C1       LDD    ,U++		; [bank_address]
 B869: ED 0A       STD    $A,X
 B86B: EF 88 16    STU    $16,X
 B86E: 39          RTS
@@ -15587,14 +15587,14 @@ FB23: C0 04       SUBB   #$04
 FB25: 25 F9       BCS    $FB20
 FB27: D7 29       STB    $29
 FB29: EE 03       LDU    $3,X
-FB2B: EC C4       LDD    ,U
+FB2B: EC C4       LDD    ,U		; [bank_address]
 FB2D: DA E4       ORB    $E4
 FB2F: ED A4       STD    ,Y
-FB31: A6 42       LDA    $2,U
+FB31: A6 42       LDA    $2,U		; [bank_address]
 FB33: A7 24       STA    $4,Y
-FB35: A6 43       LDA    $3,U
+FB35: A6 43       LDA    $3,U		; [bank_address]
 FB37: A7 28       STA    $8,Y
-FB39: A6 44       LDA    $4,U
+FB39: A6 44       LDA    $4,U		; [bank_address]
 FB3B: A7 2C       STA    $C,Y
 FB3D: D6 E7       LDB    $E7
 FB3F: 50          NEGB
@@ -15609,20 +15609,20 @@ FB4E: C3 00 10    ADDD   #$0010
 FB51: 84 01       ANDA   #$01
 FB53: 97 E4       STA    $E4
 FB55: E7 27       STB    $7,Y
-FB57: AA 41       ORA    $1,U
+FB57: AA 41       ORA    $1,U		; [bank_address]
 FB59: A7 25       STA    $5,Y
 FB5B: 96 E4       LDA    $E4
 FB5D: C3 00 10    ADDD   #$0010
 FB60: 84 01       ANDA   #$01
 FB62: 97 E4       STA    $E4
 FB64: E7 2B       STB    $B,Y
-FB66: AA 41       ORA    $1,U
+FB66: AA 41       ORA    $1,U		; [bank_address]
 FB68: A7 29       STA    $9,Y
 FB6A: 96 E4       LDA    $E4
 FB6C: C3 00 10    ADDD   #$0010
 FB6F: 84 01       ANDA   #$01
 FB71: E7 2F       STB    $F,Y
-FB73: AA 41       ORA    $1,U
+FB73: AA 41       ORA    $1,U		; [bank_address]
 FB75: A7 2D       STA    $D,Y
 FB77: 31 A8 10    LEAY   $10,Y
 FB7A: 39          RTS

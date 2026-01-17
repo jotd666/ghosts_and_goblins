@@ -1,7 +1,7 @@
-- mirror sprite display nothing!
 - grouping, seems to have issues with main character at tile 0 tile 0 seems
   to be a special case despite the precautions
-
+- cheat start with weapon
+- "cheat" key to display x/y scroll on fg layer
 - debug division routines: plant shoot angles are wrong, devils attacks maybe (level 3 first devil debug)
 - tombstone easter egg shot seems wrong
 - scrolling in HW test (with level 3 tiles)

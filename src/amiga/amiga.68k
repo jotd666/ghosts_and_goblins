@@ -125,7 +125,7 @@ NB_BG_PLANES = 5
 
 TOTAL_NB_COLORS = 1<<NB_PLAYFIELD_PLANES
 FG_NB_BYTES_PER_ROW = 0x20
-BG_NB_BYTES_PER_ROW = 80
+BG_NB_BYTES_PER_ROW = 0x60
 
 Y_START = 0x20
 
@@ -1041,8 +1041,14 @@ level3_interrupt:
 2:
 
 	subq.w	#1,delay_timer
-		
+	
 	jbsr	call_nmi
+	
+	GET_MEMORY_START_AND_DP
+	move.b	#0,0x110
+	move.w	(scroll_x_register_3b08,a6),d0
+	ror.w	#8,d0		| hardware is in little endian
+	move.w	D0,scroll_x
 	
 	* ok now D5 can be used freely
 
@@ -1053,6 +1059,7 @@ level3_interrupt:
 0:
 
 	jbsr		really_update_sprites
+	
 	
 
 	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
@@ -1217,8 +1224,11 @@ blit_background:
 	* add Y offset: Y*NB_BYTES_PER_ROW
 	add.w	(a4,d1.w),d0
 	* same offset for source and destination
-	add.w	d0,a1
-	add.w	d0,a0
+	moveq	#0,d1
+	move.w	d0,d1
+	* long add!
+	add.l	d1,a1
+	add.l	d1,a0
 	
 
     move.l  #0x09f00000,d3    | A->D copy, ascending mode	
@@ -1483,10 +1493,9 @@ update_one_bob:
 	jbsr	mirror_sprite_planes
 	
 	* BOBs must follow screen scroll
-	*add.w	scroll_y,d1
-	*add.w	scroll_x_lo,d0
-	*add.w	scroll_x_hi,d0
-	*and.w	#0x1FF,d0
+	add.w	scroll_y,d1
+	add.w	scroll_x,d0
+	and.w	#0x1FF,d0
 	
 	* D0 and D1 are already set
 	move.l	(NB_PLAYFIELD_PLANES*4,a0),d2
@@ -2347,6 +2356,57 @@ bg_tile:
 	add.l	d5,a2
 	.endm
 
+	.macro	COPY_TILE16_PLANE_ROW
+	move.w	d0,(offset,a1)  | buffer
+	move.w	d0,(offset,a3)  | restore buffer
+	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
+	move.w	d0,(offset,a4)	| second buffer
+	.endif
+	.endm
+	
+	.macro	CLEAR_TILE16_PLANE
+	.set	offset,0
+	.rept	16
+	clr.w	(offset,a1)
+	clr.w	(offset,a3)  | restore buffer
+	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
+	clr.w	(offset,a4)	| second buffer
+	.endif
+	.set	offset,offset+BG_NB_BYTES_PER_ROW
+	.endr	
+	.endm
+	
+*	.macro	COPY_TILE_PLANE_ROW_BACKBUFFER
+*	COPY_TILE_PLANE_ROW
+*	move.b	d0,(offset,a3)  | backbuffer
+*	.endm
+*	
+*	.macro	CLEAR_TILE_PLANE_BACKBUFFER
+*	.set	offset,0
+*	.rept	8
+*	clr.b	(offset,a1)
+*	clr.b	(offset,a3)
+*	.set	offset,offset+BG_NB_BYTES_PER_ROW
+*	.endr	
+*	.endm
+	
+	.macro	TILE16_NEXT_PLANE
+	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
+	add.l	d5,a1
+	add.l	d5,a3
+	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
+	add.l	d5,a4
+	.endif
+	.else
+	add.w	d5,a1
+	add.w	d5,a3
+	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
+	add.w	d5,a4
+	.endif
+	
+	.endif
+	.endm
+	
 cache_bg_tiles_address:
 	rts
 
@@ -2376,6 +2436,10 @@ update_bg_tile:
 	add.w	d0,d0	| 16 pixels
 	move.w	d7,d1
 	and.w	#0x1F,d1	| modulus 0x20
+	
+	* duplicate tile draw if 0-1F (wrap)
+	cmp.w	#0x20,d0
+	scs		d6
 	
 	* updating bitplanes
 	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
@@ -2463,68 +2527,31 @@ update_bg_tile:
 12:
 	move.l	d0,a2					| pointer on bitplanes
 
-	
-	.macro	COPY_TILE16_PLANE_ROW
-	move.w	d0,(offset,a1)  | buffer
-	move.w	d0,(offset,a3)  | restore buffer
-	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
-	move.w	d0,(offset,a4)	| second buffer
-	.endif
-	.endm
-	
-	.macro	CLEAR_TILE16_PLANE
-	.set	offset,0
-	.rept	16
-	clr.w	(offset,a1)
-	clr.w	(offset,a3)  | restore buffer
-	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
-	clr.w	(offset,a4)	| second buffer
-	.endif
-	.set	offset,offset+BG_NB_BYTES_PER_ROW
-	.endr	
-	.endm
-	
-*	.macro	COPY_TILE_PLANE_ROW_BACKBUFFER
-*	COPY_TILE_PLANE_ROW
-*	move.b	d0,(offset,a3)  | backbuffer
-*	.endm
-*	
-*	.macro	CLEAR_TILE_PLANE_BACKBUFFER
-*	.set	offset,0
-*	.rept	8
-*	clr.b	(offset,a1)
-*	clr.b	(offset,a3)
-*	.set	offset,offset+BG_NB_BYTES_PER_ROW
-*	.endr	
-*	.endm
-	
-	.macro	TILE16_NEXT_PLANE
-	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
-	add.l	d5,a1
-	add.l	d5,a3
-	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
-	add.l	d5,a4
-	.endif
-	.else
-	add.w	d5,a1
-	add.w	d5,a3
-	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
-	add.w	d5,a4
-	.endif
-	
-	.endif
-	.endm
+
 	
 	lea		mirror_jump_table,a0
+	.ifdef	NO68020
 	add.w	d1,d1
 	add.w	d1,d1
 	move.l	(a0,d1.w),a0
-	jsr		(a0)
+	.else
+	move.l	(a0,d1.w*4),a0
+	.endif
+	tst.b	d6
+	jne		0f
+	jmp		(a0)
+0:
+	* do it twice
+	movem.l	a0-a4/d4,-(a7)
+	jsr	(a0)
+	movem.l	(a7)+,a0-a4/d4
+	add.w	#0x20,a1	| wrap plane
+	add.w	#0x20,a3	| wrap plane
+	add.w	#0x20,a4	| wrap plane
+	jsr	(a0)
 	
 	rts
-* made more complex by 4 tile orientations + the fact that the last
-* tile bitplane should not be copied into the backbuffer as sprites
-* only use 4 planes
+
 standard_tile16:
 
 	* just copy
@@ -2913,10 +2940,6 @@ set_bobs_bitplanes:
 	* set bitplanes
 	moveq	#0,d0
 	move.w	scroll_y,d0
-	jpl		0f
-	moveq	#0,d0
-	jra		1f			| avoids non-atomic illegal scroll value
-0:
 
 	lea		mulBG_NB_BYTES_PER_ROW_table,a2
 	.ifdef	MC68020
@@ -2926,7 +2949,7 @@ set_bobs_bitplanes:
 	move.w	(a2,d0.w),d0		| compute Y offset
 	.endif
 1:	
-	moveq	#0,d2
+	move.w	scroll_x,d2
 	and.w	#0x1FF,d2			| wraps at 0x200!
 
 	lea		scroll_table,a2
@@ -2939,7 +2962,7 @@ set_bobs_bitplanes:
 	.endif
 	
 	move.w	(a2)+,fine_x_scroll_value
-	add.w	(a2),d0
+	add.w	(a2),d0			| add x offset
 	
 	
     moveq #NB_PLAYFIELD_PLANES-1,d1
@@ -4072,9 +4095,7 @@ target_ssp_value:
 
 scroll_y:
 	.word	0
-scroll_x_hi:
-	.word	0
-scroll_x_lo:
+scroll_x:
 	.word	0
 
 
