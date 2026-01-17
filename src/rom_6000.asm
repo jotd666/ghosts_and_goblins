@@ -61,6 +61,7 @@ scroll_y_register_3b0a = $3b0a
 bg_tiles_address_2800 = $2800
 bg_tiles_color_address_2c00 = $2c00
 bank_address_4000 = $4000
+sound_index_3a00 = $3a00
 
 ; horrible code when it comes to jump tables
 ; there are more than 200+ jump tables, that had to be
@@ -221,7 +222,7 @@ end_of_memory_test_607d:
 6143: BD 62 39    JSR    $6239
 6146: BD 62 74    JSR    $6274
 6149: 5F          CLRB
-614A: F7 3A 00    STB    $3A00
+614A: F7 3A 00    STB    sound_index_3a00		; clear sound
 614D: 4F          CLRA
 614E: 5F          CLRB
 614F: DD D4       STD    scroll_x_value_00d4
@@ -588,7 +589,7 @@ irq_65c4:
 65D3: BD 67 55    JSR    $6755
 65D6: BD 67 72    JSR    $6772
 65D9: BD 62 2C    JSR    read_dip_switches_622c
-65DC: BD 79 30    JSR    $7930
+65DC: BD 79 30    JSR    process_sound_queue_7930
 65DF: BD 67 B3    JSR    $67B3
 65E2: BD 62 39    JSR    $6239
 65E5: BD 62 74    JSR    $6274
@@ -819,7 +820,7 @@ update_some_palette_671c:
 67D0: C3 00 01    ADDD   #$0001
 67D3: 27 05       BEQ    $67DA
 67D5: DD 22       STD    $22
-67D7: 7E 79 50    JMP    $7950
+67D7: 7E 79 50    JMP    play_credit_sound_7950
 67DA: 39          RTS
 67DB: 8E 15 82    LDX    #$1582
 67DE: 5F          CLRB
@@ -873,7 +874,7 @@ update_some_palette_671c:
 682E: 8D 09       BSR    $6839
 6830: 6F 05       CLR    $5,X
 6832: 34 10       PSHS   X
-6834: BD 79 50    JSR    $7950
+6834: BD 79 50    JSR    play_credit_sound_7950
 6837: 35 90       PULS   X,PC		; X saved at 6832
 6839: 6C 84       INC    ,X
 683B: 6C 01       INC    $1,X
@@ -2502,6 +2503,7 @@ player_dead_777c:
 78E2: BD 69 09    JSR    $6909
 78E5: 0C 0B       INC    sub_sub_sub_state_000b
 78E7: 39          RTS
+
 78E8: C6 01       LDB    #$01
 78EA: D7 F0       STB    $F0
 78EC: CC 0E 00    LDD    #$0E00
@@ -2524,11 +2526,13 @@ player_dead_777c:
 7910: D7 02       STB    global_state_0002
 7912: 0F 05       CLR    sub_state_0005
 7914: 39          RTS
+
+queue_sound_7915:
 7915: 0D 52       TST    $52
-7917: 26 04       BNE    $791D
+7917: 26 04       BNE    queue_sound_forced_791d		; attract mode
 7919: 0D 28       TST    $28
 791B: 27 12       BEQ    $792F
-l_791d:
+queue_sound_forced_791d:
 791D: 10 9E 14    LDY    $14
 7920: E7 A0       STB    ,Y+
 7922: 10 8C 01 7F CMPY   #$017F
@@ -2536,6 +2540,8 @@ l_791d:
 7928: 10 8E 01 40 LDY    #$0140
 792C: 10 9F 14    STY    $14
 792F: 39          RTS
+
+process_sound_queue_7930:
 7930: 9E 16       LDX    $16
 7932: 9C 14       CMPX   $14
 7934: 27 0F       BEQ    $7945
@@ -2544,66 +2550,70 @@ l_791d:
 793B: 25 03       BCS    $7940
 793D: 8E 01 40    LDX    #$0140
 7940: 9F 16       STX    $16
-7942: F7 3A 00    STB    $3A00
+7942: F7 3A 00    STB    sound_index_3a00
 7945: 39          RTS
+
 7946: C6 00       LDB    #$00
-7948: 7E 79 15    JMP    $7915
+7948: 7E 79 15    JMP    queue_sound_7915
 794B: C6 3A       LDB    #$3A
-794D: 7E 79 15    JMP    $7915
+794D: 7E 79 15    JMP    queue_sound_7915
+
+play_credit_sound_7950:
 7950: D6 28       LDB    $28
 7952: 10 26 FF EF LBNE   $7945
 7956: C6 35       LDB    #$35
-7958: BD 79 1D    JSR    $791D
+7958: BD 79 1D    JSR    queue_sound_forced_791d
 795B: C6 FF       LDB    #$FF
-795D: 7E 79 1D    JMP    $791D
+795D: 7E 79 1D    JMP    queue_sound_forced_791d
+
 7960: C6 01       LDB    #$01
-7962: 7E 79 15    JMP    $7915
+7962: 7E 79 15    JMP    queue_sound_7915
 7965: C6 02       LDB    #$02
-7967: 7E 79 15    JMP    $7915
+7967: 7E 79 15    JMP    queue_sound_7915
 796A: C6 03       LDB    #$03
-796C: 7E 79 15    JMP    $7915
+796C: 7E 79 15    JMP    queue_sound_7915
 796F: C6 04       LDB    #$04
-7971: 7E 79 15    JMP    $7915
+7971: 7E 79 15    JMP    queue_sound_7915
 7974: C6 05       LDB    #$05
-7976: 7E 79 15    JMP    $7915
+7976: 7E 79 15    JMP    queue_sound_7915
 7979: C6 06       LDB    #$06
 797B: 7E 79 58    JMP    $7958
 797E: C6 07       LDB    #$07
-7980: BD 79 15    JSR    $7915
+7980: BD 79 15    JSR    queue_sound_7915
 7983: C6 08       LDB    #$08
-7985: 7E 79 15    JMP    $7915
+7985: 7E 79 15    JMP    queue_sound_7915
 7988: C6 1D       LDB    #$1D
-798A: 7E 79 15    JMP    $7915
+798A: 7E 79 15    JMP    queue_sound_7915
 798D: C6 0B       LDB    #$0B
 798F: 7E 79 58    JMP    $7958
 7992: C6 0C       LDB    #$0C
 7994: 7E 79 58    JMP    $7958
 7997: C6 0D       LDB    #$0D
-7999: 7E 79 15    JMP    $7915
+7999: 7E 79 15    JMP    queue_sound_7915
 799C: C6 0E       LDB    #$0E
-799E: 7E 79 15    JMP    $7915
+799E: 7E 79 15    JMP    queue_sound_7915
 79A1: C6 0F       LDB    #$0F
 79A3: 7E 79 58    JMP    $7958
 79A6: C6 10       LDB    #$10
-79A8: 7E 79 15    JMP    $7915
+79A8: 7E 79 15    JMP    queue_sound_7915
 79AB: C6 12       LDB    #$12
 79AD: 7E 79 58    JMP    $7958
 79B0: C6 13       LDB    #$13
-79B2: 7E 79 15    JMP    $7915
+79B2: 7E 79 15    JMP    queue_sound_7915
 79B5: C6 14       LDB    #$14
 79B7: 7E 79 58    JMP    $7958
 79BA: C6 17       LDB    #$17
 79BC: 7E 79 58    JMP    $7958
 79BF: C6 18       LDB    #$18
-79C1: 7E 79 15    JMP    $7915
+79C1: 7E 79 15    JMP    queue_sound_7915
 79C4: C6 19       LDB    #$19
-79C6: 7E 79 15    JMP    $7915
+79C6: 7E 79 15    JMP    queue_sound_7915
 79C9: C6 1A       LDB    #$1A
 79CB: 7E 79 58    JMP    $7958
 79CE: C6 1B       LDB    #$1B
 79D0: 7E 79 58    JMP    $7958
 79D3: C6 1C       LDB    #$1C
-79D5: 7E 79 15    JMP    $7915
+79D5: 7E 79 15    JMP    queue_sound_7915
 79D8: C6 00       LDB    #$00
 79DA: 7E 79 58    JMP    $7958
 79DD: C6 1E       LDB    #$1E
@@ -2611,7 +2621,7 @@ l_791d:
 79E2: C6 1F       LDB    #$1F
 79E4: 7E 79 58    JMP    $7958
 79E7: C6 20       LDB    #$20
-79E9: 7E 79 15    JMP    $7915
+79E9: 7E 79 15    JMP    queue_sound_7915
 79EC: C6 21       LDB    #$21
 79EE: 7E 79 58    JMP    $7958
 79F1: C6 22       LDB    #$22
@@ -2619,54 +2629,54 @@ l_791d:
 79F6: C6 23       LDB    #$23
 79F8: 7E 79 58    JMP    $7958
 79FB: C6 24       LDB    #$24
-79FD: 7E 79 15    JMP    $7915
+79FD: 7E 79 15    JMP    queue_sound_7915
 l_7a00:
 7A00: C6 25       LDB    #$25
-7A02: 7E 79 15    JMP    $7915
+7A02: 7E 79 15    JMP    queue_sound_7915
 l_7a05:
 7A05: C6 26       LDB    #$26
-7A07: 7E 79 15    JMP    $7915
+7A07: 7E 79 15    JMP    queue_sound_7915
 l_7a0a:
 7A0A: C6 27       LDB    #$27
-7A0C: 7E 79 15    JMP    $7915
+7A0C: 7E 79 15    JMP    queue_sound_7915
 l_7a0f:
 7A0F: C6 2C       LDB    #$2C
-7A11: 7E 79 15    JMP    $7915
+7A11: 7E 79 15    JMP    queue_sound_7915
 l_7a14:
 7A14: C6 28       LDB    #$28
-7A16: 7E 79 15    JMP    $7915
+7A16: 7E 79 15    JMP    queue_sound_7915
 7A19: BD 7A 66    JSR    $7A66
 7A1C: BD 79 46    JSR    $7946
 7A1F: C6 2F       LDB    #$2F
-7A21: 7E 79 15    JMP    $7915
+7A21: 7E 79 15    JMP    queue_sound_7915
 7A24: C6 30       LDB    #$30
-7A26: 7E 79 15    JMP    $7915
+7A26: 7E 79 15    JMP    queue_sound_7915
 7A29: BD 7A 66    JSR    $7A66
 7A2C: BD 79 46    JSR    $7946
 7A2F: C6 31       LDB    #$31
-7A31: 7E 79 15    JMP    $7915
+7A31: 7E 79 15    JMP    queue_sound_7915
 7A34: C6 32       LDB    #$32
-7A36: 7E 79 15    JMP    $7915
+7A36: 7E 79 15    JMP    queue_sound_7915
 7A39: C6 36       LDB    #$36
 7A3B: 7E 79 58    JMP    $7958
 7A3E: C6 37       LDB    #$37
-7A40: 7E 79 15    JMP    $7915
+7A40: 7E 79 15    JMP    queue_sound_7915
 7A43: C6 38       LDB    #$38
-7A45: 7E 79 15    JMP    $7915
+7A45: 7E 79 15    JMP    queue_sound_7915
 7A48: C6 39       LDB    #$39
-7A4A: 7E 79 15    JMP    $7915
+7A4A: 7E 79 15    JMP    queue_sound_7915
 7A4D: C6 3A       LDB    #$3A
-7A4F: 7E 79 15    JMP    $7915
+7A4F: 7E 79 15    JMP    queue_sound_7915
 7A52: C6 3B       LDB    #$3B
-7A54: 7E 79 15    JMP    $7915
+7A54: 7E 79 15    JMP    queue_sound_7915
 7A57: C6 3C       LDB    #$3C
 7A59: 7E 79 58    JMP    $7958
 7A5C: C6 3D       LDB    #$3D
 7A5E: 7E 79 58    JMP    $7958
 7A61: C6 3E       LDB    #$3E
-7A63: 7E 79 15    JMP    $7915
+7A63: 7E 79 15    JMP    queue_sound_7915
 7A66: C6 3F       LDB    #$3F
-7A68: 7E 79 15    JMP    $7915
+7A68: 7E 79 15    JMP    queue_sound_7915
 
 7A6B: C6 04       LDB    #$04
 7A6D: F7 3E 00    STB    bankswitch_3e00
@@ -5071,7 +5081,7 @@ update_tile_column_86b1:
 8FC8: D1 BD       CMPB   $BD
 8FCA: 23 05       BLS    $8FD1
 8FCC: D7 BD       STB    $BD
-8FCE: BD 79 15    JSR    $7915
+8FCE: BD 79 15    JSR    queue_sound_7915
 8FD1: A6 43       LDA    $3,U	; [bank_address]
 8FD3: 10 8E 06 70 LDY    #$0670
 8FD7: E6 06       LDB    $6,X
@@ -8423,9 +8433,9 @@ B45C: EE 88 16    LDU    $16,X
 B45F: 10 AE 88 18 LDY    $18,X
 B463: 86 87       LDA    #$87
 B465: C6 87       LDB    #$87
-B467: ED A9 04 00 STD    $0400,Y
+B467: ED A9 04 00 STD    $0400,Y  ; [video_address]
 B46B: EC C1       LDD    ,U++
-B46D: ED A4       STD    ,Y
+B46D: ED A4       STD    ,Y  		; [video_address]
 B46F: 86 87       LDA    #$87
 B471: C6 87       LDB    #$87
 B473: ED A9 04 20 STD    $0420,Y
