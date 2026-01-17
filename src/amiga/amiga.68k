@@ -1176,11 +1176,23 @@ osd_wait:
 	rts
 
 
+* "0x00">Torch
+* "0x01">Lance	
+* "0x02">Axe	
+* "0x03">Shield
+* "0x04">Sword
 
-	
-	
-
-	
+cycle_weapon:
+	movem.l	a6/a5/d0,-(a7)
+	GET_MEMORY_START_AND_DP
+	move.b	(weapon_type_0073,a6),d0
+	addq	#1,d0
+	cmp.b	#5,d0
+	jne		0f
+	moveq	#0,d0
+0:
+	move.b	d0,(weapon_type_0073,a6)
+	movem.l	(a7)+,a6/a5/d0
 
 * Z: set if not playing
 is_game_playing:
@@ -3351,26 +3363,24 @@ handle_keyboard:
 	* cheat keys
 
 
-	cmp.b	#0x50,d0	| F1 key: set score 9-0
+	cmp.b	#0x50,d0	| F1 key: toggle invincible
 	bne.b	0f
 	st.b	cheat_used
-
-	COLOR0_FLASH	0x0FF
-
-	
-0:
-	cmp.b	#0x51,d0	| F2 key: set score 0-9
-	bne.b	0f
-	st.b	cheat_used
-	
+	not.b	invincible_flag
 	COLOR0_FLASH	0x0FF
 	
 0:
-	cmp.b	#0x52,d0	| F3 key: set score 10-0 and make left side win
+	cmp.b	#0x51,d0	| F2 key: skip level TODO
 	bne.b	0f
 	st.b	cheat_used
-
+	
 	COLOR0_FLASH	0x0FF
+	
+0:
+	cmp.b	#0x52,d0	| F3 key: change weapon
+	bne.b	0f
+	st.b	cheat_used
+	jbsr	cycle_weapon
 	
 0:
 
