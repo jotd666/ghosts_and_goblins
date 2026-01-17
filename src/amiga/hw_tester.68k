@@ -701,10 +701,18 @@ demo_game:
 	jbsr	cache_fg_tiles_address
 	jbsr	cache_bg_tiles_address
 
-	moveq	#2,D0
+	GET_MEMORY_START_AND_DP
+	lea		tiles_at_start,a1
+	lea		(0x2800,a6),a0
+	move.w	#0x3FF,d0
+0:
+	move.w	(a1)+,(a0)+
+	dbf		d0,0b	
+
+
+	moveq	#1,D0
 	jbsr	load_context		| level 3
 	
-	GET_MEMORY_START_AND_DP
 	* install frame
 	lea	(0x2040,a6),a0
 	jbsr	install_horiz_frame
@@ -728,22 +736,13 @@ demo_game:
 	move.b	#0x2,d0
 	jbsr	display_text
 	
-	lea		tiles_at_start,a1
-	lea		(0x2800,a6),a0
-	move.w	#0x3FF,d0
-0:
-	move.w	(a1)+,(a0)
-	jbsr	osd_video_word_dirty
-	addq	#2,a0
-	dbf		d0,0b
+	move.w	#0x80,scroll_x
 	
 	jbsr	osd_enable_interrupts
 loop:
-	
+
 	jra	loop
 	
-scroll_x_user:
-	.word	0
 	
 tester_text:
 	.asciz	"Welcome to GNG hw tester"
@@ -816,6 +815,8 @@ load_context:
 10:
 	dbf		d7,0b
 	
+	* at start redraw everything
+	jbsr force_all_screen_redraw
 
 	movem.l	(a7)+,d0-a6
 	rts
@@ -863,18 +864,56 @@ call_nmi:
 	btst	#BIT_RIGHT,d0
 	jne		0f
 	* move scrolling left
-	addq	#1,scroll_x_user
+	addq	#1,scroll_x
 0:
 	btst	#BIT_LEFT,d0
 	jne		0f
 	* move scrolling right
-	subq	#1,scroll_x_user
+	subq	#1,scroll_x
 0:
-	move.w	scroll_x_user,d0
-
+	move.w	scroll_x,d0
+	and.w 	#0x1FF,D0
 	move.w	d0,scroll_x
 
+	jbsr	set_scroll_values
+
 	rts
+
+force_all_screen_redraw:
+	GET_MEMORY_START_AND_DP
+	* given the current scroll X/Y, draw all tiles on screen
+	move.w	scroll_x,d0
+	lea		(0x2800,a6),a5
+	lsr.w	#4,D0	| divide by 16 to get real X tile offset
+	* now compute start address to fetch data from
+	move.w	#1,d7		| first row is not visible with scroll=0, visible with=$10
+	* atm Y=0
+	lsl.w	#5,d0	| times 32
+	add.w	d0,d7	| start address
+
+	move.w	d7,d6	| save current Y
+
+	move.w	#0x0E,d2
+0:
+	move.w	d6,d7	| set current Y row
+	move.w	#0x0E,d1
+1:
+	and.w	#0x3FF,d7		| wrap
+	* force tile draw
+	lea		(a5,d7.w),a0
+	jbsr	osd_video_byte_dirty
+	add.w	#0x20,d7		| next X
+	dbf		d1,1b
+	addq	#1,d6
+	dbf		d2,0b
+	rts
+	
+* < D0: game scroll X
+set_scroll_values:
+	move.w	d0,d1
+	
+	rts
+
 	
 		
 * just in case some hardware calls nmi
@@ -2247,7 +2286,14 @@ update_bg_tile:
 	moveq	#0,d1
 	* compute address
 	move.w	d7,d0
+	
+	
 	lsr.w	#5,d0	| divide by 0x20
+
+	move.w	host_scroll_x,d1
+	lsr.w	#3,d1
+	sub.w 	d1,d0	| correct nb bytes
+
 	add.w	d0,d0	| 16 pixels
 	move.w	d7,d1
 	and.w	#0x1F,d1	| modulus 0x20
@@ -2306,7 +2352,7 @@ update_bg_tile:
 	.ifdef	NO68020
 	lsr.w	#2,d2
 	.endif
-	COLOR0_FLASH	0xF0F
+	*COLOR0_FLASH	0xF0F
 	jra		11f
 12:
 	.endif
@@ -2795,8 +2841,8 @@ set_bobs_bitplanes:
 	.endif
 1:	
 
-	move.w	scroll_x,d2
-	and.w	#0x1FF,d2			| wraps at 0x200!
+	move.w	host_scroll_x,d2
+	and.w	#0xFF,d2			| wraps at 0x100!
 
 	lea		scroll_table,a2
 	.ifdef	MC68020
@@ -3674,6 +3720,14 @@ target_usp_value:
 scroll_y:
 	.word	0
 scroll_x:
+	.word	0
+host_scroll_y:
+	.word	0
+host_scroll_x:
+	.word	0
+previous_scroll_y:
+	.word	0
+previous_scroll_x:
 	.word	0
 
 

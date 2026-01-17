@@ -5,6 +5,7 @@
 
 	.global invincible_flag
 	.global start_level_flag
+	.global skip_intro_flag
 	.global vb_ticks_count
 	.global break_at_startup_flag
 	.global log_ptr

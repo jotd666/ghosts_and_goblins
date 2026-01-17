@@ -497,6 +497,8 @@ _user:
 	move.l	misc_options,d1
 	btst	#0,d1
 	seq		frameskip
+	btst	#1,d1
+	sne		skip_intro_flag
 
 
 	move.l	cheat_flags,d0
@@ -720,6 +722,13 @@ demo_game:
 0:
 	move.l	(a0)+,(a1)+
 	dbf		d0,0b
+	* change copyright message "all right reseved"
+	lea	bank3_4000+0x9B1,A1
+	lea	copyright_message,a0
+0:
+	move.b	(a0)+,(a1)+
+	jne		0b
+	
 	* install bank 4 in 0x4000, we may as well use that space
 	* plus it allows simpler code ex at 9088 where game accesses
 	* ROM or bank ROM in bank 4
@@ -752,6 +761,10 @@ demo_game:
 	GET_MEMORY_START_AND_DP	
 	jmp		reset_6000								| pass control to the mpatrol core
 	
+copyright_message:
+	*.asciz	"ALL RIGHT RESEVED"
+	 .asciz	"AMIGA PORT : JOTD"
+
 	.ifndef	RELEASE
 dump_and_quit:	
 	jbsr	osd_dump_logs
@@ -795,7 +808,6 @@ load_context:
 	* same context: don't load
 	rts
 0:
-	BREAKPOINT 	"load context!"
 	movem.l	d0-a6,-(a7)
 	.ifne	OPT_ENABLE_LOGGING
 	* reset logged tiles
@@ -855,8 +867,40 @@ load_context:
 10:
 	dbf		d7,0b
 	
+	* at start redraw everything
+	jbsr force_all_screen_redraw
 
 	movem.l	(a7)+,d0-a6
+	rts
+	
+
+force_all_screen_redraw:
+	* given the current scroll X/Y, draw all tiles on screen
+	move.w	(scroll_x_register_3b08,a6),d0
+	move.w	(scroll_y_register_3b0a,a6),d1
+	lea		(bg_tiles_address_2800,a6),a5
+	lsr.w	#4,D0	| divide by 16 to get real X tile offset
+	* now compute start address to fetch data from
+	move.w	#1,d7		| first row is not visible with scroll=0, visible with=$10
+	* atm Y=0
+	lsl.w	#5,d0	| times 32
+	add.w	d0,d7	| start address
+
+	move.w	d7,d6	| save current Y
+
+	move.w	#0x1E,d2
+0:
+	move.w	d6,d7	| set current Y row
+	move.w	#0x1F,d1
+1:
+	* force tile draw
+	lea		(a5,d7.w),a0
+	jbsr	osd_video_byte_dirty
+	add.w	#0x20,d7		| next X
+	and.w	#0x3FF,d7		| wrap
+	dbf		d1,1b
+	addq	#1,d6
+	dbf		d2,0b
 	rts
 	
 * < A0: filename
@@ -874,7 +918,7 @@ load_file:
 install_bank_4:
 	movem.l	a0/a1/d0,-(a7)
 	lea	bank4_4000,a0
-	lea		(0x4000,a6),a1
+	lea		(bank_address_4000,a6),a1
 	move.w	#0x7FF,d0
 0:
 	move.l	(a0)+,(a1)+
@@ -1375,16 +1419,16 @@ update_one_bob:
 	jeq		10f			| nothing to do, normal tile
 	* double/triple/quadruple, whatever
 	btst	#14,d4
-	jne		2f		| center tile, never draw
+	jne		2f		| bit 14 set: center tile, never draw
 	bclr	#0,d4	| remove bit 0 now
 	asr.w	#1,d4	| divide by 2, signed
 	btst	#MIRROR_BIT,d3
 	jeq		101f
-	* mirror: negate the code
-	neg		d4	
+	* mirror: "negate" the code by flipping bit 10
+	bchg	#10,d4
 101:
-	tst		d4
-	jmi		2f		| no need to draw this part, the other part will do it
+	btst	#10,d4
+	jne		2f		| no need to draw this part, the other part will do it
 	move.w	d4,d2	| get the real sprite code to draw
 	add.w	d2,d2	| code times 2
 10:

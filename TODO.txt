@@ -1,14 +1,13 @@
 - mirror sprite display nothing!
- - restore grouping, seems to have issues with main character (maybe use mockup 
-  "sprites" in assets or try/error to ungroup until it works
- 
-- debug division routines: plant shoot angles are wrong
+- grouping, seems to have issues with main character at tile 0 tile 0 seems
+  to be a special case despite the precautions
+
+- debug division routines: plant shoot angles are wrong, devils attacks maybe (level 3 first devil debug)
 - tombstone easter egg shot seems wrong
 - scrolling in HW test (with level 3 tiles)
 - parasite sprites at the bottom
-- crash when dying (should show the map instead) or lockup in 617F loop, no events arrive
+- crash when dying if has to show the map or lockup in 617F loop, no events arrive
 - flag system to avoid re-copying tiles again and again if already correct
-- remove purple/yellow flashe
 - log tiles (per level): with zone filtering (first level only upper part)
 - use 16-bit table for mirror
 - flame in HUD wrong colors
@@ -17,7 +16,6 @@
   maximum of different colors on the bottom status
 - update bg tiles do that using dirty not by brutal refresh as it's done twice (color+tilecode)
 - fg layer: isolate frame+weapon+lives (everything non-letter on the bottom), use dynamic palette
-- level tiles & palette should be in a separate file, loadable through whdload or floppy trackloader (use RN?)
 - cpu log: control should be able to log with SR=x3xx or SR=x0xx
   here we want to avoid logging within the interrupt
 

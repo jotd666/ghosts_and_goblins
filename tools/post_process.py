@@ -257,7 +257,8 @@ for i,line in enumerate(lines):
         line = change_instruction("add.w\t#4*3,sp   | pop up 3 dx pushes",lines,i)
     elif address == 0x7AF2:
         line = "\tmove.b\tstart_level_flag,d0\n"+change_instruction("OP_W_ON_DP_ADDRESS    move,current_level_0072,d0",lines,i)
-
+    elif address == 0x7183:
+        line = "\ttst.b\tskip_intro_flag\n\tjne\tplay_intro_7187\n"+line
     ###################################################
     # 2 table of tables to rework almost completely
     # this mixes with table rework and is quite a mess but works

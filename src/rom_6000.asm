@@ -54,6 +54,13 @@ intro_devil_appears_flag_0880 = $880
 tiles_palette_in_ram_1632 = $1632
 sprites_palette_in_ram_16b2 = $16B2
 tiles_palette_change_command_00de = $de
+scroll_x_value_00d4 = $d4
+scroll_y_value_00d6 = $d6 
+scroll_x_register_3b08 = $3b08
+scroll_y_register_3b0a = $3b0a
+bg_tiles_address_2800 = $2800
+bg_tiles_color_address_2c00 = $2c00
+bank_address_4000 = $4000
 
 ; horrible code when it comes to jump tables
 ; there are more than 200+ jump tables, that had to be
@@ -83,19 +90,19 @@ reset_6000:
 6022: F7 3D 00    STB    $3D00
 6025: 4F          CLRA
 6026: 5F          CLRB
-6027: FD 3B 08    STD    $3B08
-602A: FD 3B 0A    STD    $3B0A
+6027: FD 3B 08    STD    scroll_x_register_3b08
+602A: FD 3B 0A    STD    scroll_y_register_3b0a
 602D: C6 00       LDB    #$00
 602F: 1F 9B       TFR    B,DP
 6031: C6 00       LDB    #$00
 6033: F7 3D 01    STB    $3D01
-6036: 8E 28 00    LDX    #$2800
-6039: 10 8E 2C 00 LDY    #$2C00
+6036: 8E 28 00    LDX    #bg_tiles_address_2800
+6039: 10 8E 2C 00 LDY    #bg_tiles_color_address_2c00
 603D: 86 00       LDA    #$00
 603F: C6 00       LDB    #$00
 6041: A7 80       STA    ,X+
 6043: E7 A0       STB    ,Y+
-6045: 8C 2C 00    CMPX   #$2C00
+6045: 8C 2C 00    CMPX   #bg_tiles_color_address_2c00
 6048: 25 F7       BCS    $6041
 604A: 8E 20 00    LDX    #$2000
 604D: C6 20       LDB    #$20
@@ -107,12 +114,13 @@ reset_6000:
 605C: 23 F7       BLS    $6055
 605E: C6 01       LDB    #$01
 6060: F7 3D 00    STB    $3D00
+; all scrolls at 0,0
 6063: 4F          CLRA
 6064: 5F          CLRB
-6065: FD 3B 08    STD    $3B08
-6068: DD D4       STD    $D4
-606A: FD 3B 0A    STD    $3B0A
-606D: DD D6       STD    $D6
+6065: FD 3B 08    STD    scroll_x_register_3b08
+6068: DD D4       STD    scroll_x_value_00d4
+606A: FD 3B 0A    STD    scroll_y_register_3b0a
+606D: DD D6       STD    scroll_y_value_00d6
 606F: D7 D9       STB    bankswitch_copy_d9
 6071: C6 03       LDB    #$03
 6073: F7 3E 00    STB    bankswitch_3e00
@@ -164,7 +172,7 @@ end_of_memory_test_607d:
 60D6: C6 04       LDB    #$04
 60D8: D7 D9       STB    bankswitch_copy_d9
 60DA: F7 3E 00    STB    bankswitch_3e00
-60DD: 8E 40 00    LDX    #$4000
+60DD: 8E 40 00    LDX    #bank_address_4000
 60E0: 10 8E 04 80 LDY    #$0480
 60E4: C6 80       LDB    #$80
 60E6: A6 80       LDA    ,X+		; [bank_address]
@@ -216,8 +224,8 @@ end_of_memory_test_607d:
 614A: F7 3A 00    STB    $3A00
 614D: 4F          CLRA
 614E: 5F          CLRB
-614F: DD D4       STD    $D4
-6151: DD D6       STD    $D6
+614F: DD D4       STD    scroll_x_value_00d4
+6151: DD D6       STD    scroll_y_value_00d6
 6153: C6 01       LDB    #$01
 6155: D7 D8       STB    $D8
 6157: 86 01       LDA    #$01
@@ -443,11 +451,11 @@ write_4_bg_tiles_633f:
 6377: 39          RTS
 
 ; < B: index
-; > X: $4000+B*$40
+; > X: bank_address_4000+B*$40
 compute_bank_address_from_b_6378:
 6378: 86 40       LDA    #$40
 637A: 3D          MUL
-637B: 8E 40 00    LDX    #$4000
+637B: 8E 40 00    LDX    #bank_address_4000
 637E: 30 8B       LEAX   D,X
 6380: 39          RTS
 
@@ -471,15 +479,15 @@ compute_bank_address_from_b_6378:
 63AE: 26 02       BNE    $63B2
 63B0: 6C 13       INC    -$D,X
 63B2: 39          RTS
-63B3: DC D4       LDD    $D4
+63B3: DC D4       LDD    scroll_x_value_00d4
 63B5: ED 06       STD    $6,X
-63B7: DC D6       LDD    $D6
+63B7: DC D6       LDD    scroll_y_value_00d6
 63B9: ED 08       STD    $8,X
 63BB: 4F          CLRA
 63BC: 5F          CLRB
-63BD: DD D4       STD    $D4
+63BD: DD D4       STD    scroll_x_value_00d4
 63BF: CC 01 00    LDD    #$0100
-63C2: DD D6       STD    $D6
+63C2: DD D6       STD    scroll_y_value_00d6
 63C4: 8E 16 32    LDX    #tiles_palette_in_ram_1632
 63C7: CE 65 3C    LDU    #$653C
 63CA: 86 40       LDA    #$40
@@ -522,7 +530,7 @@ compute_bank_address_from_b_6378:
 641D: F7 15 AC    STB    $15AC
 6420: 7C 15 95    INC    $1595
 6423: 39          RTS
-6424: 0F D6       CLR    $D6
+6424: 0F D6       CLR    scroll_y_value_00d6
 6426: 6A 0A       DEC    $A,X
 6428: 26 02       BNE    $642C
 642A: 6C 13       INC    -$D,X
@@ -532,9 +540,9 @@ compute_bank_address_from_b_6378:
 6433: 6A 23       DEC    $3,Y
 6435: 26 02       BNE    $6439
 6437: 6F 05       CLR    $5,X
-6439: DC D4       LDD    $D4
+6439: DC D4       LDD    scroll_x_value_00d4
 643B: C3 00 01    ADDD   #$0001
-643E: DD D4       STD    $D4
+643E: DD D4       STD    scroll_x_value_00d4
 6440: 10 83 00 8F CMPD   #$008F
 6444: 25 02       BCS    $6448
 6446: 6C 13       INC    -$D,X
@@ -547,9 +555,9 @@ compute_bank_address_from_b_6378:
 6454: 39          RTS
 
 6455: EC 06       LDD    $6,X
-6457: DD D4       STD    $D4
+6457: DD D4       STD    scroll_x_value_00d4
 6459: EC 08       LDD    $8,X
-645B: DD D4       STD    $D4
+645B: DD D4       STD    scroll_x_value_00d4
 645D: 86 01       LDA    #$01
 645F: 97 80       STA    $80
 6461: 6F 13       CLR    -$D,X
@@ -638,7 +646,7 @@ change_ram_palette_6656:
 665B: D7 DE       STB    tiles_palette_change_command_00de	; ack change
 665D: 44          LSRA
 665E: 56          RORB
-665F: C3 40 00    ADDD   #$4000
+665F: C3 40 00    ADDD   #bank_address_4000
 6662: 1F 03       TFR    D,U
 6664: 32 C8 40    LEAS   $40,U
 6667: 10 8E 16 32 LDY    #tiles_palette_in_ram_1632
@@ -750,15 +758,15 @@ update_some_palette_671c:
 6755: D6 D8       LDB    $D8
 6757: D8 DA       EORB   $DA
 6759: F7 3D 00    STB    $3D00
-675C: DC D4       LDD    $D4
+675C: DC D4       LDD    scroll_x_value_00d4
 675E: B7 3B 09    STA    $3B09
-6761: F7 3B 08    STB    $3B08
-6764: DC D6       LDD    $D6
+6761: F7 3B 08    STB    scroll_x_register_3b08
+6764: DC D6       LDD    scroll_y_value_00d6
 6766: 43          COMA
 6767: 53          COMB
 6768: C3 00 01    ADDD   #$0001
 676B: B7 3B 0B    STA    $3B0B
-676E: F7 3B 0A    STB    $3B0A
+676E: F7 3B 0A    STB    scroll_y_register_3b0a
 6771: 39          RTS
 6772: 8E 00 49    LDX    #$0049
 6775: 31 01       LEAY   $1,X
@@ -894,8 +902,8 @@ update_some_palette_671c:
 6869: 97 2A       STA    $2A
 686B: 97 2B       STA    $2B
 686D: 5F          CLRB
-686E: DD D4       STD    $D4
-6870: DD D6       STD    $D6
+686E: DD D4       STD    scroll_x_value_00d4
+6870: DD D6       STD    scroll_y_value_00d6
 6872: CC 87 CD    LDD    #$87CD
 6875: FD 00 6E    STD    >$006E
 6878: 0F 70       CLR    $70
@@ -1186,7 +1194,7 @@ attract_mode_6a8d:
 6AC2: 8E 40 0B    LDX    #$400B
 6AC5: C1 01       CMPB   #$01
 6AC7: 22 0A       BHI    $6AD3
-6AC9: 8E 40 00    LDX    #$4000
+6AC9: 8E 40 00    LDX    #bank_address_4000
 6ACC: 9F 6C       STX    background_screen_location_006c
 6ACE: BD 6C 65    JSR    $6C65
 6AD1: 20 17       BRA    $6AEA
@@ -1266,8 +1274,8 @@ start_game_screen_6b5e:
 6B70: BD 68 DF    JSR    $68DF
 6B73: 4F          CLRA
 6B74: 5F          CLRB
-6B75: DD D4       STD    $D4
-6B77: DD D6       STD    $D6
+6B75: DD D4       STD    scroll_x_value_00d4
+6B77: DD D6       STD    scroll_y_value_00d6
 6B79: CC 01 19    LDD    #$0119
 6B7C: BD 69 09    JSR    $6909
 6B7F: C6 01       LDB    #$01
@@ -1331,7 +1339,7 @@ start_game_screen_6b5e:
 6BFE: 0F 05       CLR    sub_state_0005
 6C00: 0F 08       CLR    sub_sub_state_0008
 6C02: 39          RTS
-6C03: 8E 40 00    LDX    #$4000
+6C03: 8E 40 00    LDX    #bank_address_4000
 6C06: 9F 6C       STX    background_screen_location_006c
 6C08: C6 01       LDB    #$01
 6C0A: D7 73       STB    weapon_type_0073		; set lance as weapon
@@ -1442,7 +1450,7 @@ start_game_screen_6b5e:
 6D35: 3A          ABX
 6D36: EC 84       LDD    ,X
 6D38: DD 6C       STD    background_screen_location_006c
-6D3A: 83 40 00    SUBD   #$4000
+6D3A: 83 40 00    SUBD   #bank_address_4000
 6D3D: DD 91       STD    $91
 6D3F: E6 02       LDB    $2,X
 6D41: 4F          CLRA
@@ -1735,6 +1743,7 @@ run_game_intro_sequence_7180:
 7180: BD 7A 6B    JSR    $7A6B
 7183: D6 71       LDB    game_intro_played_0071
 7185: 27 0F       BEQ    $7196
+play_intro_7187:
 7187: 4F          CLRA
 7188: 5F          CLRB
 7189: FD 15 B5    STD    $15B5
@@ -2669,8 +2678,8 @@ l_7a14:
 init_intro_sequence_7a7e:
 7A7E: 4F          CLRA
 7A7F: 5F          CLRB
-7A80: DD D4       STD    $D4
-7A82: DD D6       STD    $D6
+7A80: DD D4       STD    scroll_x_value_00d4
+7A82: DD D6       STD    scroll_y_value_00d6
 7A84: DD 9C       STD    $9C
 7A86: DD 9E       STD    $9E
 7A88: CE 05 40    LDU    #$0540
@@ -2721,7 +2730,7 @@ init_game_and_intro_scenery_7adc:
 7AEE: D7 AC       STB    armour_flag_00ac	; gives armour
 7AF0: D7 DE       STB    tiles_palette_change_command_00de
 7AF2: 0F 72       CLR    current_level_0072		; level 1
-7AF4: CC 40 00    LDD    #$4000
+7AF4: CC 40 00    LDD    #bank_address_4000
 7AF7: DD 6C       STD    background_screen_location_006c	; shows a fixed scenery in the fields
 7AF9: CC 06 00    LDD    #$0600
 7AFC: BD 69 09    JSR    $6909
@@ -3040,7 +3049,7 @@ devil_takes_girl_7d80:
 
 7E01: BD 7A 43    JSR    $7A43
 7E04: CC 01 00    LDD    #$0100
-7E07: DD D4       STD    $D4
+7E07: DD D4       STD    scroll_x_value_00d4
 7E09: CC 41 5F    LDD    #$415F
 7E0C: DD 6C       STD    background_screen_location_006c
 7E0E: CC 06 00    LDD    #$0600
@@ -3279,28 +3288,28 @@ devil_takes_girl_7d80:
 8032: 84 03       ANDA   #$03
 8034: C3 03 1E    ADDD   #$031E
 8037: 84 03       ANDA   #$03
-8039: C3 28 00    ADDD   #$2800
+8039: C3 28 00    ADDD   #bg_tiles_address_2800
 803C: DD C8       STD    $C8
 803E: DC E0       LDD    $E0
 8040: 84 03       ANDA   #$03
 8042: C3 03 11    ADDD   #$0311
 8045: 84 03       ANDA   #$03
-8047: C3 28 00    ADDD   #$2800
+8047: C3 28 00    ADDD   #bg_tiles_address_2800
 804A: DD CC       STD    $CC
 804C: DC E0       LDD    $E0
 804E: 84 03       ANDA   #$03
 8050: C3 02 37    ADDD   #$0237
 8053: 84 03       ANDA   #$03
-8055: C3 28 00    ADDD   #$2800
+8055: C3 28 00    ADDD   #bg_tiles_address_2800
 8058: DD C0       STD    $C0
 805A: DC E0       LDD    $E0
 805C: 84 03       ANDA   #$03
 805E: C3 03 D7    ADDD   #$03D7
 8061: 84 03       ANDA   #$03
-8063: C3 28 00    ADDD   #$2800
+8063: C3 28 00    ADDD   #bg_tiles_address_2800
 8066: DD C4       STD    $C4
 8068: 39          RTS
-8069: CE 28 00    LDU    #$2800
+8069: CE 28 00    LDU    #bg_tiles_address_2800
 806C: D6 6D       LDB    $6D
 806E: C5 01       BITB   #$01
 8070: 27 04       BEQ    $8076
@@ -3422,13 +3431,13 @@ devil_takes_girl_7d80:
 815D: EC 16       LDD    -$A,X
 815F: DD 9C       STD    $9C
 8161: 84 01       ANDA   #$01
-8163: DD D4       STD    $D4
+8163: DD D4       STD    scroll_x_value_00d4
 8165: BD 86 C4    JSR    $86C4
 8168: 35 10       PULS   X
 816A: EC 19       LDD    -$7,X
 816C: DD 9E       STD    $9E
 816E: 84 01       ANDA   #$01
-8170: DD D6       STD    $D6
+8170: DD D6       STD    scroll_y_value_00d6
 8172: 8E 06 40    LDX    #$0640
 8175: E6 0D       LDB    $D,X
 8177: E7 0C       STB    $C,X
@@ -3578,7 +3587,7 @@ devil_takes_girl_7d80:
 82A0: E6 C4       LDB    ,U		; [bank_address]
 82A2: 86 40       LDA    #$40
 82A4: 3D          MUL
-82A5: C3 40 00    ADDD   #$4000
+82A5: C3 40 00    ADDD   #bank_address_4000
 82A8: 1F 03       TFR    D,U
 82AA: E6 02       LDB    $2,X
 82AC: C4 0E       ANDB   #$0E
@@ -3887,7 +3896,7 @@ devil_takes_girl_7d80:
 8515: E6 C4       LDB    ,U		; [bank_address]
 8517: 86 40       LDA    #$40
 8519: 3D          MUL
-851A: C3 40 00    ADDD   #$4000
+851A: C3 40 00    ADDD   #bank_address_4000
 851D: 1F 03       TFR    D,U
 851F: 39          RTS
 8520: DC 6C       LDD    background_screen_location_006c
@@ -4246,7 +4255,7 @@ update_tile_column_86b1:
 8815: E6 C4       LDB    ,U		; [bank_address]
 8817: 86 40       LDA    #$40
 8819: 3D          MUL
-881A: C3 40 00    ADDD   #$4000
+881A: C3 40 00    ADDD   #bank_address_4000
 881D: 1F 03       TFR    D,U
 881F: E6 04       LDB    $4,X
 8821: C4 0E       ANDB   #$0E
@@ -4465,7 +4474,7 @@ update_tile_column_86b1:
 89DE: E6 C4       LDB    ,U		; [bank_address]
 89E0: 86 40       LDA    #$40
 89E2: 3D          MUL
-89E3: C3 40 00    ADDD   #$4000
+89E3: C3 40 00    ADDD   #bank_address_4000
 89E6: 1F 03       TFR    D,U
 89E8: 39          RTS
 89E9: EC 08       LDD    $8,X
@@ -4835,7 +4844,7 @@ update_tile_column_86b1:
 8CDC: D0 E9       SUBB   $E9
 8CDE: 24 37       BCC    $8D17
 8CE0: EC 7E       LDD    -$2,S
-8CE2: 83 28 00    SUBD   #$2800
+8CE2: 83 28 00    SUBD   #bg_tiles_address_2800
 8CE5: ED 7E       STD    -$2,S
 8CE7: E6 1F       LDB    -$1,X
 8CE9: 58          ASLB
@@ -4846,7 +4855,7 @@ update_tile_column_86b1:
 8CF2: 49          ROLA
 8CF3: E3 7E       ADDD   -$2,S
 8CF5: 84 03       ANDA   #$03
-8CF7: 10 8E 28 00 LDY    #$2800
+8CF7: 10 8E 28 00 LDY    #bg_tiles_address_2800
 8CFB: 31 AB       LEAY   D,Y
 8CFD: E6 A9 04 00 LDB    $0400,Y	; [video_address]
 8D01: C4 C0       ANDB   #$C0
@@ -8069,7 +8078,7 @@ B0E4: F7 3E 00    STB    bankswitch_3e00
 B0E7: E6 09       LDB    $9,X
 B0E9: CE 41 40    LDU    #$4140
 B0EC: 4F          CLRA
-B0ED: E6 CB       LDB    D,U
+B0ED: E6 CB       LDB    D,U		; [bank_address]
 B0EF: 58          ASLB
 B0F0: A6 06       LDA    $6,X
 B0F2: 3D          MUL
@@ -10265,9 +10274,9 @@ C5EC: 26 32       BNE    $C620
 C5EE: 6A 88 17    DEC    $17,X
 C5F1: 26 4E       BNE    $C641
 C5F3: EE 88 18    LDU    $18,X
-C5F6: E6 C0       LDB    ,U+
+C5F6: E6 C0       LDB    ,U+			; [bank_address]
 C5F8: 2A 04       BPL    $C5FE
-C5FA: EE C4       LDU    ,U
+C5FA: EE C4       LDU    ,U		; [bank_address]
 C5FC: C4 7F       ANDB   #$7F
 C5FE: EF 88 18    STU    $18,X
 C601: E7 88 17    STB    $17,X
@@ -10321,7 +10330,7 @@ C6BD: E7 88 13    STB    $13,X
 C6C0: E6 88 13    LDB    $13,X
 C6C3: EE 88 1E    LDU    $1E,X
 C6C6: 58          ASLB
-C6C7: EE C5       LDU    B,U
+C6C7: EE C5       LDU    B,U		; [bank_address]
 C6C9: EF 84       STU    ,X
 C6CB: EF 03       STU    $3,X
 C6CD: 6F 02       CLR    $2,X
@@ -12316,10 +12325,10 @@ D8BC: EF 84       STU    ,X
 D8BE: EF 03       STU    $3,X
 D8C0: 6F 02       CLR    $2,X
 D8C2: EE 08       LDU    $8,X
-D8C4: EC C1       LDD    ,U++
+D8C4: EC C1       LDD    ,U++		; [bank_address]
 D8C6: 2A 04       BPL    $D8CC
 D8C8: 84 7F       ANDA   #$7F
-D8CA: EE C4       LDU    ,U
+D8CA: EE C4       LDU    ,U		; [bank_address]
 D8CC: A7 0A       STA    $A,X
 D8CE: E7 1E       STB    -$2,X
 D8D0: EF 08       STU    $8,X

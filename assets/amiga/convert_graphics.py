@@ -569,7 +569,7 @@ DO_DISPLAY_MASK = 1
 
 def gen_codes(i):
     im = (i<<1)
-    return im | DO_DISPLAY_MASK,((0x10000 - im) %0x10000) | DO_DISPLAY_MASK
+    return im | DO_DISPLAY_MASK,(0x800 + im) | DO_DISPLAY_MASK
 
 gs_array = [0]*SPRITE_NB_TILES
 for i in group_sprite_pairs:
