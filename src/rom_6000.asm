@@ -4413,8 +4413,8 @@ update_tile_column_86b1:
 897E: D7 E2       STB    stack_save_00e2
 8980: C6 00       LDB    #$00
 8982: F7 3E 00    STB    bankswitch_3e00
-8985: E6 C4       LDB    ,U
-8987: 33 48       LEAU   $8,U
+8985: E6 C4       LDB    ,U			; [bank_address]
+8987: 33 48       LEAU   $8,U			; [bank_address]
 8989: 4F          CLRA
 898A: 58          ASLB
 898B: 49          ROLA
@@ -4426,11 +4426,11 @@ update_tile_column_86b1:
 8992: 1F 01       TFR    D,X
 8994: C6 01       LDB    #$01
 8996: F7 3E 00    STB    bankswitch_3e00
-8999: A6 04       LDA    $4,X
-899B: E6 06       LDB    $6,X
+8999: A6 04       LDA    $4,X			; [bank_address]
+899B: E6 06       LDB    $6,X			; [bank_address]
 899D: ED A8 30    STD    $30,Y
-89A0: A6 84       LDA    ,X
-89A2: E6 02       LDB    $2,X
+89A0: A6 84       LDA    ,X			; [bank_address]
+89A2: E6 02       LDB    $2,X		; [bank_address]
 89A4: ED A1       STD    ,Y++
 89A6: 0A E2       DEC    stack_save_00e2
 89A8: 26 D6       BNE    $8980
@@ -4462,7 +4462,7 @@ update_tile_column_86b1:
 89D6: 10 8E 42 00 LDY    #$4200
 89DA: EC AB       LDD    D,Y		; [bank_address]
 89DC: DD E0       STD    $E0
-89DE: E6 C4       LDB    ,U
+89DE: E6 C4       LDB    ,U		; [bank_address]
 89E0: 86 40       LDA    #$40
 89E2: 3D          MUL
 89E3: C3 40 00    ADDD   #$4000
@@ -13190,9 +13190,9 @@ E082: 39          RTS
 E083: 6A 06       DEC    $6,X
 E085: 26 14       BNE    $E09B
 E087: EE 08       LDU    $8,X
-E089: E6 C0       LDB    ,U+
+E089: E6 C0       LDB    ,U+	; [bank_address]
 E08B: 2A 04       BPL    $E091
-E08D: EE C4       LDU    ,U
+E08D: EE C4       LDU    ,U		; [bank_address]
 E08F: C4 7F       ANDB   #$7F
 E091: EF 08       STU    $8,X
 E093: E7 06       STB    $6,X
@@ -13240,11 +13240,11 @@ E0F1: E6 1E       LDB    -$2,X
 E0F3: CE E1 14    LDU    #$E114
 E0F6: E6 C5       LDB    B,U
 E0F8: EE 03       LDU    $3,X
-E0FA: A6 C1       LDA    ,U++
+E0FA: A6 C1       LDA    ,U++   ; [bank_address]
 E0FC: ED 88 10    STD    $10,X
-E0FF: A6 C0       LDA    ,U+
+E0FF: A6 C0       LDA    ,U+	; [bank_address]
 E101: A7 88 12    STA    task_pointer_0012,X
-E104: A6 C4       LDA    ,U
+E104: A6 C4       LDA    ,U		; [bank_address]
 E106: A7 88 13    STA    $13,X
 E109: 33 88 10    LEAU   $10,X
 E10C: EF 03       STU    $3,X
@@ -13284,11 +13284,11 @@ E151: E6 1E       LDB    -$2,X
 E153: CE E1 14    LDU    #$E114
 E156: E6 C5       LDB    B,U
 E158: EE 03       LDU    $3,X
-E15A: A6 C1       LDA    ,U++
+E15A: A6 C1       LDA    ,U++		; [bank_address]
 E15C: ED 88 10    STD    $10,X
-E15F: A6 C0       LDA    ,U+
+E15F: A6 C0       LDA    ,U+		; [bank_address]
 E161: A7 88 12    STA    task_pointer_0012,X
-E164: A6 C4       LDA    ,U
+E164: A6 C4       LDA    ,U		; [bank_address]
 E166: A7 88 13    STA    $13,X
 E169: 33 88 10    LEAU   $10,X
 E16C: EF 03       STU    $3,X
@@ -15622,12 +15622,12 @@ FB7D: C0 03       SUBB   #$03
 FB7F: 25 2B       BCS    $FBAC
 FB81: D7 29       STB    $29
 FB83: EE 03       LDU    $3,X
-FB85: EC C4       LDD    ,U		; [bank_address]
+FB85: EC C4       LDD    ,U		; [select_address]
 FB87: DA E4       ORB    $E4
 FB89: ED A4       STD    ,Y
-FB8B: A6 42       LDA    $2,U		; [bank_address]
+FB8B: A6 42       LDA    $2,U		; [select_address]
 FB8D: ED 24       STD    $4,Y
-FB8F: A6 43       LDA    $3,U		; [bank_address]
+FB8F: A6 43       LDA    $3,U		; [select_address]
 FB91: ED 28       STD    $8,Y
 FB93: D6 E7       LDB    $E7
 FB95: 50          NEGB
@@ -15648,18 +15648,18 @@ FBAF: C0 06       SUBB   #$06
 FBB1: 25 66       BCS    $FC19
 FBB3: D7 29       STB    $29
 FBB5: EE 03       LDU    $3,X
-FBB7: EC C4       LDD    ,U		; [bank_address]
+FBB7: EC C4       LDD    ,U		; [select_address]
 FBB9: DA E4       ORB    $E4
 FBBB: ED A4       STD    ,Y
-FBBD: A6 42       LDA    $2,U		; [bank_address]
+FBBD: A6 42       LDA    $2,U		; [select_address]
 FBBF: ED 24       STD    $4,Y
-FBC1: A6 43       LDA    $3,U		; [bank_address]
+FBC1: A6 43       LDA    $3,U		; [select_address]
 FBC3: A7 28       STA    $8,Y
-FBC5: A6 44       LDA    $4,U		; [bank_address]
+FBC5: A6 44       LDA    $4,U		; [select_address]
 FBC7: A7 2C       STA    $C,Y
-FBC9: A6 45       LDA    $5,U		; [bank_address]
+FBC9: A6 45       LDA    $5,U		; [select_address]
 FBCB: A7 A8 10    STA    $10,Y
-FBCE: A6 46       LDA    $6,U		; [bank_address]
+FBCE: A6 46       LDA    $6,U		; [select_address]
 FBD0: A7 A8 14    STA    $14,Y
 FBD3: D6 E7       LDB    $E7
 FBD5: 50          NEGB
@@ -15679,7 +15679,7 @@ FBF1: 84 01       ANDA   #$01
 FBF3: 97 E4       STA    $E4
 FBF5: E7 2B       STB    $B,Y
 FBF7: E7 2F       STB    $F,Y
-FBF9: AA 41       ORA    $1,U		; [bank_address]
+FBF9: AA 41       ORA    $1,U		; [select_address]
 FBFB: A7 29       STA    $9,Y
 FBFD: A7 2D       STA    $D,Y
 FBFF: 96 E4       LDA    $E4
@@ -15688,7 +15688,7 @@ FC04: 84 01       ANDA   #$01
 FC06: 97 E4       STA    $E4
 FC08: E7 A8 13    STB    $13,Y
 FC0B: E7 A8 17    STB    $17,Y
-FC0E: AA 41       ORA    $1,U		; [bank_address]
+FC0E: AA 41       ORA    $1,U		; [select_address]
 FC10: A7 A8 11    STA    $11,Y
 FC13: A7 A8 15    STA    $15,Y
 FC16: 31 A8 18    LEAY   $18,Y
