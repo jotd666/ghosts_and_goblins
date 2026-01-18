@@ -755,27 +755,84 @@ demo_game:
 	move.b	#0x2,d0
 	jbsr	display_text
 	
+	lea		(0x2044+0x20*6,a6),a0
+	lea		scrollx_text,a1
+	move.b	#0x2,d0
+	jbsr	display_text
+	lea		(0x2044+0x20*7,a6),a0
+	lea		hscrollx_text,a1
+	move.b	#0x2,d0
+	jbsr	display_text
+	
 	
 	jbsr	osd_enable_interrupts
 loop:
 
 	jra	loop
 	
+* < A1: address
+* < D0: number
+num2hexstring:
+	movem.l	d0-a6,-(a7)
+	moveq	#3,d4		| nb digits
+	move.l	#0xF000,D3
+	moveq.l	#4,D2
+	move.b	#'x',(A1)+	
+.loop:
+	move.w	D0,D1
+	and.w	D3,D1
+	rol.w	D2,D1
+	cmp.b	#9,D1
+	bgt	.letter
+	**add.b	#'0',D1		| in this charset no need to add '0'
+	move.b	D1,(A1)+
+	bra	.loopend
+.letter:
+	add.b	#'A'-10,D1
+	move.b	D1,(A1)+
+.loopend:
+	addq.l	#4,D2
+	lsr.l	#4,D3
+	dbf	D4,.loop
+	st.b	(a1)
+	movem.l	(a7)+,d0-a6
+	rts
 	
 tester_text:
-	.asciz	"Welcome to GNG hw tester"
+	.ascii	"Welcome to GNG hw tester"
+	.byte	0xff
+scrollx_text:
+	.ascii	"Game ScrollX "
+	.byte	0xff
+hscrollx_text:
+	.ascii	"Host ScrollX "
+	.byte	0xff
 	.align 2
 
 display_text:
 0:
 	move.b	(a1)+,d1
-	jeq		1f
+	jmi		1f
 	move.b	d1,(a0)
 	move.b	d0,(0x400,a0)
 	jbsr	osd_video_byte_dirty
 	addq	#1,a0
 	jra		0b
 1:
+	rts
+	
+
+* < A0: address
+* < D0: color
+* < D1: value 16 bit
+display_number:
+	lea		(-8,a7),a7
+	move.l	a7,a1
+	exg	d0,d1
+	jbsr	num2hexstring
+	exg	d0,d1
+	jbsr	display_text
+	lea		(8,a7),a7
 	rts
 	
 
@@ -880,6 +937,16 @@ tiles_at_start:
 	.include	"cavern.68k"
 
 call_nmi:
+	move.w	game_scroll_x,d1
+	lea		(0x2044+0x20*6+14,a6),a0
+	move.b	#0x3,d0
+	jbsr	display_number
+	move.w	host_scroll_x,d1
+	lea		(0x2044+0x20*7+14,a6),a0
+	move.b	#0x3,d0
+	jbsr	display_number
+	
+	
 	move.b	player_1_controls,d0
 	btst	#BIT_RIGHT,d0
 	jne		0f
