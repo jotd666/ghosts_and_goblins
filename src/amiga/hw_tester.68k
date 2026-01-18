@@ -1016,13 +1016,9 @@ draw_right_tiles:
 	lsl.w	#5,d0	| times 32
 	add.w	d0,d7	| start address
 
-	move.w	d7,d6	| save current Y
 
 	move.w	#0xE,d2
 0:
-	move.w	d6,d7	| set current Y row
-	move.w	#4-1,d1		|  (64 bit)
-1:
 	and.w	#0x3FF,d7		| wrap
 	* force tile draw
 	lea		(a5,d7.w),a0
@@ -1032,9 +1028,8 @@ draw_right_tiles:
 	*move.b	#0x41,(0x400,a0)
 	
 	jbsr	osd_video_byte_dirty
-	add.w	#0x20,d7		| next X
-	dbf		d1,1b
-	addq	#1,d6
+
+	addq	#1,d7			| next Y
 	dbf		d2,0b
 	rts
 	
@@ -1069,8 +1064,8 @@ set_scroll_values:
 	* max overshoot: we have to do something on the right: draw the tiles
 	COLOR0_FLASH	0x0F0
 	jbsr	draw_right_tiles
-	add.w	#64,max_scroll_x
-	add.w	#64,min_scroll_x
+	add.w	#16,max_scroll_x
+	add.w	#16,min_scroll_x
 5:
 	rts
 
