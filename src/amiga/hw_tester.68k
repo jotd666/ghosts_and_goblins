@@ -767,6 +767,10 @@ demo_game:
 	lea		max_scrollx_text,a1
 	move.b	#0x2,d0
 	jbsr	display_text
+	lea		(0x2044+0x20*8,a6),a0
+	lea		min_scrollx_text,a1
+	move.b	#0x2,d0
+	jbsr	display_text
 	
 	
 	jbsr	osd_enable_interrupts
@@ -813,6 +817,9 @@ hscrollx_text:
 	.byte	0xff
 max_scrollx_text:
 	.ascii	"Max ScrollX "
+	.byte	0xff
+min_scrollx_text:
+	.ascii	"Min ScrollX "
 	.byte	0xff
 	.align 2
 
@@ -956,6 +963,10 @@ call_nmi:
 	lea		(0x2044+0x20*7+14,a6),a0
 	move.b	#0x3,d0
 	jbsr	display_number
+	move.w	min_scroll_x,d1
+	lea		(0x2044+0x20*8+14,a6),a0
+	move.b	#0x3,d0
+	jbsr	display_number
 	
 	
 	move.b	player_1_controls,d0
@@ -1016,9 +1027,14 @@ force_all_screen_redraw:
 	dbf		d2,0b
 	rts
 	
+	
+draw_left_tiles:
+	move.w	min_scroll_x,d0
+	jra		draw_column_tiles
 draw_right_tiles:
+	move.w	max_scroll_x,d0	
+draw_column_tiles:
 	GET_MEMORY_START_AND_DP
-	move.w	max_scroll_x,d0
 
 	lea		(0x2800,a6),a5
 	lsr.w	#4,D0	| divide by 16 to get real X tile offset
@@ -1043,15 +1059,15 @@ draw_right_tiles:
 	addq	#1,d7			| next Y
 	dbf		d2,0b
 	rts
-	
+
+
+
 set_scroll_values:
 	* update host scroll
 	
 	move.w	game_scroll_x,d0
 	sub.w	previous_scroll_x,d0
-	jpl		0f
-	add.w	#0x200,d0
-0:
+
 	* D0 is the scroll delta
 	move.w	host_scroll_x,d1
 	add.w	d0,d1
@@ -1066,6 +1082,10 @@ set_scroll_values:
 	jcc		0f
 	* min overshoot: we have to do something on the left
 	COLOR0_FLASH	0x00F
+	sub.w	#16,max_scroll_x
+	sub.w	#16,min_scroll_x
+	jbsr	draw_left_tiles
+	
 	jra		5f
 0:
 
@@ -1077,10 +1097,14 @@ set_scroll_values:
 	jbsr	draw_right_tiles
 	add.w	#16,max_scroll_x
 	add.w	#16,min_scroll_x
-	cmp.w	#0x200,max_scroll_x
-	jne		0f
-	add.w	#0x40,x_extra_offset
-0:
+	moveq	#0,d0
+	* add 0x40 bytes every 0x200 scroll pixels
+	* to make up for memory wrap
+	move.b	max_scroll_x,d0
+	lsr.w	#1,d0
+	lsl.w	#6,d0
+	move.w	d0,x_extra_offset
+5:
 
 	rts
 
