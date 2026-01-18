@@ -750,17 +750,21 @@ demo_game:
 	addq	#0x1,a0
 	dbf		d0,0b
 	
-	lea		(0x2044+0x20*5,a6),a0
+	lea		(0x2044+0x20*3,a6),a0
 	lea		tester_text,a1
 	move.b	#0x2,d0
 	jbsr	display_text
 	
-	lea		(0x2044+0x20*6,a6),a0
+	lea		(0x2044+0x20*5,a6),a0
 	lea		scrollx_text,a1
 	move.b	#0x2,d0
 	jbsr	display_text
-	lea		(0x2044+0x20*7,a6),a0
+	lea		(0x2044+0x20*6,a6),a0
 	lea		hscrollx_text,a1
+	move.b	#0x2,d0
+	jbsr	display_text
+	lea		(0x2044+0x20*7,a6),a0
+	lea		max_scrollx_text,a1
 	move.b	#0x2,d0
 	jbsr	display_text
 	
@@ -806,6 +810,9 @@ scrollx_text:
 	.byte	0xff
 hscrollx_text:
 	.ascii	"Host ScrollX "
+	.byte	0xff
+max_scrollx_text:
+	.ascii	"Max ScrollX "
 	.byte	0xff
 	.align 2
 
@@ -938,10 +945,14 @@ tiles_at_start:
 
 call_nmi:
 	move.w	game_scroll_x,d1
-	lea		(0x2044+0x20*6+14,a6),a0
+	lea		(0x2044+0x20*5+14,a6),a0
 	move.b	#0x3,d0
 	jbsr	display_number
 	move.w	host_scroll_x,d1
+	lea		(0x2044+0x20*6+14,a6),a0
+	move.b	#0x3,d0
+	jbsr	display_number
+	move.w	max_scroll_x,d1
 	lea		(0x2044+0x20*7+14,a6),a0
 	move.b	#0x3,d0
 	jbsr	display_number
@@ -973,7 +984,7 @@ force_all_screen_redraw:
 	move.w	game_scroll_x,d0
 	move.w	d0,min_scroll_x
 	move.w	d0,d1
-	add.w	#VISIBLE_SCROLL_WIDTH+64,d1		| after that it triggers tile refresh
+	add.w	#VISIBLE_SCROLL_WIDTH+16,d1		| after that it triggers tile refresh
 	move.w	d1,max_scroll_x
 	
 	and.w	#0x3F,d0
@@ -1008,6 +1019,7 @@ force_all_screen_redraw:
 draw_right_tiles:
 	GET_MEMORY_START_AND_DP
 	move.w	max_scroll_x,d0
+
 	lea		(0x2800,a6),a5
 	lsr.w	#4,D0	| divide by 16 to get real X tile offset
 	* now compute start address to fetch data from
@@ -1015,7 +1027,6 @@ draw_right_tiles:
 	* atm Y=0
 	lsl.w	#5,d0	| times 32
 	add.w	d0,d7	| start address
-
 
 	move.w	#0xE,d2
 0:
@@ -1038,9 +1049,9 @@ set_scroll_values:
 	
 	move.w	game_scroll_x,d0
 	sub.w	previous_scroll_x,d0
-*	jpl		0f
-*	BREAKPoINT	"wpp"
-*0:
+	jpl		0f
+	add.w	#0x200,d0
+0:
 	* D0 is the scroll delta
 	move.w	host_scroll_x,d1
 	add.w	d0,d1
@@ -1066,7 +1077,11 @@ set_scroll_values:
 	jbsr	draw_right_tiles
 	add.w	#16,max_scroll_x
 	add.w	#16,min_scroll_x
-5:
+	cmp.w	#0x200,max_scroll_x
+	jne		0f
+	add.w	#0x40,x_extra_offset
+0:
+
 	rts
 
 	
@@ -2426,7 +2441,6 @@ cache_bg_tiles_address:
 
 
 update_bg_tile:
-	move.w	d7,0x100
 	
 	moveq	#0,d2			| mask up to 255
 	move.b	d0,d2			| tile code
@@ -2453,12 +2467,11 @@ update_bg_tile:
 	move.w	host_scroll_x,d1
 	sub.w	game_scroll_x,d1
 	
-	move.w	game_scroll_x,0x102
-	move.w	host_scroll_x,0x104
 	asr.w	#4,d1	| tiles are 16 pix wide
 	add.w 	d1,d0	| correct nb bytes
 
 	add.w	d0,d0	| 16 pixels
+	add.w 	x_extra_offset,d0
 	move.w	d7,d1
 	and.w	#0x1F,d1	| modulus 0x20
 	
@@ -3886,6 +3899,8 @@ host_scroll_in_sync:
 game_scroll_y:
 	.word	0
 game_scroll_x:
+	.word	0
+x_extra_offset:
 	.word	0
 host_scroll_y:
 	.word	0
