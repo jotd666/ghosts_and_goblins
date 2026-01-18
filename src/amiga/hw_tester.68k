@@ -115,7 +115,7 @@ NB_BG_PLANES = 5
 
 TOTAL_NB_COLORS = 1<<NB_PLAYFIELD_PLANES
 FG_NB_BYTES_PER_ROW = 0x20
-BG_NB_BYTES_PER_ROW = 0x28
+BG_NB_BYTES_PER_ROW = 0x28    | +64 pixels
 
 Y_START = 0x20
 
@@ -132,6 +132,7 @@ BG_NB_LINES = 512
 Y_MAX = BG_NB_LINES
 NB_PLAYFIELD_LINES = BG_NB_LINES
 
+VISIBLE_SCROLL_WIDTH = BG_NB_BYTES_PER_ROW*8-64
 
 BG_SCREEN_PLANE_SIZE = BG_NB_BYTES_PER_ROW*(BG_NB_LINES+16)
 
@@ -736,7 +737,6 @@ demo_game:
 	move.b	#0x2,d0
 	jbsr	display_text
 	
-	move.w	#0x80,scroll_x
 	
 	jbsr	osd_enable_interrupts
 loop:
@@ -816,6 +816,8 @@ load_context:
 	dbf		d7,0b
 	
 	* at start redraw everything
+	move.w	#0,game_scroll_x
+	move.w	game_scroll_x,previous_scroll_x
 	jbsr force_all_screen_redraw
 
 	movem.l	(a7)+,d0-a6
@@ -864,16 +866,16 @@ call_nmi:
 	btst	#BIT_RIGHT,d0
 	jne		0f
 	* move scrolling left
-	addq	#1,scroll_x
+	addq	#1,game_scroll_x
 0:
 	btst	#BIT_LEFT,d0
 	jne		0f
 	* move scrolling right
-	subq	#1,scroll_x
+	subq	#1,game_scroll_x
 0:
-	move.w	scroll_x,d0
+	move.w	game_scroll_x,d0
 	and.w 	#0x1FF,D0
-	move.w	d0,scroll_x
+	move.w	d0,game_scroll_x
 
 	jbsr	set_scroll_values
 
@@ -881,8 +883,18 @@ call_nmi:
 
 force_all_screen_redraw:
 	GET_MEMORY_START_AND_DP
+
 	* given the current scroll X/Y, draw all tiles on screen
-	move.w	scroll_x,d0
+	move.w	game_scroll_x,d0
+	move.w	d0,min_scroll_x
+	move.w	d0,d1
+	add.w	#VISIBLE_SCROLL_WIDTH+64,d1		| after that it triggers tile refresh
+	move.w	d1,max_scroll_x
+	
+	and.w	#0x3F,d0
+	move.w	d0,host_scroll_x		| when called, then host scroll is 0 modulus the bplcon shift fmode=3
+	
+	move.w	game_scroll_x,d0
 	lea		(0x2800,a6),a5
 	lsr.w	#4,D0	| divide by 16 to get real X tile offset
 	* now compute start address to fetch data from
@@ -896,7 +908,7 @@ force_all_screen_redraw:
 	move.w	#0x0E,d2
 0:
 	move.w	d6,d7	| set current Y row
-	move.w	#0x0E,d1
+	move.w	#BG_NB_BYTES_PER_ROW/2-1,d1		|  (64 bit margin)
 1:
 	and.w	#0x3FF,d7		| wrap
 	* force tile draw
@@ -908,10 +920,73 @@ force_all_screen_redraw:
 	dbf		d2,0b
 	rts
 	
-* < D0: game scroll X
-set_scroll_values:
-	move.w	d0,d1
+draw_right_tiles:
+	GET_MEMORY_START_AND_DP
+	move.w	max_scroll_x,d0
+	lea		(0x2800,a6),a5
+	lsr.w	#4,D0	| divide by 16 to get real X tile offset
+	* now compute start address to fetch data from
+	move.w	#1,d7		| first row is not visible with scroll=0, visible with=$10
+	* atm Y=0
+	lsl.w	#5,d0	| times 32
+	add.w	d0,d7	| start address
+
+	move.w	d7,d6	| save current Y
+
+	move.w	#0x1E,d2
+0:
+	move.w	d6,d7	| set current Y row
+	move.w	#4-1,d1		|  (64 bit)
+1:
+	and.w	#0x3FF,d7		| wrap
+	* force tile draw
+	lea		(a5,d7.w),a0
 	
+	* uncomment for wall of green bricks to test
+	*move.b	#0xE9,(a0)
+	*move.b	#0x41,(0x400,a0)
+	
+	jbsr	osd_video_byte_dirty
+	add.w	#0x20,d7		| next X
+	dbf		d1,1b
+	addq	#1,d6
+	dbf		d2,0b
+	rts
+	
+set_scroll_values:
+	* update host scroll
+	
+	move.w	game_scroll_x,d0
+	sub.w	previous_scroll_x,d0
+*	jpl		0f
+*	BREAKPoINT	"wpp"
+*0:
+	* D0 is the scroll delta
+	move.w	host_scroll_x,d1
+	add.w	d0,d1
+	move.w	d1,host_scroll_x
+	
+	
+	move.w	game_scroll_x,previous_scroll_x
+	
+	* are we still in min/max boundaries?
+	move.w	game_scroll_x,d0
+	cmp.w	min_scroll_x,d0
+	jcc		0f
+	* min overshoot: we have to do something on the left
+	COLOR0_FLASH	0x00F
+	jra		5f
+0:
+
+	add.w	#VISIBLE_SCROLL_WIDTH,d0
+	cmp.w	max_scroll_x,d0
+	jcs		5f
+	* max overshoot: we have to do something on the right: draw the tiles
+	COLOR0_FLASH	0x0F0
+	jbsr	draw_right_tiles
+	add.w	#64,max_scroll_x
+	add.w	#64,min_scroll_x
+5:
 	rts
 
 	
@@ -1434,7 +1509,7 @@ update_one_bob:
 	*jbsr	mirror_sprite_planes
 	
 	* BOBs must follow screen scroll
-	*add.w	scroll_y,d1
+	*add.w	game_scroll_y,d1
 	*add.w	scroll_x_lo,d0
 	*add.w	scroll_x_hi,d0
 	*and.w	#0x1FF,d0
@@ -2271,6 +2346,8 @@ cache_bg_tiles_address:
 
 
 update_bg_tile:
+	move.w	d7,0x100
+	
 	moveq	#0,d2			| mask up to 255
 	move.b	d0,d2			| tile code
 	moveq	#0,d3
@@ -2285,23 +2362,27 @@ update_bg_tile:
 	moveq	#0,d0
 	moveq	#0,d1
 	* compute address
+	
+	nop
+	nop
 	move.w	d7,d0
 	
 	
 	lsr.w	#5,d0	| divide by 0x20
 
 	move.w	host_scroll_x,d1
-	lsr.w	#3,d1
-	sub.w 	d1,d0	| correct nb bytes
+	sub.w	game_scroll_x,d1
+	
+	move.w	game_scroll_x,0x102
+	move.w	host_scroll_x,0x104
+	asr.w	#4,d1	| tiles are 16 pix wide
+	add.w 	d1,d0	| correct nb bytes
 
 	add.w	d0,d0	| 16 pixels
 	move.w	d7,d1
 	and.w	#0x1F,d1	| modulus 0x20
 	
-	cmp.w	#BG_NB_BYTES_PER_ROW,D0
-	jcs		0f
-	rts
-0:
+
 	* updating bitplanes
 	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
 	move.l	#BG_SCREEN_PLANE_SIZE,d5
@@ -2830,7 +2911,7 @@ set_bobs_bitplanes:
 	
 	* set bitplanes
 	moveq	#0,d0
-	move.w	scroll_y,d0
+	move.w	game_scroll_y,d0
 
 	lea		mulBG_NB_BYTES_PER_ROW_table,a2
 	.ifdef	MC68020
@@ -2842,7 +2923,7 @@ set_bobs_bitplanes:
 1:	
 
 	move.w	host_scroll_x,d2
-	and.w	#0xFF,d2			| wraps at 0x100!
+	and.w	#0x0FF,d2			| wraps at 0x100!
 
 	lea		scroll_table,a2
 	.ifdef	MC68020
@@ -2854,7 +2935,10 @@ set_bobs_bitplanes:
 	.endif
 	
 	move.w	(a2)+,fine_x_scroll_value
-	add.w	(a2),d0
+	move.w	host_scroll_x,d2
+	lsr.w	#6,d2
+	lsl.w	#3,d2
+	add.w	d2,d0
 	
 	
     moveq #NB_PLAYFIELD_PLANES-1,d1
@@ -3717,13 +3801,19 @@ system_vbr:
 target_usp_value:
 	.word	0
 
-scroll_y:
+host_scroll_in_sync:
 	.word	0
-scroll_x:
+game_scroll_y:
+	.word	0
+game_scroll_x:
 	.word	0
 host_scroll_y:
 	.word	0
 host_scroll_x:
+	.word	0
+min_scroll_x:
+	.word	0
+max_scroll_x:
 	.word	0
 previous_scroll_y:
 	.word	0
