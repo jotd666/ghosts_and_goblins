@@ -270,7 +270,6 @@ for i,line in enumerate(lines):
         line = change_instruction("asl.b\t#2,d1",lines,i)
         line += "\text.w\td1\n\tlea\ttable_of_jump_tables_7139,a2"
         lines[i+1] = remove_instruction(lines,i+1)
-        lines[i+2] = change_instruction("move.l\t(a2,d1.w),a2",lines,i+2)
     elif address == 0x9c85:
         # code must be reworked a lot because of table of tables
         # that we need to convert to native 68k code
@@ -279,7 +278,9 @@ for i,line in enumerate(lines):
         lines[i+1] = remove_instruction(lines,i+1)
         lines[i+2] = remove_instruction(lines,i+2)
         lines[i+2] = "\tmove.l\t(a4,d1.w),a4"   # will be side by side with comment
-    elif address in {0x7132,0x9C89}:
+    elif address in {0x7132}:
+        line = change_instruction("move.l\t(a2,d1.w),a2",lines,i)  # load jump table from jump of jump tables
+    elif address in {0x9C89}:
         line = remove_instruction(lines,i)
     elif address in {0x9c8e}:
         # add sign extend + optimize
@@ -405,10 +406,11 @@ for i,line in enumerate(lines):
         line = "\ttst.b\tinvincible_flag\n\tjne\tl_f59a\n"+line
     elif address in [0xf13c]:
         line = "\ttst.b\tinvincible_flag\n\tjne\tl_f150\n"+line
-##    elif address in {0x661D,0x6697}:
-##        # no need to update palette hardware registers, it takes time for nothing
-##        line = change_instruction("rts",lines,i)
-
+    elif address in {0x661D,0x6697}:
+        # no need to update palette hardware registers, it takes time for nothing
+        line = change_instruction("rts",lines,i)
+    elif address == 0x6C11:
+        line = "\tmoveq\t#1,d1\n"+line+"\tmoveq\t#1,d0\n"  # temp
 # pattern where logging is required outside the IRQ code
 # entering the IRQ disables logging, and exiting restores previous logging state
 ##    if address == 0x65C4:

@@ -560,9 +560,9 @@ compute_bank_address_from_b_6378:
 63E0: 30 A4       LEAX   ,Y
 63E2: A6 C0       LDA    ,U+
 63E4: 27 0A       BEQ    $63F0
-63E6: A7 82       STA    ,-X
+63E6: A7 82       STA    ,-X		; [video_address] (map)
 63E8: E6 C0       LDB    ,U+
-63EA: E7 89 04 00 STB    $0400,X
+63EA: E7 89 04 00 STB    $0400,X		; [video_address]
 63EE: 20 F2       BRA    $63E2
 63F0: 31 A8 20    LEAY   counter_16_bit_0020,Y
 63F3: A6 C4       LDA    ,U

@@ -1,14 +1,17 @@
+- scrolling in HW test (with level 3 tiles): right ok to a point, left: make work when scroll=0x100
+  it fails but ok otherwise: check boundary D0 offset between ok and wrong (like I did with right scroll)
+- refactor to get draw address first, to remove extra 16 pixels on the top (corkscrew)
+- add space before and after
+- Y scroll: first perform wrap at 256+16 (copper split)
+- check if palette different on map, then log tiles (and load)
 - grouping, seems to have issues with main character at tile 0 tile 0 seems
   to be a special case despite the precautions
 - detect intro fade palette
 - try to detect level 2, palette is not exactly the same as level1
   some colors are not in the same order
-- "cheat" key to display x/y scroll on fg layer
 - debug division routines: plant shoot angles are wrong, devils attacks maybe (level 3 first devil debug)
 - tombstone easter egg shot seems wrong
-- scrolling in HW test (with level 3 tiles)
 - parasite sprites at the bottom
-- crash when dying if has to show the map or lockup in 617F loop, no events arrive
 - flag system to avoid re-copying tiles again and again if already correct
 - log tiles (per level): with zone filtering (first level only upper part)
 - use 16-bit table for mirror
