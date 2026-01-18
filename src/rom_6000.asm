@@ -532,7 +532,7 @@ compute_bank_address_from_b_6378:
 639C: 6E D5       JMP    [B,U]		 ; [indirect_jump]
 
 
-
+show_map_63ac:
 63AC: D6 F0       LDB    $F0
 63AE: 26 02       BNE    $63B2
 63B0: 6C 13       INC    -$D,X
@@ -546,6 +546,7 @@ compute_bank_address_from_b_6378:
 63BD: DD D4       STD    scroll_x_value_00d4
 63BF: CC 01 00    LDD    #$0100
 63C2: DD D6       STD    scroll_y_value_00d6
+; set palette for map
 63C4: 8E 16 32    LDX    #tiles_palette_in_ram_1632
 63C7: CE 65 3C    LDU    #$653C
 63CA: 86 40       LDA    #$40
@@ -16074,7 +16075,7 @@ jump_table_5a66:
 	dc.w	$E7E9	; $5a8a
 	dc.w	$E7E9	; $5a8c
 jump_table_639e:
-	dc.w	$63ac	; $639e
+	dc.w	show_map_63ac	; $639e
 	dc.w	$63b3	; $63a0
 	dc.w	$6424	; $63a2
 	dc.w	$6430	; $63a4

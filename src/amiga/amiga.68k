@@ -775,6 +775,7 @@ dump_and_quit:
 * format (RGB4) is: offset=$RG, offset+$40=$B0
 osd_set_tile_palette:
 	OSD_ENTER
+	BREAKPOINT	"set pititi"
 	movem.l	d0-d3/a1,-(a7)
 	* re-compose RGBx word to search in palette
 	* if color are at the indicated positions, then we know

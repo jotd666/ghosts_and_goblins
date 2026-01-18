@@ -1,3 +1,4 @@
+- map: context not detected: show_map_63ac
 - scrolling in HW test (with level 3 tiles): right ok to a point, left: make work when scroll=0x100
   it fails but ok otherwise: check boundary D0 offset between ok and wrong (like I did with right scroll)
 - refactor to get draw address first, to remove extra 16 pixels on the top (corkscrew)
