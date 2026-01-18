@@ -62,6 +62,63 @@ bg_tiles_address_2800 = $2800
 bg_tiles_color_address_2c00 = $2c00
 bank_address_4000 = $4000
 sound_index_3a00 = $3a00
+game_in_play_0028 = $28
+level_music_index_00bd = $bd
+
+SND_STOP_00 = $00
+SND_UNKNOWN_FF = $FF 
+SND_UNKNOWN_01 = $01
+SND_UNKNOWN_02 = $02
+SND_UNKNOWN_03 = $03
+SND_UNKNOWN_04 = $04
+SND_UNKNOWN_05 = $05
+SND_UNKNOWN_06 = $06
+SND_UNKNOWN_07 = $07
+SND_UNKNOWN_08 = $08
+SND_UNKNOWN_1D = $1D
+SND_UNKNOWN_0B = $0B
+SND_UNKNOWN_0C = $0C
+SND_UNKNOWN_0D = $0D
+SND_UNKNOWN_0E = $0E
+SND_UNKNOWN_0F = $0F
+SND_WEAR_ARMOUR_10 = $10
+SND_UNKNOWN_12 = $12
+SND_UNKNOWN_13 = $13
+SND_UNKNOWN_14 = $14
+SND_UNKNOWN_17 = $17
+SND_UNKNOWN_18 = $18
+SND_UNKNOWN_19 = $19
+SND_UNKNOWN_1A = $1A
+SND_UNKNOWN_1B = $1B
+SND_UNKNOWN_1C = $1C
+SND_UNKNOWN_00 = $00
+SND_UNKNOWN_1E = $1E
+SND_UNKNOWN_1F = $1F
+SND_UNKNOWN_20 = $20
+SND_UNKNOWN_21 = $21
+SND_UNKNOWN_22 = $22
+SND_UNKNOWN_23 = $23
+SND_UNKNOWN_24 = $24
+SND_UNKNOWN_25 = $25
+SND_UNKNOWN_26 = $26
+SND_UNKNOWN_27 = $27
+SND_UNKNOWN_2C = $2C
+SND_UNKNOWN_28 = $28
+SND_UNKNOWN_2F = $2F
+SND_INTRO_CHORDS_30 = $30
+SND_KILLED_MUSIC_31 = $31
+SND_UNKNOWN_32 = $32
+SND_CREDIT_35 = $35
+SND_INTRO_MUSIC_START_36 = $36
+SND_UNKNOWN_37 = $37
+SND_UNKNOWN_38 = $38
+SND_UNKNOWN_39 = $39
+SND_LEVEL1_MUSIC_3A = $3A
+SND_UNKNOWN_3B = $3B
+SND_THUNDER_3C = $3C
+SND_THUNDER_3D = $3D
+SND_UNKNOWN_3E = $3E
+SND_UNKNOWN_3F = $3F
 
 ; horrible code when it comes to jump tables
 ; there are more than 200+ jump tables, that had to be
@@ -899,7 +956,7 @@ update_some_palette_671c:
 6862: C6 01       LDB    #$01
 6864: D7 D8       STB    $D8
 6866: 4F          CLRA
-6867: 97 28       STA    $28
+6867: 97 28       STA    game_in_play_0028
 6869: 97 2A       STA    $2A
 686B: 97 2B       STA    $2B
 686D: 5F          CLRB
@@ -994,7 +1051,7 @@ fill_screen_with_h_6883:
 691B: 39          RTS
 691C: 96 4B       LDA    $4B
 691E: 97 4C       STA    $4C
-6920: D6 28       LDB    $28
+6920: D6 28       LDB    game_in_play_0028
 6922: 27 12       BEQ    $6936
 6924: D6 27       LDB    $27
 6926: 27 04       BEQ    $692C
@@ -1047,7 +1104,7 @@ game_not_playing_694d:
 6984: DD 22       STD    $22
 6986: DD 24       STD    $24
 6988: 86 01       LDA    #$01
-698A: 97 28       STA    $28
+698A: 97 28       STA    game_in_play_0028
 698C: 4F          CLRA
 698D: 5F          CLRB
 698E: DD 03       STD    $03
@@ -1098,7 +1155,7 @@ game_not_playing_694d:
 69EA: 39          RTS
 69EB: C6 01       LDB    #$01
 69ED: D7 D8       STB    $D8
-69EF: 0F 28       CLR    $28
+69EF: 0F 28       CLR    game_in_play_0028
 69F1: CC 87 CD    LDD    #$87CD
 69F4: FD 00 6E    STD    >$006E
 69F7: 0F 70       CLR    $70
@@ -1390,7 +1447,7 @@ start_game_screen_6b5e:
 6C62: 97 61       STA    $61
 6C64: 39          RTS
 6C65: 96 61       LDA    $61
-6C67: D6 28       LDB    $28
+6C67: D6 28       LDB    game_in_play_0028
 6C69: 26 01       BNE    $6C6C
 6C6B: 4F          CLRA
 6C6C: 5F          CLRB
@@ -2530,7 +2587,7 @@ player_dead_777c:
 queue_sound_7915:
 7915: 0D 52       TST    $52
 7917: 26 04       BNE    queue_sound_forced_791d		; attract mode
-7919: 0D 28       TST    $28
+7919: 0D 28       TST    game_in_play_0028
 791B: 27 12       BEQ    $792F
 queue_sound_forced_791d:
 791D: 10 9E 14    LDY    $14
@@ -2553,129 +2610,130 @@ process_sound_queue_7930:
 7942: F7 3A 00    STB    sound_index_3a00
 7945: 39          RTS
 
-7946: C6 00       LDB    #$00
+7946: C6 00       LDB    #SND_STOP_00
 7948: 7E 79 15    JMP    queue_sound_7915
-794B: C6 3A       LDB    #$3A
+794B: C6 3A       LDB    #SND_LEVEL1_MUSIC_3A
 794D: 7E 79 15    JMP    queue_sound_7915
 
 play_credit_sound_7950:
-7950: D6 28       LDB    $28
+7950: D6 28       LDB    game_in_play_0028
 7952: 10 26 FF EF LBNE   $7945
-7956: C6 35       LDB    #$35
+7956: C6 35       LDB    #SND_CREDIT_35
+queue_sound_forced_with_ff_7958:
 7958: BD 79 1D    JSR    queue_sound_forced_791d
-795B: C6 FF       LDB    #$FF
+795B: C6 FF       LDB    #SND_UNKNOWN_FF
 795D: 7E 79 1D    JMP    queue_sound_forced_791d
 
-7960: C6 01       LDB    #$01
+7960: C6 01       LDB    #SND_UNKNOWN_01
 7962: 7E 79 15    JMP    queue_sound_7915
-7965: C6 02       LDB    #$02
+7965: C6 02       LDB    #SND_UNKNOWN_02
 7967: 7E 79 15    JMP    queue_sound_7915
-796A: C6 03       LDB    #$03
+796A: C6 03       LDB    #SND_UNKNOWN_03
 796C: 7E 79 15    JMP    queue_sound_7915
-796F: C6 04       LDB    #$04
+796F: C6 04       LDB    #SND_UNKNOWN_04
 7971: 7E 79 15    JMP    queue_sound_7915
-7974: C6 05       LDB    #$05
+7974: C6 05       LDB    #SND_UNKNOWN_05
 7976: 7E 79 15    JMP    queue_sound_7915
-7979: C6 06       LDB    #$06
-797B: 7E 79 58    JMP    $7958
-797E: C6 07       LDB    #$07
+7979: C6 06       LDB    #SND_UNKNOWN_06
+797B: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+797E: C6 07       LDB    #SND_UNKNOWN_07
 7980: BD 79 15    JSR    queue_sound_7915
-7983: C6 08       LDB    #$08
+7983: C6 08       LDB    #SND_UNKNOWN_08
 7985: 7E 79 15    JMP    queue_sound_7915
-7988: C6 1D       LDB    #$1D
+7988: C6 1D       LDB    #SND_UNKNOWN_1D
 798A: 7E 79 15    JMP    queue_sound_7915
-798D: C6 0B       LDB    #$0B
-798F: 7E 79 58    JMP    $7958
-7992: C6 0C       LDB    #$0C
-7994: 7E 79 58    JMP    $7958
-7997: C6 0D       LDB    #$0D
+798D: C6 0B       LDB    #SND_UNKNOWN_0B
+798F: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+7992: C6 0C       LDB    #SND_UNKNOWN_0C
+7994: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+7997: C6 0D       LDB    #SND_UNKNOWN_0D
 7999: 7E 79 15    JMP    queue_sound_7915
-799C: C6 0E       LDB    #$0E
+799C: C6 0E       LDB    #SND_UNKNOWN_0E
 799E: 7E 79 15    JMP    queue_sound_7915
-79A1: C6 0F       LDB    #$0F
-79A3: 7E 79 58    JMP    $7958
-79A6: C6 10       LDB    #$10
+79A1: C6 0F       LDB    #SND_UNKNOWN_0F
+79A3: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+79A6: C6 10       LDB    #SND_WEAR_ARMOUR_10
 79A8: 7E 79 15    JMP    queue_sound_7915
-79AB: C6 12       LDB    #$12
-79AD: 7E 79 58    JMP    $7958
-79B0: C6 13       LDB    #$13
+79AB: C6 12       LDB    #SND_UNKNOWN_12
+79AD: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+79B0: C6 13       LDB    #SND_UNKNOWN_13
 79B2: 7E 79 15    JMP    queue_sound_7915
-79B5: C6 14       LDB    #$14
-79B7: 7E 79 58    JMP    $7958
-79BA: C6 17       LDB    #$17
-79BC: 7E 79 58    JMP    $7958
-79BF: C6 18       LDB    #$18
+79B5: C6 14       LDB    #SND_UNKNOWN_14
+79B7: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+79BA: C6 17       LDB    #SND_UNKNOWN_17
+79BC: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+79BF: C6 18       LDB    #SND_UNKNOWN_18
 79C1: 7E 79 15    JMP    queue_sound_7915
-79C4: C6 19       LDB    #$19
+79C4: C6 19       LDB    #SND_UNKNOWN_19
 79C6: 7E 79 15    JMP    queue_sound_7915
-79C9: C6 1A       LDB    #$1A
-79CB: 7E 79 58    JMP    $7958
-79CE: C6 1B       LDB    #$1B
-79D0: 7E 79 58    JMP    $7958
-79D3: C6 1C       LDB    #$1C
+79C9: C6 1A       LDB    #SND_UNKNOWN_1A
+79CB: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+79CE: C6 1B       LDB    #SND_UNKNOWN_1B
+79D0: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+79D3: C6 1C       LDB    #SND_UNKNOWN_1C
 79D5: 7E 79 15    JMP    queue_sound_7915
-79D8: C6 00       LDB    #$00
-79DA: 7E 79 58    JMP    $7958
-79DD: C6 1E       LDB    #$1E
-79DF: 7E 79 58    JMP    $7958
-79E2: C6 1F       LDB    #$1F
-79E4: 7E 79 58    JMP    $7958
-79E7: C6 20       LDB    #$20
+79D8: C6 00       LDB    #SND_UNKNOWN_00
+79DA: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+79DD: C6 1E       LDB    #SND_UNKNOWN_1E
+79DF: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+79E2: C6 1F       LDB    #SND_UNKNOWN_1F
+79E4: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+79E7: C6 20       LDB    #SND_UNKNOWN_20
 79E9: 7E 79 15    JMP    queue_sound_7915
-79EC: C6 21       LDB    #$21
-79EE: 7E 79 58    JMP    $7958
-79F1: C6 22       LDB    #$22
-79F3: 7E 79 58    JMP    $7958
-79F6: C6 23       LDB    #$23
-79F8: 7E 79 58    JMP    $7958
-79FB: C6 24       LDB    #$24
+79EC: C6 21       LDB    #SND_UNKNOWN_21
+79EE: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+79F1: C6 22       LDB    #SND_UNKNOWN_22
+79F3: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+79F6: C6 23       LDB    #SND_UNKNOWN_23
+79F8: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+79FB: C6 24       LDB    #SND_UNKNOWN_24
 79FD: 7E 79 15    JMP    queue_sound_7915
 l_7a00:
-7A00: C6 25       LDB    #$25
+7A00: C6 25       LDB    #SND_UNKNOWN_25
 7A02: 7E 79 15    JMP    queue_sound_7915
 l_7a05:
-7A05: C6 26       LDB    #$26
+7A05: C6 26       LDB    #SND_UNKNOWN_26
 7A07: 7E 79 15    JMP    queue_sound_7915
 l_7a0a:
-7A0A: C6 27       LDB    #$27
+7A0A: C6 27       LDB    #SND_UNKNOWN_27
 7A0C: 7E 79 15    JMP    queue_sound_7915
 l_7a0f:
-7A0F: C6 2C       LDB    #$2C
+7A0F: C6 2C       LDB    #SND_UNKNOWN_2C
 7A11: 7E 79 15    JMP    queue_sound_7915
 l_7a14:
-7A14: C6 28       LDB    #$28
+7A14: C6 28       LDB    #SND_UNKNOWN_28
 7A16: 7E 79 15    JMP    queue_sound_7915
 7A19: BD 7A 66    JSR    $7A66
 7A1C: BD 79 46    JSR    $7946
-7A1F: C6 2F       LDB    #$2F
+7A1F: C6 2F       LDB    #SND_UNKNOWN_2F
 7A21: 7E 79 15    JMP    queue_sound_7915
-7A24: C6 30       LDB    #$30
+7A24: C6 30       LDB    #SND_INTRO_CHORDS_30
 7A26: 7E 79 15    JMP    queue_sound_7915
 7A29: BD 7A 66    JSR    $7A66
 7A2C: BD 79 46    JSR    $7946
-7A2F: C6 31       LDB    #$31
+7A2F: C6 31       LDB    #SND_KILLED_MUSIC_31
 7A31: 7E 79 15    JMP    queue_sound_7915
-7A34: C6 32       LDB    #$32
+7A34: C6 32       LDB    #SND_UNKNOWN_32
 7A36: 7E 79 15    JMP    queue_sound_7915
-7A39: C6 36       LDB    #$36
-7A3B: 7E 79 58    JMP    $7958
-7A3E: C6 37       LDB    #$37
+7A39: C6 36       LDB    #SND_INTRO_MUSIC_START_36
+7A3B: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+7A3E: C6 37       LDB    #SND_UNKNOWN_37
 7A40: 7E 79 15    JMP    queue_sound_7915
-7A43: C6 38       LDB    #$38
+7A43: C6 38       LDB    #SND_UNKNOWN_38
 7A45: 7E 79 15    JMP    queue_sound_7915
-7A48: C6 39       LDB    #$39
+7A48: C6 39       LDB    #SND_UNKNOWN_39
 7A4A: 7E 79 15    JMP    queue_sound_7915
-7A4D: C6 3A       LDB    #$3A
+7A4D: C6 3A       LDB    #SND_LEVEL1_MUSIC_3A
 7A4F: 7E 79 15    JMP    queue_sound_7915
-7A52: C6 3B       LDB    #$3B
+7A52: C6 3B       LDB    #SND_UNKNOWN_3B
 7A54: 7E 79 15    JMP    queue_sound_7915
-7A57: C6 3C       LDB    #$3C
-7A59: 7E 79 58    JMP    $7958
-7A5C: C6 3D       LDB    #$3D
-7A5E: 7E 79 58    JMP    $7958
-7A61: C6 3E       LDB    #$3E
+7A57: C6 3C       LDB    #SND_THUNDER_3C
+7A59: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+7A5C: C6 3D       LDB    #SND_THUNDER_3D
+7A5E: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+7A61: C6 3E       LDB    #SND_UNKNOWN_3E
 7A63: 7E 79 15    JMP    queue_sound_7915
-7A66: C6 3F       LDB    #$3F
+7A66: C6 3F       LDB    #SND_UNKNOWN_3F
 7A68: 7E 79 15    JMP    queue_sound_7915
 
 7A6B: C6 04       LDB    #$04
@@ -5078,9 +5136,9 @@ update_tile_column_86b1:
 8FC2: 2A 04       BPL    $8FC8
 8FC4: A6 06       LDA    $6,X
 8FC6: 26 09       BNE    $8FD1
-8FC8: D1 BD       CMPB   $BD
+8FC8: D1 BD       CMPB   level_music_index_00bd
 8FCA: 23 05       BLS    $8FD1
-8FCC: D7 BD       STB    $BD
+8FCC: D7 BD       STB    level_music_index_00bd
 8FCE: BD 79 15    JSR    queue_sound_7915
 8FD1: A6 43       LDA    $3,U	; [bank_address]
 8FD3: 10 8E 06 70 LDY    #$0670
@@ -8941,7 +8999,7 @@ B992: EF 88 1C    STU    $1C,X
 B995: 39          RTS
 B996: 00 30       NEG    $30
 B998: 00 40       NEG    copy_of_dsw1_0040
-B99A: 00 28       NEG    $28
+B99A: 00 28       NEG    game_in_play_0028
 B99C: 00 48       NEG    $48
 B99E: 00 20       NEG    counter_16_bit_0020
 B9A0: 00 50       NEG    $50
@@ -14699,7 +14757,7 @@ ED81: CC 0D 00    LDD    #$0D00
 ED84: 7E 69 09    JMP    $6909
 ED87: 39          RTS
 
-ED96: D6 28       LDB    $28
+ED96: D6 28       LDB    game_in_play_0028
 ED98: 27 2A       BEQ    $EDC4
 ED9A: D6 21       LDB    counter_8_bit_0021
 ED9C: C5 07       BITB   #$07
@@ -15515,7 +15573,7 @@ FA50: A7 A8 20    STA    counter_16_bit_0020,Y
 FA53: A6 4A       LDA    $A,U		; [select_address]
 FA55: A7 A8 24    STA    $24,Y
 FA58: A6 4B       LDA    $B,U		; [select_address]
-FA5A: A7 A8 28    STA    $28,Y
+FA5A: A7 A8 28    STA    game_in_play_0028,Y
 FA5D: A6 4C       LDA    $C,U		; [select_address]
 FA5F: A7 A8 2C    STA    $2C,Y
 FA62: A6 4D       LDA    $D,U		; [select_address]

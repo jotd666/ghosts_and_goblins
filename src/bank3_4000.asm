@@ -715,10 +715,10 @@ jump_table_563e:
 5666: 26 29       BNE    $5691
 5668: C6 01       LDB    #$01
 566A: D7 D8       STB    $D8
-566C: C6 3F       LDB    #$3F
-566E: BD 79 58    JSR    $7958
+566C: C6 3F       LDB    #$3F		; sound
+566E: BD 79 58    JSR    queue_sound_forced_with_ff_7958
 5671: 5F          CLRB
-5672: BD 79 58    JSR    $7958
+5672: BD 79 58    JSR    queue_sound_forced_with_ff_7958
 5675: 5F          CLRB
 5676: D7 0B       STB    $0B
 5678: D7 0E       STB    $0E
@@ -991,12 +991,12 @@ jump_table_56a0:
 58C4: BD 55 8B    JSR    $558B
 58C7: 39          RTS
 58C8: C6 3F       LDB    #$3F
-58CA: BD 79 58    JSR    $7958
+58CA: BD 79 58    JSR    queue_sound_forced_with_ff_7958
 58CD: 5F          CLRB
 l_58ce:
-58CE: BD 79 58    JSR    $7958
+58CE: BD 79 58    JSR    queue_sound_forced_with_ff_7958
 58D1: F6 05 01    LDB    $0501
-58D4: BD 79 1D    JSR    $791D
+58D4: BD 79 1D    JSR    queue_sound_forced_791d
 58D7: 39          RTS
 58D8: D6 0B       LDB    $0B
 58DA: 58          ASLB

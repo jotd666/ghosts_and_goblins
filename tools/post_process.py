@@ -183,6 +183,8 @@ for i,line in enumerate(lines):
         equates.append(line)
         line = ""
 
+    # post-correct forced lowercase for SND_xxx
+    line = re.sub("(snd_\w+)",lambda m:m.group(1).upper(),line)
 
     address = get_line_address(line)
 
@@ -457,13 +459,13 @@ reset_6000
 l_68df
 l_6909
 l_691c
-l_791d
+queue_sound_forced_791d
 l_7a0f
 l_7a05
 l_7a00
 l_7a0a
 l_7a14
-l_7958
+queue_sound_forced_with_ff_7958
 divmod_fef0""".splitlines():
         fw.write(f"\t.global\t{gs}\n")
     fw.write("\n")

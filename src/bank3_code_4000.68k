@@ -1897,13 +1897,13 @@ l_5655:
 	LOG_REGS	566a   | added by add_reg_log.py
 	OP_W_ON_DP_ADDRESS	move,0xd8,d1         | [$566a: stb    $d8]
 	LOG_REGS	566c   | added by add_reg_log.py
-	move.b	#0x3f,d1                        	| [$566c: ldb    #$3f]
+	move.b	#0x3f,d1                        	| [$566c: ldb    #$3f] sound
 	LOG_REGS	566e   | added by add_reg_log.py
-	jbsr	l_7958                            	| [$566e: jsr    $7958]
+	jbsr	queue_sound_forced_with_ff_7958   	| [$566e: jsr    queue_sound_forced_with_ff_7958]
 	LOG_REGS	5671   | added by add_reg_log.py
 	moveq	#0,d1                            	| [$5671: clrb]
 	LOG_REGS	5672   | added by add_reg_log.py
-	jbsr	l_7958                            	| [$5672: jsr    $7958]
+	jbsr	queue_sound_forced_with_ff_7958   	| [$5672: jsr    queue_sound_forced_with_ff_7958]
 	LOG_REGS	5675   | added by add_reg_log.py
 	moveq	#0,d1                            	| [$5675: clrb]
 	LOG_REGS	5676   | added by add_reg_log.py
@@ -2520,17 +2520,17 @@ l_58c8:
 	LOG_REGS	58c8   | added by add_reg_log.py
 	move.b	#0x3f,d1                        	| [$58c8: ldb    #$3f]
 	LOG_REGS	58ca   | added by add_reg_log.py
-	jbsr	l_7958                            	| [$58ca: jsr    $7958]
+	jbsr	queue_sound_forced_with_ff_7958   	| [$58ca: jsr    queue_sound_forced_with_ff_7958]
 	LOG_REGS	58cd   | added by add_reg_log.py
 	moveq	#0,d1                            	| [$58cd: clrb]
 l_58ce:
 	LOG_REGS	58ce   | added by add_reg_log.py
-	jbsr	l_7958                            	| [$58ce: jsr    $7958]
+	jbsr	queue_sound_forced_with_ff_7958   	| [$58ce: jsr    queue_sound_forced_with_ff_7958]
 	LOG_REGS	58d1   | added by add_reg_log.py
 	GET_ADDRESS	0x0501                     	| [$58d1: ldb    $0501]
 	move.b	(a0),d1                         	| [...]
 	LOG_REGS	58d4   | added by add_reg_log.py
-	jbsr	l_791d                            	| [$58d4: jsr    $791d]
+	jbsr	queue_sound_forced_791d           	| [$58d4: jsr    queue_sound_forced_791d]
 	LOG_REGS	58d7   | added by add_reg_log.py
 	rts                                    	| [$58d7: rts]
 l_58d8:

@@ -33,3 +33,11 @@ fill $3941,1,$F0
 
 log sounds: bpset 7942,,{print B;g}
 skip sounds: bpset 7942,B>$20,{PC=$792F;g}
+
+remove music:
+
+bpset 7A24,,{PC=7945;g}
+bpset 7A39,,{PC=7945;g}
+bpset 794B,,{PC=7945;g}
+bpset 7A4D,,{PC=7945;g}
+bpset 8FCE,,{PC=8FD1;g}
