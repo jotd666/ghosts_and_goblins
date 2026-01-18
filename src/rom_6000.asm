@@ -70,8 +70,8 @@ SND_UNKNOWN_FF = $FF
 SND_UNKNOWN_01 = $01
 SND_UNKNOWN_02 = $02
 SND_UNKNOWN_03 = $03
-SND_UNKNOWN_04 = $04
-SND_UNKNOWN_05 = $05
+SND_JUMP_04 = $04
+SND_LAND_05 = $05
 SND_UNKNOWN_06 = $06
 SND_UNKNOWN_07 = $07
 SND_UNKNOWN_08 = $08
@@ -85,7 +85,7 @@ SND_WEAR_ARMOUR_10 = $10
 SND_UNKNOWN_12 = $12
 SND_UNKNOWN_13 = $13
 SND_UNKNOWN_14 = $14
-SND_UNKNOWN_17 = $17
+SND_ZOMBIE_RISING_17 = $17
 SND_UNKNOWN_18 = $18
 SND_UNKNOWN_19 = $19
 SND_UNKNOWN_1A = $1A
@@ -2626,66 +2626,97 @@ queue_sound_forced_with_ff_7958:
 
 7960: C6 01       LDB    #SND_UNKNOWN_01
 7962: 7E 79 15    JMP    queue_sound_7915
+
 7965: C6 02       LDB    #SND_UNKNOWN_02
 7967: 7E 79 15    JMP    queue_sound_7915
+
 796A: C6 03       LDB    #SND_UNKNOWN_03
 796C: 7E 79 15    JMP    queue_sound_7915
-796F: C6 04       LDB    #SND_UNKNOWN_04
+
+796F: C6 04       LDB    #SND_JUMP_04
 7971: 7E 79 15    JMP    queue_sound_7915
-7974: C6 05       LDB    #SND_UNKNOWN_05
+
+7974: C6 05       LDB    #SND_LAND_05
 7976: 7E 79 15    JMP    queue_sound_7915
+
 7979: C6 06       LDB    #SND_UNKNOWN_06
 797B: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+
 797E: C6 07       LDB    #SND_UNKNOWN_07
 7980: BD 79 15    JSR    queue_sound_7915
+
 7983: C6 08       LDB    #SND_UNKNOWN_08
 7985: 7E 79 15    JMP    queue_sound_7915
+
 7988: C6 1D       LDB    #SND_UNKNOWN_1D
 798A: 7E 79 15    JMP    queue_sound_7915
+
 798D: C6 0B       LDB    #SND_UNKNOWN_0B
 798F: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+
 7992: C6 0C       LDB    #SND_UNKNOWN_0C
 7994: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+
 7997: C6 0D       LDB    #SND_UNKNOWN_0D
 7999: 7E 79 15    JMP    queue_sound_7915
+
 799C: C6 0E       LDB    #SND_UNKNOWN_0E
 799E: 7E 79 15    JMP    queue_sound_7915
+
 79A1: C6 0F       LDB    #SND_UNKNOWN_0F
 79A3: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+
 79A6: C6 10       LDB    #SND_WEAR_ARMOUR_10
 79A8: 7E 79 15    JMP    queue_sound_7915
+
 79AB: C6 12       LDB    #SND_UNKNOWN_12
 79AD: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+
 79B0: C6 13       LDB    #SND_UNKNOWN_13
 79B2: 7E 79 15    JMP    queue_sound_7915
+
 79B5: C6 14       LDB    #SND_UNKNOWN_14
 79B7: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
-79BA: C6 17       LDB    #SND_UNKNOWN_17
+
+79BA: C6 17       LDB    #SND_ZOMBIE_RISING_17
 79BC: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+
 79BF: C6 18       LDB    #SND_UNKNOWN_18
 79C1: 7E 79 15    JMP    queue_sound_7915
+
 79C4: C6 19       LDB    #SND_UNKNOWN_19
 79C6: 7E 79 15    JMP    queue_sound_7915
+
 79C9: C6 1A       LDB    #SND_UNKNOWN_1A
 79CB: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+
 79CE: C6 1B       LDB    #SND_UNKNOWN_1B
 79D0: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+
 79D3: C6 1C       LDB    #SND_UNKNOWN_1C
 79D5: 7E 79 15    JMP    queue_sound_7915
+
 79D8: C6 00       LDB    #SND_UNKNOWN_00
 79DA: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+
 79DD: C6 1E       LDB    #SND_UNKNOWN_1E
 79DF: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+
 79E2: C6 1F       LDB    #SND_UNKNOWN_1F
 79E4: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+
 79E7: C6 20       LDB    #SND_UNKNOWN_20
 79E9: 7E 79 15    JMP    queue_sound_7915
+
 79EC: C6 21       LDB    #SND_UNKNOWN_21
 79EE: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+
 79F1: C6 22       LDB    #SND_UNKNOWN_22
 79F3: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+
 79F6: C6 23       LDB    #SND_UNKNOWN_23
 79F8: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+
 79FB: C6 24       LDB    #SND_UNKNOWN_24
 79FD: 7E 79 15    JMP    queue_sound_7915
 l_7a00:

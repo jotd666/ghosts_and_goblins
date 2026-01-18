@@ -32,7 +32,7 @@ fill $3941,1,$F0
 
 
 log sounds: bpset 7942,,{print B;g}
-skip sounds: bpset 7942,B>$20,{PC=$792F;g}
+skip sounds: bpset 7942,B==$17,{PC=$792F;g}
 
 remove music:
 

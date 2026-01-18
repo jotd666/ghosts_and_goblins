@@ -709,8 +709,26 @@ demo_game:
 0:
 	move.w	(a1)+,(a0)+
 	dbf		d0,0b	
+	* set "walls" that we can identify on the X edges
+	
+	lea		(0x2801,a6),a0
+	move	#7,d0
+0:
+	move.b	#0xE9,(a0)
+	move.b	#0x41,(0x400,a0)
+	addq 	#2,a0
+	dbf		d0,0b
+	
+	lea		(0x2BE0,a6),a0
+	move	#7,d0
+0:
+	move.b	#0xE9,(a0)
+	move.b	#0x41,(0x400,a0)
+	addq 	#2,a0
+	dbf		d0,0b
 
 
+	
 	moveq	#1,D0
 	jbsr	load_context		| level 3
 	
@@ -933,7 +951,7 @@ draw_right_tiles:
 
 	move.w	d7,d6	| save current Y
 
-	move.w	#0x1E,d2
+	move.w	#0xE,d2
 0:
 	move.w	d6,d7	| set current Y row
 	move.w	#4-1,d1		|  (64 bit)
