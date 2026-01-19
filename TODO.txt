@@ -1,10 +1,9 @@
-- map: context not detected: show_map_63ac
+- killed: crash no map displayed??? after map context doesn't reload properly
 - scrolling in HW test (with level 3 tiles): right ok to a point, left: make work when scroll=0x100
   it fails but ok otherwise: check boundary D0 offset between ok and wrong (like I did with right scroll)
 - refactor to get draw address first, to remove extra 16 pixels on the top (corkscrew)
-- add space before and after
+- add space (rows) before and after screens
 - Y scroll: first perform wrap at 256+16 (copper split)
-- check if palette different on map, then log tiles (and load)
 - grouping, seems to have issues with main character at tile 0 tile 0 seems
   to be a special case despite the precautions
 - detect intro fade palette
@@ -13,18 +12,40 @@
 - debug division routines: plant shoot angles are wrong, devils attacks maybe (level 3 first devil debug)
 - tombstone easter egg shot seems wrong
 - parasite sprites at the bottom
-- flag system to avoid re-copying tiles again and again if already correct
 - log tiles (per level): with zone filtering (first level only upper part)
 - use 16-bit table for mirror
 - flame in HUD wrong colors
 - fg tiles color reduction is too violent, maybe do a manual reduction
   or dynamic color change between scores and in-game, try to keep the
   maximum of different colors on the bottom status
-- update bg tiles do that using dirty not by brutal refresh as it's done twice (color+tilecode)
 - fg layer: isolate frame+weapon+lives (everything non-letter on the bottom), use dynamic palette
 - cpu log: control should be able to log with SR=x3xx or SR=x0xx
   here we want to avoid logging within the interrupt
 
+- E: flame crashes and burns
+- 2: turn into frog
+- 23: devil shot
+- 1A: powerful enemy hit
+- 1F: shield flying enemies
+- 19: bag enemies howling
+- C: giant stomping
+- F: boss killed
+- 3F 3E: take a key (3F: stop tune?)
+- 3F 3B: door opening
+- 30: map music
+- 31: killed music
+- B: small fyling goblins noise
+- 2B: level 1/2 music
+- 12: purple goblin howl
+- 2D: boss 1/2 music
+- 33: level 3 cave music
+- 34: level 3 boss dragon music
+- 21: dragon woooo
+- 37: extra life
+- 29: castle music (lev 5)
+- 20: skeleton bones
+- 38: last boss music (resolve your battle)
+- 2A: boss music (in game)
 
 hacks:
 

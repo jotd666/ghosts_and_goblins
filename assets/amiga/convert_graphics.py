@@ -494,18 +494,21 @@ for context in context_list:
     bg_tile_plane_cache = {}
     bg_tile_table,_ = read_tileset(bg_tile_set_list,bg_tile_palette,[True,False,False,False],cache=bg_tile_plane_cache, is_bob=False, nb_cluts=BG_NB_CLUTS)
 
+    map_context = context == "map"
+
     bank = bg_bank_dir / f"{context}.68k"
     with open(bank,"w") as f:
         f.write("bg_tile_palette:\n")
         bitplanelib.palette_dump(bg_tile_palette,f,bitplanelib.PALETTE_FORMAT_ASMGNU)
         f.write("bg_character_table:\n")
-        dump_tile_layer(bg_tile_table,"bg",relative_root="bg_character_table")
+        # map layer is special, included in exe, no need to relocate
+        dump_tile_layer(bg_tile_table,"bg",relative_root=None if map_context else "bg_character_table")
         for k,v in bg_tile_plane_cache.items():
             f.write(f"tile_plane_{v:02d}:")
             dump_asm_bytes(k,f)
     banko = bank.parent / f"{bank.stem}.o"
 
-    if context != "map":
+    if not map_context:
         cmd = ["m68k-amigaos-as","-o",banko,bank]
         subprocess.run(cmd,check=True)
         bankbin = data_dir / f"{bank.stem}"

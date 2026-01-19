@@ -409,8 +409,8 @@ for i,line in enumerate(lines):
     elif address in {0x661D,0x6697}:
         # no need to update palette hardware registers, it takes time for nothing
         line = change_instruction("rts",lines,i)
-    elif address == 0x6C11:
-        line = "\tmoveq\t#1,d1\n"+line+"\tmoveq\t#1,d0\n"  # temp
+##    elif address == 0x6C11:
+##        line = "\tmoveq\t#1,d1\n"+line+"\tmoveq\t#1,d0\n"  # temp show map at start
 # pattern where logging is required outside the IRQ code
 # entering the IRQ disables logging, and exiting restores previous logging state
 ##    if address == 0x65C4:

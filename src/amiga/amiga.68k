@@ -96,6 +96,9 @@ TARGET_SPRITE_SIZEOF = 4
 MIRROR_BIT = 2
 FLIT_BIT = 3
 
+
+MAP_CONTEXT = 6
+
 	.ifdef	RELEASE
 
 OPT_ENABLE_LOGGING = 0           | DO NOT CHANGE THIS
@@ -816,30 +819,38 @@ load_context:
 	clr.l	(a0)+
 	cmp.l	#bg_tile_log_table_end,A0
 	jne	0b
-
 	.endif
 	
+	move.w	current_context,previous_context
 	move.w	d0,current_context
-	cmp.w	#6,d0
+	cmp.w	#MAP_CONTEXT,d0
 	jne		0f
-	* map context: we should save previous context (TODO)
+
+	* map context: we should save previous context
 	* and use that map context aleady in RAM
+	move.w	previous_context,saved_context
 	move.l	#bg_tile_palette,bg_character_table_buffer_ptr
-	jra		1f
+	jra		30f
 0:
+	* is previous context map?
+	cmp.w	#MAP_CONTEXT,previous_context
+	jne		1f
+	* coming from map: check if saved_context is the context we want
+	cmp.w	previous_context,d0
+	jne		1f   
+	* the file buffer already contains the context, just set pointer
+	move.l	#bg_character_table_buffer,bg_character_table_buffer_ptr
+	jra		30f
+1:
 	lea	context_name_table,A0
 	add.w	d0,d0	
 	add.w	d0,d0
 	move.l	(a0,d0.w),a0
+	move.w	#-1,saved_context   | cancel saved context
 	lea		bg_character_table_buffer,a1
 	move.l	a1,bg_character_table_buffer_ptr
 	jbsr	load_file
-1:
-	* set palette
-	move.l	bg_character_table_buffer_ptr,a0
-	move.l	color_copper_pointers,a1	| entries 0-31
-	move.w	#TOTAL_NB_COLORS/2,d0
-	jbsr	load_palette
+2:
 
 	
 	* now relocate file
@@ -877,6 +888,16 @@ load_context:
 10:
 	dbf		d7,0b
 
+30:
+	* re-set pointer
+	move.l	bg_character_table_buffer_ptr,a0
+	lea		(TOTAL_NB_COLORS,a0),a0		| skip 32 color palette
+	move.l	a0,bg_tile_character_table				| set character table pointer
+	* set palette
+	move.l	bg_character_table_buffer_ptr,a0
+	move.l	color_copper_pointers,a1	| entries 0-31
+	move.w	#TOTAL_NB_COLORS/2,d0
+	jbsr	load_palette
 	
 	* at start redraw everything
 	jbsr force_all_screen_redraw
@@ -899,10 +920,10 @@ force_all_screen_redraw:
 
 	move.w	d7,d6	| save current Y
 
-	move.w	#0x1E,d2
+	move.w	#0x0E,d2
 0:
 	move.w	d6,d7	| set current Y row
-	move.w	#0x1F,d1
+	move.w	#0x0F,d1
 1:
 	* force tile draw
 	lea		(a5,d7.w),a0
@@ -1056,7 +1077,6 @@ level3_interrupt:
 	jbsr	call_nmi
 	
 	GET_MEMORY_START_AND_DP
-	move.b	#0,0x110
 	move.w	(scroll_x_register_3b08,a6),d0
 	ror.w	#8,d0		| hardware is in little endian
 	move.w	D0,scroll_x
@@ -4012,6 +4032,10 @@ music_volume:
 	.byte	0
 	.align	2
 current_context:
+	.word	-1
+saved_context:
+	.word	-1
+previous_context:
 	.word	-1
 
 music_track_start_number:
