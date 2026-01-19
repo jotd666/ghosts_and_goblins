@@ -399,7 +399,7 @@ for i,line in enumerate(lines):
     if address == 0x68f3:
         # change loop count register
         line = change_instruction("subq.b\t#1,d7",lines,i)
-    elif address == 0x6692:
+    elif address in {0x6692,0x6423}:
         # palette update: try to change context
         line = "\tGET_ADDRESS\ttiles_palette_in_ram_1632\n"+change_instruction("jbra\tosd_set_tile_palette",lines,i)
     elif address in [0xf570]:

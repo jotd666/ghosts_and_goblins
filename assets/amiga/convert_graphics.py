@@ -451,8 +451,7 @@ fg_tile_palette += (16-len(fg_tile_palette)) * [(0x10,0x20,0x30)]
 # background: per level, 1=2
 ###############
 
-context_list = ["map","level1","level3","level5","level6"]
-context_list = ["level1","level3","level4","level5","level6","level7"]
+context_list = ["map","level1","level3","level5","level6","level7"]
 for context in context_list:
     bg_tile_sheet_dict = {i:Image.open(sheets_path / "bg_tiles" / context / f"pal_{i:02x}.png") for i in range(BG_NB_CLUTS)}
     bg_tile_cluts = {}
@@ -506,11 +505,12 @@ for context in context_list:
             dump_asm_bytes(k,f)
     banko = bank.parent / f"{bank.stem}.o"
 
-    cmd = ["m68k-amigaos-as","-o",banko,bank]
-    subprocess.run(cmd,check=True)
-    bankbin = data_dir / f"{bank.stem}"
-    cmd = ["m68k-amigaos-objcopy","-O","binary",banko,bankbin]
-    subprocess.run(cmd,check=True)
+    if context != "map":
+        cmd = ["m68k-amigaos-as","-o",banko,bank]
+        subprocess.run(cmd,check=True)
+        bankbin = data_dir / f"{bank.stem}"
+        cmd = ["m68k-amigaos-objcopy","-O","binary",banko,bankbin]
+        subprocess.run(cmd,check=True)
 
 ###############
 # sprites

@@ -589,6 +589,7 @@ show_map_63ac:
 641D: F7 15 AC    STB    $15AC
 6420: 7C 15 95    INC    $1595
 6423: 39          RTS
+
 6424: 0F D6       CLR    scroll_y_value_00d6
 6426: 6A 0A       DEC    $A,X
 6428: 26 02       BNE    $642C

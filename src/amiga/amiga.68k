@@ -39,7 +39,7 @@ BORDERBLANK = 1
 PREVIOUS_SPRITE_SIZE = 8
 CURRENT_SPRITE_SIZE = 4
 
-BG_TILE_MAX_SIZE = 60000  | possibly less
+BG_TILE_MAX_SIZE = 64000  | possibly less
 
 SCORE_FILE_SIZE = 0x23		| wrong
 
@@ -775,7 +775,6 @@ dump_and_quit:
 * format (RGB4) is: offset=$RG, offset+$40=$B0
 osd_set_tile_palette:
 	OSD_ENTER
-	BREAKPOINT	"set pititi"
 	movem.l	d0-d3/a1,-(a7)
 	* re-compose RGBx word to search in palette
 	* if color are at the indicated positions, then we know
@@ -821,22 +820,32 @@ load_context:
 	.endif
 	
 	move.w	d0,current_context
+	cmp.w	#6,d0
+	jne		0f
+	* map context: we should save previous context (TODO)
+	* and use that map context aleady in RAM
+	move.l	#bg_tile_palette,bg_character_table_buffer_ptr
+	jra		1f
+0:
 	lea	context_name_table,A0
 	add.w	d0,d0	
 	add.w	d0,d0
 	move.l	(a0,d0.w),a0
 	lea		bg_character_table_buffer,a1
+	move.l	a1,bg_character_table_buffer_ptr
 	jbsr	load_file
-	
+1:
 	* set palette
-	lea		bg_character_table_buffer,a0
+	move.l	bg_character_table_buffer_ptr,a0
 	move.l	color_copper_pointers,a1	| entries 0-31
 	move.w	#TOTAL_NB_COLORS/2,d0
 	jbsr	load_palette
+
 	
 	* now relocate file
-	lea		bg_character_table_buffer+64,a0		| skip palette
-	move.l	a0,bg_character_table				| set character table pointer
+	move.l	bg_character_table_buffer_ptr,a0
+	lea		(TOTAL_NB_COLORS,a0),a0		| skip 32 color palette
+	move.l	a0,bg_tile_character_table				| set character table pointer
 	move.l	a0,d0
 	move.w	#0x3FF,d7
 0:
@@ -867,6 +876,7 @@ load_context:
 	dbf		d6,1b
 10:
 	dbf		d7,0b
+
 	
 	* at start redraw everything
 	jbsr force_all_screen_redraw
@@ -2488,7 +2498,7 @@ update_bg_tile:
 	
 	*cmp.b	#0x20,d2
 	*jeq		11f				| optim: blank tile
-	move.l		bg_character_table,a0
+	move.l		bg_tile_character_table,a0
 	.ifndef	RELEASE
 	cmp.l	#0,A0
 	jne		111f
@@ -2687,10 +2697,6 @@ mirror_jump_table:
 	.long	flipped_tile16
 	.long	mirror_flipped_tile16
 	
-mirror_bits:
-	.include "mirror_bits.68k"
-
-	.include	"context.68k"
 	
 * bruteforce all possible x/y combinations
 * d2: 0: no X swap, 1: X swap (for scrolling maps)
@@ -3963,7 +3969,12 @@ sprite_mem_name:
 	.endif	
 
 
+mirror_bits:
+	.include "mirror_bits.68k"
 
+	.include	"context.68k"
+
+	.include	"bg_banks/map.68k"
 
 * all 4 channels
 	.align	2
@@ -4240,8 +4251,10 @@ cpu_log_prev_state:
 
 	.section	.bsspublic
 
-bg_character_table:
+bg_tile_character_table:
 	.long 	0
+bg_character_table_buffer_ptr:
+	.long	0
 bg_character_table_buffer:
 	.skip	BG_TILE_MAX_SIZE
 	
