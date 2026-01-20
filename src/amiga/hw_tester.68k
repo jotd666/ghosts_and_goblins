@@ -772,7 +772,11 @@ demo_game:
 	move.b	#0x2,d0
 	jbsr	display_text
 	lea		(0x2044+0x20*9,a6),a0
-	lea		x_offset_text,a1
+	lea		xr_offset_text,a1
+	move.b	#0x2,d0
+	jbsr	display_text
+	lea		(0x2044+0x20*10,a6),a0
+	lea		xl_offset_text,a1
 	move.b	#0x2,d0
 	jbsr	display_text
 	
@@ -825,8 +829,11 @@ max_scrollx_text:
 min_scrollx_text:
 	.ascii	"Min ScrollX "
 	.byte	0xff
-x_offset_text:
-	.ascii	"X offset "
+xr_offset_text:
+	.ascii	"XR offset "
+	.byte	0xff
+xl_offset_text:
+	.ascii	"XL offset "
 	.byte	0xff
 	.align 2
 
@@ -974,8 +981,12 @@ call_nmi:
 	lea		(0x2044+0x20*8+14,a6),a0
 	move.b	#0x3,d0
 	jbsr	display_number
-	move.w	x_extra_offset,d1
+	move.w	xr_offset,d1
 	lea		(0x2044+0x20*9+14,a6),a0
+	move.b	#0x3,d0
+	jbsr	display_number
+	move.w	xl_offset,d1
+	lea		(0x2044+0x20*10+14,a6),a0
 	move.b	#0x3,d0
 	jbsr	display_number
 	
@@ -992,7 +1003,7 @@ call_nmi:
 	subq	#1,game_scroll_x
 0:
 	move.w	game_scroll_x,d0
-	and.w 	#0x1FF,D0
+	and.w 	#GAME_MAX_SCROLL_X-1,D0
 	move.w	d0,game_scroll_x
 
 	jbsr	set_scroll_values
@@ -1006,7 +1017,7 @@ force_all_screen_redraw:
 	move.w	game_scroll_x,d0
 	move.w	d0,min_scroll_x
 	move.w	d0,d1
-	add.w	#VISIBLE_SCROLL_WIDTH+16,d1		| after that it triggers tile refresh
+	add.w	#VISIBLE_SCROLL_WIDTH+BG_TILE_WIDTH,d1		| after that it triggers tile refresh
 	move.w	d1,max_scroll_x
 	
 	and.w	#0x3F,d0
@@ -1023,12 +1034,12 @@ force_all_screen_redraw:
 
 	move.w	d7,d6	| save current Y
 
-	move.w	#0x0E,d2
+	move.w	#0x0E,d2	| size of screen in tiles
 0:
 	move.w	d6,d7	| set current Y row
 	move.w	#BG_NB_BYTES_PER_ROW/2-1,d1		|  (64 bit margin)
 1:
-	and.w	#0x3FF,d7		| wrap
+	and.w	#0x3FF,d7		| wrap on memory
 	* force tile draw
 	lea		(a5,d7.w),a0
 	jbsr	osd_video_byte_dirty
@@ -1072,7 +1083,7 @@ draw_column_tiles:
 	rts
 
 GAME_MAX_SCROLL_X = 0x200
-BG_TILE_SIZE = 16
+BG_TILE_WIDTH = 16
 
 set_scroll_values:
 	* update host scroll
@@ -1082,19 +1093,19 @@ set_scroll_values:
 	move.w	d0,d2
 	sub.w	d1,d2		| d2: diff between game scroll before / after
 	
-	cmp.w	#GAME_MAX_SCROLL_X-BG_TILE_SIZE,d0
+	cmp.w	#GAME_MAX_SCROLL_X-BG_TILE_WIDTH,d0
 	jcs		0f
 	* game scroll X >= 0x1F0
-	cmp.w	#BG_TILE_SIZE,d1
+	cmp.w	#BG_TILE_WIDTH,d1
 	jcc		0f
 	* previous scroll X < 0x10: wrap left
 	sub.w	#GAME_MAX_SCROLL_X,d2
 	jra		1f
 0:
-	cmp.w	#BG_TILE_SIZE,d0
+	cmp.w	#BG_TILE_WIDTH,d0
 	jcc		1f
 	* game scroll X < 0x10
-	cmp.w	#GAME_MAX_SCROLL_X-BG_TILE_SIZE,d1
+	cmp.w	#GAME_MAX_SCROLL_X-BG_TILE_WIDTH,d1
 	jcs		1f
 	* previous scroll X > 0x1F0: wrap right
 	add.w	#GAME_MAX_SCROLL_X,d2
@@ -1113,9 +1124,10 @@ set_scroll_values:
 	jcc		0f
 	* min overshoot: we have to do something on the left
 	COLOR0_FLASH	0x00F
-	sub.w	#16,max_scroll_x
-	sub.w	#16,min_scroll_x
+	sub.w	#BG_TILE_WIDTH,max_scroll_x
+	sub.w	#BG_TILE_WIDTH,min_scroll_x
 	jbsr	draw_left_tiles
+	jbsr	update_x_offsets
 	
 	jra		5f
 0:
@@ -1126,19 +1138,28 @@ set_scroll_values:
 	* max overshoot: we have to do something on the right: draw the tiles
 	COLOR0_FLASH	0x0F0
 	jbsr	draw_right_tiles
-	add.w	#16,max_scroll_x
-	add.w	#16,min_scroll_x
+	add.w	#BG_TILE_WIDTH,max_scroll_x
+	add.w	#BG_TILE_WIDTH,min_scroll_x
 	moveq	#0,d0
 	* add 0x40 bytes every 0x200 scroll pixels
 	* to make up for memory wrap
-	move.b	max_scroll_x,d0
-	lsr.w	#1,d0
-	lsl.w	#6,d0
-	move.w	d0,x_extra_offset
+	jbsr	update_x_offsets
 5:
 
 	rts
 
+update_x_offsets:
+	moveq	#0,d0
+	move.b	max_scroll_x,d0
+	lsr.w	#1,d0
+	lsl.w	#6,d0
+	move.w	d0,xr_offset
+	move.b	min_scroll_x,d0
+	lsr.w	#1,d0
+	lsl.w	#6,d0
+	move.w	d0,xl_offset
+	rts
+	
 	
 		
 * just in case some hardware calls nmi
@@ -2523,7 +2544,7 @@ update_bg_tile:
 	add.w 	d1,d0	| correct nb bytes
 
 	add.w	d0,d0	| 16 pixels
-	add.w 	x_extra_offset,d0
+	add.w 	xr_offset,d0
 	
 
 	move.w	d7,d1
@@ -3953,7 +3974,9 @@ game_scroll_y:
 	.word	0
 game_scroll_x:
 	.word	0
-x_extra_offset:
+xr_offset:
+	.word	0
+xl_offset:
 	.word	0
 host_scroll_y:
 	.word	0
