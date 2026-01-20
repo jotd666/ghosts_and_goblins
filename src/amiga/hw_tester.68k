@@ -974,7 +974,7 @@ call_nmi:
 	lea		(0x2044+0x20*8+14,a6),a0
 	move.b	#0x3,d0
 	jbsr	display_number
-	move.w	x_offset,d1
+	move.w	x_extra_offset,d1
 	lea		(0x2044+0x20*9+14,a6),a0
 	move.b	#0x3,d0
 	jbsr	display_number
@@ -1071,28 +1071,44 @@ draw_column_tiles:
 	dbf		d2,0b
 	rts
 
-
+GAME_MAX_SCROLL_X = 0x200
+BG_TILE_SIZE = 16
 
 set_scroll_values:
 	* update host scroll
-	
+	* handle 2 wrap points
 	move.w	game_scroll_x,d0
-	sub.w	previous_scroll_x,d0
-	* detect wrap & correct
-	jpl		0f
-	add.w	#0x200,d0
+	move.w	previous_scroll_x,d1
+	move.w	d0,d2
+	sub.w	d1,d2		| d2: diff between game scroll before / after
+	
+	cmp.w	#GAME_MAX_SCROLL_X-BG_TILE_SIZE,d0
+	jcs		0f
+	* game scroll X >= 0x1F0
+	cmp.w	#BG_TILE_SIZE,d1
+	jcc		0f
+	* previous scroll X < 0x10: wrap left
+	sub.w	#GAME_MAX_SCROLL_X,d2
+	jra		1f
 0:
+	cmp.w	#BG_TILE_SIZE,d0
+	jcc		1f
+	* game scroll X < 0x10
+	cmp.w	#GAME_MAX_SCROLL_X-BG_TILE_SIZE,d1
+	jcs		1f
+	* previous scroll X > 0x1F0: wrap right
+	add.w	#GAME_MAX_SCROLL_X,d2
+1:
 
-	* D0 is the scroll delta
-	move.w	host_scroll_x,d1
-	add.w	d0,d1
-	move.w	d1,host_scroll_x
-	
-	
-	move.w	game_scroll_x,previous_scroll_x
-	
-	* are we still in min/max boundaries?
+0:
+	move.w	d0,previous_scroll_x
+	* update unwrapped host scroll X
+	* we need it to be continuous!
 	move.w	host_scroll_x,d0
+	add.w	d2,d0
+	move.w	d0,host_scroll_x
+	
+	* now, are we still in min/max boundaries?
 	cmp.w	min_scroll_x,d0
 	jcc		0f
 	* min overshoot: we have to do something on the left
@@ -2496,8 +2512,7 @@ update_bg_tile:
 	moveq	#0,d1
 	* compute address
 	
-	nop
-	nop
+
 	move.w	d7,d0
 	
 	
@@ -2510,7 +2525,7 @@ update_bg_tile:
 	add.w	d0,d0	| 16 pixels
 	add.w 	x_extra_offset,d0
 	
-	move.w	d0,x_offset
+
 	move.w	d7,d1
 	and.w	#0x1F,d1	| modulus 0x20
 	
@@ -3939,8 +3954,6 @@ game_scroll_y:
 game_scroll_x:
 	.word	0
 x_extra_offset:
-	.word	0
-x_offset:
 	.word	0
 host_scroll_y:
 	.word	0
