@@ -2315,7 +2315,6 @@ platform_init:
     add	#AGA_X_SHIFT,d0
     add	#AGA_X_SHIFT,d1
 	.endif
-	
     move.w d0,diwstrt(a5)
     move.w d1,diwstop(a5)
     move.w #0x0038,ddfstrt(a5)
