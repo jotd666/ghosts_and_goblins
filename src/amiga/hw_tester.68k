@@ -771,6 +771,10 @@ demo_game:
 	lea		min_scrollx_text,a1
 	move.b	#0x2,d0
 	jbsr	display_text
+	lea		(0x2044+0x20*9,a6),a0
+	lea		x_offset_text,a1
+	move.b	#0x2,d0
+	jbsr	display_text
 	
 	
 	jbsr	osd_enable_interrupts
@@ -820,6 +824,9 @@ max_scrollx_text:
 	.byte	0xff
 min_scrollx_text:
 	.ascii	"Min ScrollX "
+	.byte	0xff
+x_offset_text:
+	.ascii	"X offset "
 	.byte	0xff
 	.align 2
 
@@ -967,6 +974,10 @@ call_nmi:
 	lea		(0x2044+0x20*8+14,a6),a0
 	move.b	#0x3,d0
 	jbsr	display_number
+	move.w	x_offset,d1
+	lea		(0x2044+0x20*9+14,a6),a0
+	move.b	#0x3,d0
+	jbsr	display_number
 	
 	
 	move.b	player_1_controls,d0
@@ -1067,6 +1078,10 @@ set_scroll_values:
 	
 	move.w	game_scroll_x,d0
 	sub.w	previous_scroll_x,d0
+	* detect wrap & correct
+	jpl		0f
+	add.w	#0x200,d0
+0:
 
 	* D0 is the scroll delta
 	move.w	host_scroll_x,d1
@@ -1077,7 +1092,7 @@ set_scroll_values:
 	move.w	game_scroll_x,previous_scroll_x
 	
 	* are we still in min/max boundaries?
-	move.w	game_scroll_x,d0
+	move.w	host_scroll_x,d0
 	cmp.w	min_scroll_x,d0
 	jcc		0f
 	* min overshoot: we have to do something on the left
@@ -2488,14 +2503,14 @@ update_bg_tile:
 	
 	lsr.w	#5,d0	| divide by 0x20
 
-	move.w	host_scroll_x,d1
-	sub.w	game_scroll_x,d1
 	
 	asr.w	#4,d1	| tiles are 16 pix wide
 	add.w 	d1,d0	| correct nb bytes
 
 	add.w	d0,d0	| 16 pixels
 	add.w 	x_extra_offset,d0
+	
+	move.w	d0,x_offset
 	move.w	d7,d1
 	and.w	#0x1F,d1	| modulus 0x20
 	
@@ -2524,12 +2539,11 @@ update_bg_tile:
 	move.w	(a2,d1.w*2),d1
 	.endif
 	lsl.w	#4,d1	| 16 pixels
-	* ATM we have to use long add
-	add.l	d1,d0
-	add.l	d0,a1
+	add.w	d1,d0
+	add.w	d0,a1
 
 	lea		background_restore_buffer,a3
-	add.l	d0,a3
+	add.w	d0,a3
 
 	
 	*cmp.b	#0x20,d2
@@ -3925,6 +3939,8 @@ game_scroll_y:
 game_scroll_x:
 	.word	0
 x_extra_offset:
+	.word	0
+x_offset:
 	.word	0
 host_scroll_y:
 	.word	0
