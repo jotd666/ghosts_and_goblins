@@ -941,12 +941,12 @@ install_horiz_frame:
 	move.w	#0x0E0E,(0x400,a0)
 	jbsr	osd_video_word_dirty
 	addq	#2,a0
-	move.w	#0x1B,d0
+	move.w	#0x1B/2,d0
 0:
 	move.b	#0xA2,(a0)
 	move.b	#0x0E,(0x400,a0)
 	jbsr	osd_video_byte_dirty
-	addq	#1,a0
+	addq	#2,a0
 	dbf		d0,0b
 	move.w	#0xA3A3,(a0)
 	move.w	#0x0E0E,(0x400,a0)
@@ -1015,6 +1015,7 @@ force_all_screen_redraw:
 
 	* given the current scroll X/Y, draw all tiles on screen
 	move.w	game_scroll_x,d0
+	move.w	d0,previous_scroll_x
 	move.w	d0,min_scroll_x
 	move.w	d0,d1
 	add.w	#VISIBLE_SCROLL_WIDTH+BG_TILE_WIDTH,d1		| after that it triggers tile refresh
@@ -1022,6 +1023,8 @@ force_all_screen_redraw:
 	
 	and.w	#0x3F,d0
 	move.w	d0,host_scroll_x		| when called, then host scroll is 0 modulus the bplcon shift fmode=3
+	clr.w	xr_offset
+	clr.w	xl_offset
 	
 	move.w	game_scroll_x,d0
 	lea		(0x2800,a6),a5
@@ -1052,9 +1055,11 @@ force_all_screen_redraw:
 	
 draw_left_tiles:
 	move.w	min_scroll_x,d0
+	move.w	xl_offset,x_offset
 	jra		draw_column_tiles
 draw_right_tiles:
-	move.w	max_scroll_x,d0	
+	move.w	max_scroll_x,d0
+	move.w	xr_offset,x_offset
 draw_column_tiles:
 	GET_MEMORY_START_AND_DP
 
@@ -1112,6 +1117,17 @@ set_scroll_values:
 1:
 
 0:
+	move.w	d2,d3
+	jpl	2f
+	neg.w	d3
+2:
+	cmp.w	#BG_TILE_WIDTH,d3
+	jcs		3f
+	* before/after diff is too big: redraw all
+	jbsr	force_all_screen_redraw
+	
+	rts
+3:
 	move.w	d0,previous_scroll_x
 	* update unwrapped host scroll X
 	* we need it to be continuous!
@@ -1124,9 +1140,9 @@ set_scroll_values:
 	jcc		0f
 	* min overshoot: we have to do something on the left
 	COLOR0_FLASH	0x00F
+	jbsr	draw_left_tiles
 	sub.w	#BG_TILE_WIDTH,max_scroll_x
 	sub.w	#BG_TILE_WIDTH,min_scroll_x
-	jbsr	draw_left_tiles
 	jbsr	update_x_offsets
 	
 	jra		5f
@@ -1140,7 +1156,6 @@ set_scroll_values:
 	jbsr	draw_right_tiles
 	add.w	#BG_TILE_WIDTH,max_scroll_x
 	add.w	#BG_TILE_WIDTH,min_scroll_x
-	moveq	#0,d0
 	* add 0x40 bytes every 0x200 scroll pixels
 	* to make up for memory wrap
 	jbsr	update_x_offsets
@@ -1154,6 +1169,7 @@ update_x_offsets:
 	lsr.w	#1,d0
 	lsl.w	#6,d0
 	move.w	d0,xr_offset
+	moveq	#0,d0
 	move.b	min_scroll_x,d0
 	lsr.w	#1,d0
 	lsl.w	#6,d0
@@ -2544,7 +2560,7 @@ update_bg_tile:
 	add.w 	d1,d0	| correct nb bytes
 
 	add.w	d0,d0	| 16 pixels
-	add.w 	xr_offset,d0
+	add.w 	x_offset,d0
 	
 
 	move.w	d7,d1
@@ -3977,6 +3993,8 @@ game_scroll_x:
 xr_offset:
 	.word	0
 xl_offset:
+	.word	0
+x_offset:
 	.word	0
 host_scroll_y:
 	.word	0
