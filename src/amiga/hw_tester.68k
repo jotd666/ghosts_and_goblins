@@ -32,13 +32,18 @@ NB_PLAYFIELD_PLANES = 6  | this is externally defined!!
 	
 RAM_START = 0x0000
 
+COPPER_NOP = 0x1FE
 
 BORDERBLANK = 1
 
 PREVIOUS_SPRITE_SIZE = 8
 CURRENT_SPRITE_SIZE = 4
 
-BG_TILE_MAX_SIZE = 60000  | possibly less
+
+GAME_MAX_SCROLL_X = 0x200
+BG_TILE_WIDTH = 16
+
+BG_TILE_MAX_SIZE = 64000  | possibly less
 
 SCORE_FILE_SIZE = 0x23		| wrong
 
@@ -127,6 +132,12 @@ BASE_BPLCON2_VALUE = 0x0064
 
 BASE_BPLCON4_VALUE = 0x0044	  | sprites palette starts at color 64
 
+
+NB_FIRST_ROWS = 0x80-0x21
+NB_SECOND_ROWS = 0x80
+NB_THIRD_ROWS = 0x20
+
+
 FG_NB_LINES = 256
 BG_NB_LINES = 512
 Y_MAX = BG_NB_LINES
@@ -154,10 +165,10 @@ BIT_COIN2 = 7
 BIT_START_1P = 0
 BIT_START_2P = 1
 
-BIT_LEFT = 1
+BIT_UP = 3
 BIT_RIGHT = 0
-BIT_UP = 2
-BIT_DOWN = 3
+BIT_LEFT = 1
+BIT_DOWN = 2
 BIT_FIRE_1 = 4
 BIT_FIRE_2 = 5
 
@@ -169,15 +180,17 @@ BIT_FIRE_2 = 5
 	move.w	#\v,_custom+color	
 	.endm
 
-	* this game uses USP & SSP and is sensitive about stack usage
-	* plus it's way better to save S just in case of an osd call
-	* which is interrupted, then calls game irq which uses S
+	* S aka D5 is used a lot in the code as virtual stack, not only
+	* using host 68k SP. So we need to be consistent with its value
+	* specially when the irq is called. Except that if the irq interrupts
+	* an osd call, we need to restore the value of D5 on osd enter, not
+	* the value within osd
 	
 	.macro	OSD_ENTER
 	tst.b	osd_entry_count
 	jne		osd_enter_\@
-	* top entry: save game U register
-	move.w	d5,target_usp_value
+	* top entry: save game S register
+	move.w	d5,target_ssp_value
 
 osd_enter_\@:
 	addq.b	#1,osd_entry_count	| increase nesting
@@ -209,11 +222,12 @@ osd_enter_\@:
 * osd layer		
 	.global osd_enable_interrupts
 	.global osd_disable_interrupts
+	.global osd_set_tile_palette
 	.global osd_break		| for debug	
 	.global osd_blitz		| for debug
 	.global osd_read_dsw1
 	.global osd_read_dsw2
-
+	.global	osd_set_bank
 	.global	osd_read_system
 	.global	osd_sound_command
 	.global	osd_read_p1_inputs
@@ -234,7 +248,10 @@ osd_enter_\@:
 	.global	force_sound_stop
 	.global music_tick
 	.global	music_track_start_number
-
+	.global	osd_get_last_known_pc
+	.global	osd_dump_logs
+	.global	osd_log_cpu
+	.global	osd_cpu_logging_control
 		
 		
 	.include	"ReadJoypad.i"
@@ -457,6 +474,10 @@ _user:
 	move.l	cheat_flags,d0
 	jeq		1f
 	btst	#0,d0
+	sne		invincible_flag
+	btst	#1,d0
+	sne		infinite_lives_flag
+	btst	#2,d0
 	sne		infinite_time_flag
 	move.b	d0,d1
 	and.b	#3,d1
@@ -480,6 +501,8 @@ _user:
 	move.l	misc_options,d1
 	btst	#0,d1
 	seq		frameskip
+	btst	#1,d1
+	sne		skip_intro_flag
 
 
 	move.l	cheat_flags,d0
@@ -886,7 +909,7 @@ load_context:
 	
 	* now relocate file
 	lea		bg_character_table_buffer+64,a0		| skip palette
-	move.l	a0,bg_character_table				| set character table pointer
+	move.l	a0,bg_tile_character_table				| set character table pointer
 	move.l	a0,d0
 	move.w	#0x3FF,d7
 0:
@@ -925,90 +948,7 @@ load_context:
 
 	movem.l	(a7)+,d0-a6
 	rts
-	
-* < A0: filename
-* < A1: buffer
-load_file:
-	move.l	_resload,d0
-	jeq		0f
-	move.l	d0,a2
-	jbsr	resload_LoadFileDecrunch(a2)
-	rts
-0:
-	illegal	
-install_horiz_frame:
-	move.w	#0xA0A1,(a0)
-	move.w	#0x0E0E,(0x400,a0)
-	jbsr	osd_video_word_dirty
-	addq	#2,a0
-	move.w	#0x1B/2,d0
-0:
-	move.b	#0xA2,(a0)
-	move.b	#0x0E,(0x400,a0)
-	jbsr	osd_video_byte_dirty
-	addq	#2,a0
-	dbf		d0,0b
-	move.w	#0xA3A3,(a0)
-	move.w	#0x0E0E,(0x400,a0)
-	jbsr	osd_video_word_dirty
-	rts
-	
-	.ifndef	RELEASE
-dump_and_quit:	
 
-	illegal
-	.endif
-	
-	.include	"context.68k"
-	
-tiles_at_start:
-	.include	"cavern.68k"
-
-call_nmi:
-	move.w	game_scroll_x,d1
-	lea		(0x2044+0x20*5+14,a6),a0
-	move.b	#0x3,d0
-	jbsr	display_number
-	move.w	host_scroll_x,d1
-	lea		(0x2044+0x20*6+14,a6),a0
-	move.b	#0x3,d0
-	jbsr	display_number
-	move.w	max_scroll_x,d1
-	lea		(0x2044+0x20*7+14,a6),a0
-	move.b	#0x3,d0
-	jbsr	display_number
-	move.w	min_scroll_x,d1
-	lea		(0x2044+0x20*8+14,a6),a0
-	move.b	#0x3,d0
-	jbsr	display_number
-	move.w	xr_offset,d1
-	lea		(0x2044+0x20*9+14,a6),a0
-	move.b	#0x3,d0
-	jbsr	display_number
-	move.w	xl_offset,d1
-	lea		(0x2044+0x20*10+14,a6),a0
-	move.b	#0x3,d0
-	jbsr	display_number
-	
-	
-	move.b	player_1_controls,d0
-	btst	#BIT_RIGHT,d0
-	jne		0f
-	* move scrolling left
-	addq	#1,game_scroll_x
-0:
-	btst	#BIT_LEFT,d0
-	jne		0f
-	* move scrolling right
-	subq	#1,game_scroll_x
-0:
-	move.w	game_scroll_x,d0
-	and.w 	#GAME_MAX_SCROLL_X-1,D0
-	move.w	d0,game_scroll_x
-
-	jbsr	set_scroll_values
-
-	rts
 
 force_all_screen_redraw:
 	GET_MEMORY_START_AND_DP
@@ -1086,9 +1026,6 @@ draw_column_tiles:
 	addq	#1,d7			| next Y
 	dbf		d2,0b
 	rts
-
-GAME_MAX_SCROLL_X = 0x200
-BG_TILE_WIDTH = 16
 
 set_scroll_values:
 	* update host scroll
@@ -1177,6 +1114,91 @@ update_x_offsets:
 	rts
 	
 	
+* < A0: filename
+* < A1: buffer
+load_file:
+	move.l	_resload,d0
+	jeq		0f
+	move.l	d0,a2
+	jbsr	resload_LoadFileDecrunch(a2)
+	rts
+0:
+	illegal	
+install_horiz_frame:
+	move.w	#0xA0A1,(a0)
+	move.w	#0x0E0E,(0x400,a0)
+	jbsr	osd_video_word_dirty
+	addq	#2,a0
+	move.w	#0x1B/2,d0
+0:
+	move.b	#0xA2,(a0)
+	move.b	#0x0E,(0x400,a0)
+	jbsr	osd_video_byte_dirty
+	addq	#2,a0
+	dbf		d0,0b
+	move.w	#0xA3A3,(a0)
+	move.w	#0x0E0E,(0x400,a0)
+	jbsr	osd_video_word_dirty
+	rts
+	
+	.ifndef	RELEASE
+dump_and_quit:	
+
+	illegal
+	.endif
+	
+	.include	"context.68k"
+	
+tiles_at_start:
+	.include	"cavern.68k"
+
+call_nmi:
+	move.w	game_scroll_x,d1
+	lea		(0x2044+0x20*5+14,a6),a0
+	move.b	#0x3,d0
+	jbsr	display_number
+	move.w	host_scroll_x,d1
+	lea		(0x2044+0x20*6+14,a6),a0
+	move.b	#0x3,d0
+	jbsr	display_number
+	move.w	max_scroll_x,d1
+	lea		(0x2044+0x20*7+14,a6),a0
+	move.b	#0x3,d0
+	jbsr	display_number
+	move.w	min_scroll_x,d1
+	lea		(0x2044+0x20*8+14,a6),a0
+	move.b	#0x3,d0
+	jbsr	display_number
+	move.w	xr_offset,d1
+	lea		(0x2044+0x20*9+14,a6),a0
+	move.b	#0x3,d0
+	jbsr	display_number
+	move.w	xl_offset,d1
+	lea		(0x2044+0x20*10+14,a6),a0
+	move.b	#0x3,d0
+	jbsr	display_number
+	
+	
+	move.b	player_1_controls,d0
+	btst	#BIT_RIGHT,d0
+	jne		0f
+	* move scrolling left
+	addq	#1,game_scroll_x
+0:
+	btst	#BIT_LEFT,d0
+	jne		0f
+	* move scrolling right
+	subq	#1,game_scroll_x
+0:
+	move.w	game_scroll_x,d0
+	and.w 	#GAME_MAX_SCROLL_X-1,D0
+	move.w	d0,game_scroll_x
+
+	jbsr	set_scroll_values
+
+	rts
+
+	
 		
 * just in case some hardware calls nmi
 _nmi:
@@ -1189,7 +1211,7 @@ level3_interrupt:
 	move.l	(2,a7),interrupted_code_pc
 	.endif
 	* disable osd context switch
-	* we must not save d5 or change stack from an osd call from an interrupt
+	* we MUST NOT change d5 or change stack from an osd call from an interrupt
 	addq.b	#1,osd_entry_count
     	movem.l d0-d7/a0-a6,-(a7)
 	lea		_custom,a5
@@ -1230,10 +1252,10 @@ level3_interrupt:
 1:
 	* has to be copper: set sync
 
-	* we're going to ack copper & software/level 5 interrupt now
+	* we're going to ack copper & software interrupt now
 	* do it twice (040/pistorm bug)
-	move.w	#0x14+(1<<11),(intreq,a5)
-	move.w	#0x14+(1<<11),(intreq,a5)
+	move.w	#0x14,(intreq,a5)
+	move.w	#0x14,(intreq,a5)
 
 	tst.b	pause_flag
 	jne	23f
@@ -1380,11 +1402,14 @@ osd_wait:
 	rts
 
 
+* "0x00">Torch
+* "0x01">Lance	
+* "0x02">Axe	
+* "0x03">Shield
+* "0x04">Sword
 
-	
-	
-
-	
+cycle_weapon:
+	rts
 
 * Z: set if not playing
 is_game_playing:
@@ -1629,19 +1654,18 @@ update_one_bob:
 	add.w	d2,d2				| code times 2
 	move.w	(a3,d2.w),d4
 	jeq		10f			| nothing to do, normal tile
-	move.b	#0,0x110
 	* double/triple/quadruple, whatever
 	btst	#14,d4
-	jne		2f		| center tile, never draw
+	jne		2f		| bit 14 set: center tile, never draw
 	bclr	#0,d4	| remove bit 0 now
 	asr.w	#1,d4	| divide by 2, signed
 	btst	#MIRROR_BIT,d3
 	jeq		101f
-	* mirror: negate the code
-	neg		d4	
+	* mirror: "negate" the code by flipping bit 10
+	bchg	#10,d4
 101:
-	tst		d4
-	jmi		2f		| no need to draw this part, the other part will do it
+	btst	#10,d4
+	jne		2f		| no need to draw this part, the other part will do it
 	move.w	d4,d2	| get the real sprite code to draw
 	add.w	d2,d2	| code times 2
 10:
@@ -1678,13 +1702,13 @@ update_one_bob:
 	move.l	d4,a0
 
 	
-*	btst	#6,d3
-*	jne		101f
-*	* mirror
+*	btst	#MIRROR_BIT,d3
+*	jeq		101f
+*	* pre-computed mirror bitplanes, can't afford that here
 *	add.w	#((NB_PLAYFIELD_PLANES+1)*4+8),a0
 
 	btst	#MIRROR_BIT,d3
-	seq		d3		| convert attribute to boolean 0/ff for mirror_sprite_planes
+	sne		d3		| convert attribute to boolean 0/ff for mirror_sprite_planes
 
 
 	move.w	(a0)+,d4		| height
@@ -1693,13 +1717,12 @@ update_one_bob:
 	* A0 points on the first bitplane of the bob
 	addq 	#2,a0
 
-	*jbsr	mirror_sprite_planes
+	jbsr	mirror_sprite_planes
 	
 	* BOBs must follow screen scroll
-	*add.w	game_scroll_y,d1
-	*add.w	scroll_x_lo,d0
-	*add.w	scroll_x_hi,d0
-	*and.w	#0x1FF,d0
+	add.w	game_scroll_y,d1
+	add.w	game_scroll_x,d0
+	and.w	#0x3F,d0		| TODO check if it's ok!!
 	
 	* D0 and D1 are already set
 	move.l	(NB_PLAYFIELD_PLANES*4,a0),d2
@@ -2143,7 +2166,7 @@ start_process_1_plane:
 
 
 
-	
+
 bob_previous_positions_1:
 	.fill NB_TARGET_SPRITES*PREVIOUS_SPRITE_SIZE , 1 , -1
 	
@@ -2288,7 +2311,7 @@ platform_init:
 	bne		0f
 	st.b	ntsc_flag
 	* disable extra mid-screen interrupt, as it would be too fast (NTSC)
-	move.w	#0x1FE,pal_intreq_block_game
+	move.w	#COPPER_NOP,pal_intreq_block_game
 	move.w	#0x0401,pal_wait			| else intreq never happens
 0:
 	.if		NB_PLAYFIELD_PLANES==8
@@ -2329,10 +2352,24 @@ platform_init:
 	move.w #0x00D0,ddfstop(a5)		| C0 for fmode=3
 	.endif
 	
-	# 0 modulo (OCS)
+
+	* 0 modulo (OCS)
     move.w d0,bpl1mod(a5)
     move.w d0,bpl2mod(a5)
 
+	lea		rows_table,a1
+	lea		first_rows,a0
+	move.w	#NB_FIRST_ROWS,d0
+	jbsr	generate_row_table
+	lea		second_rows,a0
+	move.w	#NB_SECOND_ROWS,d0
+	jbsr	generate_row_table
+	lea		third_rows,a0
+	move.w	#NB_THIRD_ROWS,d0
+	jbsr	generate_row_table
+
+	*move.w	#0xC0,d0
+	*jbsr	wrap_bitplanes
 	
 	lea		_custom,a5
 	lea		game_copperlist,a0
@@ -2403,8 +2440,59 @@ load_palette:
 	dbf		d0,1b
 2:
 	rts
-	
 
+* < D0: row, if 0: do nothing
+wrap_bitplanes:
+	movem.l	a0-a2/d0-d3,-(a7)
+	* first restore previous wrap if wasn't 0 TODO
+	
+	* if zero, we stop here, row 0 wraps naturally
+	subq	#1,d0
+	jmi		2f
+	add.w	d0,d0
+	add.w	d0,d0
+ 	lea	rows_table,a2
+	add.w	d0,a2
+	move.l	(a2),a1
+	move.w	#COPPER_NOP,(0x8,a1)	| remove copjmp2, enable what's below
+	add		#0x12,a1	| skip preamble
+	move.w	#BG_SCREEN_PLANE_SIZE,d2
+	move.w	#NB_PLAYFIELD_PLANES,d1
+    move.l	playfield_displayed_screen_ptr(pc),d3
+	* we should store A1 (double buffering)
+1:
+    swap d3
+    move.w d3,(a1)
+    swap d3
+    move.w d3,(4,a1)    
+    addq.w  #8,a1
+    add.l d2,d3
+    dbf d1,1b
+2:
+	movem.l	(a7)+,a0-a2/d0-d3
+	rts
+	
+* < A0: copper block with rows
+* < A1: part of the pointers list
+* < D0: number of rows to fill
+
+generate_row_table:
+	* generate row table, set jumps
+	move.w	#(first_rows_end-first_rows)/NB_FIRST_ROWS,d7	| block size
+	subq	#1,d0
+0:
+	move.l 	a0,(a1)+
+	lea		(a0,d7.w),a2	| next row jump
+	move.l	a2,d1
+	move.w	d1,(6,a0)
+	swap	d1
+	move.w	d1,(2,a0)
+	move.l	a2,a0		| next row
+	dbf		d0,0b
+	
+	rts
+	
+	
 * change return address from vblank
 * D0: return address (0: no change)
 osd_set_irq_return_address:
@@ -2429,6 +2517,11 @@ osd_disable_interrupts:
 	
 
 
+* set bank
+* < D0.B bank 0-4
+* > A1 bank pointer minus 0x4000
+osd_set_bank:
+	rts
 
 osd_video_word_dirty:
 	jbsr	osd_video_byte_dirty
@@ -2599,7 +2692,7 @@ update_bg_tile:
 	
 	*cmp.b	#0x20,d2
 	*jeq		11f				| optim: blank tile
-	move.l		bg_character_table,a0
+	move.l		bg_tile_character_table,a0
 	.ifdef	NO68020
 	add.w	d2,d2
 	add.w	d2,d2	
@@ -2704,9 +2797,7 @@ update_bg_tile:
 	jsr		(a0)
 	
 	rts
-* made more complex by 4 tile orientations + the fact that the last
-* tile bitplane should not be copied into the backbuffer as sprites
-* only use 4 planes
+
 standard_tile16:
 
 	* just copy
@@ -2961,7 +3052,7 @@ update_fg_tile:
 	lsr.w	#2,d2
 	.endif
 	add.w	#FG_SCREEN_TILE_ADDRESS,d7
-	COLOR0_FLASH	0x00F
+	**COLOR0_FLASH	0x00F
 	*BREAKPOINT	"unregistered game tile (in D2, at address D7)"	
 
 	jra		11f
@@ -3137,7 +3228,6 @@ set_bobs_bitplanes:
 	add.l	d0,a0		| X/Y scroll offset (long!)
 	move.l	a0,d0		| first bitplane screen pointer
  	lea	bobs_bitplanes+2,a0
-set_bitplanes:
 1:
     swap d0
     move.w d0,(a0)
@@ -3190,7 +3280,7 @@ osd_read_p2_inputs:
 	st.B	d0
 	rts
 	
-	move.b	player_2_controls,d0
+
 	move.l	A0,-(a7)
 	lea		keyboard_table(pc),a0
 	tst.b	(2,a0)		| "2" key like in MAME
@@ -3414,26 +3504,25 @@ handle_keyboard:
 	* cheat keys
 
 
-	cmp.b	#0x50,d0	| F1 key: set score 9-0
+	cmp.b	#0x50,d0	| F1 key: toggle invincible
 	bne.b	0f
 	st.b	cheat_used
-
+	not.b	invincible_flag
 	COLOR0_FLASH	0x0FF
 
 	
 0:
-	cmp.b	#0x51,d0	| F2 key: set score 0-9
+	cmp.b	#0x51,d0	| F2 key: skip level TODO
 	bne.b	0f
 	st.b	cheat_used
 	
 	COLOR0_FLASH	0x0FF
 	
 0:
-	cmp.b	#0x52,d0	| F3 key: set score 10-0 and make left side win
+	cmp.b	#0x52,d0	| F3 key: change weapon
 	bne.b	0f
 	st.b	cheat_used
-
-	COLOR0_FLASH	0x0FF
+	jbsr	cycle_weapon
 	
 0:
 
@@ -3835,7 +3924,6 @@ cpu_init:
 	moveq	#0,d2
 	moveq	#0,d3
 	moveq	#0,d4
-	moveq	#0,d5
 	moveq	#0,d6
 	moveq	#0,d7
 	rts	
@@ -3871,17 +3959,14 @@ music_playing:
 	.byte	0
 dont_store_blitted_coords:
 	.byte	0
-scrolling_override:
-	.byte	0
+
 music_loops:
 	.byte	0
 music_volume:
 	.byte	0
 	.align	2
-scrolling_timer:
-	.word	0
-min_forced_scrolling:
-	.word	0
+
+
 music_track_start_number:
 	.word	-1
 music_pattern:
@@ -3980,11 +4065,10 @@ mid_screen_interrupt_count:
 	.align	2
 system_vbr:
 	.long	0
-target_usp_value:
+target_ssp_value:
 	.word	0
 
-host_scroll_in_sync:
-	.word	0
+
 game_scroll_y:
 	.word	0
 game_scroll_x:
@@ -4017,8 +4101,6 @@ osd_entry_count:
 	.byte	0
 player_1_controls:
 	.byte	0
-player_2_controls:
-	.byte	0
 flip_flop:
 	.byte	0
 bank_value:
@@ -4033,7 +4115,9 @@ p2_joystick_slot:
 	.byte	0
 	.align	2
 
-
+rows_table:
+	.skip	0x120*4
+	
 keyboard_table:
 	.skip	0x100
 
@@ -4142,7 +4226,7 @@ cpu_log_prev_state:
 
 	.section	.bsspublic
 
-bg_character_table:
+bg_tile_character_table:
 	.long 	0
 bg_character_table_buffer:
 	.skip	BG_TILE_MAX_SIZE
@@ -4202,6 +4286,15 @@ m6809_direct_page_pointer:
 	DECL_COLORS	0,32
 	.endm
 
+	.macro	DECL_ROW
+	.word   cop2lc,0        | jump high
+	.word   cop2lc+2,0      | jump low
+	.word   copjmp2,0
+	.word   0x01+(y_pos<<8),0xFFFE
+	DECL_BITPLANES	0,NB_PLAYFIELD_PLANES	
+	.set	y_pos,y_pos+1
+	.endm
+	
 	
 	
 blank_sprite:
@@ -4226,16 +4319,9 @@ game_copperlist:
 	
 	* black color background plane
 	* enable sprite colors now
-	.word	0x0801,0xFFFE
+	.word	0x0601,0xFFFE
 	
-		
-bobs_bitplanes:
-	DECL_BITPLANES	0,NB_PLAYFIELD_PLANES
 
-	.word	bplcon1
-fine_x_scroll_value:
-	.word	0
-	
 game_sprites:
 	DECL_SPRITES
 game_sprites_end:
@@ -4252,14 +4338,34 @@ copperlist_colors:
 	.endr
 	.endif
 
+	.set	y_pos,0x20
+	.word	0x01+(y_pos<<8),0xFFFE
+	.set	y_pos,y_pos+1
+		
+bobs_bitplanes:
+	DECL_BITPLANES	0,NB_PLAYFIELD_PLANES
 
+	.word	bplcon1
+fine_x_scroll_value:
+	.word	0
+	
+first_rows:
+	.rept	NB_FIRST_ROWS
+	DECL_ROW
+	.endr
+first_rows_end:
+		
+	
 	* mid-line wait & extra interrupt
 	.word	0x8001,0xFFFE
 pal_intreq_block_game:
 	.word	 intreq,0x8014  | call copper interrupt in the middle of a frame, also flag so copper interrupt knows that we're going to call copper int
 
-	
-	*.word	0xF001,0xFFFE	| if we don't add an extra wait, NTSC version locks up
+second_rows:
+	.rept	NB_SECOND_ROWS
+	DECL_ROW
+	.endr
+
 	
 	* pal limit
 	.if		NB_PLAYFIELD_PLANES>6
@@ -4268,10 +4374,17 @@ pal_intreq_block_game:
     .word  0xFFDF,0xFFFE       | PAL wait
 	.endif
 	* extra wait for PAL (NTSC can't afford this)
+	.set	y_pos,0
+	
+third_rows:
+	.rept	NB_THIRD_ROWS
+	DECL_ROW
+	.endr
+	.word	bplcon3,0
+	.word	color,0xF00
 
 	
 pal_wait:
-	.word	0x1801,0xFFFE
 	*.word	bplcon3,(BORDERBLANK<<5)
 	*.word	color,0x0F0
 	.word	 intreq,0x8010

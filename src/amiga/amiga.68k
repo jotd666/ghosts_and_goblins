@@ -33,11 +33,14 @@ NB_PLAYFIELD_PLANES = 6  | this is externally defined!!
 	.error	"NB_PLAYFIELD_PLANES must be defined via --defsym"
 	.endif
 
+COPPER_NOP = 0x1FE
 
 BORDERBLANK = 1
 
 PREVIOUS_SPRITE_SIZE = 8
 CURRENT_SPRITE_SIZE = 4
+GAME_MAX_SCROLL_X = 0x200
+BG_TILE_WIDTH = 16
 
 BG_TILE_MAX_SIZE = 64000  | possibly less
 
@@ -128,7 +131,7 @@ NB_BG_PLANES = 5
 
 TOTAL_NB_COLORS = 1<<NB_PLAYFIELD_PLANES
 FG_NB_BYTES_PER_ROW = 0x20
-BG_NB_BYTES_PER_ROW = 0x60
+BG_NB_BYTES_PER_ROW = 0x28    | +64 pixels
 
 Y_START = 0x20
 
@@ -140,11 +143,15 @@ BASE_BPLCON2_VALUE = 0x0064
 
 BASE_BPLCON4_VALUE = 0x0044	  | sprites palette starts at color 64
 
+NB_FIRST_ROWS = 0x80-0x21
+NB_SECOND_ROWS = 0x80
+NB_THIRD_ROWS = 0x20
 FG_NB_LINES = 256
 BG_NB_LINES = 512
 Y_MAX = BG_NB_LINES
 NB_PLAYFIELD_LINES = BG_NB_LINES
 
+VISIBLE_SCROLL_WIDTH = BG_NB_BYTES_PER_ROW*8-64
 
 BG_SCREEN_PLANE_SIZE = BG_NB_BYTES_PER_ROW*(BG_NB_LINES+16)
 
@@ -900,6 +907,8 @@ load_context:
 	jbsr	load_palette
 	
 	* at start redraw everything
+	move.w	#0,game_scroll_x		| maybe should not be done
+	move.w	game_scroll_x,previous_scroll_x
 	jbsr force_all_screen_redraw
 
 	movem.l	(a7)+,d0-a6
@@ -907,10 +916,22 @@ load_context:
 	
 
 force_all_screen_redraw:
+	GET_MEMORY_START_AND_DP
+
 	* given the current scroll X/Y, draw all tiles on screen
-	move.w	(scroll_x_register_3b08,a6),d0
-	move.w	(scroll_y_register_3b0a,a6),d1
-	lea		(bg_tiles_address_2800,a6),a5
+	move.w	game_scroll_x,d0
+	move.w	d0,previous_scroll_x
+	move.w	d0,min_scroll_x
+	move.w	d0,d1
+	add.w	#VISIBLE_SCROLL_WIDTH+BG_TILE_WIDTH,d1		| after that it triggers tile refresh
+	move.w	d1,max_scroll_x
+	
+	and.w	#0x3F,d0
+	move.w	d0,host_scroll_x		| when called, then host scroll is 0 modulus the bplcon shift fmode=3
+	clr.w	xr_offset
+	clr.w	xl_offset
+	
+	move.w	game_scroll_x,d0
 	lsr.w	#4,D0	| divide by 16 to get real X tile offset
 	* now compute start address to fetch data from
 	move.w	#1,d7		| first row is not visible with scroll=0, visible with=$10
@@ -920,20 +941,153 @@ force_all_screen_redraw:
 
 	move.w	d7,d6	| save current Y
 
-	move.w	#0x0E,d2
+	move.w	#0x0E,d2	| size of screen in tiles
 0:
 	move.w	d6,d7	| set current Y row
-	move.w	#0x0F,d1
+	move.w	#BG_NB_BYTES_PER_ROW/2-1,d1		|  (64 bit margin)
 1:
+	and.w	#0x3FF,d7		| wrap on memory
 	* force tile draw
-	lea		(a5,d7.w),a0
-	jbsr	osd_video_byte_dirty
+	lea		(BG_SCREEN_TILE_ADDRESS,a6),a0
+	move.b	(a0,d7.w),d0
+	jeq		2f
+	move.b	#0,0x110
+2:
+
+	movem.w	d1/d2/d6/d7,-(a7)
+	lea		(BG_SCREEN_COLOR_ADDRESS,a6),a0
+	move.b	(a0,d7.w),d1
+
+	jbsr	update_bg_tile	
+	movem.w	(a7)+,d1/d2/d6/d7
+	
 	add.w	#0x20,d7		| next X
-	and.w	#0x3FF,d7		| wrap
 	dbf		d1,1b
 	addq	#1,d6
 	dbf		d2,0b
 	rts
+	
+	
+draw_left_tiles:
+	move.w	min_scroll_x,d0
+	move.w	xl_offset,x_offset
+	jra		draw_column_tiles
+draw_right_tiles:
+	move.w	max_scroll_x,d0
+	move.w	xr_offset,x_offset
+draw_column_tiles:
+	GET_MEMORY_START_AND_DP
+
+	lea		(0x2800,a6),a5
+	lsr.w	#4,D0	| divide by 16 to get real X tile offset
+	* now compute start address to fetch data from
+	move.w	#1,d7		| first row is not visible with scroll=0, visible with=$10
+	* atm Y=0
+	lsl.w	#5,d0	| times 32
+	add.w	d0,d7	| start address
+
+	move.w	#0xE,d2
+0:
+	and.w	#0x3FF,d7		| wrap
+	* force tile draw
+	lea		(a5,d7.w),a0
+	
+	* uncomment for wall of green bricks to test
+	*move.b	#0xE9,(a0)
+	*move.b	#0x41,(0x400,a0)
+	
+	jbsr	osd_video_byte_dirty
+
+	addq	#1,d7			| next Y
+	dbf		d2,0b
+	rts
+
+set_scroll_values:
+	* update host scroll
+	* handle 2 wrap points
+	move.w	game_scroll_x,d0
+	move.w	previous_scroll_x,d1
+	move.w	d0,d2
+	sub.w	d1,d2		| d2: diff between game scroll before / after
+	
+	cmp.w	#GAME_MAX_SCROLL_X-BG_TILE_WIDTH,d0
+	jcs		0f
+	* game scroll X >= 0x1F0
+	cmp.w	#BG_TILE_WIDTH,d1
+	jcc		0f
+	* previous scroll X < 0x10: wrap left
+	sub.w	#GAME_MAX_SCROLL_X,d2
+	jra		1f
+0:
+	cmp.w	#BG_TILE_WIDTH,d0
+	jcc		1f
+	* game scroll X < 0x10
+	cmp.w	#GAME_MAX_SCROLL_X-BG_TILE_WIDTH,d1
+	jcs		1f
+	* previous scroll X > 0x1F0: wrap right
+	add.w	#GAME_MAX_SCROLL_X,d2
+1:
+
+0:
+	move.w	d2,d3
+	jpl	2f
+	neg.w	d3
+2:
+	cmp.w	#BG_TILE_WIDTH,d3
+	jcs		3f
+	* before/after diff is too big: redraw all
+	jbsr	force_all_screen_redraw
+	
+	rts
+3:
+	move.w	d0,previous_scroll_x
+	* update unwrapped host scroll X
+	* we need it to be continuous!
+	move.w	host_scroll_x,d0
+	add.w	d2,d0
+	move.w	d0,host_scroll_x
+	
+	* now, are we still in min/max boundaries?
+	cmp.w	min_scroll_x,d0
+	jcc		0f
+	* min overshoot: we have to do something on the left
+	COLOR0_FLASH	0x00F
+	jbsr	draw_left_tiles
+	sub.w	#BG_TILE_WIDTH,max_scroll_x
+	sub.w	#BG_TILE_WIDTH,min_scroll_x
+	jbsr	update_x_offsets
+	
+	jra		5f
+0:
+
+	add.w	#VISIBLE_SCROLL_WIDTH,d0
+	cmp.w	max_scroll_x,d0
+	jcs		5f
+	* max overshoot: we have to do something on the right: draw the tiles
+	COLOR0_FLASH	0x0F0
+	jbsr	draw_right_tiles
+	add.w	#BG_TILE_WIDTH,max_scroll_x
+	add.w	#BG_TILE_WIDTH,min_scroll_x
+	* add 0x40 bytes every 0x200 scroll pixels
+	* to make up for memory wrap
+	jbsr	update_x_offsets
+5:
+
+	rts
+
+update_x_offsets:
+	moveq	#0,d0
+	move.b	max_scroll_x,d0
+	lsr.w	#1,d0
+	lsl.w	#6,d0
+	move.w	d0,xr_offset
+	moveq	#0,d0
+	move.b	min_scroll_x,d0
+	lsr.w	#1,d0
+	lsl.w	#6,d0
+	move.w	d0,xl_offset
+	rts
+	
 	
 * < A0: filename
 * < A1: buffer
@@ -1079,7 +1233,10 @@ level3_interrupt:
 	GET_MEMORY_START_AND_DP
 	move.w	(scroll_x_register_3b08,a6),d0
 	ror.w	#8,d0		| hardware is in little endian
-	move.w	D0,scroll_x
+	move.w	D0,game_scroll_x
+	move.w	(scroll_y_register_3b0a,a6),d0
+	ror.w	#8,d0		| hardware is in little endian
+	move.w	D0,game_scroll_y
 	
 	* ok now D5 can be used freely
 
@@ -1091,6 +1248,7 @@ level3_interrupt:
 
 	jbsr		really_update_sprites
 	
+	jbsr	set_scroll_values
 	
 
 	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
@@ -1224,7 +1382,8 @@ cycle_weapon:
 0:
 	move.b	d0,(weapon_type_0073,a6)
 	movem.l	(a7)+,a6/a5/d0
-
+	rts
+	
 * Z: set if not playing
 is_game_playing:
 	rts
@@ -1267,11 +1426,8 @@ blit_background:
 	* add Y offset: Y*NB_BYTES_PER_ROW
 	add.w	(a4,d1.w),d0
 	* same offset for source and destination
-	moveq	#0,d1
-	move.w	d0,d1
-	* long add!
-	add.l	d1,a1
-	add.l	d1,a0
+	add.w	d0,a1
+	add.w	d0,a0
 	
 
     move.l  #0x09f00000,d3    | A->D copy, ascending mode	
@@ -1536,9 +1692,9 @@ update_one_bob:
 	jbsr	mirror_sprite_planes
 	
 	* BOBs must follow screen scroll
-	add.w	scroll_y,d1
-	add.w	scroll_x,d0
-	and.w	#0x1FF,d0
+	**add.w	game_scroll_y,d1
+	move.w	host_scroll_x,d2
+	add.w 	d2,d0
 	
 	* D0 and D1 are already set
 	move.l	(NB_PLAYFIELD_PLANES*4,a0),d2
@@ -2135,8 +2291,8 @@ platform_init:
 	bne		0f
 	st.b	ntsc_flag
 	* disable extra mid-screen interrupt, as it would be too fast (NTSC)
-	move.w	#0x1FE,pal_intreq_block_game
-	move.w	#0x0401,pal_wait			| else intreq never happens
+	move.w	#COPPER_NOP,pal_intreq_block_game
+	*move.w	#0x0401,pal_wait			| else intreq never happens
 0:
 	.if		NB_PLAYFIELD_PLANES==8
     move.w #0x0210+BORDERBLANK,bplcon0(a5) | 8 bitplanes, borderblank
@@ -2177,10 +2333,20 @@ platform_init:
 	move.w #0x00D0,ddfstop(a5)		| C0 for fmode=3
 	.endif
 	
-	# 0 modulo (OCS)
+	* 0 modulo (OCS)
     move.w d0,bpl1mod(a5)
     move.w d0,bpl2mod(a5)
 
+	lea		rows_table,a1
+	lea		first_rows,a0
+	move.w	#NB_FIRST_ROWS,d0
+	jbsr	generate_row_table
+	lea		second_rows,a0
+	move.w	#NB_SECOND_ROWS,d0
+	jbsr	generate_row_table
+	lea		third_rows,a0
+	move.w	#NB_THIRD_ROWS,d0
+	jbsr	generate_row_table
 	
 	lea		_custom,a5
 	lea		game_copperlist,a0
@@ -2251,8 +2417,54 @@ load_palette:
 	dbf		d0,1b
 2:
 	rts
+* < D0: row, if 0: do nothing
+wrap_bitplanes:
+	movem.l	a0-a2/d0-d3,-(a7)
+	* first restore previous wrap if wasn't 0 TODO
 	
+	* if zero, we stop here, row 0 wraps naturally
+	subq	#1,d0
+	jmi		2f
+	add.w	d0,d0
+	add.w	d0,d0
+ 	lea	rows_table,a2
+	add.w	d0,a2
+	move.l	(a2),a1
+	move.w	#COPPER_NOP,(0x8,a1)	| remove copjmp2, enable what's below
+	add		#0x12,a1	| skip preamble
+	move.w	#BG_SCREEN_PLANE_SIZE,d2
+	move.w	#NB_PLAYFIELD_PLANES,d1
+    move.l	playfield_displayed_screen_ptr(pc),d3
+	* we should store A1 (double buffering)
+1:
+    swap d3
+    move.w d3,(a1)
+    swap d3
+    move.w d3,(4,a1)    
+    addq.w  #8,a1
+    add.l d2,d3
+    dbf d1,1b
+2:
+	movem.l	(a7)+,a0-a2/d0-d3
+	rts
+* < A0: copper block with rows
+* < A1: part of the pointers list
+* < D0: number of rows to fill
 
+generate_row_table:
+	* generate row table, set jumps
+	move.w	#(first_rows_end-first_rows)/NB_FIRST_ROWS,d7	| block size
+	subq	#1,d0
+0:
+	move.l 	a0,(a1)+
+	lea		(a0,d7.w),a2	| next row jump
+	move.l	a2,d1
+	move.w	d1,(6,a0)
+	swap	d1
+	move.w	d1,(2,a0)
+	move.l	a2,a0		| next row
+	dbf		d0,0b
+	rts
 * change return address from vblank
 * D0: return address (0: no change)
 osd_set_irq_return_address:
@@ -2351,7 +2563,7 @@ osd_video_byte_dirty:
 	.endif
 	
 	cmp.w	#BG_SCREEN_TILE_ADDRESS-FG_SCREEN_TILE_ADDRESS,d7
-	jcc		bg_tile
+	jcc		osd_w_videoram_out
 	
 	and.w	#0x3FF,d7
 
@@ -2399,6 +2611,130 @@ bg_tile:
 	add.l	d5,a2
 	.endm
 
+cache_bg_tiles_address:
+	rts
+* < D7: 0-0x400 address
+* < D0: tile code
+* < D1: color code
+
+
+update_bg_tile:
+	
+	moveq	#0,d2			| mask up to 255
+	move.b	d0,d2			| tile code
+	moveq	#0,d3
+	move.b	d1,d3			| CLUT & tile code & flags
+
+	move.w	d3,d4
+	and.b	#0xC0,d4
+	add.w	d4,d4
+	add.w	d4,d4
+	add.w	d4,d2			| full tile code
+
+	moveq	#0,d0
+	moveq	#0,d1
+	* compute address
+	
+
+	move.w	d7,d0
+	
+	
+	lsr.w	#5,d0	| divide by 0x20
+
+	
+	asr.w	#4,d1	| tiles are 16 pix wide
+	add.w 	d1,d0	| correct nb bytes
+
+	add.w	d0,d0	| 16 pixels
+	add.w 	x_offset,d0
+	
+
+	move.w	d7,d1
+	and.w	#0x1F,d1	| modulus 0x20
+	
+
+	* updating bitplanes
+	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
+	move.l	#BG_SCREEN_PLANE_SIZE,d5
+	.else
+	move.w	#BG_SCREEN_PLANE_SIZE,d5
+	.endif
+	
+	move.w	#NB_BG_PLANES-1,d4
+	move.l		playfield_drawed_screen_ptr,a1
+	.ifeq	OPT_ENABLE_DOUBLE_BUFFERING
+	.else 
+	* double buffering
+	move.l		playfield_displayed_screen_ptr,a4
+	.endif
+	
+	lea		mulBG_NB_BYTES_PER_ROW_table,A2
+	.ifdef	NO68020
+	add.w	d1,d1
+	move.w	(a2,d1.w),d1
+	.else
+	move.w	(a2,d1.w*2),d1
+	.endif
+	lsl.w	#4,d1	| 16 pixels
+	add.w	d1,d0
+	add.w	d0,a1
+	.ifeq	OPT_ENABLE_DOUBLE_BUFFERING
+	.else 
+	* double buffering
+	add.w	d0,a4
+	.endif
+
+	lea		background_restore_buffer,a3
+	add.w	d0,a3
+
+	
+	*cmp.b	#0x20,d2
+	*jeq		11f				| optim: blank tile
+	move.l		bg_tile_character_table,a0
+	.ifdef	NO68020
+	add.w	d2,d2
+	add.w	d2,d2	
+	move.l	(a0,d2.w),d0		| tile pointer
+	.else
+	move.l	(a0,d2.w*4),d0		| tile pointer
+	.endif
+	.ifdef	RELEASE
+	jeq		11f					| clear tile, no error (release)
+	.else
+	jne		12f
+	add.w	#BG_SCREEN_TILE_ADDRESS,d7
+	.ifdef	NO68020
+	lsr.w	#2,d2
+	.endif
+	*COLOR0_FLASH	0xF0F
+	jra		11f
+12:
+	.endif
+	move.l	d0,a2
+	move.w	d3,d1		| save attributes
+	lsr.w	#4,d1
+	and.w	#3,d1		| mirror/flip
+	
+	and.w	#0x7,d3
+	.ifdef	NO68020
+	add.w	d3,d3
+	add.w	d3,d3
+	move.l	(a2,d3.w),d0			| pointer on tile bitplanes for that CLUT
+	.else
+	move.l	(a2,d3.w*4),d0			| pointer on tile bitplanes for that CLUT	
+	.endif
+	.ifdef	RELEASE
+	jeq		11f						| not necessarily a problem
+	.else
+	jne		12f
+	add.w	#BG_SCREEN_TILE_ADDRESS,d7
+	lsr.w	#2,d2
+	lsr.w	#2,d3
+	COLOR0_FLASH	0xFF0
+	jra		11f
+	.endif
+12:
+	move.l	d0,a2					| pointer on bitplanes
 	.macro	COPY_TILE16_PLANE_ROW
 	move.w	d0,(offset,a1)  | buffer
 	move.w	d0,(offset,a3)  | restore buffer
@@ -2450,149 +2786,16 @@ bg_tile:
 	.endif
 	.endm
 	
-cache_bg_tiles_address:
-	rts
 
-
-* < D7: 0-0x400 address
-* < D0: tile code
-* < D1: color code
-
-
-update_bg_tile:
-	moveq	#0,d2			| mask up to 255
-	move.b	d0,d2			| tile code
-	moveq	#0,d3
-	move.b	d1,d3			| CLUT & tile code & flags
-
-	move.w	d3,d4
-	and.b	#0xC0,d4
-	add.w	d4,d4
-	add.w	d4,d4
-	add.w	d4,d2			| full tile code
-
-	moveq	#0,d0
-	moveq	#0,d1
-	* compute address
-	move.w	d7,d0
-	lsr.w	#5,d0	| divide by 0x20
-	add.w	d0,d0	| 16 pixels
-	move.w	d7,d1
-	and.w	#0x1F,d1	| modulus 0x20
-	
-	* duplicate tile draw if 0-1F (wrap)
-	cmp.w	#0x20,d0
-	scs		d6
-	
-	* updating bitplanes
-	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
-	move.l	#BG_SCREEN_PLANE_SIZE,d5
-	.else
-	move.w	#BG_SCREEN_PLANE_SIZE,d5
-	.endif
-	
-	move.w	#NB_BG_PLANES-1,d4
-	move.l		playfield_drawed_screen_ptr,a1
-	.ifeq	OPT_ENABLE_DOUBLE_BUFFERING
-	.else 
-	* double buffering
-	move.l		playfield_displayed_screen_ptr,a4
-
-	.endif
-	
-	lea		mulBG_NB_BYTES_PER_ROW_table,A2
-	.ifdef	NO68020
-	add.w	d1,d1
-	move.w	(a2,d1.w),d1
-	.else
-	move.w	(a2,d1.w*2),d1
-	.endif
-	lsl.w	#4,d1	| 16 pixels
-	* ATM we have to use long add
-	add.l	d1,d0
-	add.l	d0,a1
-
-	lea		background_restore_buffer,a3
-	add.l	d0,a3
-
-	
-	*cmp.b	#0x20,d2
-	*jeq		11f				| optim: blank tile
-	move.l		bg_tile_character_table,a0
-	.ifndef	RELEASE
-	cmp.l	#0,A0
-	jne		111f
-	BREAKPOINT	"no bg tiles loaded!"
-111:
-	.endif
-	.ifdef	NO68020
-	add.w	d2,d2
-	add.w	d2,d2	
-	move.l	(a0,d2.w),d0		| tile pointer
-	.else
-	move.l	(a0,d2.w*4),d0		| tile pointer
-	.endif
-	.ifdef	RELEASE
-	jeq		11f					| clear tile, no error (release)
-	.else
-	jne		12f
-	add.w	#BG_SCREEN_TILE_ADDRESS,d7
-	.ifdef	NO68020
-	lsr.w	#2,d2
-	.endif
-	**COLOR0_FLASH	0xF0F
-	jra		11f
-12:
-	.endif
-	move.l	d0,a2
-	move.w	d3,d1		| save attributes
-	lsr.w	#4,d1
-	and.w	#3,d1		| mirror/flip
-	
-	and.w	#0x7,d3
-	.ifdef	NO68020
-	add.w	d3,d3
-	add.w	d3,d3
-	move.l	(a2,d3.w),d0			| pointer on tile bitplanes for that CLUT
-	.else
-	move.l	(a2,d3.w*4),d0			| pointer on tile bitplanes for that CLUT	
-	.endif
-	.ifdef	RELEASE
-	jeq		11f						| not necessarily a problem
-	.else
-	jne		12f
-	add.w	#BG_SCREEN_TILE_ADDRESS,d7
-	lsr.w	#2,d2
-	lsr.w	#2,d3
-	**COLOR0_FLASH	0xFF0
-	jra		11f
-	.endif
-12:
-	move.l	d0,a2					| pointer on bitplanes
-
-
-	
 	lea		mirror_jump_table,a0
 	.ifdef	NO68020
 	add.w	d1,d1
 	add.w	d1,d1
 	move.l	(a0,d1.w),a0
+	jsr	(a0)
 	.else
-	move.l	(a0,d1.w*4),a0
+	jsr		([a0,d1.w*4])
 	.endif
-	tst.b	d6
-	jne		0f
-	jmp		(a0)
-0:
-	* do it twice
-	movem.l	a0-a4/d4,-(a7)
-	jsr	(a0)
-	movem.l	(a7)+,a0-a4/d4
-	add.w	#0x20,a1	| wrap plane
-	add.w	#0x20,a3	| wrap plane
-	add.w	#0x20,a4	| wrap plane
-	jsr	(a0)
-	
 	rts
 
 standard_tile16:
@@ -2978,7 +3181,7 @@ set_bobs_bitplanes:
 	
 	* set bitplanes
 	moveq	#0,d0
-	move.w	scroll_y,d0
+	move.w	game_scroll_y,d0
 
 	lea		mulBG_NB_BYTES_PER_ROW_table,a2
 	.ifdef	MC68020
@@ -2988,8 +3191,8 @@ set_bobs_bitplanes:
 	move.w	(a2,d0.w),d0		| compute Y offset
 	.endif
 1:	
-	move.w	scroll_x,d2
-	and.w	#0x1FF,d2			| wraps at 0x200!
+	move.w	host_scroll_x,d2
+	and.w	#0x0FF,d2			| wraps at 0x100!
 
 	lea		scroll_table,a2
 	.ifdef	MC68020
@@ -3001,7 +3204,10 @@ set_bobs_bitplanes:
 	.endif
 	
 	move.w	(a2)+,fine_x_scroll_value
-	add.w	(a2),d0			| add x offset
+	move.w	host_scroll_x,d2
+	lsr.w	#6,d2
+	lsl.w	#3,d2
+	add.w	d2,d0
 	
 	
     moveq #NB_PLAYFIELD_PLANES-1,d1
@@ -3018,7 +3224,6 @@ set_bobs_bitplanes:
 	add.l	d0,a0		| X/Y scroll offset (long!)
 	move.l	a0,d0		| first bitplane screen pointer
  	lea	bobs_bitplanes+2,a0
-set_bitplanes:
 1:
     swap d0
     move.w d0,(a0)
@@ -3331,6 +3536,12 @@ log_used_sprites:
 	rts
 	.endif
 	
+redraw_bg_tiles:
+	movem.l	d0-a6,-(a7)
+	jbsr 	force_all_screen_redraw
+	movem.l	(a7)+,d0-a6
+	rts
+	
 handle_keyboard:
 	movem.l	D0/A0/A5,-(a7)
 	LEA	0x00BFD000,A5
@@ -3431,6 +3642,11 @@ handle_keyboard:
 	jbsr	osd_dump_logs
 0:
 
+	* last life, if killed, direct game over
+	cmp.b	#0x56,d0	| F8 key: set time at 0
+	bne.b	0f
+	jbsr	redraw_bg_tiles
+0:
 	* last life, if killed, direct game over
 	cmp.b	#0x57,d0	| F8 key: set time at 0
 	bne.b	0f
@@ -4139,9 +4355,27 @@ system_vbr:
 target_ssp_value:
 	.word	0
 
-scroll_y:
+game_scroll_y:
 	.word	0
-scroll_x:
+game_scroll_x:
+	.word	0
+xr_offset:
+	.word	0
+xl_offset:
+	.word	0
+x_offset:
+	.word	0
+host_scroll_y:
+	.word	0
+host_scroll_x:
+	.word	0
+min_scroll_x:
+	.word	0
+max_scroll_x:
+	.word	0
+previous_scroll_y:
+	.word	0
+previous_scroll_x:
 	.word	0
 
 
@@ -4166,6 +4400,8 @@ p2_joystick_slot:
 	.byte	0
 	.align	2
 
+rows_table:
+	.skip	0x120*4
 
 keyboard_table:
 	.skip	0x100
@@ -4345,6 +4581,14 @@ sprite_log_table_end:
 	DECL_COLORS	0,32
 	.endm
 
+	.macro	DECL_ROW
+	.word   cop2lc,0        | jump high
+	.word   cop2lc+2,0      | jump low
+	.word   copjmp2,0
+	.word   0x01+(y_pos<<8),0xFFFE
+	DECL_BITPLANES	0,NB_PLAYFIELD_PLANES	
+	.set	y_pos,y_pos+1
+	.endm
 	
 	
 blank_sprite:
@@ -4369,15 +4613,10 @@ game_copperlist:
 	
 	* black color background plane
 	* enable sprite colors now
-	.word	0x0801,0xFFFE
+	.word	0x0601,0xFFFE
 	
 		
-bobs_bitplanes:
-	DECL_BITPLANES	0,NB_PLAYFIELD_PLANES
 
-	.word	bplcon1
-fine_x_scroll_value:
-	.word	0
 	
 game_sprites:
 	DECL_SPRITES
@@ -4395,14 +4634,30 @@ copperlist_colors:
 	.endr
 	.endif
 
+	.set	y_pos,0x20
+	.word	0x01+(y_pos<<8),0xFFFE
+	.set	y_pos,y_pos+1
+bobs_bitplanes:
+	DECL_BITPLANES	0,NB_PLAYFIELD_PLANES
 
+	.word	bplcon1
+fine_x_scroll_value:
+	.word	0
+first_rows:
+	.rept	NB_FIRST_ROWS
+	DECL_ROW
+	.endr
+first_rows_end:
 	* mid-line wait & extra interrupt
 	.word	0x8001,0xFFFE
 pal_intreq_block_game:
 	.word	 intreq,0x8014  | call copper interrupt in the middle of a frame, also flag so copper interrupt knows that we're going to call copper int
 
+second_rows:
+	.rept	NB_SECOND_ROWS
+	DECL_ROW
+	.endr
 	
-	*.word	0xF001,0xFFFE	| if we don't add an extra wait, NTSC version locks up
 	
 	* pal limit
 	.if		NB_PLAYFIELD_PLANES>6
@@ -4411,12 +4666,16 @@ pal_intreq_block_game:
     .word  0xFFDF,0xFFFE       | PAL wait
 	.endif
 	* extra wait for PAL (NTSC can't afford this)
+	.set	y_pos,0
+third_rows:
+	.rept	NB_THIRD_ROWS
+	DECL_ROW
+	.endr
+
 
 	
 pal_wait:
-	.word	0x1801,0xFFFE
-	*.word	bplcon3,(BORDERBLANK<<5)
-	*.word	color,0x0F0
+	*.word	xxxx
 	.word	 intreq,0x8010
 
 

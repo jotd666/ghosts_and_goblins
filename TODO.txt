@@ -1,4 +1,13 @@
-- scrolling X: ok but tiles on the left refreshed too late
+- scrolling X completely off: check draw_right_tiles
+- video dirty: should draw tile if visible
+- sprite X offset : add host scroll as linear X offset
+  when drawing sprites, not when computing X (maybe it will work, though
+  as code doesn't clip X): works but not for blit_background (protected?)
+- restore_background: should restore 5 first bitplanes, then clear the last one
+- sprite palette: seems that a few colors are wasted in the end: magenta is here +
+  3 other 123 colors...
+- hw_test: scrolling X: ok but tiles on the left refreshed too late
+
 - killed: crash no map displayed??? after map context doesn't reload properly
 - refactor to get draw address first, to remove extra 16 pixels on the top (corkscrew)
 - add space (rows) before and after screens
