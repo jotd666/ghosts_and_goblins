@@ -978,7 +978,7 @@ draw_right_tiles:
 draw_column_tiles:
 	GET_MEMORY_START_AND_DP
 
-	lea		(0x2800,a6),a5
+	lea		(bg_tiles_address_2800,a6),a5
 	lsr.w	#4,D0	| divide by 16 to get real X tile offset
 	* now compute start address to fetch data from
 	move.w	#1,d7		| first row is not visible with scroll=0, visible with=$10
@@ -991,11 +991,7 @@ draw_column_tiles:
 	and.w	#0x3FF,d7		| wrap
 	* force tile draw
 	lea		(a5,d7.w),a0
-	
-	* uncomment for wall of green bricks to test
-	*move.b	#0xE9,(a0)
-	*move.b	#0x41,(0x400,a0)
-	
+		
 	jbsr	osd_video_byte_dirty
 
 	addq	#1,d7			| next Y
@@ -1428,7 +1424,6 @@ blit_background:
 	* same offset for source and destination
 	add.w	d0,a1
 	add.w	d0,a0
-	
 
     move.l  #0x09f00000,d3    | A->D copy, ascending mode	
 	move.w	#BG_NB_BYTES_PER_ROW,d1		| blit modulo
@@ -1525,7 +1520,7 @@ really_update_sprites:
 	move.w	(2,a4),d1
 	cmp.w	#BG_NB_LINES,d1
 	jcc		11f				| too low: discard
-	and.w	#0x1F0,d0		| align on 16 lower bound
+	and.w	#0xFFF0,d0		| align on 16 lower bound
 	* clear area where the sprite was
 	move.l	#-1,(a4)+			| ack deletion by setting -1 in X & Y
 	move.w	(a4)+,d4			| height
@@ -1693,8 +1688,8 @@ update_one_bob:
 	
 	* BOBs must follow screen scroll
 	**add.w	game_scroll_y,d1
-	move.w	host_scroll_x,d2
-	add.w 	d2,d0
+
+	add.w 	host_scroll_x,d0
 	
 	* D0 and D1 are already set
 	move.l	(NB_PLAYFIELD_PLANES*4,a0),d2
@@ -1728,7 +1723,7 @@ update_one_bob:
 	
 	* store attributes for clipped sprite erase (unless blocked)
 	move.w	d0,(a6)+			| store current sprite attributes to previous ones
-	clr.w	(a6)+			| store current sprite attributes to previous ones
+	clr.w	(a6)+			    | store current sprite attributes to previous ones
 	move.w	d4,(a6)+			| store height
 	move.w	d2,(a6)+			| store width in bytes
 

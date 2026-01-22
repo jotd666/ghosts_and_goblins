@@ -726,7 +726,11 @@ demo_game:
 	jbsr	cache_bg_tiles_address
 
 	GET_MEMORY_START_AND_DP
-	lea		tiles_at_start,a1
+	lea		cavern_at_start,a1
+	tst.b	start_level_3
+	jne		0f
+	lea		graveyard_at_start,a1
+0:
 	lea		(0x2800,a6),a0
 	move.w	#0x3FF,d0
 0:
@@ -750,9 +754,11 @@ demo_game:
 	addq 	#2,a0
 	dbf		d0,0b
 
-
-	
 	moveq	#1,D0
+	tst.b	start_level_3
+	jne		0f
+	moveq	#0,d0
+0:
 	jbsr	load_context		| level 3
 	
 	* install frame
@@ -1149,8 +1155,10 @@ dump_and_quit:
 	
 	.include	"context.68k"
 	
-tiles_at_start:
+cavern_at_start:
 	.include	"cavern.68k"
+graveyard_at_start:
+	.include	"graveyard.68k"
 
 call_nmi:
 	move.w	game_scroll_x,d1
@@ -4060,6 +4068,8 @@ dip_switches_2:
 	.byte	0
 ntsc_flag:
 	.byte 	0
+start_level_3:
+	.byte	0
 mid_screen_interrupt_count:
 	.byte	0
 	.align	2

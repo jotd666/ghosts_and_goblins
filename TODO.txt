@@ -3,17 +3,20 @@
 - sprite X offset : add host scroll as linear X offset
   when drawing sprites, not when computing X (maybe it will work, though
   as code doesn't clip X): works but not for blit_background (protected?)
+- game over: game locks up
 - restore_background: should restore 5 first bitplanes, then clear the last one
 - sprite palette: seems that a few colors are wasted in the end: magenta is here +
   3 other 123 colors...
 - hw_test: scrolling X: ok but tiles on the left refreshed too late
-
+- frog colors: change dynamically (detect in sprites palette) like the original
+  but as the colors were quantized, make a list of the used colors of quantized
+  frog frames, then try to find the best greens (the ones from the original palette change)
 - killed: crash no map displayed??? after map context doesn't reload properly
 - refactor to get draw address first, to remove extra 16 pixels on the top (corkscrew)
 - add space (rows) before and after screens
 - Y scroll: first perform wrap at 256+16 (copper split)
 - grouping, seems to have issues with main character at tile 0 tile 0 seems
-  to be a special case despite the precautions
+  to be a special case despite the precautions, use mockup to see what's happening
 - detect intro fade palette
 - try to detect level 2, palette is not exactly the same as level1
   some colors are not in the same order

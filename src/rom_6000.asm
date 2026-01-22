@@ -773,13 +773,13 @@ update_sprites_palette_6693:
 66F0: 35 16       PULS   D,X
 66F2: ED A8 40    STD    $40,Y
 66F5: AF A8 42    STX    $42,Y
-66F8: 37 16       PULU   D,X
+66F8: 37 16       PULU   D,X		; [bank_address]
 66FA: ED A1       STD    ,Y++
 66FC: AF A1       STX    ,Y++
 66FE: 35 16       PULS   D,X
 6700: ED A8 40    STD    $40,Y
 6703: AF A8 42    STX    $42,Y
-6706: 37 16       PULU   D,X
+6706: 37 16       PULU   D,X		; [bank_address]
 6708: ED A1       STD    ,Y++
 670A: AF A1       STX    ,Y++
 670C: 0A E0       DEC    $E0
@@ -4932,7 +4932,7 @@ update_tile_column_86b1:
 8CBC: 35 40       PULS   U
 8CBE: DD EE       STD    $EE
 8CC0: BD 8D D2    JSR    $8DD2
-8CC3: 10 AF 7E    STY    -$2,S
+8CC3: 10 AF 7E    STY    -$2,S		; [select_address]
 8CC6: DD E8       STD    $E8
 8CC8: E6 A9 04 00 LDB    $0400,Y	; [video_address]
 8CCC: C4 C0       ANDB   #$C0
