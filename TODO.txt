@@ -1,3 +1,4 @@
+- music working but at track 0 for all tunes!
 - scrolling X completely off: check draw_right_tiles
 - video dirty: should draw tile if visible
 - sprite X offset : add host scroll as linear X offset
@@ -33,30 +34,30 @@
 - cpu log: control should be able to log with SR=x3xx or SR=x0xx
   here we want to avoid logging within the interrupt
 
-- E: flame crashes and burns
-- 2: turn into frog
-- 23: devil shot
-- 1A: powerful enemy hit
-- 1F: shield flying enemies
-- 19: bag enemies howling
-- C: giant stomping
-- F: boss killed
-- 3F 3E: take a key (3F: stop tune?)
-- 3F 3B: door opening
-- 30: map music
-- 31: killed music
-- B: small fyling goblins noise
-- 2B: level 1/2 music
-- 12: purple goblin howl
-- 2D: boss 1/2 music
-- 33: level 3 cave music
-- 34: level 3 boss dragon music
-- 21: dragon woooo
-- 37: extra life
-- 29: castle music (lev 5)
-- 20: skeleton bones
-- 38: last boss music (resolve your battle)
-- 2A: boss music (in game)
+- 0x0E, # flame crashes and burns
+- 0x02, # turn into frog
+- 0x23, # devil shot
+- 0x1A, # powerful enemy hit
+- 0x1F, # shield flying enemies
+- 0x19, # bag enemies howling
+- 0x0C, # giant stomping
+- 0x0F, # boss killed
+- 0x3E: take a key (3F: stop tune?)
+- 0x3B: door opening
+- 0x30, # map music
+- 0x31, # killed music
+- 0x0B, # small fyling goblins noise
+- 0x2B, # level 1/2 music
+- 0x12, # purple goblin howl
+- 0x2D, # boss 1/2 music
+- 0x33, # level 3 cave music
+- 0x34, # level 3 boss dragon music
+- 0x21, # dragon woooo
+- 0x37, # extra life
+- 0x29, # castle music (lev 5)
+- 0x20, # skeleton bones
+- 0x38, # last boss music (resolve your battle)
+- 0x2A, # boss music (in game)
 
 hacks:
 

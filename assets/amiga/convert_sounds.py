@@ -27,6 +27,7 @@ def convert():
     outfile = os.path.join(out_dir,"sounds.68k")
     sndfile = os.path.join(out_dir,"sound_entries.68k")
 
+    low_memory = False
 
     hq_sample_rate = 10000 if low_memory else 20000  #{"aga":18004,"ecs":12000,"ocs":11025}[mode]
     lq_sample_rate = hq_sample_rate//2 # if aga_mode else 8000
@@ -36,7 +37,31 @@ def convert():
 
     EMPTY_SND = "EMPTY_SND"
 
-    dummy_sounds = {0x9,0xb}
+    dummy_sounds = {0x0E, # flame crashes and burns
+0x02, # turn into frog
+0x23, # devil shot
+0x1A, # powerful enemy hit
+0x1F, # shield flying enemies
+0x19, # bag enemies howling
+0x0C, # giant stomping
+0x0F, # boss killed
+0x3E, # take a key (3F: stop tune?)
+0x3B, # door opening
+0x30, # map music
+0x31, # killed music
+0x0B, # small fyling goblins noise
+0x2B, # level 1/2 music
+0x12, # purple goblin howl
+0x2D, # boss 1/2 music
+0x33, # level 3 cave music
+0x34, # level 3 boss dragon music
+0x21, # dragon woooo
+0x37, # extra life
+0x29, # castle music (lev 5)
+0x20, # skeleton bones
+0x38, # last boss music (resolve your battle)
+0x2A, # boss music (in game)
+    0xFF}
 
 
     sound_dict = {}
@@ -65,19 +90,14 @@ def convert():
 
 
 
-    main_mod = "digdug2_main_tune"
-    others = "digdug2_others"
 
 
     sound_dict.update({
-    "MAIN_TUNE_SND"      :{"index":1,"pattern":0,"volume":32,"module":main_mod},
-    "GAME_OVER_TUNE_SND"      :{"index":0x4,"pattern":1,"volume":32,"module":others},
-    "HIGHSCORE_TUNE_SND"      :{"index":0xA,"pattern":2,"volume":32,"module":others},
-    "LEVEL_COMPLETE_TUNE_SND"      :{"index":0x12,"pattern":5,"volume":32,"module":others},
-    "LEVEL_START_TUNE_SND"      :{"index":0x0,"pattern":0,"volume":32,"module":others},
-    "CAUGHT_SND"      :{"index":0xD,"pattern":6,"volume":32,"module":others},
-    "KILLED_SND"      :{"index":0x11,"pattern":7,"volume":32,"module":others},
-    }
+    "MAIN_TUNE_SND"      :{"index":0x2B,"pattern":0,"volume":32},
+    "KILLED_TUNE_SND"      :{"index":0x31,"pattern":2,"volume":32},
+    "LEVEL_COMPLETE_TUNE_SND"      :{"index":0x3E,"pattern":9,"volume":32},
+    "LEVEL_START_TUNE_SND"      :{"index":0x30,"pattern":7,"volume":32},
+    })
 
 
 
@@ -244,15 +264,6 @@ def convert():
                 write_asm(contents,fw)
 
 
-        input_mods = [None,others] if low_memory else [main_mod,others]
-        for mmod,name in zip(input_mods,[main_mod,others]):
-            if mmod:
-                with open(os.path.join(sound_dir,f"{mmod}.mod"),"rb") as f:
-                    contents = f.read()
-            fw.write(f"{name}_tunes:\n")    # write empty label on low memory setup
-            if mmod:
-                write_asm(contents,fw)
-
 
         fw.write("\t.align\t8\n")
 
@@ -261,7 +272,7 @@ def convert():
         fst.write("\n\t.global\t{0}\n\n{0}:\n".format("sound_table"))
         for i,st in enumerate(sound_table_set_1):
             fst.write(st)
-            fst.write(" | {}\n".format(i))
+            fst.write(f" | 0x{i:02x}\n")
 
 
 convert()

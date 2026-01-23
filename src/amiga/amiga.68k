@@ -857,6 +857,18 @@ load_context:
 	lea		bg_character_table_buffer,a1
 	move.l	a1,bg_character_table_buffer_ptr
 	jbsr	load_file
+	
+	* check if we must load some music too
+	lea		music_file_table,a0
+	move.w	current_context,d0
+	add.w	d0,d0
+	add.w	d0,d0
+	move.l	(a0,d0.w),d0
+	jeq		2f
+	move.l	d0,a0
+	lea		module_buffer,a1
+	jbsr	load_file
+	
 2:
 
 	
@@ -3851,21 +3863,21 @@ force_sound_stop:
 	
 osd_sound_start:
 	OSD_ENTER
-	
+
 	movem.l	d0/d1/d2/a0/a1/a6,-(a7)
 	lea		_custom,a6
 	
 	moveq	#0,d2
 	
-	and.w	#0x7F,d0
-	jeq		12f
 	
 	lsl.w	#3,d0
 	lea		sound_table,a0
 
-	move.w	(a0,d0.w),d1	| sound type
-	jeq	11f		| no sound
 
+	move.w	(a0,d0.w),d1	| sound type
+	jeq	10f		| no sound
+	cmp.w	#3,d1
+	jeq	10f			| mute for now
 2:
 	cmp.w	#1,d1
 	jne	4f		| music module
@@ -3873,7 +3885,7 @@ osd_sound_start:
 	move.l	(4,a0,d0.w),a0
 	lea		_custom,a6
 	tst.w	d1
-	beq.b	3f
+	jeq	3f
 	
 	* looped sound
 	moveq	#0,d0
@@ -3891,17 +3903,15 @@ osd_sound_start:
 2:
 	* now that prev loop is stopped, play the next one
 	st.b	(a1,d0.w)
-	jsr		_mt_loopfx
-	bra.b	10f
+	jbsr		_mt_loopfx
+	jra	10f
 3:
-	jsr		_mt_playfx
+	jbsr		_mt_playfx
 10:
 	movem.l	(a7)+,d0/d1/d2/a0/a1/a6
 	OSD_EXIT
 	rts
 11:
-	cmp.w	#0x20*8,d0
-	jcs		10b		| temp no music
 	.ifndef	RELEASE
 	lsr.w	#3,d0
 	move.w	d0,d2
@@ -3932,16 +3942,8 @@ osd_sound_start:
 	bsr		force_sound_stop
     lea _custom,a6
  	movem.l	d0/a0,-(a7)
-*	lea	tunes_table,a0
-*	lsr.w	#1,d0		| times 4 not 8
-*	move.l	(a0,d0.w),d0	| filename
-*	jeq		no_tune
-*	move.l	d0,a0
-*	move.l	music_memory_ptr,a1
-*	move.l	_resload,a2
-*	jbsr	resload_LoadFileDecrunch(a2)
-*	
-*	move.l	music_memory_ptr,a0
+	
+	lea		module_buffer,a0
 	moveq	#0,d0
     sub.l   a1,a1		| samples are in the module
     jsr _mt_init
@@ -3970,28 +3972,18 @@ no_tune:
 	movem.l	(a7)+,d0/a0
 	jra		5b
 	
-tunes_table:
-	.long	0                  | 0
-	.long	0                  | 1
-	.long	0     | 2
-	.long	0     | 3
-	.long	0     | 4
-	.long	0     | 5
-	.long	0     | 6
-	.long	0     | 7
-	.long	0     | 8
-	.long	0     | 9
-	.long	0     | A
-	.long	0     | B
-	.long	0     | C
-	.long	0      | D level_5_mod
-	.long	0      | E lost
-	.long	0     | F
-	.long	0        | 10
-	.long	0     | 11
-	.long	0          | 12
-	.long	0     | 13
-	.long	0      | 14 won
+* all level modules have the same structure
+* Pattern 0-2     = Game music
+* Pattern 3        = death
+* Pattern 4        = empty block in loop
+* Pattern 5-6     = game over 
+* Pattern 7        = Map
+* Pattern 8        = Low time
+* Pattern 9-10   = stage clear
+* Pattern 11      = Open gate sfx
+* Pattern 12-15 = Dragon boss music	
+	
+
 	
 
 quit_to_os:
@@ -4207,13 +4199,23 @@ mirror_bits:
 
 	.include	"bg_banks/map.68k"
 
-* all 4 channels
+
 	.align	2
 difficulty_table:
-	.byte	0x02		| easy
+	.byte	0x02		| easy  from us vball!!!
 	.byte	0x03		| medium
 	.byte	0x01		| hard
 	.byte	0x00		| very hard
+
+music_file_table:
+	.long	level_12_music
+	.long	level_34_music
+	.long	level_34_music
+	.long	0
+	.long	0
+	.long	0
+	.long	0
+	.long	0
 
 
 looped_sound_enabled:
@@ -4270,9 +4272,14 @@ highscore_loaded:
 last_sound_played:
 	.byte	0
 normal_hiscorename:
-	.asciz	"us_champ_vball.high"
+	.asciz	"gng.high"
 	
 
+level_12_music:
+	.asciz	"level_12.mod"
+level_34_music:
+	.asciz	"level_34.mod"
+	
 tile_file_name:
 	.ascii	"tiles_"
 tile_file_name_end:
@@ -4684,6 +4691,9 @@ pal_wait:
 	
 		.section .bsschip
 
+module_buffer:
+	.skip	411000		| biggest tune
+	
 hw_sprite_ram_buffer:
 	.skip	HW_SPRITE_BUFFER_SIZE*8	| 8 64-bit wide sprites + control words + align
 	

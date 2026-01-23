@@ -409,6 +409,9 @@ for i,line in enumerate(lines):
     elif address in {0x661D,0x6697}:
         # no need to update palette hardware registers, it takes time for nothing
         line = change_instruction("rts",lines,i)
+    elif address == 0x7942:
+        # sound
+        line = "\texg\td0,d1\n"+change_instruction("jbsr\tosd_sound_start",lines,i)+"\texg\td0,d1\n"
 ##    elif address == 0x6C11:
 ##        line = "\tmoveq\t#1,d1\n"+line+"\tmoveq\t#1,d0\n"  # temp show map at start
 # pattern where logging is required outside the IRQ code
