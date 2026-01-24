@@ -94,9 +94,9 @@ def convert():
 
     sound_dict.update({
     "MAIN_TUNE_SND"      :{"index":0x2B,"pattern":0,"volume":32},
-    "KILLED_TUNE_SND"      :{"index":0x31,"pattern":2,"volume":32},
-    "LEVEL_COMPLETE_TUNE_SND"      :{"index":0x3E,"pattern":9,"volume":32},
-    "LEVEL_START_TUNE_SND"      :{"index":0x30,"pattern":7,"volume":32},
+    "KILLED_TUNE_SND"      :{"index":0x31,"pattern":7,"volume":32},
+    "LEVEL_COMPLETE_TUNE_SND"      :{"index":0x3E,"pattern":0xf,"volume":32},
+    "LEVEL_START_TUNE_SND"      :{"index":0x30,"pattern":0xB,"volume":32},
     })
 
 

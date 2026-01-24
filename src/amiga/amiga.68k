@@ -2570,7 +2570,7 @@ osd_video_byte_dirty:
 	.endif
 	
 	cmp.w	#BG_SCREEN_TILE_ADDRESS-FG_SCREEN_TILE_ADDRESS,d7
-	jcc		osd_w_videoram_out
+	jcc		bg_tile
 	
 	and.w	#0x3FF,d7
 
@@ -2588,8 +2588,9 @@ osd_w_videoram_out:
 	rts	
 	
 bg_tile:
-
 	and.w	#0x3FF,d7
+
+
 
 	lea		(BG_SCREEN_TILE_ADDRESS,a6),a0
 	move.b	(a0,d7.w),d0
@@ -2618,8 +2619,42 @@ bg_tile:
 	add.l	d5,a2
 	.endm
 
+* create 2 caches
+
 cache_bg_tiles_address:
+	* 1 cache: tile-accurate X,Y => address
+	lea		bg_tile_xy2address_cache,a0
+	moveq	#0,d1
+0:
+	moveq	#0,d0
+1:
+	move.w	d0,d2
+	lsl.w	#5,d2		| X*32
+	add.w	d1,d2		| plus Y
+	move.w	d2,(a0)+
+	addq	#1,d0
+	cmp.w	#0x20,d0
+	jne		1b
+	addq	#1,d1
+	cmp.w	#0x20,d1
+	jne		0b
+	
+	* 2 cache: address => tile-accurate X,Y
+	lea		bg_tile_address2xy_cache,a0
+	move.w	#0,d7
+0:
+	move.w	d7,d0
+	lsr.w	#5,d0
+	lsl.w	#8,d0
+	move.w	d7,d1
+	and.b	#0x1F,d1
+	or.b	d1,d0
+	move.w	d0,(a0)+
+	addq	#1,d7
+	cmp.w	#0x400,d7
+	jne		0b
 	rts
+	
 * < D7: 0-0x400 address
 * < D0: tile code
 * < D1: color code
@@ -3943,8 +3978,10 @@ osd_sound_start:
     lea _custom,a6
  	movem.l	d0/a0,-(a7)
 	
+	move.w	(2,a0,d0.w),d1	| pattern number in .mod file
 	lea		module_buffer,a0
 	moveq	#0,d0
+	move.w	d1,d0
     sub.l   a1,a1		| samples are in the module
     jsr _mt_init
 	movem.l	(a7)+,d0/a0
@@ -3952,7 +3989,6 @@ osd_sound_start:
     * set master volume a little less loud if needed
 	move.b	(6,a0,d0.w),music_volume
 	*move.b	(7,a0,d0.w),music_loops
-	*move.w	(2,a0,d0.w),music_pattern	| pattern number in .mod file
 	*move.w	(4,a0,d0.w),d2
 
 	*move.w	d2,music_duration
@@ -3972,18 +4008,23 @@ no_tune:
 	movem.l	(a7)+,d0/a0
 	jra		5b
 	
-* all level modules have the same structure
+* all level modules have the same structure but in fact not atm...
 * Pattern 0-2     = Game music
-* Pattern 3        = death
 * Pattern 4        = empty block in loop
-* Pattern 5-6     = game over 
-* Pattern 7        = Map
 * Pattern 8        = Low time
-* Pattern 9-10   = stage clear
 * Pattern 11      = Open gate sfx
 * Pattern 12-15 = Dragon boss music	
 	
+* Pattern 0-x     = Game music
 
+* levels 1-2:
+* Pattern 7        = death
+* Pattern 9     = game over 
+* Pattern B        = Map
+* Pattern C        = Low time
+* Pattern D        = boss
+* Pattern F   = stage clear
+* Pattern 11   = Open gate sfx
 	
 
 quit_to_os:
@@ -4280,26 +4321,14 @@ level_12_music:
 level_34_music:
 	.asciz	"level_34.mod"
 	
-tile_file_name:
-	.ascii	"tiles_"
-tile_file_name_end:
-	.skip	30
-net_file_name:
-	.ascii	"net_"
-net_file_name_end:
-	.skip	30
-bob_file_name:
-	.ascii	"bobs_"
-bob_file_name_end:
-	.skip	30
-palette_file_name:
-	.ascii	"palette_"
-palette_file_name_end:
-	.skip	30
 
 	.align	2
 
-
+bg_tile_xy2address_cache:
+	.skip	0x800
+bg_tile_address2xy_cache:
+	.skip	0x800
+	
 old_intena:
 	.long	0
 old_dmacon:
@@ -4522,8 +4551,7 @@ bg_character_table_buffer:
 	
 fg_tile_address_table:
 	.skip	0x400*2
-bg_tile_address_table:
-	.skip	0x1000*2
+
 
 	
 	.ifne	OPT_ENABLE_LOGGING

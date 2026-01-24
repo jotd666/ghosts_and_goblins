@@ -1,4 +1,4 @@
-- music working but at track 0 for all tunes!
+- 0x100 x shift on sprites not supported
 - scrolling X completely off: check draw_right_tiles
 - video dirty: should draw tile if visible
 - sprite X offset : add host scroll as linear X offset
@@ -42,22 +42,23 @@
 - 0x19, # bag enemies howling
 - 0x0C, # giant stomping
 - 0x0F, # boss killed
+- 0x0B, # small fyling goblins noise
+- 0x12, # purple goblin howl
+- 0x21, # dragon woooo
+- 0x37, # extra life
+- 0x20, # skeleton bones
+
+- 0x38, # last boss music (resolve your battle)
+- 0x2A, # boss music (in game)
 - 0x3E: take a key (3F: stop tune?)
 - 0x3B: door opening
 - 0x30, # map music
 - 0x31, # killed music
-- 0x0B, # small fyling goblins noise
 - 0x2B, # level 1/2 music
-- 0x12, # purple goblin howl
 - 0x2D, # boss 1/2 music
 - 0x33, # level 3 cave music
 - 0x34, # level 3 boss dragon music
-- 0x21, # dragon woooo
-- 0x37, # extra life
 - 0x29, # castle music (lev 5)
-- 0x20, # skeleton bones
-- 0x38, # last boss music (resolve your battle)
-- 0x2A, # boss music (in game)
 
 hacks:
 
@@ -69,7 +70,9 @@ fill $3941,1,$F0
 
 
 log sounds: bpset 7942,,{print B;g}
-skip sounds: bpset 7942,B==$17,{PC=$792F;g}
+skip sounds: bpset 7942,B == $17,{PC=$792F;g}
+record sounds: bpset 791D,B != $FF,{B=$E;g}
+
 
 remove music:
 
