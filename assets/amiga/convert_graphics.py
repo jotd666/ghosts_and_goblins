@@ -8,6 +8,20 @@ sprite_names = get_sprite_names()
 
 mirror_sprites = get_mirror_sprites()
 
+# rom copy from 51FB: 4 colors each (with black, only 3 first colors are important!)
+fg_weapon_palette_hex = [
+     "A8 C0 C7 00 60 00 00 00",  # torch
+     "88 66 AA 00 A0 80 C0 00",  # lance, we dumped the tiles when that was active
+     "A8 88 AA 00 60 A0 C0 00",  # axe
+     "99 AA C0 00 00 C0 00 00",  # shield
+     "88 AA C0 00 A0 C0 00 00",  # sword
+]
+# parse
+fg_weapon_palette = [[int(x,16) for x in s.split()] for s in fg_weapon_palette_hex]
+# regroup as RGB
+fg_weapon_palette = [[((a << 4)+(b>>4)) for a,b in zip(p,p[4:])] for p in fg_weapon_palette]
+
+ref_fg_weapon_palette = fg_weapon_palette[1]  # lance colors for all weapons
 
 possible_hw_sprites = set()
 
@@ -465,12 +479,29 @@ else:
     fg_tile_upper_palette = sorted(fg_tile_upper_palette)
 
 if len(fg_tile_lower_palette)>16:
-    print(f"Too many colors in fg lower tiles ({len(fg_tile_lower_palette)}), quantizing")
-    fg_replacement_dict = quantize_palette(fg_tile_lower_palette,"foreground_lower_tiles",16,transparent=None,dump_it=dump_it)
-    apply_color_replacement(fg_tile_lower_set_list,fg_replacement_dict)
-    fg_tile_lower_palette = sorted(set(fg_replacement_dict.values()))
+    # this is going to be hell to find matching colors for dynamic color changes
+    raise Error(f"Too many colors in fg lower tiles ({len(fg_tile_lower_palette)}), quantizing")
+##    fg_replacement_dict = quantize_palette(fg_tile_lower_palette,"foreground_lower_tiles",16,transparent=None,dump_it=dump_it)
+##    apply_color_replacement(fg_tile_lower_set_list,fg_replacement_dict)
+##    fg_tile_lower_palette = sorted(set(fg_replacement_dict.values()))
 else:
-    fg_tile_lower_palette = sorted(fg_tile_lower_palette)
+    # round both palettes & ref palettes to RGB4
+    fg_tile_lower_palette_rgb4 = {bitplanelib.rgb4_to_rgb_triplet(bitplanelib.to_rgb4_color(x)) for x in fg_tile_lower_palette}
+    ref_fg_weapon_palette_rgb4 = bitplanelib.palette_rgb42palette(ref_fg_weapon_palette)
+
+    # [(128, 128, 160), (96, 96, 128), (160, 160, 192), (0, 0, 0)]
+    # non-rounded variants, allowing to find indexes of colors and put them first
+    rgb32 = [(136, 136, 170),(102, 102, 136),(170, 170, 204),(0, 0, 0)]
+
+    # place reference colors first: remove them from list to add them later
+    for r in rgb32:
+        fg_tile_lower_palette.remove(r)
+
+    # sort: zero first, then respect order of original image palette (important!!)
+    fg_tile_lower_palette = [(0, 0, 0)] + rgb32[:3] + list(fg_tile_lower_palette)
+
+    if dump_it:
+        bitplanelib.palette_dump(fg_tile_lower_palette,dump_dir / "fg_lower_palette.png",bitplanelib.PALETTE_FORMAT_PNG)
 
 print(f"Used fg tile upper colors: {len(fg_tile_upper_palette)}")
 print(f"Used fg tile lower colors: {len(fg_tile_lower_palette)}")
@@ -601,6 +632,10 @@ with open(src_dir / "palette.68k","w") as f:
     bitplanelib.palette_dump(fg_tile_lower_palette,f,bitplanelib.PALETTE_FORMAT_ASMGNU)
     f.write("sprite_palette:\n")
     bitplanelib.palette_dump(sprite_palette,f,bitplanelib.PALETTE_FORMAT_ASMGNU)
+    f.write("weapons_palette:\n")
+    for wp in fg_weapon_palette:
+        wprgb = bitplanelib.palette_rgb42palette(wp)
+        bitplanelib.palette_dump(wprgb,f,bitplanelib.PALETTE_FORMAT_ASMGNU)
 
 BLOCK_DISPLAY_MASK = 1<<14
 DO_DISPLAY_MASK = 1

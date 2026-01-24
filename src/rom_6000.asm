@@ -788,10 +788,10 @@ update_sprites_palette_6693:
 6713: 08 DF       ASL    $DF
 6715: 39          RTS
 
-update_some_palette_6716:
+update_osd_palette_6716:
 6716: 10 8E 38 C0 LDY    #$38C0
 671A: 20 04       BRA    $6720
-update_some_palette_671c:
+update_osd_palette_671c:
 671C: 10 8E 38 80 LDY    #$3880
 6720: 10 DF E2    STS    stack_save_00e2
 6723: CE 04 80    LDU    #$0480
@@ -16090,8 +16090,8 @@ jump_table_65bc:
 jump_table_6611:
 	dc.w	update_tiles_palette_6619	; $6611
 	dc.w	update_sprites_palette_6693	; $6613
-	dc.w	update_some_palette_671c	; $6615
-	dc.w	update_some_palette_6716	; $6617
+	dc.w	update_osd_palette_671c	; $6615
+	dc.w	update_osd_palette_6716	; $6617
 jump_table_6857:
 	dc.w	$685f	; $6857
 	dc.w	fill_screen_with_h_6883	; $6859

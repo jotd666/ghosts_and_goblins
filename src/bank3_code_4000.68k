@@ -789,15 +789,16 @@ l_518e:
 	movem.l	(sp)+,d4                       	| [$51a1: puls   u,pc]
 	rts                                    	| [...]
 
-l_5223:
+* each weapon uses only 4 colors!
+update_weapon_palette_5223:
 	LOG_REGS	5223   | added by add_reg_log.py
-	OP_R_ON_DP_ADDRESS	move,0x73,d1         | [$5223: ldb    $73]
+	OP_R_ON_DP_ADDRESS	move,weapon_type_0073,d1| [$5223: ldb    weapon_type_0073]
                                          | [$5225: aslb]
                                          | [$5226: aslb]
 	LOG_REGS	5227   | added by add_reg_log.py
-	asl.b	#3,d1                            	| [$5227: aslb]
+	asl.b	#3,d1                            	| [$5227: aslb] times 8 for 4 RGB4 colors
 	LOG_REGS	5228   | added by add_reg_log.py
-	move.w	#0x51fb,d2                      	| [$5228: ldx    #$51fb]
+	move.w	#0x51fb,d2                      	| [$5228: ldx    #$51fb] color table
 	moveq	#0,d6                            	| [...]
 	move.b	d1,d6                           	| [...] as byte
 	DO_EXTB	d6                             	| [...] with sign extension
@@ -805,18 +806,18 @@ l_5223:
 	move.w	d2,d3                           	| [$522b: leay   b,x]
 	add.w	d6,d3                            	| [$522b: leay   b,x]
 	LOG_REGS	522d   | added by add_reg_log.py
-	move.w	#0x04bc,d2                      	| [$522d: ldx    #$04bc]
+	move.w	#0x04bc,d2                      	| [$522d: ldx    #$04bc] end of color palette
 	LOG_REGS	5230   | added by add_reg_log.py
 	move.b	#0x04,d1                        	| [$5230: ldb    #$04]
 l_5232:
 	LOG_REGS	5232   | added by add_reg_log.py
-	GET_REG_BANK_ADDRESS	0x4,d3                 	| [$5232: lda    $4,y] [bank_address]
+	GET_REG_BANK_ADDRESS	0x4,d3                 	| [$5232: lda    $4,y] [bank_address] blue<<4
 	move.b	(a0),d0                         	| [...]
 	LOG_REGS	5234   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x40,d2                	| [$5234: sta    $40,x]
 	move.b	d0,(a0)                         	| [...]
 	LOG_REGS	5237   | added by add_reg_log.py
-	GET_REG_BANK_ADDRESS	0,d3                   	| [$5237: lda    ,y+] [bank_address]
+	GET_REG_BANK_ADDRESS	0,d3                   	| [$5237: lda    ,y+] [bank_address] red<<4 + green
 	addq.w	#1,d3                           	| [...]
 	move.b	(a0),d0                         	| [...]
 	LOG_REGS	5239   | added by add_reg_log.py
@@ -827,6 +828,7 @@ l_5232:
 	subq.b	#1,d1                           	| [$523b: decb]
 	LOG_REGS	523c   | added by add_reg_log.py
 	jne	l_5232                             	| [$523c: bne    $5232]
+	jbsr	osd_weapon_palette_change
 	LOG_REGS	523e   | added by add_reg_log.py
 	rts                                    	| [$523e: rts]
 write_framed_weapon_523f:
@@ -845,7 +847,7 @@ write_framed_weapon_523f:
 	LOG_REGS	5247   | added by add_reg_log.py
 	jne	l_526b                             	| [$5247: bne    $526b]
 	LOG_REGS	5249   | added by add_reg_log.py
-	jbsr	l_5223                            	| [$5249: bsr    $5223]
+	jbsr	update_weapon_palette_5223        	| [$5249: bsr    update_weapon_palette_5223]
 	LOG_REGS	524b   | added by add_reg_log.py
 	move.w	#0x236f,d2                      	| [$524b: ldx    #$236f] address of weapon in frame
 	LOG_REGS	524e   | added by add_reg_log.py

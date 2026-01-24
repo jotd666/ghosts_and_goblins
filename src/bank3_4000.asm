@@ -301,9 +301,9 @@ update_weapon_palette_5223:
 522B: 31 85       LEAY   B,X
 522D: 8E 04 BC    LDX    #$04BC		; end of color palette
 5230: C6 04       LDB    #$04
-5232: A6 24       LDA    $4,Y		; [bank_address]
+5232: A6 24       LDA    $4,Y		; [bank_address] blue<<4
 5234: A7 88 40    STA    $40,X
-5237: A6 A0       LDA    ,Y+		; [bank_address]
+5237: A6 A0       LDA    ,Y+		; [bank_address] red<<4 + green
 5239: A7 80       STA    ,X+
 523B: 5A          DECB
 523C: 26 F4       BNE    $5232

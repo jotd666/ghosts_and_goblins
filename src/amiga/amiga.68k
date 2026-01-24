@@ -468,6 +468,12 @@ _user:
 	move.w	#16,d0
 	jbsr	load_palette
 		
+	* load palette for bottom tiles (in-game)
+	lea		fg_tile_lower_palette+2,a0
+	lea		osd_lower_palette,a1
+	move.w	#15,d0
+	jbsr	load_palette
+	
 	lea		sprite_palette,a0
 	move.l	color_copper_pointers+TOTAL_NB_COLORS/2*4,a1	| entries 32-64
 	move.w	#TOTAL_NB_COLORS/2,d0
@@ -2540,11 +2546,22 @@ osd_set_bank:
 	rts
 
 * < A6: game memory
-* < A1: bank memory (source for the 4 palette colors)
 
 osd_weapon_palette_change:
+	movem.l	d0/a0/a1,-(a7)
+	moveq	#0,d0
 	move.b	(weapon_type_0073,a6),d0	| current weapon type
-	
+	lsl.w	#3,d0
+	lea		weapons_palette,a0
+	lea		osd_lower_palette+2,a1
+	add.w	d0,a0
+	* copy the 3 colors for weapon
+	move.w	(a0)+,(a1)
+	addq	#4,a1
+	move.w	(a0)+,(a1)
+	addq	#4,a1
+	move.w	(a0)+,(a1)
+	movem.l	(a7)+,d0/a0/a1
 	rts
 	
 	
@@ -4740,10 +4757,15 @@ osd_lower_palette_switch_address:
 * write COPPER_NOP here to apply lower palette, copjmp2 to skip it
 osd_lower_palette_switch:
 	.word	copjmp2,0
+	.word	bplcon3,(2<<13)+(BORDERBLANK<<5)	| bank 2: color 64
 osd_lower_palette:
-	
-	.word	bplcon3,0
-	.word	color,0xF0F
+	* first, weapon, then rest of palette
+	.set	offset,2
+	.rept	15
+	.word	color+offset,0
+	.set	offset,offset+2
+	.endr
+
 
 third_rows:
 	.rept	NB_THIRD_ROWS
