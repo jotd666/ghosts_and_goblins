@@ -37,28 +37,13 @@ def convert():
 
     EMPTY_SND = "EMPTY_SND"
 
-    dummy_sounds = {0x0E, # flame crashes and burns
-0x02, # turn into frog
-0x23, # devil shot
-0x1A, # powerful enemy hit
-0x1F, # shield flying enemies
-0x19, # bag enemies howling
-0x0C, # giant stomping
-0x0F, # boss killed
+    dummy_sounds = {
 0x3E, # take a key (3F: stop tune?)
 0x3B, # door opening
-0x30, # map music
-0x31, # killed music
-0x0B, # small fyling goblins noise
-0x2B, # level 1/2 music
-0x12, # purple goblin howl
 0x2D, # boss 1/2 music
 0x33, # level 3 cave music
 0x34, # level 3 boss dragon music
-0x21, # dragon woooo
-0x37, # extra life
 0x29, # castle music (lev 5)
-0x20, # skeleton bones
 0x38, # last boss music (resolve your battle)
 0x2A, # boss music (in game)
     0xFF}

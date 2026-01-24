@@ -2570,6 +2570,7 @@ osd_video_byte_dirty:
 	.endif
 	
 	cmp.w	#BG_SCREEN_TILE_ADDRESS-FG_SCREEN_TILE_ADDRESS,d7
+	jcc		osd_w_videoram_out
 	jcc		bg_tile
 	
 	and.w	#0x3FF,d7
@@ -2963,23 +2964,15 @@ mirror_jump_table:
 	.long	mirror_flipped_tile16
 	
 	
-* bruteforce all possible x/y combinations
-* d2: 0: no X swap, 1: X swap (for scrolling maps)
 cache_fg_tiles_address:
 	moveq	#0,d7
 	lea		fg_tile_address_table,a0
-	lea		mulFG_NB_BYTES_PER_ROW_table,A1
 0:
-	moveq	#0,d0
 	jbsr	compute_fg_tile_xy
 
+	move.b	d0,(a0)+		| store offset
+	move.b	d1,(a0)+		| store offset
 
-	* displayable tile
-	add.w	d1,d1
-	move.w	(a1,d1.w),d1
-	add.w	d1,d0
-	move.w	d0,(a0)+		| store offset
-2:
 	addq.w	#1,d7
 	cmp.w	#0x400,d7
 	jne		0b
@@ -3037,7 +3030,18 @@ update_fg_tile:
 	move.b	d1,d3	| attribute + tile msbits
 	and.w	#0xF,d3	| clut
 	
-	jbsr	compute_fg_tile_xy
+	lea		fg_tile_address_table,a1
+	.ifdef	NO68020
+	add.w	d7,d7
+	move.w	(a1,d7.w),d0
+	.else
+	move.w	(a1,d7.w*2),d0
+	.endif
+	moveq	#0,d1
+	move.b	d0,d1
+	rol.w	#8,d0
+	and.w	#0xFF,d0
+	
 	* select which destination sprites (0-3)
 	move.w	d0,d4
 	lea		hw_sprite_pointers,a1
@@ -3062,14 +3066,6 @@ update_fg_tile:
 	* now get source data
 	lea		fg_character_table,a0
 	
-*	lea		fg_tile_address_table,a1
-*	moveq	#0,d5
-*	.ifdef	MC68020
-*	move.w	(a1,d7.w*2),d5
-*	.else
-*	add.w	d7,d7
-*	move.w	(a1,d7.w),d5
-*	.endif
 
 20:
 
