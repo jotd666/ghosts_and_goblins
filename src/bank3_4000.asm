@@ -291,13 +291,15 @@ l_5180:
 519F: 26 EB       BNE    $518C
 51A1: 35 C0       PULS   U,PC
 
-5223: D6 73       LDB    $73                                       
+; each weapon uses only 4 colors!
+update_weapon_palette_5223:
+5223: D6 73       LDB    weapon_type_0073                                      
 5225: 58          ASLB                                             
 5226: 58          ASLB                                             
-5227: 58          ASLB
-5228: 8E 51 FB    LDX    #$51FB
+5227: 58          ASLB				; times 8 for 4 RGB4 colors
+5228: 8E 51 FB    LDX    #$51FB		; color table
 522B: 31 85       LEAY   B,X
-522D: 8E 04 BC    LDX    #$04BC
+522D: 8E 04 BC    LDX    #$04BC		; end of color palette
 5230: C6 04       LDB    #$04
 5232: A6 24       LDA    $4,Y		; [bank_address]
 5234: A7 88 40    STA    $40,X
@@ -312,7 +314,7 @@ write_framed_weapon_523f:
 5243: 8D 28       BSR    write_weapon_frame_526d
 5245: E6 E0       LDB    ,S+
 5247: 26 22       BNE    $526B
-5249: 8D D8       BSR    $5223
+5249: 8D D8       BSR    update_weapon_palette_5223
 524B: 8E 23 6F    LDX    #$236F		; address of weapon in frame
 524E: CE 52 A5    LDU    #$52A5		; weapon graphics table
 5251: D6 73       LDB    weapon_type_0073

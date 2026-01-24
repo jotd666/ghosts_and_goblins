@@ -43,6 +43,7 @@ def ensure_exists(d):
     else:
         os.makedirs(d)
 
+sr = lambda a,b : set(range(a,b))
 sr2 = lambda a,b : set(range(a,b,2))
 sr3 = lambda a,b : set(range(a,b,3))
 sr4 = lambda a,b : set(range(a,b,4))
@@ -88,6 +89,24 @@ sr3(0x290,0x296)
 group_sprite_quadruplets = sr4(0x2C0,0x300)
 
 
+# tiles that represent lives and weapon: not alphanumeric
+
+weapon_layout = lambda x:{x,x+1,x+0x10,x+0x11}
+
+weapons = [
+0x82, # torch
+0x80, # lance
+0x88, # axe
+0x86, # shield
+0x84, # sword
+]
+
+lower_osd_tiles = {
+0x9A,0x9B,  # lives
+} | sr(0xA0,0xD4)
+
+for w in weapons:
+    lower_osd_tiles.update(weapon_layout(w))
 
 def add_tile(table,index,cluts=[0],merge_cluts=True):
     if isinstance(index,range):

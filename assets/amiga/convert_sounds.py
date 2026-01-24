@@ -38,6 +38,8 @@ def convert():
     EMPTY_SND = "EMPTY_SND"
 
     dummy_sounds = {
+    0x3F,  # stop tune
+    0,     # stop ???
 0x3E, # take a key (3F: stop tune?)
 0x3B, # door opening
 0x2D, # boss 1/2 music

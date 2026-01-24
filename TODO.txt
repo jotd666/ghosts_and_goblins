@@ -1,6 +1,7 @@
 - 0x100 x shift on sprites not supported
 - scrolling X completely off: check draw_right_tiles
-- video dirty: should draw tile if visible
+- video dirty: should draw tile if visible: ok but shifted
+- "map" music plays but probably cut by level music at start. 3F stops music?
 - sprite X offset : add host scroll as linear X offset
   when drawing sprites, not when computing X (maybe it will work, though
   as code doesn't clip X): works but not for blit_background (protected?)

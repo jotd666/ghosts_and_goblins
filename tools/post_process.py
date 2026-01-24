@@ -116,7 +116,9 @@ for i,line in enumerate(lines):
         line = "\taddq.w\t#1,d5\n"+change_instruction("rts",lines,i)
     elif address in {0x5c41,0x5241}:
         line = change_instruction("GET_REG_ADDRESS\t0,d5",lines,i) + "\tsubq.w\t#1,d5\n\tmove.b\td1,-(a0)   | [...]\n"
-
+    elif address == 0x523E:
+        # hook on weapon palette change (maybe not useful on 256 color-capable platforms but on amiga we need that)
+        line = "\tjbsr\tosd_weapon_palette_change\n" + line
     elif address == 0x5025:
         # remove movem because afterwards the registers are restored individually
         # plus it's slightly faster, but it was indeed equivalent

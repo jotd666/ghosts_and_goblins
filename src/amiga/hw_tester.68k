@@ -456,7 +456,7 @@ _user:
 
 	
 	* load attached sprites palette
-	lea		fg_tile_palette,a0
+	lea		fg_tile_upper_palette,a0
 	move.l	color_copper_pointers+TOTAL_NB_COLORS*4,a1	| entries 64-80
 	move.w	#16,d0
 	jbsr	load_palette

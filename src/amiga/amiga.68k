@@ -144,8 +144,9 @@ BASE_BPLCON2_VALUE = 0x0064
 BASE_BPLCON4_VALUE = 0x0044	  | sprites palette starts at color 64
 
 NB_FIRST_ROWS = 0x80-0x21
-NB_SECOND_ROWS = 0x80
-NB_THIRD_ROWS = 0x20
+NB_SECOND_ROWS = 0x80-NB_THIRD_ROWS
+NB_THIRD_ROWS = 0xE
+NB_FOURTH_ROWS = 0x20-NB_THIRD_ROWS
 FG_NB_LINES = 256
 BG_NB_LINES = 512
 Y_MAX = BG_NB_LINES
@@ -235,9 +236,8 @@ osd_enter_\@:
 	
 	.global	osd_video_byte_dirty
 	.global	osd_video_word_dirty
-	.global	osd_set_scrollx_hi
-	.global	osd_set_scrollx_lo
-	.global	osd_set_scrolly_lo
+	.global	osd_weapon_palette_change
+	
 
 	.global osd_read_high_scores
 	.global osd_write_high_scores
@@ -463,7 +463,7 @@ _user:
 
 	
 	* load attached sprites palette
-	lea		fg_tile_palette,a0
+	lea		fg_tile_upper_palette,a0
 	move.l	color_copper_pointers+TOTAL_NB_COLORS*4,a1	| entries 64-80
 	move.w	#16,d0
 	jbsr	load_palette
@@ -2345,6 +2345,9 @@ platform_init:
     move.w d0,bpl2mod(a5)
 
 	lea		rows_table,a1
+	* generate a contiguous pointer table for copperlist row entries
+	* we cannot have a contiguous copperlist because we need to insert
+	* stuff now and then (ntsc emulation, color change, PAL wait)
 	lea		first_rows,a0
 	move.w	#NB_FIRST_ROWS,d0
 	jbsr	generate_row_table
@@ -2354,6 +2357,16 @@ platform_init:
 	lea		third_rows,a0
 	move.w	#NB_THIRD_ROWS,d0
 	jbsr	generate_row_table
+	lea		fourth_rows,a0
+	move.w	#NB_FOURTH_ROWS,d0
+	jbsr	generate_row_table
+	
+	* install jump for palette switch
+	move.l	#third_rows,d0
+	lea		osd_lower_palette_switch_address,a0
+	move.w	d0,(6,a0)
+	swap	d0
+	move.w	d0,(2,a0)
 	
 	lea		_custom,a5
 	lea		game_copperlist,a0
@@ -2466,9 +2479,9 @@ generate_row_table:
 	move.l 	a0,(a1)+
 	lea		(a0,d7.w),a2	| next row jump
 	move.l	a2,d1
-	move.w	d1,(6,a0)
+	move.w	d1,(6+4,a0)
 	swap	d1
-	move.w	d1,(2,a0)
+	move.w	d1,(2+4,a0)
 	move.l	a2,a0		| next row
 	dbf		d0,0b
 	rts
@@ -2526,6 +2539,15 @@ osd_set_bank:
 1:
 	rts
 
+* < A6: game memory
+* < A1: bank memory (source for the 4 palette colors)
+
+osd_weapon_palette_change:
+	move.b	(weapon_type_0073,a6),d0	| current weapon type
+	
+	rts
+	
+	
 osd_video_word_dirty:
 	jbsr	osd_video_byte_dirty
 	addq	#1,a0
@@ -2570,7 +2592,6 @@ osd_video_byte_dirty:
 	.endif
 	
 	cmp.w	#BG_SCREEN_TILE_ADDRESS-FG_SCREEN_TILE_ADDRESS,d7
-	jcc		osd_w_videoram_out
 	jcc		bg_tile
 	
 	and.w	#0x3FF,d7
@@ -2590,9 +2611,25 @@ osd_w_videoram_out:
 	
 bg_tile:
 	and.w	#0x3FF,d7
+	
+	* we need to see if the tile is on screen considering X scolling
+	* positions. Compute first X & last X coord visible
 
-
-
+	move.w	d7,d2
+	lsr.w	#5,d2
+	
+	move.w	game_scroll_x,d0
+	lsr.w	#4,d0		| divide by 16 match tile
+	* is min X < d2
+	cmp.b	d0,d2
+	jcs		osd_w_videoram_out	| tile x < scroll x
+	add.b	#0x21,d0
+	cmp.b	d0,d2
+	jcc		osd_w_videoram_out	| tile x+screen width < scroll x
+	
+	* tile is in screen considered the current scrolling: update it
+	* (don't check Y we need update no matter when in that case)
+	
 	lea		(BG_SCREEN_TILE_ADDRESS,a6),a0
 	move.b	(a0,d7.w),d0
 	lea		(BG_SCREEN_COLOR_ADDRESS,a6),a0
@@ -2654,6 +2691,7 @@ cache_bg_tiles_address:
 	addq	#1,d7
 	cmp.w	#0x400,d7
 	jne		0b
+	
 	rts
 	
 * < D7: 0-0x400 address
@@ -2733,7 +2771,9 @@ update_bg_tile:
 	
 	*cmp.b	#0x20,d2
 	*jeq		11f				| optim: blank tile
-	move.l		bg_tile_character_table,a0
+	move.l		bg_tile_character_table,d0
+	jeq		0f			| no context loaded: out
+	move.l	d0,a0
 	.ifdef	NO68020
 	add.w	d2,d2
 	add.w	d2,d2	
@@ -3030,6 +3070,15 @@ update_fg_tile:
 	move.b	d1,d3	| attribute + tile msbits
 	and.w	#0xF,d3	| clut
 	
+	* if weapon frame is written, install palette change branch
+	cmp.w	#0x34E,d7
+	jne		0f
+	lea		osd_lower_palette_switch,a0
+	move.w	#copjmp2,(a0)
+	cmp.b	#0xA0,d0
+	jne		0f
+	move.w	#COPPER_NOP,(a0)		| activate weapon & frame palette
+0:
 	lea		fg_tile_address_table,a1
 	.ifdef	NO68020
 	add.w	d7,d7
@@ -3906,7 +3955,7 @@ osd_sound_start:
 
 
 	move.w	(a0,d0.w),d1	| sound type
-	jeq	10f		| no sound
+	jeq	11f		| no sound
 	cmp.w	#3,d1
 	jeq	10f			| mute for now
 2:
@@ -4608,10 +4657,10 @@ sprite_log_table_end:
 	.endm
 
 	.macro	DECL_ROW
+	.word   0x01+(y_pos<<8),0xFFFE
 	.word   cop2lc,0        | jump high
 	.word   cop2lc+2,0      | jump low
 	.word   copjmp2,0
-	.word   0x01+(y_pos<<8),0xFFFE
 	DECL_BITPLANES	0,NB_PLAYFIELD_PLANES	
 	.set	y_pos,y_pos+1
 	.endm
@@ -4684,6 +4733,22 @@ second_rows:
 	DECL_ROW
 	.endr
 	
+osd_lower_palette_switch_address:
+	* dynamic palette for weapons & lives on OSD
+	.word	cop2lc,0
+	.word	cop2lc+2,0
+* write COPPER_NOP here to apply lower palette, copjmp2 to skip it
+osd_lower_palette_switch:
+	.word	copjmp2,0
+osd_lower_palette:
+	
+	.word	bplcon3,0
+	.word	color,0xF0F
+
+third_rows:
+	.rept	NB_THIRD_ROWS
+	DECL_ROW
+	.endr
 	
 	* pal limit
 	.if		NB_PLAYFIELD_PLANES>6
@@ -4693,8 +4758,8 @@ second_rows:
 	.endif
 	* extra wait for PAL (NTSC can't afford this)
 	.set	y_pos,0
-third_rows:
-	.rept	NB_THIRD_ROWS
+fourth_rows:
+	.rept	NB_FOURTH_ROWS
 	DECL_ROW
 	.endr
 

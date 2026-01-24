@@ -424,28 +424,60 @@ sprite_sheet_dict = {i:Image.open(sheets_path / "sprites" / f"pal_{i:02x}.png") 
 
 ###############
 # foreground
+# not so simple as we need to separate tiles for better colors
 ###############
-fg_tile_palette = set()
-fg_tile_set_list = []
+fg_tile_upper_palette = set()  # mostly alphanum + title
+fg_tile_lower_palette = set()  # frame+weapons+lives
+fg_tile_upper_set_list = []
+fg_tile_lower_set_list = []
 
 for i,tsd in fg_tile_sheet_dict.items():
-    tp,tile_set = load_tileset(tsd,i,8,8,"fg_tiles",dump_dir,dump=dump_it,
+    _,tile_set = load_tileset(tsd,i,8,8,"fg_tiles",dump_dir,dump=dump_it,
     cluts=fg_tile_cluts,
     name_dict=None)
-    fg_tile_set_list.append(tile_set)
-    fg_tile_palette.update(tp)
+
+    # we need to separate the palettes for OSD because 1) there are too many of them and quantize sucks
+    # and 2) the colors of the weapons in the panel is
+
+    upper_tile_set = [None] * len(tile_set)
+    lower_tile_set = [None] * len(tile_set)
+    for j,tile in enumerate(tile_set):
+        tp = set()
+        if tile:
+            tp = set(bitplanelib.palette_extract(tile))
+        if j in lower_osd_tiles:
+            fg_tile_lower_palette.update(tp)
+            lower_tile_set[j] = tile
+        else:
+            fg_tile_upper_palette.update(tp)
+            upper_tile_set[j] = tile
+
+    fg_tile_upper_set_list.append(upper_tile_set)
+    fg_tile_lower_set_list.append(lower_tile_set)
 
 # pad
-if len(fg_tile_palette)>16:
-    print(f"Too many colors in fg tiles ({len(fg_tile_palette)}), quantizing")
-    fg_replacement_dict = quantize_palette(fg_tile_palette,"foreground_tiles",16,transparent=None,dump_it=dump_it)
-    apply_color_replacement(fg_tile_set_list,fg_replacement_dict)
+if len(fg_tile_upper_palette)>16:
+    print(f"Too many colors in fg upper tiles ({len(fg_tile_upper_palette)}), quantizing")
+    fg_replacement_dict = quantize_palette(fg_tile_upper_palette,"foreground_upper_tiles",16,transparent=None,dump_it=dump_it)
+    apply_color_replacement(fg_tile_upper_set_list,fg_replacement_dict)
+    fg_tile_upper_palette = sorted(set(fg_replacement_dict.values()))
+else:
+    fg_tile_upper_palette = sorted(fg_tile_upper_palette)
 
-fg_tile_palette = sorted(set(fg_replacement_dict.values()))
+if len(fg_tile_lower_palette)>16:
+    print(f"Too many colors in fg lower tiles ({len(fg_tile_lower_palette)}), quantizing")
+    fg_replacement_dict = quantize_palette(fg_tile_lower_palette,"foreground_lower_tiles",16,transparent=None,dump_it=dump_it)
+    apply_color_replacement(fg_tile_lower_set_list,fg_replacement_dict)
+    fg_tile_lower_palette = sorted(set(fg_replacement_dict.values()))
+else:
+    fg_tile_lower_palette = sorted(fg_tile_lower_palette)
 
-print(f"Used fg tile colors: {len(fg_tile_palette)}")
+print(f"Used fg tile upper colors: {len(fg_tile_upper_palette)}")
+print(f"Used fg tile lower colors: {len(fg_tile_lower_palette)}")
 
-fg_tile_palette += (16-len(fg_tile_palette)) * [(0x10,0x20,0x30)]
+# pad to 16 colors
+for p in [fg_tile_lower_palette,fg_tile_upper_palette]:
+    p += (16-len(p)) * [(0x10,0x20,0x30)]
 
 ###############
 # background: per level, 1=2
@@ -555,15 +587,18 @@ empty_32_cols = [(1,1,1)]*len(bg_tile_palette)
 
 tile_plane_cache = {}
 bob_plane_cache = {}
-fg_tile_table,_ = read_tileset(fg_tile_set_list,fg_tile_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=FG_NB_CLUTS)
+fg_tile_upper_table,next_id = read_tileset(fg_tile_upper_set_list,fg_tile_upper_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=FG_NB_CLUTS)
+fg_tile_lower_table,_ = read_tileset(fg_tile_lower_set_list,fg_tile_lower_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=FG_NB_CLUTS, next_cache_id = next_id)
 sprite_table,_ = read_tileset(sprite_set_list,empty_32_cols+sprite_palette,[True,False,False,False],cache=bob_plane_cache, is_bob=True, nb_cluts=SPRITE_NB_CLUTS)
 
 
 
 with open(src_dir / "palette.68k","w") as f:
     f.write(generated_message)
-    f.write("fg_tile_palette:\n")
-    bitplanelib.palette_dump(fg_tile_palette,f,bitplanelib.PALETTE_FORMAT_ASMGNU)
+    f.write("fg_tile_upper_palette:\n")
+    bitplanelib.palette_dump(fg_tile_upper_palette,f,bitplanelib.PALETTE_FORMAT_ASMGNU)
+    f.write("fg_tile_lower_palette:\n")
+    bitplanelib.palette_dump(fg_tile_lower_palette,f,bitplanelib.PALETTE_FORMAT_ASMGNU)
     f.write("sprite_palette:\n")
     bitplanelib.palette_dump(sprite_palette,f,bitplanelib.PALETTE_FORMAT_ASMGNU)
 
@@ -593,7 +628,8 @@ with open(src_dir / "sprite_groups.68k","w") as f:
     bitplanelib.dump_asm_bytes(gs_array,f,mit_format=True,size=2)
 
 
-
+# merge both tables
+fg_tile_table = [a if any(a) else b for a,b in zip(fg_tile_upper_table,fg_tile_lower_table)]
 
 with open(src_dir / "graphics_aga.68k","w") as f:
     f.write(generated_message)
