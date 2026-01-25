@@ -1,29 +1,32 @@
-- unknown sounds 1F05/1F06 at level 2 log with MAME
-- fix some sfx on channel 3, elaborate sound priorities
 - resume from scroll X != 0 doesn't work properly, test on hw tester
+- Y scroll: first perform wrap at 256+16 (copper split)
 - 0x100 x shift on sprites not supported
-- "map" music plays but probably cut by level music at start. 3F stops music?
+- update_bg_tile: store draw address first and act on first column tile on the right draw, to remove extra 16 pixels on the top (corkscrew)
 - level 7 crashes when killed
-- level 1: first devil stays forever sometimes (unkillable), no more enemies in level then
 - game over: game locks up
+- parasite sprites at the bottom
+- hw_test: scrolling X: ok but tiles on the left refreshed too late: see the address
+  draw_left uses
+
+- "map" music plays but probably cut by level music at start. 3F stops music?
+- level 1: first devil stays forever sometimes (unkillable), no more enemies in level then
+  same devil strange issue on level 3
+- dynamic palette change on level 2: check 65D1 break or hack something (when houses appear)
+  we'd have to remove browns for ice palace first, then restore them
+  check if water tiles aren't using the same blues
 - 3F stop music should be implemented (demo => start game music remains)
-- restore_background: should restore 5 first bitplanes, then clear the last one
-- sprite palette: seems that a few colors are wasted in the end: magenta is here +
-  3 other 123 colors...
-- remove foreground palette update useless on amiga
-- hw_test: scrolling X: ok but tiles on the left refreshed too late
 - frog colors: change dynamically (detect in sprites palette) like the original
   but as the colors were quantized, make a list of the used colors of quantized
   frog frames, then try to find the best greens (the ones from the original palette change)
-- refactor to get draw address first, to remove extra 16 pixels on the top (corkscrew)
 - add space (rows) before and after screens
-- Y scroll: first perform wrap at 256+16 (copper split)
 - grouping, seems to have issues with main character at tile 0 tile 0 seems
   to be a special case despite the precautions, use mockup to see what's happening
-- detect intro fade palette
 - Y=0 is address 2801
+- fix some sfx on channel 3, elaborate sound priorities
+
+- restore_background: should restore 5 first bitplanes, then clear the last one
+- check if game tries to load music from level 1 to 2 or if it's cached
 - tombstone easter egg shot seems wrong
-- parasite sprites at the bottom
 - bottom left life icon not erased by "credit" message
 - log tiles (per level): with zone filtering (first level only upper part)
 - use 16-bit table for mirror
@@ -34,12 +37,6 @@
 
 - 0x38, # last boss music (resolve your battle)
 - 0x2A, # boss music (in game)
-- 0x3E: take a key (3F: stop tune?)
-- 0x3B: door opening
-- 0x30, # map music
-- 0x31, # killed music
-- 0x2B, # level 1/2 music
-- 0x2D, # boss 1/2 music
 - 0x33, # level 3 cave music
 - 0x34, # level 3 boss dragon music
 - 0x29, # castle music (lev 5)

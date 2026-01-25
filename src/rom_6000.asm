@@ -8450,7 +8450,7 @@ B3B5: 39          RTS
 B3B6: CE 41 40    LDU    #$4140
 B3B9: 1F 89       TFR    A,B
 B3BB: 4F          CLRA
-B3BC: E6 CB       LDB    D,U
+B3BC: E6 CB       LDB    D,U		; [bank_address]
 B3BE: 2A 01       BPL    $B3C1
 B3C0: 50          NEGB
 B3C1: 58          ASLB
@@ -8529,9 +8529,9 @@ B46B: EC C1       LDD    ,U++
 B46D: ED A4       STD    ,Y  		; [video_address]
 B46F: 86 87       LDA    #$87
 B471: C6 87       LDB    #$87
-B473: ED A9 04 20 STD    $0420,Y
+B473: ED A9 04 20 STD    $0420,Y 		; [video_address]
 B477: EC C1       LDD    ,U++
-B479: ED A8 20    STD    counter_16_bit_0020,Y
+B479: ED A8 20    STD    $0020,Y    	; [video_address]
 B47C: E6 C0       LDB    ,U+
 B47E: C4 7F       ANDB   #$7F
 B480: E7 88 15    STB    $15,X
@@ -11481,10 +11481,10 @@ D05F: BD 90 74    JSR    $9074
 D062: 6A 09       DEC    $9,X
 D064: 26 2D       BNE    $D093
 D066: EE 0A       LDU    $A,X
-D068: E6 C0       LDB    ,U+
+D068: E6 C0       LDB    ,U+		; [bank_address]
 D06A: 26 04       BNE    $D070
-D06C: EE C4       LDU    ,U
-D06E: E6 C0       LDB    ,U+
+D06C: EE C4       LDU    ,U		; [bank_address]
+D06E: E6 C0       LDB    ,U+	; [bank_address]
 D070: EF 0A       STU    $A,X
 D072: E7 09       STB    $9,X
 D074: BD 68 F9    JSR    $68F9

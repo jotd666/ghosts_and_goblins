@@ -180,8 +180,9 @@ zd1d2 = """\tZERO_MSW\td1
 with open(source_dir / f"{gamename}.s") as f:
     lines = list(f)
 
+equates_re = re.compile("\w+\s*=\s*")
 for i,line in enumerate(lines):
-    if " = " in line:
+    if equates_re.match(line):
         equates.append(line)
         line = ""
 

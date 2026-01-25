@@ -100,7 +100,7 @@ MIRROR_BIT = 2
 FLIT_BIT = 3
 
 
-MAP_CONTEXT = 6
+MAP_CONTEXT = 7
 
 	.ifdef	RELEASE
 
@@ -791,7 +791,7 @@ dump_and_quit:
 * format (RGB4) is: offset=$RG, offset+$40=$B0
 osd_set_tile_palette:
 	OSD_ENTER
-	movem.l	d0-d3/a1/a6,-(a7)
+	movem.l	d0-a6,-(a7)
 	* re-compose RGBx word to search in palette
 	* if color are at the indicated positions, then we know
 	* for sure what is the palette and thus what is the context
@@ -830,7 +830,7 @@ osd_set_tile_palette:
 	move.l	color_copper_pointers,a1	| entries 0-31
 	move.w	#TOTAL_NB_COLORS/2,d0
 	jbsr	load_palette
-	movem.l	(a7)+,d0-d3/a1/a6
+	movem.l	(a7)+,d0-a6
 	OSD_EXIT
 	rts
 7:
@@ -3982,6 +3982,7 @@ force_sound_stop:
 	movem.l	(a7)+,d0-d1/a0/a6
 	rts
 	
+* < D0.B sound index
 osd_sound_start:
 	OSD_ENTER
 
@@ -3990,7 +3991,7 @@ osd_sound_start:
 	
 	moveq	#0,d2
 	
-	
+	and.w	#0xFF,d0
 	lsl.w	#3,d0
 	lea		sound_table,a0
 
@@ -4335,14 +4336,15 @@ difficulty_table:
 	.byte	0x00		| very hard
 
 music_file_table:
-	.long	level_12_music
-	.long	level_34_music
-	.long	level_34_music
+	.long	level_12_music   | level 1
+	.long	level_12_music   | level 2
+	.long	level_34_music   | level 3
+	.long	level_34_music   | level 4
 	.long	0
 	.long	0
 	.long	0
 	.long	0
-	.long	0
+
 
 
 looped_sound_enabled:

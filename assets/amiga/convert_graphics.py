@@ -520,10 +520,8 @@ context_list = ["map","level1","level2","level3","level4","level5","level6","lev
 # palette is the same between level 1 and 2 except that
 # 1) used tiles are very different, so mixing them would mean quantize & color loss
 # 2) we use the steady palette values from level 2 (water is animated by color cycling on level 1, corrupting level 2 ice tower tiles)
-context_trans = {"level1":"level12","level2":"level12"}
 for context in context_list:
-    context_pics = context_trans.get(context,context)
-    bg_tile_sheet_dict = {i:Image.open(sheets_path / "bg_tiles" / context_pics / f"pal_{i:02x}.png") for i in range(BG_NB_CLUTS)}
+    bg_tile_sheet_dict = {i:Image.open(sheets_path / "bg_tiles" / context / f"pal_{i:02x}.png") for i in range(BG_NB_CLUTS)}
     bg_tile_cluts = {}
     read_used_tiles(pathlib.Path(context)/"bg_used_tiles",bg_tile_cluts,BG_NB_TILES,BG_NB_CLUTS)
 
