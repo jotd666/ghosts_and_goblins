@@ -791,7 +791,7 @@ dump_and_quit:
 * format (RGB4) is: offset=$RG, offset+$40=$B0
 osd_set_tile_palette:
 	OSD_ENTER
-	movem.l	d0-d3/a1,-(a7)
+	movem.l	d0-d3/a1/a6,-(a7)
 	* re-compose RGBx word to search in palette
 	* if color are at the indicated positions, then we know
 	* for sure what is the palette and thus what is the context
@@ -809,8 +809,19 @@ osd_set_tile_palette:
 	jne		0b
 	* we recognized our context
 	move.w	(-2,a1),d0
+	jne		1f
+	* level 1 or 2. Check the level number in RAM color to find out
+	* as both levels share the exact same palette, but we want
+	* a different context load as it's cleaner that way
+	GET_MEMORY_START_IN_A6
+	tst.b	(current_level_0072,a6)
+	jeq		2f			| level 1 all right
+	addq	#1,d0
+	jra		2f			| level 2
+1:
 	cmp.w	#0x100,d0
 	jcc		7f			| special context
+2:
 	jbsr	load_context
 5:
 	* reset palette
@@ -819,7 +830,7 @@ osd_set_tile_palette:
 	move.l	color_copper_pointers,a1	| entries 0-31
 	move.w	#TOTAL_NB_COLORS/2,d0
 	jbsr	load_palette
-	movem.l	(a7)+,d0-d3/a1
+	movem.l	(a7)+,d0-d3/a1/a6
 	OSD_EXIT
 	rts
 7:
@@ -942,7 +953,7 @@ load_context:
 	
 
 force_all_screen_redraw:
-	GET_MEMORY_START_AND_DP
+	GET_MEMORY_START_IN_A6
 
 	* given the current scroll X/Y, draw all tiles on screen
 	move.w	game_scroll_x,d0
@@ -1002,7 +1013,7 @@ draw_right_tiles:
 	move.w	max_scroll_x,d0
 	move.w	xr_offset,x_offset
 draw_column_tiles:
-	GET_MEMORY_START_AND_DP
+	GET_MEMORY_START_IN_A6
 
 	lea		(bg_tiles_address_2800,a6),a5
 	lsr.w	#4,D0	| divide by 16 to get real X tile offset
@@ -1257,7 +1268,7 @@ level3_interrupt:
 	
 	jbsr	call_nmi
 	
-	GET_MEMORY_START_AND_DP
+	GET_MEMORY_START_IN_A6
 	move.w	(scroll_x_register_3b08,a6),d0
 	ror.w	#8,d0		| hardware is in little endian
 	move.w	D0,game_scroll_x
@@ -1399,8 +1410,8 @@ osd_wait:
 * "0x04">Sword
 
 cycle_weapon:
-	movem.l	a6/a5/d0,-(a7)
-	GET_MEMORY_START_AND_DP
+	movem.l	a6/d0,-(a7)
+	GET_MEMORY_START_IN_A6
 	move.b	(weapon_type_0073,a6),d0
 	addq	#1,d0
 	cmp.b	#5,d0
@@ -1408,7 +1419,7 @@ cycle_weapon:
 	moveq	#0,d0
 0:
 	move.b	d0,(weapon_type_0073,a6)
-	movem.l	(a7)+,a6/a5/d0
+	movem.l	(a7)+,a6/d0
 	rts
 	
 * Z: set if not playing
@@ -1416,7 +1427,7 @@ is_game_playing:
 	rts
 	
 *	move.l	a6,-(a7)
-*	GET_MEMORY_START_AND_DP
+*	GET_MEMORY_START_IN_A6
 *	* both flags are at 1 when actual game is playing (not demo)
 *	tst.b	(game_playing_flag_36,a6)
 *	jeq		0f
@@ -1572,7 +1583,7 @@ really_update_sprites:
 	
 
 
-	GET_MEMORY_START_AND_DP
+	GET_MEMORY_START_IN_A6
 	lea		(SPRITE_ADDRESS+SPRITE_BUFFER_SIZE-CURRENT_SPRITE_SIZE,a6),a0
 	*lea		mockup,a0
 
@@ -3570,7 +3581,7 @@ log_used_fg_tiles:
 	* scan the whole screen, see what was updated
 	* main screen
 
-	GET_MEMORY_START_AND_DP
+	GET_MEMORY_START_IN_A6
 	lea		(FG_SCREEN_TILE_ADDRESS,a6),a5
 	lea		(FG_SCREEN_COLOR_ADDRESS,a6),a4
 	lea		fg_tile_log_table,a0
@@ -3582,7 +3593,7 @@ log_used_bg_tiles:
 	* scan the whole screen, see what was updated
 	* main screen
 
-	GET_MEMORY_START_AND_DP
+	GET_MEMORY_START_IN_A6
 	lea		(BG_SCREEN_TILE_ADDRESS,a6),a5
 	lea		(BG_SCREEN_COLOR_ADDRESS,a6),a4
 	lea		bg_tile_log_table,a0
@@ -3622,7 +3633,7 @@ log_used_sprites:
 	* scan the whole screen, see what was updated
 	* main screen
 	
-	GET_MEMORY_START_AND_DP
+	GET_MEMORY_START_IN_A6
 	lea		(SPRITE_ADDRESS,a6),a5
 	lea	sprite_log_table,a0
 	moveq	#0,d7
@@ -3836,7 +3847,7 @@ read_args_string_end:
 * < A0: buffer
 osd_read_high_scores:
 	movem.l	d0-d7/a0-a6,-(a7)
-	GET_MEMORY_START_AND_DP
+	GET_MEMORY_START_IN_A6
 	*lea		(high_score_table_0294,a6),a1
 	move.l	_resload,d0
 	beq.b	0f
@@ -3870,7 +3881,7 @@ osd_write_high_scores:
 	tst.b	cheat_used		| don't save score if cheat on
 	bne.b	2f
 	.endif
-	GET_MEMORY_START_AND_DP
+	GET_MEMORY_START_IN_A6
 	lea		(high_score_table_0294,a6),a0
 
 	move.l	_resload,d0
@@ -4265,7 +4276,7 @@ osd_dump_logs:
 	move.l	#SPRITE_LOG_LENGTH,d0
 	jbsr	resload_SaveFile(a2)
 	
-	GET_MEMORY_START_AND_DP
+	GET_MEMORY_START_IN_A6
 	lea		(SPRITE_ADDRESS,a6),a1
 	lea		sprite_mem_name(pc),a0
 	move.l	#SPRITE_BUFFER_SIZE,d0

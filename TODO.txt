@@ -1,11 +1,10 @@
-- boss tune not triggered
-- unknown sounds 1F05/1F06
+- unknown sounds 1F05/1F06 at level 2 log with MAME
+- fix some sfx on channel 3, elaborate sound priorities
 - resume from scroll X != 0 doesn't work properly, test on hw tester
 - 0x100 x shift on sprites not supported
-- elaborate sound priorities in .wav filenames (#pri)
 - "map" music plays but probably cut by level music at start. 3F stops music?
 - level 7 crashes when killed
-- devil stays forever if not killed
+- level 1: first devil stays forever sometimes (unkillable), no more enemies in level then
 - game over: game locks up
 - 3F stop music should be implemented (demo => start game music remains)
 - restore_background: should restore 5 first bitplanes, then clear the last one
@@ -23,8 +22,6 @@
   to be a special case despite the precautions, use mockup to see what's happening
 - detect intro fade palette
 - Y=0 is address 2801
-- try to detect level 2, palette is not exactly the same as level1
-  some colors are not in the same order
 - tombstone easter egg shot seems wrong
 - parasite sprites at the bottom
 - bottom left life icon not erased by "credit" message

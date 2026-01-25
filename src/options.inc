@@ -23,9 +23,7 @@ LOG_BUFFER_SIZE = 0x8000
 	* amiga specific
 	.endif
 	
-	.macro	GET_MEMORY_START_AND_DP
-	move.l	m6809_direct_page_pointer,a5
-	move.l	bank_base,a1
+	.macro	GET_MEMORY_START_IN_A6
 	.ifeq	OPT_ALIGNED_MEMORY
 	lea		ram_buffer-RAM_START,a6
 	.else
@@ -34,7 +32,13 @@ LOG_BUFFER_SIZE = 0x8000
 	.ifne	RAM_START
 	sub.w	#RAM_START,a6
 	.endif
-	.endif
+	.endif	
+	.endm
+	
+	.macro	GET_MEMORY_START_AND_DP
+	move.l	m6809_direct_page_pointer,a5
+	move.l	bank_base,a1
+	GET_MEMORY_START_IN_A6
 	.endm
 	
 	.endif

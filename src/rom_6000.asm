@@ -710,7 +710,7 @@ change_ram_palette_6656:
 6662: 1F 03       TFR    D,U
 6664: 32 C8 40    LEAS   $40,U
 6667: 10 8E 16 32 LDY    #tiles_palette_in_ram_1632
-666B: C6 08       LDB    #$08
+666B: C6 08       LDB    #$08		; 8*16 = 64 color words
 666D: D7 E0       STB    $E0
 666F: 35 16       PULS   D,X		; [bank_address]
 6671: ED A8 40    STD    $40,Y
@@ -14863,7 +14863,7 @@ EE27: EE C5       LDU    B,U
 EE29: AE 85       LDX    B,X
 EE2B: C6 21       LDB    #$21
 EE2D: 86 07       LDA    #$07
-EE2F: 7E EE 44    JMP    $EE44
+EE2F: 7E EE 44    JMP    change_a_few_colors_ee44
 
 EE32: CE EE 57    LDU    #$EE57
 EE35: 8E EE 6B    LDX    #$EE6B
@@ -14871,8 +14871,13 @@ EE38: EE C5       LDU    B,U
 EE3A: AE 85       LDX    B,X
 EE3C: C6 2A       LDB    #$2A
 EE3E: 86 04       LDA    #$04
-EE40: 7E EE 44    JMP    $EE44
+EE40: 7E EE 44    JMP    change_a_few_colors_ee44
 EE43: 39          RTS
+
+; water in level 1 is done using dynamic palette change
+; in level 2 water color remains static, probably because else all
+; ice towers would change too
+change_a_few_colors_ee44:
 EE44: 10 8E 16 32 LDY    #tiles_palette_in_ram_1632
 EE48: 31 A5       LEAY   B,Y
 EE4A: E6 80       LDB    ,X+

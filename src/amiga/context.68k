@@ -5,20 +5,20 @@
 unique_color_index:
 	.word	39
 context_data:
-	.word	0x08a0  | rgb for color 39, context level1
+	.word	0x08a0  | rgb for color 39, context level1 or 2
 	.word	0  | context index
 	.word	0x0b30  | rgb for color 39, context level3
-	.word	1  | context index
-	.word	0x0f70  | rgb for color 39, context level4
 	.word	2  | context index
-	.word	0x0444  | rgb for color 39, context level5
+	.word	0x0f70  | rgb for color 39, context level4
 	.word	3  | context index
-	.word	0x0b9a  | rgb for color 39, context level6
+	.word	0x0444  | rgb for color 39, context level5
 	.word	4  | context index
-	.word	0x0600  | rgb for color 39, context level7
+	.word	0x0b9a  | rgb for color 39, context level6
 	.word	5  | context index
-	.word	0x0bbb  | rgb for color 39, context map
+	.word	0x0600  | rgb for color 39, context level7
 	.word	6  | context index
+	.word	0x0bbb  | rgb for color 39, context map
+	.word	7  | context index
 	.word	0x0790 | rgb for color 39, context intro fade 1 10% darker
 	.word	0x100  | context index
 	.word	0x0680  | rgb for color 39, context intro fade 2 25% darker
@@ -29,6 +29,7 @@ context_data:
 
 context_name_table:
 	.long	level1_path
+	.long	level2_path
 	.long	level3_path
 	.long	level4_path
 	.long	level5_path
@@ -38,6 +39,8 @@ context_name_table:
 
 level1_path:
 	.asciz	"level1"
+level2_path:
+	.asciz	"level2"
 level3_path:
 	.asciz	"level3"
 level4_path:
