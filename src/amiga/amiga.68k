@@ -189,6 +189,22 @@ BIT_FIRE_2 = 5
 	move.w	#\v,_custom+color	
 	.endm
 
+	.macro	WRITE_TEXT	text,color
+	lea		(0x2047+0x20*row,a6),a0
+	lea		\text,a1
+	move.b	#\color,d0
+	jbsr	display_text
+	.set	row,row+1
+	.endm
+
+	.macro	WRITE_HEX	value,color
+	move.w	\value,d1
+	lea		(0x2047+0x20*row+14,a6),a0
+	move.b	#\color,d0
+	jbsr	display_number
+	.set	row,row+1
+	.endm
+	
 	* S aka D5 is used a lot in the code as virtual stack, not only
 	* using host 68k SP. So we need to be consistent with its value
 	* specially when the irq is called. Except that if the irq interrupts
@@ -541,6 +557,62 @@ _user:
 
 	jra		demo_game
 
+	.ifndef	RELEASE
+display_text:
+0:
+	move.b	(a1)+,d1
+	jmi		1f
+	move.b	d1,(a0)
+	move.b	d0,(0x400,a0)
+	jbsr	osd_video_byte_dirty
+	addq	#1,a0
+	jra		0b
+1:
+	rts
+	
+* < A1: address
+* < D0: number
+num2hexstring:
+	movem.l	d0-a6,-(a7)
+	moveq	#3,d4		| nb digits
+	move.l	#0xF000,D3
+	moveq.l	#4,D2
+	move.b	#'x',(A1)+	
+.loop:
+	move.w	D0,D1
+	and.w	D3,D1
+	rol.w	D2,D1
+	cmp.b	#9,D1
+	bgt	.letter
+	**add.b	#'0',D1		| in this charset no need to add '0'
+	move.b	D1,(A1)+
+	bra	.loopend
+.letter:
+	add.b	#'A'-10,D1
+	move.b	D1,(A1)+
+.loopend:
+	addq.l	#4,D2
+	lsr.l	#4,D3
+	dbf	D4,.loop
+	st.b	(a1)
+	movem.l	(a7)+,d0-a6
+	rts
+	
+* < A0: address
+* < D0: color
+* < D1: value 16 bit
+display_number:
+	lea		(-8,a7),a7
+	move.l	a7,a1
+	exg	d0,d1
+	jbsr	num2hexstring
+	exg	d0,d1
+	jbsr	display_text
+	lea		(8,a7),a7
+	rts
+	
+	
+	.endif
 	
 * so memory is quadword-aligned (not trusting .align directives)
 align_for_fmode:
@@ -1269,11 +1341,15 @@ level3_interrupt:
 	jbsr	call_nmi
 	
 	GET_MEMORY_START_IN_A6
-	move.w	(scroll_x_register_3b08,a6),d0
+	move.w	(scroll_x_register_lsb_3b08,a6),d0
 	ror.w	#8,d0		| hardware is in little endian
 	move.w	D0,game_scroll_x
-	move.w	(scroll_y_register_3b0a,a6),d0
+	move.w	(scroll_y_register_lsb_3b0a,a6),d0
 	ror.w	#8,d0		| hardware is in little endian
+	jpl		0f
+	* scroll register is either 0 or negative FE00->FFFF->0000
+	add.w	#0x200,d0
+0:
 	move.w	D0,game_scroll_y
 	
 	* ok now D5 can be used freely
@@ -1288,6 +1364,21 @@ level3_interrupt:
 	
 	jbsr	set_scroll_values
 	
+	.ifndef	RELEASE
+	tst.b	osd_debug_active
+	jeq		0f
+	.set	row,2
+	GET_MEMORY_START_IN_A6
+	WRITE_TEXT	scrollx_text,2
+	WRITE_TEXT	scrolly_text,2
+	WRITE_TEXT	hscrollx_text,2
+
+	.set		row,2
+	WRITE_HEX	game_scroll_x,3
+	WRITE_HEX	game_scroll_y,3
+	WRITE_HEX	host_scroll_x,3
+0:
+	.endif
 
 	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
 	jbsr		switch_screen_buffers
@@ -2854,7 +2945,7 @@ update_bg_tile:
 	add.w	#BG_SCREEN_TILE_ADDRESS,d7
 	lsr.w	#2,d2
 	lsr.w	#2,d3
-	COLOR0_FLASH	0xFF0
+	*COLOR0_FLASH	0xFF0
 	jra		11f
 	.endif
 12:
@@ -3770,10 +3861,10 @@ handle_keyboard:
 	jbsr	osd_dump_logs
 0:
 
-	* last life, if killed, direct game over
-	cmp.b	#0x56,d0	| F8 key: set time at 0
+	
+	cmp.b	#0x56,d0	| F7 key: debug params
 	bne.b	0f
-	jbsr	redraw_bg_tiles
+	eor.b		#1,osd_debug_active
 0:
 	* last life, if killed, direct game over
 	cmp.b	#0x57,d0	| F8 key: set time at 0
@@ -4162,6 +4253,18 @@ cpu_init:
 	moveq	#0,d6
 	moveq	#0,d7
 	rts	
+	
+	.ifndef	RELEASE
+scrollx_text:
+	.ascii	"Game ScrollX "
+	.byte	0xff
+hscrollx_text:
+	.ascii	"Host ScrollX "
+	.byte	0xff
+scrolly_text:
+	.ascii	"Game ScrollY "
+	.byte	0xff	
+	.endif
 	
 	.ifne	OPT_ENABLE_LOGGING
 
@@ -4626,6 +4729,8 @@ cpu_log_enable:
 	.word	0
 cpu_log_prev_state:
 	.word	0
+osd_debug_active:
+	.byte	0
 	.endif
 
 	.section	.bsspublic

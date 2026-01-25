@@ -34,13 +34,18 @@ RAM_START = 0x0000
 
 COPPER_NOP = 0x1FE
 
+START_X = 0x100
+START_Y = 0
+
 BORDERBLANK = 1
 
 PREVIOUS_SPRITE_SIZE = 8
 CURRENT_SPRITE_SIZE = 4
 
+COLUMN_SIZE = 0x1f
 
 GAME_MAX_SCROLL_X = 0x200
+GAME_MAX_SCROLL_Y = 0x200
 BG_TILE_WIDTH = 16
 
 BG_TILE_MAX_SIZE = 64000  | possibly less
@@ -235,9 +240,7 @@ osd_enter_\@:
 	
 	.global	osd_video_byte_dirty
 	.global	osd_video_word_dirty
-	.global	osd_set_scrollx_hi
-	.global	osd_set_scrollx_lo
-	.global	osd_set_scrolly_lo
+
 
 	.global osd_read_high_scores
 	.global osd_write_high_scores
@@ -684,7 +687,21 @@ call_bcpl:
 	movem.l (sp)+,d2-d7/a2-a6
 	rts
 
+	.macro	WRITE_TEXT	text,color
+	lea		(0x2044+0x20*row,a6),a0
+	lea		\text,a1
+	move.b	#\color,d0
+	jbsr	display_text
+	.set	row,row+1
+	.endm
 
+	.macro	WRITE_HEX	value,color
+	move.w	\value,d1
+	lea		(0x2044+0x20*row+14,a6),a0
+	move.b	#\color,d0
+	jbsr	display_number
+	.set	row,row+1
+	.endm
 
 
 demo_game:
@@ -754,7 +771,7 @@ demo_game:
 	addq 	#2,a0
 	dbf		d0,0b
 
-	moveq	#1,D0
+	moveq	#2,D0
 	tst.b	start_level_3
 	jne		0f
 	moveq	#0,d0
@@ -779,40 +796,23 @@ demo_game:
 	addq	#0x1,a0
 	dbf		d0,0b
 	
-	lea		(0x2044+0x20*3,a6),a0
-	lea		tester_text,a1
-	move.b	#0x2,d0
-	jbsr	display_text
+	.set	row,4
 	
-	lea		(0x2044+0x20*5,a6),a0
-	lea		scrollx_text,a1
-	move.b	#0x2,d0
-	jbsr	display_text
-	lea		(0x2044+0x20*6,a6),a0
-	lea		hscrollx_text,a1
-	move.b	#0x2,d0
-	jbsr	display_text
-	lea		(0x2044+0x20*7,a6),a0
-	lea		max_scrollx_text,a1
-	move.b	#0x2,d0
-	jbsr	display_text
-	lea		(0x2044+0x20*8,a6),a0
-	lea		min_scrollx_text,a1
-	move.b	#0x2,d0
-	jbsr	display_text
-	lea		(0x2044+0x20*9,a6),a0
-	lea		xr_offset_text,a1
-	move.b	#0x2,d0
-	jbsr	display_text
-	lea		(0x2044+0x20*10,a6),a0
-	lea		xl_offset_text,a1
-	move.b	#0x2,d0
-	jbsr	display_text
+	WRITE_TEXT	tester_text,2
+	
+	WRITE_TEXT	scrollx_text,2
+	WRITE_TEXT	scrolly_text,2
+	WRITE_TEXT	hscrollx_text,2
+	WRITE_TEXT	max_scrollx_text,2
+	WRITE_TEXT	min_scrollx_text,2
+	WRITE_TEXT	xr_offset_text,2
+	WRITE_TEXT	xl_offset_text,2
+
 	
 	
 	jbsr	osd_enable_interrupts
 loop:
-
+	stop	#0x2000
 	jra	loop
 	
 * < A1: address
@@ -851,6 +851,12 @@ scrollx_text:
 	.byte	0xff
 hscrollx_text:
 	.ascii	"Host ScrollX "
+	.byte	0xff
+scrolly_text:
+	.ascii	"Game ScrollY "
+	.byte	0xff
+hscrolly_text:
+	.ascii	"Host ScrollY "
 	.byte	0xff
 max_scrollx_text:
 	.ascii	"Max ScrollX "
@@ -948,7 +954,8 @@ load_context:
 	dbf		d7,0b
 	
 	* at start redraw everything
-	move.w	#0,game_scroll_x
+	move.w	#START_X,game_scroll_x
+	move.w	#START_Y,game_scroll_y
 	move.w	game_scroll_x,previous_scroll_x
 	jbsr force_all_screen_redraw
 
@@ -962,13 +969,12 @@ force_all_screen_redraw:
 	* given the current scroll X/Y, draw all tiles on screen
 	move.w	game_scroll_x,d0
 	move.w	d0,previous_scroll_x
+	
+	move.w	d0,host_scroll_x		| when called, then host scroll is 0 modulus the bplcon shift fmode=3
 	move.w	d0,min_scroll_x
 	move.w	d0,d1
 	add.w	#VISIBLE_SCROLL_WIDTH+BG_TILE_WIDTH,d1		| after that it triggers tile refresh
 	move.w	d1,max_scroll_x
-	
-	and.w	#0x3F,d0
-	move.w	d0,host_scroll_x		| when called, then host scroll is 0 modulus the bplcon shift fmode=3
 	clr.w	xr_offset
 	clr.w	xl_offset
 	
@@ -983,7 +989,7 @@ force_all_screen_redraw:
 
 	move.w	d7,d6	| save current Y
 
-	move.w	#0x0E,d2	| size of screen in tiles
+	move.w	#COLUMN_SIZE,d2	| size of screen in tiles
 0:
 	move.w	d6,d7	| set current Y row
 	move.w	#BG_NB_BYTES_PER_ROW/2-1,d1		|  (64 bit margin)
@@ -1017,7 +1023,7 @@ draw_column_tiles:
 	lsl.w	#5,d0	| times 32
 	add.w	d0,d7	| start address
 
-	move.w	#0xE,d2
+	move.w	#COLUMN_SIZE,d2
 0:
 	and.w	#0x3FF,d7		| wrap
 	* force tile draw
@@ -1034,6 +1040,11 @@ draw_column_tiles:
 	rts
 
 set_scroll_values:
+	* update Y
+*	move.w	game_scroll_y,d0
+*	and.w	#0xFF,d0
+*	jbsr	wrap_bitplanes
+	
 	* update host scroll
 	* handle 2 wrap points
 	move.w	game_scroll_x,d0
@@ -1161,31 +1172,16 @@ graveyard_at_start:
 	.include	"graveyard.68k"
 
 call_nmi:
-	move.w	game_scroll_x,d1
-	lea		(0x2044+0x20*5+14,a6),a0
-	move.b	#0x3,d0
-	jbsr	display_number
-	move.w	host_scroll_x,d1
-	lea		(0x2044+0x20*6+14,a6),a0
-	move.b	#0x3,d0
-	jbsr	display_number
-	move.w	max_scroll_x,d1
-	lea		(0x2044+0x20*7+14,a6),a0
-	move.b	#0x3,d0
-	jbsr	display_number
-	move.w	min_scroll_x,d1
-	lea		(0x2044+0x20*8+14,a6),a0
-	move.b	#0x3,d0
-	jbsr	display_number
-	move.w	xr_offset,d1
-	lea		(0x2044+0x20*9+14,a6),a0
-	move.b	#0x3,d0
-	jbsr	display_number
-	move.w	xl_offset,d1
-	lea		(0x2044+0x20*10+14,a6),a0
-	move.b	#0x3,d0
-	jbsr	display_number
-	
+	.set		row,5
+	WRITE_HEX	game_scroll_x,3
+	WRITE_HEX	game_scroll_y,3
+	WRITE_HEX	host_scroll_x,3
+	WRITE_HEX	max_scroll_x,3
+	WRITE_HEX	min_scroll_x,3
+	WRITE_HEX	xr_offset,3
+	WRITE_HEX	xl_offset,3
+
+
 	
 	move.b	player_1_controls,d0
 	btst	#BIT_RIGHT,d0
@@ -1198,9 +1194,23 @@ call_nmi:
 	* move scrolling right
 	subq	#1,game_scroll_x
 0:
+	btst	#BIT_DOWN,d0
+	jne		0f
+	* move scrolling down
+	addq	#1,game_scroll_y
+0:
+	btst	#BIT_UP,d0
+	jne		0f
+	* move scrolling right
+	subq	#1,game_scroll_y
+0:
 	move.w	game_scroll_x,d0
 	and.w 	#GAME_MAX_SCROLL_X-1,D0
 	move.w	d0,game_scroll_x
+	
+	move.w	game_scroll_y,d0
+	and.w 	#GAME_MAX_SCROLL_Y-1,D0
+	move.w	d0,game_scroll_y
 
 	jbsr	set_scroll_values
 
@@ -2449,10 +2459,21 @@ load_palette:
 2:
 	rts
 
-* < D0: row, if 0: do nothing
+* < D0: row (0-0x1FF), if 0: do nothing
 wrap_bitplanes:
+	cmp.w	previous_wrap_y_pos,d0
+	jne		0f
+	* already wrapped there
+	rts
+0:	
 	movem.l	a0-a2/d0-d3,-(a7)
-	* first restore previous wrap if wasn't 0 TODO
+	* first restore previous wrap if wasn't 0
+	move.l	previous_wrap_copperlist_pos,d1
+	jeq		0f
+	move.l	d1,a0
+	move.w	#copjmp2,(8,a1)	| re-instante copjmp2, disable what's below
+0:
+	move.w	d0,previous_wrap_y_pos
 	
 	* if zero, we stop here, row 0 wraps naturally
 	subq	#1,d0
@@ -2462,6 +2483,7 @@ wrap_bitplanes:
  	lea	rows_table,a2
 	add.w	d0,a2
 	move.l	(a2),a1
+	move.l	a1,previous_wrap_copperlist_pos
 	move.w	#COPPER_NOP,(0x8,a1)	| remove copjmp2, enable what's below
 	add		#0x12,a1	| skip preamble
 	move.w	#BG_SCREEN_PLANE_SIZE,d2
@@ -2479,6 +2501,11 @@ wrap_bitplanes:
 2:
 	movem.l	(a7)+,a0-a2/d0-d3
 	rts
+	
+previous_wrap_y_pos:
+	.word	0
+previous_wrap_copperlist_pos:
+	.long	0
 	
 * < A0: copper block with rows
 * < A1: part of the pointers list
@@ -4069,7 +4096,7 @@ dip_switches_2:
 ntsc_flag:
 	.byte 	0
 start_level_3:
-	.byte	0
+	.byte	1
 mid_screen_interrupt_count:
 	.byte	0
 	.align	2
@@ -4390,8 +4417,6 @@ third_rows:
 	.rept	NB_THIRD_ROWS
 	DECL_ROW
 	.endr
-	.word	bplcon3,0
-	.word	color,0xF00
 
 	
 pal_wait:

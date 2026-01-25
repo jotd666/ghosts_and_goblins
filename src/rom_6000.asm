@@ -56,8 +56,10 @@ sprites_palette_in_ram_16b2 = $16B2
 tiles_palette_change_command_00de = $de
 scroll_x_value_00d4 = $d4
 scroll_y_value_00d6 = $d6 
-scroll_x_register_3b08 = $3b08
-scroll_y_register_3b0a = $3b0a
+scroll_x_register_lsb_3b08 = $3b08
+scroll_x_register_msb_3b09 = $3b09
+scroll_y_register_lsb_3b0a = $3b0a
+scroll_y_register_msb_3b0b = $3b0b
 bg_tiles_address_2800 = $2800
 bg_tiles_color_address_2c00 = $2c00
 bank_address_4000 = $4000
@@ -67,22 +69,22 @@ level_music_index_00bd = $bd
 
 SND_STOP_00 = $00
 SND_UNKNOWN_FF = $FF 
-SND_UNKNOWN_01 = $01
-SND_UNKNOWN_02 = $02
-SND_UNKNOWN_03 = $03
+SND_LOSE_ARMOUR_01 = $01
+SND_FROG_SPELL_02 = $02
+SND_WINGED_WIZARD_03 = $03
 SND_JUMP_04 = $04
 SND_LAND_05 = $05
-SND_UNKNOWN_06 = $06
+SND_SHOT_FIRED_06 = $06
 SND_UNKNOWN_07 = $07
 SND_UNKNOWN_08 = $08
-SND_UNKNOWN_1D = $1D
-SND_UNKNOWN_0B = $0B
-SND_UNKNOWN_0C = $0C
-SND_UNKNOWN_0D = $0D
-SND_UNKNOWN_0E = $0E
-SND_UNKNOWN_0F = $0F
+SND_BONUS_PICKED_UP_06 = $1D
+SND_FLYING_GOBLIN_0B = $0B
+SND_GIANT_STOMPS_0C = $0C
+SND_SHOT_BOUNCES_0D = $0D
+SND_FLAME_0E = $0E
+SND_BOSS_KILLED_0F = $0F
 SND_WEAR_ARMOUR_10 = $10
-SND_UNKNOWN_12 = $12
+SND_GOBLIN_HOWLS_12 = $12
 SND_UNKNOWN_13 = $13
 SND_UNKNOWN_14 = $14
 SND_ZOMBIE_RISING_17 = $17
@@ -95,7 +97,7 @@ SND_UNKNOWN_00 = $00
 SND_UNKNOWN_1E = $1E
 SND_UNKNOWN_1F = $1F
 SND_UNKNOWN_20 = $20
-SND_UNKNOWN_21 = $21
+SND_DRAGON_WOOOS_21 = $21
 SND_UNKNOWN_22 = $22
 SND_UNKNOWN_23 = $23
 SND_UNKNOWN_24 = $24
@@ -104,7 +106,7 @@ SND_UNKNOWN_26 = $26
 SND_UNKNOWN_27 = $27
 SND_UNKNOWN_2C = $2C
 SND_UNKNOWN_28 = $28
-SND_UNKNOWN_2F = $2F
+SND_GAME_OVER_2F = $2F
 SND_INTRO_CHORDS_30 = $30
 SND_KILLED_MUSIC_31 = $31
 SND_UNKNOWN_32 = $32
@@ -819,14 +821,14 @@ update_osd_palette_671c:
 6757: D8 DA       EORB   $DA
 6759: F7 3D 00    STB    $3D00
 675C: DC D4       LDD    scroll_x_value_00d4
-675E: B7 3B 09    STA    $3B09
-6761: F7 3B 08    STB    scroll_x_register_3b08	; hardware is in little endian
+675E: B7 3B 09    STA    scroll_x_register_msb_3b09
+6761: F7 3B 08    STB    scroll_x_register_lsb_3b08	; hardware is in little endian
 6764: DC D6       LDD    scroll_y_value_00d6
 6766: 43          COMA
 6767: 53          COMB
 6768: C3 00 01    ADDD   #$0001
-676B: B7 3B 0B    STA    $3B0B
-676E: F7 3B 0A    STB    scroll_y_register_3b0a
+676B: B7 3B 0B    STA    scroll_y_register_msb_3b0b
+676E: F7 3B 0A    STB    scroll_y_register_lsb_3b0a
 6771: 39          RTS
 6772: 8E 00 49    LDX    #$0049
 6775: 31 01       LEAY   $1,X
@@ -2626,13 +2628,13 @@ queue_sound_forced_with_ff_7958:
 795B: C6 FF       LDB    #SND_UNKNOWN_FF
 795D: 7E 79 1D    JMP    queue_sound_forced_791d
 
-7960: C6 01       LDB    #SND_UNKNOWN_01
+7960: C6 01       LDB    #SND_LOSE_ARMOUR_01
 7962: 7E 79 15    JMP    queue_sound_7915
 
-7965: C6 02       LDB    #SND_UNKNOWN_02
+7965: C6 02       LDB    #SND_FROG_SPELL_02
 7967: 7E 79 15    JMP    queue_sound_7915
 
-796A: C6 03       LDB    #SND_UNKNOWN_03
+796A: C6 03       LDB    #SND_WINGED_WIZARD_03
 796C: 7E 79 15    JMP    queue_sound_7915
 
 796F: C6 04       LDB    #SND_JUMP_04
@@ -2641,7 +2643,7 @@ queue_sound_forced_with_ff_7958:
 7974: C6 05       LDB    #SND_LAND_05
 7976: 7E 79 15    JMP    queue_sound_7915
 
-7979: C6 06       LDB    #SND_UNKNOWN_06
+7979: C6 06       LDB    #SND_SHOT_FIRED_06
 797B: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
 
 797E: C6 07       LDB    #SND_UNKNOWN_07
@@ -2650,28 +2652,28 @@ queue_sound_forced_with_ff_7958:
 7983: C6 08       LDB    #SND_UNKNOWN_08
 7985: 7E 79 15    JMP    queue_sound_7915
 
-7988: C6 1D       LDB    #SND_UNKNOWN_1D
+7988: C6 1D       LDB    #SND_BONUS_PICKED_UP_06
 798A: 7E 79 15    JMP    queue_sound_7915
 
-798D: C6 0B       LDB    #SND_UNKNOWN_0B
+798D: C6 0B       LDB    #SND_FLYING_GOBLIN_0B
 798F: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
 
-7992: C6 0C       LDB    #SND_UNKNOWN_0C
+7992: C6 0C       LDB    #SND_GIANT_STOMPS_0C
 7994: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
 
-7997: C6 0D       LDB    #SND_UNKNOWN_0D
+7997: C6 0D       LDB    #SND_SHOT_BOUNCES_0D
 7999: 7E 79 15    JMP    queue_sound_7915
 
-799C: C6 0E       LDB    #SND_UNKNOWN_0E
+799C: C6 0E       LDB    #SND_FLAME_0E
 799E: 7E 79 15    JMP    queue_sound_7915
 
-79A1: C6 0F       LDB    #SND_UNKNOWN_0F
+79A1: C6 0F       LDB    #SND_BOSS_KILLED_0F
 79A3: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
 
 79A6: C6 10       LDB    #SND_WEAR_ARMOUR_10
 79A8: 7E 79 15    JMP    queue_sound_7915
 
-79AB: C6 12       LDB    #SND_UNKNOWN_12
+79AB: C6 12       LDB    #SND_GOBLIN_HOWLS_12
 79AD: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
 
 79B0: C6 13       LDB    #SND_UNKNOWN_13
@@ -2710,7 +2712,7 @@ queue_sound_forced_with_ff_7958:
 79E7: C6 20       LDB    #SND_UNKNOWN_20
 79E9: 7E 79 15    JMP    queue_sound_7915
 
-79EC: C6 21       LDB    #SND_UNKNOWN_21
+79EC: C6 21       LDB    #SND_DRAGON_WOOOS_21
 79EE: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
 
 79F1: C6 22       LDB    #SND_UNKNOWN_22
@@ -2736,36 +2738,50 @@ l_7a0f:
 l_7a14:
 7A14: C6 28       LDB    #SND_UNKNOWN_28
 7A16: 7E 79 15    JMP    queue_sound_7915
+
 7A19: BD 7A 66    JSR    $7A66
 7A1C: BD 79 46    JSR    $7946
-7A1F: C6 2F       LDB    #SND_UNKNOWN_2F
+7A1F: C6 2F       LDB    #SND_GAME_OVER_2F
 7A21: 7E 79 15    JMP    queue_sound_7915
+
 7A24: C6 30       LDB    #SND_INTRO_CHORDS_30
 7A26: 7E 79 15    JMP    queue_sound_7915
+
 7A29: BD 7A 66    JSR    $7A66
 7A2C: BD 79 46    JSR    $7946
 7A2F: C6 31       LDB    #SND_KILLED_MUSIC_31
 7A31: 7E 79 15    JMP    queue_sound_7915
+
 7A34: C6 32       LDB    #SND_UNKNOWN_32
 7A36: 7E 79 15    JMP    queue_sound_7915
+
 7A39: C6 36       LDB    #SND_INTRO_MUSIC_START_36
 7A3B: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+
 7A3E: C6 37       LDB    #SND_UNKNOWN_37
 7A40: 7E 79 15    JMP    queue_sound_7915
+
 7A43: C6 38       LDB    #SND_UNKNOWN_38
 7A45: 7E 79 15    JMP    queue_sound_7915
+
 7A48: C6 39       LDB    #SND_UNKNOWN_39
 7A4A: 7E 79 15    JMP    queue_sound_7915
+
 7A4D: C6 3A       LDB    #SND_LEVEL1_MUSIC_3A
 7A4F: 7E 79 15    JMP    queue_sound_7915
+
 7A52: C6 3B       LDB    #SND_UNKNOWN_3B
 7A54: 7E 79 15    JMP    queue_sound_7915
+
 7A57: C6 3C       LDB    #SND_THUNDER_3C
 7A59: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+
 7A5C: C6 3D       LDB    #SND_THUNDER_3D
 7A5E: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
+
 7A61: C6 3E       LDB    #SND_UNKNOWN_3E
 7A63: 7E 79 15    JMP    queue_sound_7915
+
 7A66: C6 3F       LDB    #SND_UNKNOWN_3F
 7A68: 7E 79 15    JMP    queue_sound_7915
 

@@ -8,12 +8,9 @@ sox = "sox"
 
 sound_dir = this_dir / ".." / "sounds"
 
-sound_settings_dict = { 0x14 : {"channel":3,"priority":1},
-8 : {"priority":40},
-3 : {"priority":20},
-0x15 : {"priority":70},
-0xC : {"priority":70},
-0x13 : {"priority":80},
+sound_settings_dict = { 0x2 : {"channel":2,"priority":100},
+0x23 : {"channel":3,"priority":100},
+0xf : {"channel":3,"priority":100},
 
 }
 
@@ -38,6 +35,8 @@ def convert():
     EMPTY_SND = "EMPTY_SND"
 
     dummy_sounds = {
+    # 7,8: sound exists but seem unused
+    9,0xA,22,     # unused/silence
     0x3F,  # stop tune
     0,     # stop ???
 0x33, # level 3 cave music
@@ -45,7 +44,7 @@ def convert():
 0x29, # castle music (lev 5)
 0x38, # last boss music (resolve your battle)
 0x2A, # boss music (in game)
-
+0x1C, # end music (maybe loop 1)
     0xFF}
 
 
@@ -75,17 +74,18 @@ def convert():
 
 
 
-
-
-    sound_dict.update({
+    music_dict = {
     "MAIN_TUNE_SND"      :{"index":0x2B,"pattern":0,"volume":32},
     "KILLED_TUNE_SND"      :{"index":0x31,"pattern":7,"volume":32},
     "GAME_OVER_SND"      :{"index":0x2F,"pattern":9,"volume":32},
     "BOSS_TUNE_SND"      :{"index":0x2D,"pattern":0xD,"volume":32},
+    "HURRY_UP_SND"      :{"index":0x18,"pattern":0xc,"volume":32},
     "OPEN_DOOR_TUNE_SND"      :{"index":0x3B,"pattern":0x11,"volume":32},
     "LEVEL_COMPLETE_TUNE_SND"      :{"index":0x3E,"pattern":0xf,"volume":32},
     "LEVEL_START_TUNE_SND"      :{"index":0x30,"pattern":0xB,"volume":32},
-    })
+    }
+
+    sound_dict.update(music_dict)
 
 
 
@@ -209,7 +209,6 @@ def convert():
 
                 amp_ratio = max(maxsigned,abs(minsigned))/32
 
-                # JOTD: for that one, I'm using maxxed out sfx by no9, no amp
                 print(f"amp_ratio: {amp_ratio}")
 
                 wav = os.path.splitext(wav_name)[0]
@@ -262,7 +261,10 @@ def convert():
             fst.write(st)
             fst.write(f" | 0x{i:02x}\n")
 
-
+    music_list = {v["index"] for v in music_dict.values()}
+    unused_indexes = set(range(0,0x3E))-sfx_list-dummy_sounds-music_list
+    print("Unmapped sound indexes: ")
+    print(sorted(hex(x) for x in unused_indexes))
 convert()
 
 
