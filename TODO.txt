@@ -1,19 +1,22 @@
 - 0x100 x shift on sprites not supported
 - scrolling X completely off: check draw_right_tiles
+- Y=0 is address 2801
 - video dirty: should draw tile if visible: ok but shifted
 - "map" music plays but probably cut by level music at start. 3F stops music?
 - sprite X offset : add host scroll as linear X offset
   when drawing sprites, not when computing X (maybe it will work, though
   as code doesn't clip X): works but not for blit_background (protected?)
+- level 7 crashes when killed
 - game over: game locks up
+- 3F stop music should be implemented (demo => start game music remains)
 - restore_background: should restore 5 first bitplanes, then clear the last one
 - sprite palette: seems that a few colors are wasted in the end: magenta is here +
   3 other 123 colors...
+- remove foreground palette update useless on amiga
 - hw_test: scrolling X: ok but tiles on the left refreshed too late
 - frog colors: change dynamically (detect in sprites palette) like the original
   but as the colors were quantized, make a list of the used colors of quantized
   frog frames, then try to find the best greens (the ones from the original palette change)
-- killed: crash no map displayed??? after map context doesn't reload properly
 - refactor to get draw address first, to remove extra 16 pixels on the top (corkscrew)
 - add space (rows) before and after screens
 - Y scroll: first perform wrap at 256+16 (copper split)
@@ -25,29 +28,13 @@
 - debug division routines: plant shoot angles are wrong, devils attacks maybe (level 3 first devil debug)
 - tombstone easter egg shot seems wrong
 - parasite sprites at the bottom
+- bottom left life icon not erased by "credit" message
 - log tiles (per level): with zone filtering (first level only upper part)
 - use 16-bit table for mirror
-- flame in HUD wrong colors
-- fg tiles color reduction is too violent, maybe do a manual reduction
-  or dynamic color change between scores and in-game, try to keep the
-  maximum of different colors on the bottom status
-- fg layer: isolate frame+weapon+lives (everything non-letter on the bottom), use dynamic palette
+- fg layer: lives colors are not good. Black!=transparent, maybe rework or rip with changed
+  palette to separate black from background
 - cpu log: control should be able to log with SR=x3xx or SR=x0xx
   here we want to avoid logging within the interrupt
-
-- 0x0E, # flame crashes and burns
-- 0x02, # turn into frog
-- 0x23, # devil shot
-- 0x1A, # powerful enemy hit
-- 0x1F, # shield flying enemies
-- 0x19, # bag enemies howling
-- 0x0C, # giant stomping
-- 0x0F, # boss killed
-- 0x0B, # small fyling goblins noise
-- 0x12, # purple goblin howl
-- 0x21, # dragon woooo
-- 0x37, # extra life
-- 0x20, # skeleton bones
 
 - 0x38, # last boss music (resolve your battle)
 - 0x2A, # boss music (in game)

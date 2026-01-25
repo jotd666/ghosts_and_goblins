@@ -2640,7 +2640,7 @@ bg_tile:
 	* is min X < d2
 	cmp.b	d0,d2
 	jcs		osd_w_videoram_out	| tile x < scroll x
-	add.b	#0x21,d0
+	add.b	#0x11,d0			| visible tile span (including invisible scroll column)
 	cmp.b	d0,d2
 	jcc		osd_w_videoram_out	| tile x+screen width < scroll x
 	
