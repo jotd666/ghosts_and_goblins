@@ -809,14 +809,27 @@ osd_set_tile_palette:
 	jne		0b
 	* we recognized our context
 	move.w	(-2,a1),d0
-
-	
+	cmp.w	#0x100,d0
+	jcc		7f			| special context
 	jbsr	load_context
 5:
+	* reset palette
+	move.l	bg_character_table_buffer_ptr,a0
+6:
+	move.l	color_copper_pointers,a1	| entries 0-31
+	move.w	#TOTAL_NB_COLORS/2,d0
+	jbsr	load_palette
 	movem.l	(a7)+,d0-d3/a1
 	OSD_EXIT
 	rts
-
+7:
+	* palette change
+	sub.w	#0x100,d0	
+	lsl.w	#NB_PLAYFIELD_PLANES,d0  | half colors, 2 bytes per word
+	lea		fade_palettes,a0
+	add.w	d0,a0
+	jra		6b
+	
 * < D0: context name
 load_context:
 	cmp.w	current_context,d0
@@ -918,11 +931,6 @@ load_context:
 	move.l	bg_character_table_buffer_ptr,a0
 	lea		(TOTAL_NB_COLORS,a0),a0		| skip 32 color palette
 	move.l	a0,bg_tile_character_table				| set character table pointer
-	* set palette
-	move.l	bg_character_table_buffer_ptr,a0
-	move.l	color_copper_pointers,a1	| entries 0-31
-	move.w	#TOTAL_NB_COLORS/2,d0
-	jbsr	load_palette
 	
 	* at start redraw everything
 	move.w	#0,game_scroll_x		| maybe should not be done
@@ -2557,7 +2565,7 @@ osd_weapon_palette_change:
 	moveq	#0,d0
 	move.b	(weapon_type_0073,a6),d0	| current weapon type
 	lsl.w	#3,d0
-	lea		weapons_palette,a0
+	lea		weapon_palettes,a0
 	lea		osd_lower_palette+2,a1
 	add.w	d0,a0
 	* copy the 3 colors for weapon

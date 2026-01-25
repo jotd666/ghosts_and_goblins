@@ -514,6 +514,8 @@ for p in [fg_tile_lower_palette,fg_tile_upper_palette]:
 # background: per level, 1=2
 ###############
 
+special_fade_palettes = []
+
 context_list = ["map","level1","level3","level5","level6","level7"]
 for context in context_list:
     bg_tile_sheet_dict = {i:Image.open(sheets_path / "bg_tiles" / context / f"pal_{i:02x}.png") for i in range(BG_NB_CLUTS)}
@@ -539,6 +541,9 @@ for context in context_list:
         bg_tile_palette = sorted(bg_tile_palette)
 
     bg_tile_palette += (32-len(bg_tile_palette)) * [(0x10,0x20,0x30)]
+    if context == "level1":
+        # generate 3 more palettes for intro fade
+        special_fade_palettes = [[tuple(((x*100-(x*i))//100) for x in rgb) for rgb in bg_tile_palette] for i in (10,25,100)]
 
     print(f"{context}: Used bg tile colors: {len(bg_tile_palette)}")
     if dump_it:
@@ -645,10 +650,14 @@ with open(src_dir / "palette.68k","w") as f:
     bitplanelib.palette_dump(fg_tile_lower_palette,f,bitplanelib.PALETTE_FORMAT_ASMGNU)
     f.write("sprite_palette:\n")
     bitplanelib.palette_dump(sprite_palette,f,bitplanelib.PALETTE_FORMAT_ASMGNU)
-    f.write("weapons_palette:\n")
+    f.write("weapon_palettes:\n")
     for wp in fg_weapon_palette:
         wprgb = bitplanelib.palette_rgb42palette(wp)
         bitplanelib.palette_dump(wprgb,f,bitplanelib.PALETTE_FORMAT_ASMGNU)
+    f.write("fade_palettes:\n")
+    for sf in special_fade_palettes:
+        bitplanelib.palette_dump(sf,f,bitplanelib.PALETTE_FORMAT_ASMGNU)
+        f.write("\n")
 
 BLOCK_DISPLAY_MASK = 1<<14
 DO_DISPLAY_MASK = 1
