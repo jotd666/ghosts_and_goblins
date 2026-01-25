@@ -593,10 +593,23 @@ for i,tsd in sprite_sheet_dict.items():
     sprite_set_list.append(tile_set)
     sprite_palette.update(tp)
 
+# remove transparent color from palette
+sprite_palette.remove(magenta)
+
 if len(sprite_palette)>32:
     print(f"Too many colors in sprite tiles ({len(sprite_palette)}), quantizing")
-    sprite_replacement_dict = quantize_palette(sprite_palette,"sprite_tiles",32,transparent=magenta,dump_it=dump_it)
-    sprite_palette = sorted(set(sprite_replacement_dict.values()))
+    # if we specify 32 right away, the algorithm can provide less colors than 32, wasting entries
+    # by attempting to quantize with higher values, we guarantee not to waste colors
+    for attempt_nb_colors in [35,34,33,32]:
+        sprite_replacement_dict = quantize_palette(sprite_palette,"sprite_tiles",attempt_nb_colors,dump_it=dump_it)
+        new_sprite_palette = sorted(set(sprite_replacement_dict.values()))
+        if len(new_sprite_palette)<=32:
+            print(f"Quantization achieved {len(new_sprite_palette)} colors with start colors = {attempt_nb_colors}")
+            sprite_palette = new_sprite_palette
+            break
+    else:
+        raise Exception("quantize error")  # not really possible since we try 32 as last chance!
+
     apply_color_replacement(sprite_set_list,sprite_replacement_dict)
 else:
     sprite_palette = sorted(sprite_palette)

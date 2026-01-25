@@ -2368,17 +2368,17 @@ take_a_key_level_complete_72c9:
 76D0: 86 0A       LDA    #$0A
 76D2: 3D          MUL
 76D3: 33 CB       LEAU   D,U
-76D5: A7 89 04 00 STA    $0400,X
+76D5: A7 89 04 00 STA    $0400,X	; [video_address]
 76D9: E6 C0       LDB    ,U+
-76DB: E7 80       STB    ,X+
+76DB: E7 80       STB    ,X+	; [video_address]
 76DD: 0A E3       DEC    $E3
 76DF: 26 F4       BNE    $76D5
 76E1: C6 05       LDB    #$05
 76E3: D7 E3       STB    $E3
 76E5: 30 88 3B    LEAX   $3B,X
-76E8: A7 89 04 00 STA    $0400,X
+76E8: A7 89 04 00 STA    $0400,X	; [video_address]
 76EC: E6 C0       LDB    ,U+
-76EE: E7 80       STB    ,X+
+76EE: E7 80       STB    ,X+	; [video_address]
 76F0: 0A E3       DEC    $E3
 76F2: 26 F4       BNE    $76E8
 76F4: D6 72       LDB    current_level_0072
@@ -15969,10 +15969,11 @@ FED1: ED 13       STD    -$D,X
 FED3: E7 15       STB    -$B,X
 FED5: 7E 8E 38    JMP    $8E38
 
-* < A: value
-* < B: divisor
-* > A: result
-* > B: remainder
+; < A: value
+; < B: divisor
+; > A: result
+; > B: remainder
+; if B==0, then returns B=1, A=$FF
 divide_fed8:
 FED8: 34 04       PSHS   B
 FEDA: C6 08       LDB    #$08
@@ -15993,6 +15994,7 @@ FEEF: 39          RTS
 ; < pushed on U: value to divide
 ; < D: divisor
 ; > D: remainder of (U)/D
+; if D==0, then word in U becomes FFFF
 divmod_fef0:
 FEF0: 34 06       PSHS   D
 FEF2: C6 10       LDB    #$10

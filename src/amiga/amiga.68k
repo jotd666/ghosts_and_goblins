@@ -1010,8 +1010,13 @@ draw_column_tiles:
 	* force tile draw
 	lea		(a5,d7.w),a0
 		
-	jbsr	osd_video_byte_dirty
+	move.b	(a0),d0
+	move.b	(0x400,a0),d1
 
+	move.w	d2,-(a7)
+	jbsr	update_bg_tile
+	move.w	(a7)+,d2
+	
 	addq	#1,d7			| next Y
 	dbf		d2,0b
 	rts
@@ -1065,7 +1070,7 @@ set_scroll_values:
 	cmp.w	min_scroll_x,d0
 	jcc		0f
 	* min overshoot: we have to do something on the left
-	COLOR0_FLASH	0x00F
+
 	jbsr	draw_left_tiles
 	sub.w	#BG_TILE_WIDTH,max_scroll_x
 	sub.w	#BG_TILE_WIDTH,min_scroll_x
@@ -1078,7 +1083,7 @@ set_scroll_values:
 	cmp.w	max_scroll_x,d0
 	jcs		5f
 	* max overshoot: we have to do something on the right: draw the tiles
-	COLOR0_FLASH	0x0F0
+
 	jbsr	draw_right_tiles
 	add.w	#BG_TILE_WIDTH,max_scroll_x
 	add.w	#BG_TILE_WIDTH,min_scroll_x

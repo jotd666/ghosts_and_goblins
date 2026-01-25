@@ -48,6 +48,7 @@ def convert():
 0x29, # castle music (lev 5)
 0x38, # last boss music (resolve your battle)
 0x2A, # boss music (in game)
+
     0xFF}
 
 
@@ -82,6 +83,7 @@ def convert():
     sound_dict.update({
     "MAIN_TUNE_SND"      :{"index":0x2B,"pattern":0,"volume":32},
     "KILLED_TUNE_SND"      :{"index":0x31,"pattern":7,"volume":32},
+    "GAME_OVER_SND"      :{"index":0x2F,"pattern":9,"volume":32},
     "LEVEL_COMPLETE_TUNE_SND"      :{"index":0x3E,"pattern":0xf,"volume":32},
     "LEVEL_START_TUNE_SND"      :{"index":0x30,"pattern":0xB,"volume":32},
     })

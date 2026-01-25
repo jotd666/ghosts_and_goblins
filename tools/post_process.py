@@ -202,17 +202,23 @@ for i,line in enumerate(lines):
     # the 210+ jump tables!
     line = process_jump_table(line)
 
-    # remove divide code, replace by breakpoint ATM
+    # original divide/divmod code is slow and uses stack so it's tricky to port
+    # better replace it completely
 
     if 0xfed8 == address:
         #line = '\tBREAKPOINT "implement divide"\n'
         line = """\tand.w\t#0xFF,d1
+\tjne\t0f
+* avoid zero divide, follow original code behaviour
+\tst.b\td0
+\tmoveq\t#1,d1
+\trts
+0:
 \tdivu\td1,d0
 \tswap\td0
 \tmove.w\td0,d1
 \tclr.w\td0
 \tswap\td0
-\texg\td1,d0
 \trts
 """
         for j in range(i+1,len(lines)):
@@ -227,9 +233,17 @@ for i,line in enumerate(lines):
             lines[j] = ""
         line = """\tGET_REG_ADDRESS\t0,d4   | get pushed address
 \tMOVE_W_TO_REG\ta0,d6   | put to scratch register
+\tjne\t0f
+* avoid zero divide, follow original code behaviour
+\tmove.w\t#-1,d1
+\tMOVE_W_FROM_REG\td1,a0
+\tmoveq\t#0,d0
+\tmove.b\t#0x20,d1  | relevant? whatever
+\trts
+0:
 \tdivu\td1,d6   | divide
 \texg\td1,d6
-\tmove.w\td1,(a0) | store the result of the division
+\tMOVE_W_FROM_REG\td1,a0 | store the result of the division
 \tclr.w\td1     | clear the result
 \tswap\td1      | swap to get the remainder
 """
@@ -408,7 +422,7 @@ for i,line in enumerate(lines):
         line = "\ttst.b\tinvincible_flag\n\tjne\tl_f59a\n"+line
     elif address in [0xf13c]:
         line = "\ttst.b\tinvincible_flag\n\tjne\tl_f150\n"+line
-    elif address in {0x661D,0x6697}:
+    elif address in {0x661D,0x6697,0x671c,0x6716}:
         # no need to update palette hardware registers, it takes time for nothing
         line = change_instruction("rts",lines,i)
     elif address == 0x7942:

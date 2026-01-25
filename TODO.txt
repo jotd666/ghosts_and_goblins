@@ -1,12 +1,10 @@
+- unknown sounds 1F05/1F06
+- resume from scroll X != 0 doesn't work properly, test on hw tester
 - 0x100 x shift on sprites not supported
-- scrolling X completely off: check draw_right_tiles
-- Y=0 is address 2801
-- video dirty: should draw tile if visible: ok but shifted
+- elaborate sound priorities in .wav filenames (#pri)
 - "map" music plays but probably cut by level music at start. 3F stops music?
-- sprite X offset : add host scroll as linear X offset
-  when drawing sprites, not when computing X (maybe it will work, though
-  as code doesn't clip X): works but not for blit_background (protected?)
 - level 7 crashes when killed
+- devil stays forever if not killed
 - game over: game locks up
 - 3F stop music should be implemented (demo => start game music remains)
 - restore_background: should restore 5 first bitplanes, then clear the last one
@@ -23,9 +21,9 @@
 - grouping, seems to have issues with main character at tile 0 tile 0 seems
   to be a special case despite the precautions, use mockup to see what's happening
 - detect intro fade palette
+- Y=0 is address 2801
 - try to detect level 2, palette is not exactly the same as level1
   some colors are not in the same order
-- debug division routines: plant shoot angles are wrong, devils attacks maybe (level 3 first devil debug)
 - tombstone easter egg shot seems wrong
 - parasite sprites at the bottom
 - bottom left life icon not erased by "credit" message
@@ -56,6 +54,11 @@ first color of sprites purple:
 fill $3841,1,$F0
 fill $3941,1,$F0
 
+
+replace division: 
+
+bpset FED8,,{temp0=A;A /= B; B = A % B;PC=FEEF;g}
+bpset FEF0,,{temp0=w@U; temp1=temp0/D; w@U=temp1; D = temp0%D; PC=$feef; g}
 
 log sounds: bpset 7942,,{print B;g}
 skip sounds: bpset 7942,B == $17,{PC=$792F;g}
