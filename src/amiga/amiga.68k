@@ -1800,8 +1800,9 @@ update_one_bob:
 	and.b	#0XC0,d2
 	lsl.w	#2,d2
 	move.b	(TARGET_SPRITE_CODE,a0),d2
+	move.b	(TARGET_SPRITE_ATTRIBUTES,a0),d3
 	COLOR0_FLASH	0xF00
-	*BREAKPOINT	"unregistered sprite clut (D2=code)"
+	*BREAKPOINT	"unregistered sprite clut (D2=code, D3=attribute)"
 	jra		2f
 100:
 	.endif

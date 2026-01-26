@@ -1,4 +1,6 @@
 - rip sound 7 & 8 (boss dies)
+- level 4: a lot of tiles are missing, rip mockup, tile 2B/7, 2C/7 won't display (
+  (after killing daemon)
 - resume from scroll X != 0 doesn't work properly, test on hw tester
 - Y scroll: first perform wrap at 256+16 (copper split)
 - update_bg_tile: store draw address first and act on first column tile on the right draw, to remove extra 16 pixels on the top (corkscrew)
