@@ -13072,9 +13072,9 @@ DE63: 26 27       BNE    $DE8C
 DE65: 6A 0C       DEC    $C,X
 DE67: 26 23       BNE    $DE8C
 DE69: EE 0A       LDU    $A,X
-DE6B: E6 C0       LDB    ,U+
+DE6B: E6 C0       LDB    ,U+		; [bank_address]
 DE6D: 2A 04       BPL    $DE73
-DE6F: EE C4       LDU    ,U
+DE6F: EE C4       LDU    ,U		; [bank_address]
 DE71: C4 7F       ANDB   #$7F
 DE73: EF 0A       STU    $A,X
 DE75: E7 0C       STB    $C,X
@@ -13090,9 +13090,9 @@ DE89: BD 8E BF    JSR    $8EBF
 DE8C: E6 02       LDB    $2,X
 DE8E: 26 0F       BNE    $DE9F
 DE90: EE 08       LDU    $8,X
-DE92: E6 C0       LDB    ,U+
+DE92: E6 C0       LDB    ,U+		; [bank_address]
 DE94: 2A 04       BPL    $DE9A
-DE96: EE C4       LDU    ,U
+DE96: EE C4       LDU    ,U		; [bank_address]
 DE98: C4 7F       ANDB   #$7F
 DE9A: EF 08       STU    $8,X
 DE9C: BD 8E BF    JSR    $8EBF
@@ -15829,14 +15829,14 @@ FC1C: C0 04       SUBB   #$04
 FC1E: 25 36       BCS    $FC56
 FC20: D7 29       STB    $29
 FC22: EE 03       LDU    $3,X
-FC24: EC C4       LDD    ,U
+FC24: EC C4       LDD    ,U		; [bank_address]
 FC26: DA E4       ORB    $E4
 FC28: ED A4       STD    ,Y
-FC2A: A6 42       LDA    $2,U
+FC2A: A6 42       LDA    $2,U		; [bank_address]
 FC2C: ED 24       STD    $4,Y
-FC2E: A6 43       LDA    $3,U
+FC2E: A6 43       LDA    $3,U		; [bank_address]
 FC30: ED 28       STD    $8,Y
-FC32: A6 44       LDA    $4,U
+FC32: A6 44       LDA    $4,U		; [bank_address]
 FC34: ED 2C       STD    $C,Y
 FC36: D6 E7       LDB    $E7
 FC38: 50          NEGB

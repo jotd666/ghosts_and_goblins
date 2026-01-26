@@ -1,3 +1,4 @@
+- rip sound 7 & 8 (boss dies)
 - resume from scroll X != 0 doesn't work properly, test on hw tester
 - Y scroll: first perform wrap at 256+16 (copper split)
 - update_bg_tile: store draw address first and act on first column tile on the right draw, to remove extra 16 pixels on the top (corkscrew)
@@ -25,7 +26,9 @@
   to be a special case despite the precautions, use mockup to see what's happening
 - Y=0 is address 2801
 - fix some sfx on channel 3, elaborate sound priorities
-
+- infinite lives trainer not working
+- level 4: wrong ripped bg tiles, missing bg tiles on screen: dump & submit to MAME
+  and check MAME memory
 - restore_background: should restore 5 first bitplanes, then clear the last one
 - check if game tries to load music from level 1 to 2 or if it's cached
 - tombstone easter egg shot seems wrong

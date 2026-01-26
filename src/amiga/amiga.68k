@@ -843,6 +843,12 @@ demo_game:
 	jbsr	cache_fg_tiles_address
 	jbsr	cache_bg_tiles_address
 
+	* load level 1 music
+	lea		level_12_music,a0
+	move.l	a0,current_music_name
+	lea		module_buffer,a1
+	jbsr	load_file
+	
 	
 	moveq	#0,d0
 	jbsr	osd_set_bank
@@ -960,16 +966,6 @@ load_context:
 	move.l	a1,bg_character_table_buffer_ptr
 	jbsr	load_file
 	
-	* check if we must load some music too
-	lea		music_file_table,a0
-	move.w	current_context,d0
-	add.w	d0,d0
-	add.w	d0,d0
-	move.l	(a0,d0.w),d0
-	jeq		2f
-	move.l	d0,a0
-	lea		module_buffer,a1
-	jbsr	load_file
 	
 2:
 
@@ -4166,6 +4162,9 @@ osd_sound_start:
 	st.b	play_level_1_tune_after_music_stop
 	jra		6f		| don't play now
 60:
+
+	jbsr	load_music_if_needed
+	
 	* don't play if already playing
 	* (music_tick value is not important for looped tunes
 	* as long as it's not zero)
@@ -4212,6 +4211,28 @@ osd_sound_start:
 no_tune:
 	movem.l	(a7)+,d0/a0
 	jra		5b
+	
+load_music_if_needed:
+ 	movem.l	d0/a0,-(a7)
+	lea		level_12_music,a0
+	cmp.w	#LEVEL12_TUNE_SND*8,d0
+	jeq		70f
+	lea		level_34_music,a0
+	cmp.w	#LEVEL34_TUNE_SND*8,d0
+	jeq		70f
+	jra		75f
+70:
+	cmp.l	current_music_name,a0
+	jeq		75f
+	* stop current music if any
+	jbsr	osd_music_stop
+	
+	move.l	a0,current_music_name
+	lea		module_buffer,a1
+	jbsr	load_file
+75:
+	movem.l	(a7)+,d0/a0
+	rts
 	
 * all level modules have the same structure but in fact not atm...
 * Pattern 0-2     = Game music
@@ -4465,22 +4486,14 @@ difficulty_table:
 	.byte	0x01		| hard
 	.byte	0x00		| very hard
 
-music_file_table:
-	.long	level_12_music   | level 1
-	.long	level_12_music   | level 2
-	.long	level_34_music   | level 3
-	.long	level_34_music   | level 4
-	.long	0
-	.long	0
-	.long	0
-	.long	0
-
-
 
 looped_sound_enabled:
 	.long	0
 
 return_address:
+	.long	0
+	
+current_music_name:
 	.long	0
 	
 play_level_1_tune_after_music_stop:
