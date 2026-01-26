@@ -544,6 +544,14 @@
 	.endm
 
 
+multiply_ab:
+	and.w	#0xFF,d0
+	and.w	#0xFF,d1
+	mulu	d0,d1
+	ror.w	#8,d1
+	move.b	d1,d0
+	ror.w	#8,d1
+	rts
 
 	.ifndef	RELEASE
 	
@@ -632,11 +640,3 @@ get_bank_address:
 	.endm
 	.endif
 
-multiply_ab:
-	and.w	#0xFF,d0
-	and.w	#0xFF,d1
-	mulu	d0,d1
-	ror.w	#8,d1
-	move.b	d1,d0
-	ror.w	#8,d1
-	rts

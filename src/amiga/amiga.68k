@@ -66,7 +66,7 @@ SPRITE_LOG_LENGTH = NB_SPRITES*SPRITE_NB_CLUTS
 FG_TILE_LOG_LENGTH = FG_TILE_NB_CLUTS*FG_TILE_COUNT
 BG_TILE_LOG_LENGTH = BG_TILE_NB_CLUTS*BG_TILE_COUNT
 
-SPRITE_X_CORRECTION = 4
+SPRITE_X_CORRECTION = 0
 SPRITE_Y_CORRECTION = 0
 HW_SPRITE_X_CORRECTION = 0
 HW_SPRITE_Y_CORRECTION = 0
@@ -1246,9 +1246,9 @@ call_nmi:
 	swap	d5
 	clr		d5
 	swap 	d5
+	.ifndef	RELEASE
 	tst.w	d5
 	jne		0f
-	.ifndef	RELEASE
 	BREAKPOINT	"entering game irq with d5/S=0"
 0:
 	.endif
@@ -1273,8 +1273,21 @@ level3_interrupt:
 	lea		_custom,a5
 	move.w	(intreqr,a5),d0
 	btst	#5,d0
-	beq.b		1f
+	jeq		1f
 
+	* music
+	tst.b	_mt_E8Trigger
+	jeq		0f
+	* trigger: map/level start music ended: time to start level music
+	* if queued
+	clr.b	_mt_E8Trigger
+	clr.b	wait_for_map_music_end
+	tst.b	play_level_1_tune_after_music_stop
+	jeq		0f
+	clr.b	play_level_1_tune_after_music_stop
+	move.w	#LEVEL12_TUNE_SND,d0
+	jbsr	osd_sound_start
+0:
 	tst.b	detect_controllers
 	jeq	0f
 	clr.b	detect_controllers
@@ -1711,6 +1724,10 @@ compute_sprite_xy_code:
 	* tile_code = buffered_spriteram[offs] + ((attributes << 2) & 0x300)
 	moveq	#0,d2
 	move.b	(TARGET_SPRITE_ATTRIBUTES,a0),d2
+	btst	#0,d2
+	jeq		0f
+	sub.w	#0x100,d0
+0:
 	and.b	#0xC0,d2
 	lsl.w	#2,d2
 	move.b	(TARGET_SPRITE_CODE,a0),d2
@@ -1727,8 +1744,12 @@ update_one_bob:
 	jeq		2f
 0:
 	jbsr	compute_sprite_xy_code
-		
-
+	cmp.w	#240,d1		| too low: scrap it
+	jcc		2f
+	tst.w	d0
+	* if X < 0 don't display it
+	jmi		2f
+	
 	* handle custom amiga horizontal grouping (saves a lot of blitter masking)
 	* the table holds several info bits
 	* - if 0, this is a normal sprite, no horizontal grouping
@@ -2432,7 +2453,7 @@ platform_init:
 
  	*         VVHH
     move.w #0x89+(Y_START<<8),d0
-    move.w #0x89+((Y_START+8)<<8),d1
+    move.w #0x89+((Y_START)<<8),d1
 	cmp.l	#NTSC_MONITOR_ID,monitor
 	jne		0f
 	sub.w	#NTSC_Y_SHIFT<<8,d0
@@ -3789,13 +3810,7 @@ handle_keyboard:
 	bne.b	0f
 	move.b	#10,coin2_requested
 0:
-	tst.b	(6,a0)		| "6" key like in MAME
-	cmp.b	#55,d0		| "M" key
-	jne		0f
-	eor.b	#1,no_main_tune
-	jeq		0f
-	jbsr	osd_music_stop
-0:
+
     cmp.b   #0x19,d0	| "P" key
     bne.b   0f
 
@@ -4138,7 +4153,19 @@ osd_sound_start:
 	
 	* music
 4:
-	
+	* if map music, set flag
+	cmp.w	#LEVEL_START_TUNE_SND*8,d0
+	jne		50f
+	* next tune will have to wait for this tune to end
+	st.b	wait_for_map_music_end
+50:
+	cmp.w	#LEVEL12_TUNE_SND*8,d0
+	jne		60f
+	tst.b	wait_for_map_music_end
+	jeq		60f
+	st.b	play_level_1_tune_after_music_stop
+	jra		6f		| don't play now
+60:
 	* don't play if already playing
 	* (music_tick value is not important for looped tunes
 	* as long as it's not zero)
@@ -4456,6 +4483,10 @@ looped_sound_enabled:
 return_address:
 	.long	0
 	
+play_level_1_tune_after_music_stop:
+	.byte	0
+wait_for_map_music_end:
+	.byte	0
 	
 difficulty_dsw:
 	.byte	0

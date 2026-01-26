@@ -10,8 +10,11 @@ sound_dir = this_dir / ".." / "sounds"
 
 sound_settings_dict = { 0x2 : {"channel":2,"priority":100},
 0x23 : {"channel":3,"priority":100},
+0x1 : {"channel":2,"priority":100},  # lose armour
+0x19 : {"channel":3,"priority":100},  # bag enemies
+0xc : {"channel":3,"priority":100},  # giant stomps
 0xf : {"channel":3,"priority":100},
-
+0x21 : {"channel":3,"priority":100},  # dragon
 }
 
 def convert():
@@ -75,7 +78,7 @@ def convert():
 
 
     music_dict = {
-    "MAIN_TUNE_SND"      :{"index":0x2B,"pattern":0,"volume":32},
+    "LEVEL12_TUNE_SND"      :{"index":0x2B,"pattern":0,"volume":32},
     "KILLED_TUNE_SND"      :{"index":0x31,"pattern":7,"volume":32},
     "GAME_OVER_SND"      :{"index":0x2F,"pattern":9,"volume":32},
     "BOSS_TUNE_SND"      :{"index":0x2D,"pattern":0xD,"volume":32},
