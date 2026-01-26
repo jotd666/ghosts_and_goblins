@@ -79,9 +79,11 @@ def convert():
 
     music_dict = {
     "LEVEL12_TUNE_SND"      :{"index":0x2B,"pattern":0,"volume":32},
+    "LEVEL34_TUNE_SND"      :{"index":0x33,"pattern":0,"volume":32},
+    "BOSS34_TUNE_SND"      :{"index":0x34,"pattern":0,"volume":32},
     "KILLED_TUNE_SND"      :{"index":0x31,"pattern":7,"volume":32},
     "GAME_OVER_SND"      :{"index":0x2F,"pattern":9,"volume":32},
-    "BOSS_TUNE_SND"      :{"index":0x2D,"pattern":0xD,"volume":32},
+    "BOSS12_TUNE_SND"      :{"index":0x2D,"pattern":0xD,"volume":32},
     "HURRY_UP_SND"      :{"index":0x18,"pattern":0xc,"volume":32},
     "OPEN_DOOR_TUNE_SND"      :{"index":0x3B,"pattern":0x11,"volume":32},
     "LEVEL_COMPLETE_TUNE_SND"      :{"index":0x3E,"pattern":0xf,"volume":32},

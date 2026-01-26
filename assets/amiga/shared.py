@@ -156,6 +156,7 @@ def get_sprite_names():
     rval[0x5F] = "sword"
     rval[0x8F] = "bag_bonus"
     rval[0x260] = "necklace_bonus"
+    rval[0x262] = "shoe_bonus"
     rval[0x257] = "star_bonus"
     rval[0x277] = "king_bonus"
     rval[0x27F] = "pot"
