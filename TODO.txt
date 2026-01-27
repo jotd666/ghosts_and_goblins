@@ -1,14 +1,12 @@
-- rip sound 7 & 8 (boss dies)
 - level 4: a lot of tiles are missing, rip mockup, tile 2B/7, 2C/7 won't display (
   (after killing daemon)
 - resume from scroll X != 0 doesn't work properly, test on hw tester
 - Y scroll: first perform wrap at 256+16 (copper split)
 - update_bg_tile: store draw address first and act on first column tile on the right draw, to remove extra 16 pixels on the top (corkscrew)
-- level 7 crashes when killed
 - game over: game locks up
 - hw_test: scrolling X: ok but tiles on the left refreshed too late: see the address
   draw_left uses
-
+- map: missing tiles
 - "map" music plays but probably cut by level music at start. 3F stops music?
 - level 1: first devil stays forever sometimes (unkillable) if we approach too closely without killing him
   no more enemies in level then same devil strange issue on level 3
@@ -23,6 +21,8 @@
   frog frames, then try to find the best greens (the ones from the original palette change)
   or just recolor from plant
   
+- inprint the tombstones in the background (for instance when drawing left & right tiles) to save
+  cpu & reduce the shaking effect
 - add space (rows) before and after screens
 - grouping, seems to have issues with main character at tile 0 tile 0 seems
   to be a special case despite the precautions, use mockup to see what's happening
@@ -37,10 +37,14 @@
 - bottom left life icon not erased by "credit" message
 - log tiles (per level): with zone filtering (first level only upper part)
 - use 16-bit table for mirror
+- optimize video_address writes. Don't update twice, wait for attribute+tile code to be set
+  (both layers)
 - fg layer: lives colors are not good. Black!=transparent, maybe rework or rip with changed
   palette to separate black from background
 - cpu log: control should be able to log with SR=x3xx or SR=x0xx
   here we want to avoid logging within the interrupt
+- option to start without music, in which case all sounds except a given list should use automatic channel
+
 
 - 0x38, # last boss music (resolve your battle)
 - 0x2A, # boss music (in game)

@@ -885,7 +885,27 @@ osd_set_tile_palette:
 	addq	#2,a1
 	cmp.w	d0,d2
 	jne		0b
+
 	* we recognized our context
+	* but actually it's way more complex as the game performs
+	* dynamic color changes. Better rely on the level number
+	* at this point
+	* level 3 or 4. Check the level number in RAM color to find out
+	* as both levels share the exact same palette, but we want
+	* a different context load as it's cleaner that way
+	
+	GET_MEMORY_START_IN_A6
+	cmp.b	#2,(current_level_0072,a6)
+	jeq		3f			| level 3 all right
+	cmp.b	#3,(current_level_0072,a6)
+	jne		1f
+	moveq	#3,d0
+	jra		2f			| level 4
+3:
+	moveq	#2,d0		| level 3
+	jra		2f
+1:
+	
 	move.w	(-2,a1),d0
 	jne		1f
 	* level 1 or 2. Check the level number in RAM color to find out
@@ -897,6 +917,8 @@ osd_set_tile_palette:
 	addq	#1,d0
 	jra		2f			| level 2
 1:
+
+	
 	cmp.w	#0x100,d0
 	jcc		7f			| special context
 2:
@@ -2450,7 +2472,7 @@ platform_init:
 
  	*         VVHH
     move.w #0x89+(Y_START<<8),d0
-    move.w #0x89+((Y_START)<<8),d1
+    move.w #0x89+((Y_START-0x10)<<8),d1
 	cmp.l	#NTSC_MONITOR_ID,monitor
 	jne		0f
 	sub.w	#NTSC_Y_SHIFT<<8,d0
@@ -2861,6 +2883,7 @@ update_bg_tile:
 	add.w	d4,d4
 	add.w	d4,d4
 	add.w	d4,d2			| full tile code
+
 
 	moveq	#0,d0
 	moveq	#0,d1
