@@ -42,9 +42,6 @@ def convert():
     9,0xA,22,     # unused/silence
     0x3F,  # stop tune
     0,     # stop ???
-0x33, # level 3 cave music
-0x34, # level 3 boss dragon music
-0x29, # castle music (lev 5)
 0x38, # last boss music (resolve your battle)
 0x2A, # boss music (in game)
 0x1C, # end music (maybe loop 1)
@@ -80,7 +77,8 @@ def convert():
     music_dict = {
     "LEVEL12_TUNE_SND"      :{"index":0x2B,"pattern":0,"volume":32},
     "LEVEL34_TUNE_SND"      :{"index":0x33,"pattern":0,"volume":32},
-    "BOSS34_TUNE_SND"      :{"index":0x34,"pattern":0,"volume":32},
+    "LEVEL56_TUNE_SND"      :{"index":0x29,"pattern":0,"volume":32},
+    "BOSS34_TUNE_SND"      :{"index":0x34,"pattern":0x10,"volume":32},
     "KILLED_TUNE_SND"      :{"index":0x31,"pattern":7,"volume":32},
     "GAME_OVER_SND"      :{"index":0x2F,"pattern":9,"volume":32},
     "BOSS12_TUNE_SND"      :{"index":0x2D,"pattern":0xD,"volume":32},

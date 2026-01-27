@@ -1391,9 +1391,9 @@ level3_interrupt:
 	jeq		23f
 0:
 
-	jbsr		really_update_sprites
 	
 	jbsr	set_scroll_values
+	jbsr	really_update_sprites
 	
 	.ifndef	RELEASE
 	tst.b	osd_debug_active
@@ -4244,6 +4244,9 @@ load_music_if_needed:
 	lea		level_34_music,a0
 	cmp.w	#LEVEL34_TUNE_SND*8,d0
 	jeq		70f
+	lea		level_56_music,a0
+	cmp.w	#LEVEL56_TUNE_SND*8,d0
+	jeq		70f
 	jra		75f
 70:
 	cmp.l	current_music_name,a0
@@ -4579,6 +4582,8 @@ level_12_music:
 	.asciz	"level_12.mod"
 level_34_music:
 	.asciz	"level_34.mod"
+level_56_music:
+	.asciz	"level_56.mod"
 	
 
 	.align	2

@@ -1,27 +1,17 @@
-- level 4: a lot of tiles are missing, rip mockup, tile 2B/7, 2C/7 won't display (
-  (after killing daemon)
 - resume from scroll X != 0 doesn't work properly, test on hw tester
 - Y scroll: first perform wrap at 256+16 (copper split)
 - update_bg_tile: store draw address first and act on first column tile on the right draw, to remove extra 16 pixels on the top (corkscrew)
 - game over: game locks up
 - hw_test: scrolling X: ok but tiles on the left refreshed too late: see the address
   draw_left uses
-- map: missing tiles
-- "map" music plays but probably cut by level music at start. 3F stops music?
 - level 1: first devil stays forever sometimes (unkillable) if we approach too closely without killing him
   no more enemies in level then same devil strange issue on level 3
 - dynamic palette in water level 1 intercept it and simulate it
 - 
 - dynamic palette change on level 2: check 65D1 break or hack something (when houses appear)
   we'd have to remove browns for ice palace first, then restore them
-  check if water tiles aren't using the same blues
-- 3F stop music should be implemented (demo => start game music remains)
-- frog colors: change dynamically (detect in sprites palette) like the original
-  but as the colors were quantized, make a list of the used colors of quantized
-  frog frames, then try to find the best greens (the ones from the original palette change)
-  or just recolor from plant
   
-- inprint the tombstones in the background (for instance when drawing left & right tiles) to save
+- inprint the tombstones in the background (for instance when drawing left & right tiles but also at start) to save
   cpu & reduce the shaking effect
 - add space (rows) before and after screens
 - grouping, seems to have issues with main character at tile 0 tile 0 seems

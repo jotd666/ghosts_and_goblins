@@ -21,6 +21,13 @@ fg_weapon_palette = [[int(x,16) for x in s.split()] for s in fg_weapon_palette_h
 # regroup as RGB
 fg_weapon_palette = [[((a << 4)+(b>>4)) for a,b in zip(p,p[4:])] for p in fg_weapon_palette]
 
+# game uses dynamic colors to switch between Arthur and the frog. We have color quantize so it's
+# more difficult to do that properly, unless... we can find similar colors in existing sprites
+# which is the case (giant, plant) so the replacement colors already exist
+frog_colors_replacement_dict = {(68,68,102):(102,187,102), (136,136,170):(0,153,0),
+   (102,102,136):(0,119,0), (204,0,0):(187,187,187),
+   (136,68,0):(170,85,0),(102,0,0):(136,0,0),(204,11,0):(85,85,85)}
+
 ref_fg_weapon_palette = fg_weapon_palette[1]  # lance colors for all weapons
 
 possible_hw_sprites = set()
@@ -598,6 +605,12 @@ for i,tsd in sprite_sheet_dict.items():
     cluts=sprite_cluts,
     name_dict=get_sprite_names(),
     is_bob=True)
+    for j,tile in enumerate(tile_set):
+        if tile:
+            name = get_sprite_names().get(j)
+            if name and name.startswith("frog"):
+                bitplanelib.replace_color_from_dict(tile,frog_colors_replacement_dict)
+                tile.save(name+f"{j}.png")
     sprite_set_list.append(tile_set)
     sprite_palette.update(tp)
 
