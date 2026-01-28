@@ -1,11 +1,13 @@
+- hw_test: scrolling X: ok but tiles on the left refreshed too late: see the address
+  draw_left uses: works only with the correct number of "nop", see which tiles are drawn
+  at start because there's a big bug!! then remove xr_offset/xl_offset and simplfy
 - grouping, seems to have issues with main character at tile 0 tile 0 seems
   to be a special case despite the precautions, use mockup to see what's happening
 - resume from scroll X != 0 doesn't work properly, test on hw tester
 - Y scroll: first perform wrap at 256+16 (copper split)
 - update_bg_tile: store draw address first and act on first column tile on the right draw, to remove extra 16 pixels on the top (corkscrew)
 - game over: game locks up
-- hw_test: scrolling X: ok but tiles on the left refreshed too late: see the address
-  draw_left uses
+
 - level 1: first devil stays forever sometimes (unkillable) if we approach too closely without killing him
   no more enemies in level then same devil strange issue on level 3
 - dynamic palette in water level 1 intercept it and simulate it

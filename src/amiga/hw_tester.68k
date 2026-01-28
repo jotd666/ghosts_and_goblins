@@ -805,8 +805,8 @@ demo_game:
 	WRITE_TEXT	hscrollx_text,2
 	WRITE_TEXT	max_scrollx_text,2
 	WRITE_TEXT	min_scrollx_text,2
-	WRITE_TEXT	xr_offset_text,2
-	WRITE_TEXT	xl_offset_text,2
+	*WRITE_TEXT	xr_offset_text,2
+	*WRITE_TEXT	xl_offset_text,2
 
 	
 	
@@ -1012,13 +1012,17 @@ draw_left_tiles:
 	lsr.w	#8,d0
 	lsr.w	#1,d0
 	lsl.w	#6,d0	
-	move.w	d0,xl_offset
+	move.w	d0,x_offset
 	move.w	(a7)+,d0
-	move.w	xl_offset,x_offset
 	jra		draw_column_tiles
 draw_right_tiles:
 	move.w	max_scroll_x,d0
-	move.w	xr_offset,x_offset
+	move.w	d0,-(a7)
+	lsr.w	#8,d0
+	lsr.w	#1,d0
+	lsl.w	#6,d0	
+	move.w	d0,x_offset
+	move.w	(a7)+,d0
 draw_column_tiles:
 	GET_MEMORY_START_AND_DP
 
@@ -1129,14 +1133,19 @@ update_x_offsets:
 	move.b	max_scroll_x,d0
 	lsr.w	#1,d0
 	lsl.w	#6,d0
-	move.w	d0,xr_offset
+	*move.w	d0,xr_offset
 	moveq	#0,d0
 	move.b	min_scroll_x,d0		| high part
 	lsr.w	#1,d0
 	lsl.w	#6,d0
-	move.w	d0,xl_offset
+	*move.w	d0,xl_offset
 	rts
-	
+	nop
+	nop
+	*nop
+	nop
+	nop
+	nop
 	
 * < A0: filename
 * < A1: buffer
@@ -1185,8 +1194,8 @@ call_nmi:
 	WRITE_HEX	host_scroll_x,3
 	WRITE_HEX	max_scroll_x,3
 	WRITE_HEX	min_scroll_x,3
-	WRITE_HEX	xr_offset,3
-	WRITE_HEX	xl_offset,3
+	*WRITE_HEX	xr_offset,3
+	*WRITE_HEX	xl_offset,3
 
 
 	
@@ -1427,11 +1436,6 @@ osd_wait:
 	rts
 
 
-* "0x00">Torch
-* "0x01">Lance	
-* "0x02">Axe	
-* "0x03">Shield
-* "0x04">Sword
 
 cycle_weapon:
 	rts
@@ -4117,10 +4121,6 @@ game_scroll_y:
 	.word	0
 game_scroll_x:
 	.word	0
-xr_offset:
-	.word	0
-xl_offset:
-	.word	0
 x_offset:
 	.word	0
 host_scroll_y:
@@ -4134,6 +4134,10 @@ max_scroll_x:
 previous_scroll_y:
 	.word	0
 previous_scroll_x:
+	.word	0
+xr_offset:
+	.word	0
+xl_offset:
 	.word	0
 
 
