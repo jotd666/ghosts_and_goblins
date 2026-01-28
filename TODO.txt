@@ -1,3 +1,5 @@
+- grouping, seems to have issues with main character at tile 0 tile 0 seems
+  to be a special case despite the precautions, use mockup to see what's happening
 - resume from scroll X != 0 doesn't work properly, test on hw tester
 - Y scroll: first perform wrap at 256+16 (copper split)
 - update_bg_tile: store draw address first and act on first column tile on the right draw, to remove extra 16 pixels on the top (corkscrew)
@@ -14,8 +16,6 @@
 - inprint the tombstones in the background (for instance when drawing left & right tiles but also at start) to save
   cpu & reduce the shaking effect
 - add space (rows) before and after screens
-- grouping, seems to have issues with main character at tile 0 tile 0 seems
-  to be a special case despite the precautions, use mockup to see what's happening
 - Y=0 is address 2801
 - fix some sfx on channel 3, elaborate sound priorities
 - infinite lives trainer not working

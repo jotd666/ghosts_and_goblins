@@ -498,16 +498,16 @@ write_4_bg_tiles_633f:
 ; this part will need optimization
 635A: E6 A4       LDB    ,Y		; [select_address]
 635C: A6 21       LDA    $1,Y		; [select_address]
-635E: ED C3       STD    ,--U		; [video_address]
+635E: ED C3       STD    ,--U		; [unchecked_address]
 6360: E6 22       LDB    $2,Y		; [select_address]
 6362: A6 23       LDA    $3,Y		; [select_address]
-6364: ED C8 20    STD    $20,U		; [video_address]
+6364: ED C8 20    STD    $20,U		; [unchecked_address]
 6367: E6 24       LDB    $4,Y		; [select_address]
 6369: A6 25       LDA    $5,Y		; [select_address]
-636B: ED C9 04 00 STD    $0400,U		; [video_address]
+636B: ED C9 04 00 STD    $0400,U		; [video_address_word]
 636F: E6 26       LDB    $6,Y		; [select_address]
 6371: A6 27       LDA    $7,Y		; [select_address]
-6373: ED C9 04 20 STD    $0420,U		; [video_address]
+6373: ED C9 04 20 STD    $0420,U		; [video_address_word]
 6377: 39          RTS
 
 ; < B: index
@@ -563,7 +563,7 @@ show_map_63ac:
 63E0: 30 A4       LEAX   ,Y
 63E2: A6 C0       LDA    ,U+
 63E4: 27 0A       BEQ    $63F0
-63E6: A7 82       STA    ,-X		; [video_address] (map)
+63E6: A7 82       STA    ,-X		; [unchecked_address] (map)
 63E8: E6 C0       LDB    ,U+
 63EA: E7 89 04 00 STB    $0400,X		; [video_address]
 63EE: 20 F2       BRA    $63E2
@@ -979,7 +979,7 @@ fill_screen_with_h_6883:
 6883: 8E 20 00    LDX    #$2000
 6886: 86 48       LDA    #$48		; 'H'
 6888: C6 01       LDB    #$01
-688A: E7 89 04 00 STB    $0400,X	; [video_address]
+688A: E7 89 04 00 STB    $0400,X	; [unchecked_address]
 688E: A7 80       STA    ,X+		; [video_address]
 6890: 8C 23 FF    CMPX   #$23FF
 6893: 23 F5       BLS    $688A
@@ -2335,9 +2335,9 @@ take_a_key_level_complete_72c9:
 767F: EE 84       LDU    ,X
 7681: 33 5C       LEAU   -$4,U
 7683: EC A1       LDD    ,Y++
-7685: ED C4       STD    ,U		; [video_address]
+7685: ED C4       STD    ,U		; [unchecked_address]
 7687: EC A1       LDD    ,Y++
-7689: ED 42       STD    $2,U		; [video_address]
+7689: ED 42       STD    $2,U		; [unchecked_address]
 768B: DC E4       LDD    $E4
 768D: ED C9 04 00 STD    $0400,U		; [video_address]
 7691: ED C9 04 02 STD    $0402,U		; [video_address]
@@ -2370,7 +2370,7 @@ take_a_key_level_complete_72c9:
 76D0: 86 0A       LDA    #$0A
 76D2: 3D          MUL
 76D3: 33 CB       LEAU   D,U
-76D5: A7 89 04 00 STA    $0400,X	; [video_address]
+76D5: A7 89 04 00 STA    $0400,X	; [unchecked_address]
 76D9: E6 C0       LDB    ,U+
 76DB: E7 80       STB    ,X+	; [video_address]
 76DD: 0A E3       DEC    $E3
@@ -2378,7 +2378,7 @@ take_a_key_level_complete_72c9:
 76E1: C6 05       LDB    #$05
 76E3: D7 E3       STB    $E3
 76E5: 30 88 3B    LEAX   $3B,X
-76E8: A7 89 04 00 STA    $0400,X	; [video_address]
+76E8: A7 89 04 00 STA    $0400,X	; [unchecked_address]
 76EC: E6 C0       LDB    ,U+
 76EE: E7 80       STB    ,X+	; [video_address]
 76F0: 0A E3       DEC    $E3
@@ -4208,7 +4208,7 @@ devil_takes_girl_7d80:
 86AD: 31 89 04 00 LEAY   $0400,X
 update_tile_column_86b1:
 86B1: A6 C8 30    LDA    $30,U
-86B4: A7 A2       STA    ,-Y		; [video_address]
+86B4: A7 A2       STA    ,-Y		; [unchecked_address] (video but refreshed 2 instructions below)
 86B6: A6 C0       LDA    ,U+
 86B8: A7 82       STA    ,-X		; [video_address]
 86BA: 11 83 03 B0 CMPU   #$03B0
@@ -8540,12 +8540,12 @@ B45C: EE 88 16    LDU    $16,X
 B45F: 10 AE 88 18 LDY    $18,X
 B463: 86 87       LDA    #$87
 B465: C6 87       LDB    #$87
-B467: ED A9 04 00 STD    $0400,Y  ; [video_address]
+B467: ED A9 04 00 STD    $0400,Y  ; [unchecked_address]
 B46B: EC C1       LDD    ,U++
 B46D: ED A4       STD    ,Y  		; [video_address]
 B46F: 86 87       LDA    #$87
 B471: C6 87       LDB    #$87
-B473: ED A9 04 20 STD    $0420,Y 		; [video_address]
+B473: ED A9 04 20 STD    $0420,Y 		; [unchecked_address]
 B477: EC C1       LDD    ,U++
 B479: ED A8 20    STD    $0020,Y    	; [video_address]
 B47C: E6 C0       LDB    ,U+
@@ -8787,7 +8787,7 @@ B72E: CC 03 00    LDD    #$0300
 B731: ED 14       STD    -$C,X
 B733: 39          RTS
 B734: 0C B5       INC    $B5
-B736: C6 03       LDB    #$03
+B736: C6 03       LDB    #$03		; number of hits to kill small red devil
 B738: E7 88 1E    STB    $1E,X
 B73B: C6 03       LDB    #$03
 B73D: E7 1F       STB    -$1,X
@@ -14956,9 +14956,11 @@ EF27: BD F5 30    JSR    $F530
 EF2A: 7E F7 62    JMP    $F762
 
 EF49: 39          RTS
+enemy_shot_collision_ef4a:
 EF4A: E6 10       LDB    -$10,X
 EF4C: E4 11       ANDB   -$F,X
-EF4E: 27 F9       BEQ    $EF49
+EF4E: 27 F9       BEQ    $EF49		; no enemies in sight: return
+; there are enemies to shoot
 EF50: 4F          CLRA
 EF51: D6 E0       LDB    $E0
 EF53: 5A          DECB
@@ -14993,7 +14995,8 @@ EF84: C6 04       LDB    #$04
 EF86: D7 E1       STB    $E1
 EF88: E6 30       LDB    -$10,Y
 EF8A: E4 31       ANDB   -$F,Y
-EF8C: 10 27 00 83 LBEQ   $F013
+EF8C: 10 27 00 83 LBEQ   $F013		; no shots in the air, no need to detect collision
+; player shot active
 EF90: DC E8       LDD    $E8
 EF92: 30 A5       LEAX   B,Y
 EF94: 9F E6       STX    $E6
@@ -15005,11 +15008,13 @@ EF9E: A3 36       SUBD   -$A,Y
 EFA0: E3 84       ADDD   ,X
 EFA2: 10 A3 02    CMPD   $2,X
 EFA5: 22 6C       BHI    $F013
+; X coord of weapon aligned with enemy, is Y aligned too?
 EFA7: EC 59       LDD    -$7,U
 EFA9: A3 39       SUBD   -$7,Y
 EFAB: E3 04       ADDD   $4,X
 EFAD: 10 A3 06    CMPD   $6,X
 EFB0: 22 61       BHI    $F013
+; X and Y coords are aligned: weapon hit the enemy
 EFB2: 8E EF 35    LDX    #$EF35
 EFB5: E6 45       LDB    $5,U
 EFB7: A6 85       LDA    B,X
@@ -15019,10 +15024,11 @@ EFBD: A6 50       LDA    -$10,U
 EFBF: 2B 28       BMI    $EFE9
 EFC1: 8E F0 1E    LDX    #$F01E
 EFC4: A6 85       LDA    B,X
-EFC6: 27 08       BEQ    $EFD0
+EFC6: 27 08       BEQ    $EFD0		; enemy with only 1 HP: instant kill
+; serious enemy (devil, boss) requiring several shots
 EFC8: C6 01       LDB    #$01
 EFCA: E7 52       STB    -$E,U
-EFCC: 6A C6       DEC    A,U
+EFCC: 6A C6       DEC    A,U		; remove one point of energy for enemy
 EFCE: 26 19       BNE    $EFE9
 EFD0: 8E F0 D8    LDX    #$F0D8
 EFD3: E6 45       LDB    $5,U
@@ -16041,7 +16047,7 @@ FF10: 39          RTS
 ; FFFF tells post processing to zap the symbol
 	; from bank 4
 jump_table_4540:
-	dc.w	$EF4A	; $4540
+	dc.w	enemy_shot_collision_ef4a	; $4540
 	dc.w	$DDB9	; $4542
 jump_table_4544:
 	dc.w	$A0DB	; $4544

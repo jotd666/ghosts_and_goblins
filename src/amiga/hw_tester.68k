@@ -34,7 +34,7 @@ RAM_START = 0x0000
 
 COPPER_NOP = 0x1FE
 
-START_X = 0x100
+START_X = 0
 START_Y = 0
 
 BORDERBLANK = 1
@@ -1007,6 +1007,13 @@ force_all_screen_redraw:
 	
 draw_left_tiles:
 	move.w	min_scroll_x,d0
+	sub.w	#0x10,d0
+	move.w	d0,-(a7)
+	lsr.w	#8,d0
+	lsr.w	#1,d0
+	lsl.w	#6,d0	
+	move.w	d0,xl_offset
+	move.w	(a7)+,d0
 	move.w	xl_offset,x_offset
 	jra		draw_column_tiles
 draw_right_tiles:
@@ -1124,7 +1131,7 @@ update_x_offsets:
 	lsl.w	#6,d0
 	move.w	d0,xr_offset
 	moveq	#0,d0
-	move.b	min_scroll_x,d0
+	move.b	min_scroll_x,d0		| high part
 	lsr.w	#1,d0
 	lsl.w	#6,d0
 	move.w	d0,xl_offset
