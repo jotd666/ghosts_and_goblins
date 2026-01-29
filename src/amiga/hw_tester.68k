@@ -1140,12 +1140,7 @@ update_x_offsets:
 	lsl.w	#6,d0
 	*move.w	d0,xl_offset
 	rts
-	nop
-	nop
-	*nop
-	nop
-	nop
-	nop
+
 	
 * < A0: filename
 * < A1: buffer
@@ -4397,11 +4392,6 @@ bobs_bitplanes:
 fine_x_scroll_value:
 	.word	0
 	
-first_rows:
-	.rept	NB_FIRST_ROWS
-	DECL_ROW
-	.endr
-first_rows_end:
 		
 	
 	* mid-line wait & extra interrupt
@@ -4409,10 +4399,6 @@ first_rows_end:
 pal_intreq_block_game:
 	.word	 intreq,0x8014  | call copper interrupt in the middle of a frame, also flag so copper interrupt knows that we're going to call copper int
 
-second_rows:
-	.rept	NB_SECOND_ROWS
-	DECL_ROW
-	.endr
 
 	
 	* pal limit
@@ -4424,10 +4410,6 @@ second_rows:
 	* extra wait for PAL (NTSC can't afford this)
 	.set	y_pos,0
 	
-third_rows:
-	.rept	NB_THIRD_ROWS
-	DECL_ROW
-	.endr
 
 	
 pal_wait:
@@ -4439,6 +4421,21 @@ pal_wait:
 
      .long    -2					
 	.ascii	"ENDCPLST"
+
+first_rows:
+	.rept	NB_FIRST_ROWS
+	DECL_ROW
+	.endr
+first_rows_end:
+second_rows:
+	.rept	NB_SECOND_ROWS
+	DECL_ROW
+	.endr
+third_rows:
+	.rept	NB_THIRD_ROWS
+	DECL_ROW
+	.endr
+
 
 	* aligning on 8 bytes so .align will work
 	* in the next datachip sections
