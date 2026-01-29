@@ -975,8 +975,7 @@ force_all_screen_redraw:
 	move.w	d0,d1
 	add.w	#VISIBLE_SCROLL_WIDTH+BG_TILE_WIDTH,d1		| after that it triggers tile refresh
 	move.w	d1,max_scroll_x
-	clr.w	xr_offset
-	clr.w	xl_offset
+
 	
 	move.w	game_scroll_x,d0
 	lea		(0x2800,a6),a5
@@ -1004,26 +1003,24 @@ force_all_screen_redraw:
 	dbf		d2,0b
 	rts
 	
+	* add 0x40 bytes every 0x200 scroll pixels
+	* to make up for memory wrap
 	
 draw_left_tiles:
 	move.w	min_scroll_x,d0
 	sub.w	#0x10,d0
-	move.w	d0,-(a7)
-	lsr.w	#8,d0
-	lsr.w	#1,d0
-	lsl.w	#6,d0	
-	move.w	d0,x_offset
-	move.w	(a7)+,d0
+
 	jra		draw_column_tiles
 draw_right_tiles:
 	move.w	max_scroll_x,d0
+
+draw_column_tiles:
 	move.w	d0,-(a7)
 	lsr.w	#8,d0
 	lsr.w	#1,d0
 	lsl.w	#6,d0	
 	move.w	d0,x_offset
-	move.w	(a7)+,d0
-draw_column_tiles:
+	move.w	(a7)+,d0	
 	GET_MEMORY_START_AND_DP
 
 	lea		(0x2800,a6),a5
@@ -1108,7 +1105,6 @@ set_scroll_values:
 	jbsr	draw_left_tiles
 	sub.w	#BG_TILE_WIDTH,max_scroll_x
 	sub.w	#BG_TILE_WIDTH,min_scroll_x
-	jbsr	update_x_offsets
 	
 	jra		5f
 0:
@@ -1121,25 +1117,11 @@ set_scroll_values:
 	jbsr	draw_right_tiles
 	add.w	#BG_TILE_WIDTH,max_scroll_x
 	add.w	#BG_TILE_WIDTH,min_scroll_x
-	* add 0x40 bytes every 0x200 scroll pixels
-	* to make up for memory wrap
-	jbsr	update_x_offsets
+
 5:
 
 	rts
 
-update_x_offsets:
-	moveq	#0,d0
-	move.b	max_scroll_x,d0
-	lsr.w	#1,d0
-	lsl.w	#6,d0
-	*move.w	d0,xr_offset
-	moveq	#0,d0
-	move.b	min_scroll_x,d0		| high part
-	lsr.w	#1,d0
-	lsl.w	#6,d0
-	*move.w	d0,xl_offset
-	rts
 
 	
 * < A0: filename
