@@ -34,7 +34,7 @@ RAM_START = 0x0000
 
 COPPER_NOP = 0x1FE
 
-START_X = 0
+START_X = 0x80
 START_Y = 0
 
 BORDERBLANK = 1
@@ -770,7 +770,21 @@ demo_game:
 	move.b	#0x41,(0x400,a0)
 	addq 	#2,a0
 	dbf		d0,0b
-
+	
+	* set "walls" in diagonals too
+	lea		(0x2822,a6),a0
+	move	#0x2,d1
+1:
+	move	#0xF,d0
+	move.l	a0,a1
+0:
+	move.b	#0xE9,(a1)
+	move.b	#0x41,(0x400,a1)
+	add 	#0x21,a1
+	dbf		d0,0b
+	add	#0x100,a0
+	dbf		d1,1b
+	
 	moveq	#2,D0
 	tst.b	start_level_3
 	jne		0f
@@ -805,7 +819,7 @@ demo_game:
 	WRITE_TEXT	hscrollx_text,2
 	WRITE_TEXT	max_scrollx_text,2
 	WRITE_TEXT	min_scrollx_text,2
-	*WRITE_TEXT	xr_offset_text,2
+	WRITE_TEXT	x_offset_text,2
 	*WRITE_TEXT	xl_offset_text,2
 
 	
@@ -864,8 +878,8 @@ max_scrollx_text:
 min_scrollx_text:
 	.ascii	"Min ScrollX "
 	.byte	0xff
-xr_offset_text:
-	.ascii	"XR offset "
+x_offset_text:
+	.ascii	"X offset "
 	.byte	0xff
 xl_offset_text:
 	.ascii	"XL offset "
@@ -969,7 +983,6 @@ force_all_screen_redraw:
 	* given the current scroll X/Y, draw all tiles on screen
 	move.w	game_scroll_x,d0
 	move.w	d0,previous_scroll_x
-	
 	move.w	d0,host_scroll_x		| when called, then host scroll is 0 modulus the bplcon shift fmode=3
 	move.w	d0,min_scroll_x
 	move.w	d0,d1
@@ -1008,8 +1021,7 @@ force_all_screen_redraw:
 	
 draw_left_tiles:
 	move.w	min_scroll_x,d0
-	sub.w	#0x10,d0
-
+	sub.w	#BG_TILE_WIDTH,d0		| else refresh will be okay but visible
 	jra		draw_column_tiles
 draw_right_tiles:
 	move.w	max_scroll_x,d0
@@ -1171,7 +1183,7 @@ call_nmi:
 	WRITE_HEX	host_scroll_x,3
 	WRITE_HEX	max_scroll_x,3
 	WRITE_HEX	min_scroll_x,3
-	*WRITE_HEX	xr_offset,3
+	WRITE_HEX	x_offset,3
 	*WRITE_HEX	xl_offset,3
 
 
@@ -2330,7 +2342,7 @@ platform_init:
 
  	*         VVHH
     move.w #0x89+(Y_START<<8),d0
-    move.w #0x89+((Y_START+8)<<8),d1
+    move.w #0x89+((Y_START-0x10)<<8),d1
 	cmp.l	#NTSC_MONITOR_ID,monitor
 	jne		0f
 	sub.w	#NTSC_Y_SHIFT<<8,d0
@@ -2606,11 +2618,64 @@ osd_w_videoram_out:
 	movem.l	(a7)+,d0-d7/a0-a2
 	OSD_EXIT
 	rts	
+
+* < D7: address (0-0x400)
+* > D0: x_offset or -1 if not in visible screen
+compute_x_offset:
+	* we need to see if the tile is on screen considering X scolling
+	* positions. Compute first X & last X coord visible
+
+	move.w	d7,d2
+	lsr.w	#5,d2
+	
+	* establish min & max bounds including invisible tile used for scroll
+	* which is outside the screen
+	move.w	game_scroll_x,d0  | left of screen
+	lsr.w	#4,d0		| divide by 16 match tile
+	move.w	d0,d1
+	add.w	#0x12,d1	| right part
+	
+	* is min X < d2
+	cmp.b	d0,d2
+	jcc		0f
+	move.w	d1,d3
+	and.w	#0x1F,d3
+	cmp.w	d0,d3
+	jcc		0f
+	* handle wrap
+	add.w	#0x20,d2
+0:
+	cmp.w	d0,d2
+	jcs		10f
+	add.w	#0x11,d0			| visible tile span (including invisible scroll column)
+	cmp.b	d0,d2
+	jcc		10f	| tile x+screen width < scroll x
+
+	* in screen: return x offset (0: left => 0x40: right)
+	move.w	game_scroll_x,d0  | left of screen
+	lsr.w	#4,d0		| divide by 16 match tile
+	move.w	d7,d2
+	lsr.w	#5,d2
+	sub.w	d0,d2
+	jpl		1f
+	add.w	#0x20,d2
+1:
+	add.w	d2,D2		| 0->0x40 for x offset
+	move.w	d2,d0
+	rts
+10:
+	moveq	#-1,d0
+	rts
+		
 	
 bg_tile:
-
 	and.w	#0x3FF,d7
 
+	
+	
+	* tile is in screen considered the current scrolling: update it
+	* (don't check Y we need update no matter when in that case)
+	
 	lea		(BG_SCREEN_TILE_ADDRESS,a6),a0
 	move.b	(a0,d7.w),d0
 	lea		(BG_SCREEN_COLOR_ADDRESS,a6),a0
@@ -2645,7 +2710,7 @@ cache_bg_tiles_address:
 * < D7: 0-0x400 address
 * < D0: tile code
 * < D1: color code
-
+* uses x_offset computed from scrolling current params
 
 update_bg_tile:
 	
@@ -4112,10 +4177,7 @@ previous_scroll_y:
 	.word	0
 previous_scroll_x:
 	.word	0
-xr_offset:
-	.word	0
-xl_offset:
-	.word	0
+
 
 
 
