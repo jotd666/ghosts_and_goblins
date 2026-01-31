@@ -1009,7 +1009,11 @@ force_all_screen_redraw:
 	and.w	#0x3FF,d7		| wrap on memory
 	* force tile draw
 	lea		(a5,d7.w),a0
-	jbsr	osd_video_byte_dirty
+	movem.l	d1-d2,-(a7)
+	move.b	(a0),d0
+	move.b	(0x400,a0),d1
+	jbsr	update_bg_tile
+	movem.l	(a7)+,d1-d2
 	add.w	#0x20,d7		| next X
 	dbf		d1,1b
 	addq	#1,d6
@@ -1053,11 +1057,12 @@ draw_column_tiles:
 	*move.b	#0xE9,(a0)
 	*move.b	#0x41,(0x400,a0)
 	
+	
 	move.b	(a0),d0
 	move.b	(0x400,a0),d1
-	move.w	d7,-(a7)
+	move.w	d2,-(a7)
 	jbsr	update_bg_tile
-	move.w	(a7)+,d7
+	move.w	(a7)+,d2
 	
 	addq	#1,d7			| next Y
 	dbf		d2,0b
@@ -2626,6 +2631,7 @@ osd_w_videoram_out:
 * < D7: address (0-0x400)
 * > D0: x_offset or -1 if not in visible screen
 compute_x_offset:
+	movem.w	d1-d2,-(a7)
 	* we need to see if the tile is on screen considering X scolling
 	* positions. Compute first X & last X coord visible
 
@@ -2664,12 +2670,15 @@ compute_x_offset:
 	jpl		1f
 	add.w	#0x20,d2
 1:
+	add.w	d2,D2
 	add.w	d2,D2		| 0->0x40 for x offset
 	move.w	d2,d0
+2:
+	movem.w	(a7)+,d1-d2
 	rts
 10:
 	moveq	#-1,d0
-	rts
+	jra		2b
 		
 	
 bg_tile:
@@ -2796,11 +2805,13 @@ update_bg_tile:
 	jeq		11f					| clear tile, no error (release)
 	.else
 	jne		12f
+	move.w	d7,-(a7)
 	add.w	#BG_SCREEN_TILE_ADDRESS,d7
 	.ifdef	NO68020
 	lsr.w	#2,d2
 	.endif
 	*COLOR0_FLASH	0xF0F
+	move.w	(a7)+,d7
 	jra		11f
 12:
 	.endif
@@ -2821,10 +2832,12 @@ update_bg_tile:
 	jeq		11f						| not necessarily a problem
 	.else
 	jne		12f
+	move.w	d7,-(a7)
 	add.w	#BG_SCREEN_TILE_ADDRESS,d7
 	lsr.w	#2,d2
 	lsr.w	#2,d3
 	COLOR0_FLASH	0xFF0
+	move.w	(a7)+,d7
 	jra		11f
 	.endif
 12:
