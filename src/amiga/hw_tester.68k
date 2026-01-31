@@ -144,8 +144,8 @@ NB_THIRD_ROWS = 0x20
 
 
 FG_NB_LINES = 256
-BG_NB_LINES = 512
-Y_MAX = BG_NB_LINES
+BG_NB_LINES = 512+256
+Y_MAX = 512
 NB_PLAYFIELD_LINES = BG_NB_LINES
 
 VISIBLE_SCROLL_WIDTH = BG_NB_BYTES_PER_ROW*8-64
@@ -1009,11 +1009,11 @@ force_all_screen_redraw:
 	and.w	#0x3FF,d7		| wrap on memory
 	* force tile draw
 	lea		(a5,d7.w),a0
-	movem.l	d1-d2,-(a7)
+	movem.l	d1-d2/d6,-(a7)
 	move.b	(a0),d0
 	move.b	(0x400,a0),d1
-	jbsr	update_bg_tile
-	movem.l	(a7)+,d1-d2
+	jbsr	calc_x_offset_and_update_bg_tile
+	movem.l	(a7)+,d1-d2/d6
 	add.w	#0x20,d7		| next X
 	dbf		d1,1b
 	addq	#1,d6
@@ -2719,6 +2719,7 @@ bg_tile:
 cache_bg_tiles_address:
 	rts
 
+calc_x_offset_and_update_bg_tile:
 
 * < D7: 0-0x400 address
 * < D0: tile code
@@ -2758,7 +2759,8 @@ update_bg_tile:
 
 	move.w	d7,d1
 	and.w	#0x1F,d1	| modulus 0x20
-	
+	cmp.w	#0x10,d1
+	scs		d6			| repeat tile draw if Y tile  < 0x10
 
 	* updating bitplanes
 	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
@@ -2767,7 +2769,6 @@ update_bg_tile:
 	move.w	#BG_SCREEN_PLANE_SIZE,d5
 	.endif
 	
-	move.w	#NB_BG_PLANES-1,d4
 	move.l		playfield_drawed_screen_ptr,a1
 	.ifeq	OPT_ENABLE_DOUBLE_BUFFERING
 	.else 
@@ -2776,6 +2777,7 @@ update_bg_tile:
 
 	.endif
 	
+	move.w	#NB_BG_PLANES-1,d4   | needed even if no tile
 	lea		mulBG_NB_BYTES_PER_ROW_table,A2
 	.ifdef	NO68020
 	add.w	d1,d1
@@ -2899,6 +2901,21 @@ update_bg_tile:
 	add.w	d1,d1
 	add.w	d1,d1
 	move.l	(a0,d1.w),a0
+	tst.b 	d6
+	jeq		0f
+	movem.l	d0-D3/a0-a6,-(a7)
+	jsr		(a0)
+	* lower part too
+	movem.l	(a7)+,d0-D3/a0-a6
+	move.w	d5,d6
+	lsr.w	#1,d6
+	add.w	d6,a1
+	add.w	d6,a3
+	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
+	add.w	d6,a4
+	.endif
+	move.w	#NB_BG_PLANES-1,d4
+0:
 	jsr		(a0)
 	
 	rts
@@ -2946,8 +2963,6 @@ flipped_tile16:
 0:
 	rts
 
-	CLEAR_TILE16_PLANE
-	jra		41b
 	
 mirror_tile16:
 	lea		mirror_bits(pc),a4
