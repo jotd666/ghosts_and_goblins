@@ -1053,8 +1053,12 @@ draw_column_tiles:
 	*move.b	#0xE9,(a0)
 	*move.b	#0x41,(0x400,a0)
 	
-	jbsr	osd_video_byte_dirty
-
+	move.b	(a0),d0
+	move.b	(0x400,a0),d1
+	move.w	d7,-(a7)
+	jbsr	update_bg_tile
+	move.w	(a7)+,d7
+	
 	addq	#1,d7			| next Y
 	dbf		d2,0b
 	rts
