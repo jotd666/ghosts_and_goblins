@@ -1,13 +1,7 @@
-- hw_test: X ok if we start with scroll from 0 to ??? over some limit the initial tiles are bad
-  because x_offset changes at some point from 0 to 0x40
-- in the same area: we should start host_scroll "in the middle" ex 0x800 to allow to scroll 8 screens right
-  (maybe 4 screens would be enough for all levels, maybe it's not necessary as all levels start on the hard left)
-- implement Y scroll with 3 screens to simulate wrap, get rid of copper Y split for now
+- line 1142 uncommenting update_bg_tiles crashes directly!
 
 - grouping, seems to have issues with main character at tile 0 tile 0 seems
   to be a special case despite the precautions, use mockup to see what's happening
-- resume from scroll X != 0 doesn't work properly, test on hw tester
-- Y scroll: first perform wrap at 256+16 (copper split)
 - update_bg_tile: store draw address first and act on first column tile on the right draw, to remove extra 16 pixels on the top (corkscrew)
 - game over: game locks up
 

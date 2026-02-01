@@ -93,6 +93,9 @@ BG_SCREEN_COLOR_ADDRESS = 0x2C00
 SPRITE_ADDRESS = 0x1E00  | to 0x1FFF
 SPRITE_BUFFER_SIZE = 0x100
 
+bg_tiles_address_2800 = BG_SCREEN_TILE_ADDRESS
+
+
 * if the alloc_sprite & update_sprite routines
 * are reused, changing those offsets can make
 * a quick reuse from game to game as most sprite
@@ -243,6 +246,7 @@ osd_enter_\@:
 	
 	.global	osd_video_byte_dirty
 	.global	osd_video_word_dirty
+	.global	osd_weapon_palette_change
 
 
 	.global osd_read_high_scores
@@ -751,7 +755,7 @@ demo_game:
 	jne		0f
 	lea		graveyard_at_start,a1
 0:
-	lea		(0x2800,a6),a0
+	lea		(bg_tiles_address_2800,a6),a0
 	move.w	#0x3FF,d0
 0:
 	move.w	(a1)+,(a0)+
@@ -996,7 +1000,7 @@ force_all_screen_redraw:
 	
 	move.w	host_scroll_x,d0
 	move.w	d0,d5				| save scroll X
-	lea		(0x2800,a6),a5
+	lea		(bg_tiles_address_2800,a6),a5
 	lsr.w	#4,D0	| divide by 16 to get real X tile offset
 	* now compute start address to fetch data from
 	move.w	#1,d7		| first row is not visible with scroll=0, visible with=$10
@@ -1006,7 +1010,7 @@ force_all_screen_redraw:
 
 	move.w	d7,d6	| save current Y
 
-	*move.w	#BG_NB_BYTES_PER_ROW/2-1,d2	| size of screen in tiles
+
 	move.w	#0x10,d2	| size of screen in tiles
 0:
 	move.w	d6,d7	| set current Y row
@@ -1044,6 +1048,7 @@ draw_left_tiles:
 draw_right_tiles:
 	move.w	max_scroll_x,d0
 
+
 draw_column_tiles:
 	move.w	d0,-(a7)
 	lsr.w	#8,d0
@@ -1053,7 +1058,7 @@ draw_column_tiles:
 	move.w	(a7)+,d0	
 	GET_MEMORY_START_AND_DP
 
-	lea		(0x2800,a6),a5
+	lea		(bg_tiles_address_2800,a6),a5
 	lsr.w	#4,D0	| divide by 16 to get real X tile offset
 	* now compute start address to fetch data from
 	move.w	#1,d7		| first row is not visible with scroll=0, visible with=$10
@@ -1083,10 +1088,6 @@ draw_column_tiles:
 	rts
 
 set_scroll_values:
-	* update Y
-*	move.w	game_scroll_y,d0
-*	and.w	#0xFF,d0
-*	jbsr	wrap_bitplanes
 	
 	* update host scroll
 	* handle 2 wrap points
@@ -2398,16 +2399,16 @@ platform_init:
     move.w d0,bpl1mod(a5)
     move.w d0,bpl2mod(a5)
 
-	lea		rows_table,a1
-	lea		first_rows,a0
-	move.w	#NB_FIRST_ROWS,d0
-	jbsr	generate_row_table
-	lea		second_rows,a0
-	move.w	#NB_SECOND_ROWS,d0
-	jbsr	generate_row_table
-	lea		third_rows,a0
-	move.w	#NB_THIRD_ROWS,d0
-	jbsr	generate_row_table
+*	lea		rows_table,a1
+*	lea		first_rows,a0
+*	move.w	#NB_FIRST_ROWS,d0
+*	jbsr	generate_row_table
+*	lea		second_rows,a0
+*	move.w	#NB_SECOND_ROWS,d0
+*	jbsr	generate_row_table
+*	lea		third_rows,a0
+*	move.w	#NB_THIRD_ROWS,d0
+*	jbsr	generate_row_table
 
 	*move.w	#0xC0,d0
 	*jbsr	wrap_bitplanes
@@ -2809,6 +2810,11 @@ update_bg_tile:
 	lsl.w	#4,d1	| 16 pixels
 	add.w	d1,d0
 	add.w	d0,a1
+	.ifeq	OPT_ENABLE_DOUBLE_BUFFERING
+	.else 
+	* double buffering
+	add.w	d0,a4
+	.endif
 
 	lea		background_restore_buffer,a3
 	add.w	d0,a3
@@ -2816,7 +2822,9 @@ update_bg_tile:
 	
 	*cmp.b	#0x20,d2
 	*jeq		11f				| optim: blank tile
-	move.l		bg_tile_character_table,a0
+	move.l		bg_tile_character_table,d0
+	jeq		0f			| no context loaded: out
+	move.l	d0,a0
 	.ifdef	NO68020
 	add.w	d2,d2
 	add.w	d2,d2	
@@ -2859,7 +2867,7 @@ update_bg_tile:
 	add.w	#BG_SCREEN_TILE_ADDRESS,d7
 	lsr.w	#2,d2
 	lsr.w	#2,d3
-	COLOR0_FLASH	0xFF0
+	*COLOR0_FLASH	0xFF0
 	move.w	(a7)+,d7
 	jra		11f
 	.endif
@@ -2919,9 +2927,13 @@ update_bg_tile:
 	.endm
 	
 	lea		mirror_jump_table,a0
+	.ifdef	NO68020
 	add.w	d1,d1
 	add.w	d1,d1
 	move.l	(a0,d1.w),a0
+	.else
+	move.l	(a0,d1.w*4),a0
+	.endif
 	tst.b 	d6
 	jeq		0f
 	movem.l	d0-D3/a0-a6,-(a7)
@@ -2937,9 +2949,8 @@ update_bg_tile:
 	.endif
 	move.w	#NB_BG_PLANES-1,d4
 0:
-	jsr		(a0)
+	jmp		(a0)
 	
-	rts
 
 standard_tile16:
 
