@@ -37,6 +37,8 @@ COPPER_NOP = 0x1FE
 START_X = 0x150
 START_Y = 0
 
+CORKSCREW_NB_SCREENS = 20
+
 BORDERBLANK = 1
 
 PREVIOUS_SPRITE_SIZE = 8
@@ -984,6 +986,7 @@ force_all_screen_redraw:
 	* given the current scroll X/Y, draw all tiles on screen
 	move.w	game_scroll_x,d0
 	move.w	d0,previous_scroll_x
+	add.w	#(CORKSCREW_NB_SCREENS/2)*0x100,d0			| give us some leeway to the left: 10 screens before havoc
 	move.w	d0,host_scroll_x
 	move.w	d0,min_scroll_x
 	move.w	d0,d1
@@ -991,7 +994,7 @@ force_all_screen_redraw:
 	move.w	d1,max_scroll_x
 
 	
-	move.w	game_scroll_x,d0
+	move.w	host_scroll_x,d0
 	move.w	d0,d5				| save scroll X
 	lea		(0x2800,a6),a5
 	lsr.w	#4,D0	| divide by 16 to get real X tile offset
@@ -2672,21 +2675,20 @@ compute_x_offset:
 	cmp.b	d0,d2
 	jcc		10f	| tile x+screen width < scroll x
 
-	* in screen: return x offset (0: left => 0x40: right)
-	* what is the first visible address (where x_offset = 0)
+	* tile is in screen: return x offset (0, 0x40, 0x80 ...)
 	
-	move.w	host_scroll_x,d0  | left of screen
-	lsr.w	#4,d0		| divide by 16 match tile
 	move.w	d7,d2
-	lsr.w	#5,d2
-	sub.w	d0,d2
-	jpl		1f
-	add.w	#0x20,d2
-1:
-	and.w	#0xFFF0,d2
-	add.w	d2,D2
-	add.w	d2,D2		| 0->0x40 for x offset
-	move.w	d2,d0
+	lsr.w	#5,d2		| this is our Y
+	* now we have D2 between 0 and 0x1F
+	lsl.w	#4,d2		| in X coords
+	move.w	host_scroll_x,d0
+	* add host scroll
+	add.w	d2,d0
+	* now reduce 0x200 => 0x40
+	lsr.w	#8,d0
+	lsr.w	#1,d0
+	lsl.w	#6,d0
+	move.w	d0,x_offset	
 2:
 	movem.w	(a7)+,d1-d2
 	rts
@@ -4545,10 +4547,12 @@ background_restore_buffer:
 	.skip	BG_SCREEN_SIZE
 		
 bobs_screen_buffer_1:
+	.skip	BG_NB_BYTES_PER_ROW*CORKSCREW_NB_SCREENS		| margin for corkscrew
 	.skip	BG_SCREEN_SIZE
 	.skip	BG_NB_BYTES_PER_ROW*48		| margin to avoid sprite blit wrap when game scrolls up
 	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
 bobs_screen_buffer_2:
+	.skip	BG_NB_BYTES_PER_ROW*CORKSCREW_NB_SCREENS		| margin for corkscrew
 	.skip	BG_SCREEN_SIZE
 	.skip	BG_NB_BYTES_PER_ROW*48
 	.endif
