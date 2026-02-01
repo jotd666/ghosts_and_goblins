@@ -34,7 +34,7 @@ RAM_START = 0x0000
 
 COPPER_NOP = 0x1FE
 
-START_X = 0x80
+START_X = 0x150
 START_Y = 0
 
 BORDERBLANK = 1
@@ -43,6 +43,7 @@ PREVIOUS_SPRITE_SIZE = 8
 CURRENT_SPRITE_SIZE = 4
 
 COLUMN_SIZE = 0x1f
+ROW_SIZE = 0x10
 
 GAME_MAX_SCROLL_X = 0x200
 GAME_MAX_SCROLL_Y = 0x200
@@ -983,7 +984,7 @@ force_all_screen_redraw:
 	* given the current scroll X/Y, draw all tiles on screen
 	move.w	game_scroll_x,d0
 	move.w	d0,previous_scroll_x
-	move.w	d0,host_scroll_x		| when called, then host scroll is 0 modulus the bplcon shift fmode=3
+	move.w	d0,host_scroll_x
 	move.w	d0,min_scroll_x
 	move.w	d0,d1
 	add.w	#VISIBLE_SCROLL_WIDTH+BG_TILE_WIDTH,d1		| after that it triggers tile refresh
@@ -991,6 +992,7 @@ force_all_screen_redraw:
 
 	
 	move.w	game_scroll_x,d0
+	move.w	d0,d5				| save scroll X
 	lea		(0x2800,a6),a5
 	lsr.w	#4,D0	| divide by 16 to get real X tile offset
 	* now compute start address to fetch data from
@@ -1001,22 +1003,31 @@ force_all_screen_redraw:
 
 	move.w	d7,d6	| save current Y
 
-	move.w	#COLUMN_SIZE,d2	| size of screen in tiles
+	*move.w	#BG_NB_BYTES_PER_ROW/2-1,d2	| size of screen in tiles
+	move.w	#0x10,d2	| size of screen in tiles
 0:
 	move.w	d6,d7	| set current Y row
-	move.w	#BG_NB_BYTES_PER_ROW/2-1,d1		|  (64 bit margin)
+	move.w	#COLUMN_SIZE,d1		|  (64 bit margin)
 1:
+	* compute X offset now align on 0x40
+	move.w	d5,d0
+	lsr.w	#8,d0
+	lsr.w	#1,d0
+	lsl.w	#6,d0
+	move.w	d0,x_offset
+
 	and.w	#0x3FF,d7		| wrap on memory
 	* force tile draw
 	lea		(a5,d7.w),a0
-	movem.l	d1-d2/d6,-(a7)
+	movem.l	d1-d2/d5-d6,-(a7)
 	move.b	(a0),d0
 	move.b	(0x400,a0),d1
-	jbsr	calc_x_offset_and_update_bg_tile
-	movem.l	(a7)+,d1-d2/d6
-	add.w	#0x20,d7		| next X
+	jbsr	update_bg_tile
+	movem.l	(a7)+,d1-d2/d5-d6
+	add.w	#0x1,d7		| next X
 	dbf		d1,1b
-	addq	#1,d6
+	add.w	#0x20,d6
+	add.w	#BG_TILE_WIDTH,d5	| keep track of current "scroll"
 	dbf		d2,0b
 	rts
 	
@@ -2662,7 +2673,9 @@ compute_x_offset:
 	jcc		10f	| tile x+screen width < scroll x
 
 	* in screen: return x offset (0: left => 0x40: right)
-	move.w	game_scroll_x,d0  | left of screen
+	* what is the first visible address (where x_offset = 0)
+	
+	move.w	host_scroll_x,d0  | left of screen
 	lsr.w	#4,d0		| divide by 16 match tile
 	move.w	d7,d2
 	lsr.w	#5,d2
@@ -2670,6 +2683,7 @@ compute_x_offset:
 	jpl		1f
 	add.w	#0x20,d2
 1:
+	and.w	#0xFFF0,d2
 	add.w	d2,D2
 	add.w	d2,D2		| 0->0x40 for x offset
 	move.w	d2,d0
@@ -2720,7 +2734,12 @@ cache_bg_tiles_address:
 	rts
 
 calc_x_offset_and_update_bg_tile:
-
+	move.w	d0,-(a7)
+	jbsr	compute_x_offset
+	movem.w	(a7)+,d0
+	jpl		0f
+	rts
+0:
 * < D7: 0-0x400 address
 * < D0: tile code
 * < D1: color code
