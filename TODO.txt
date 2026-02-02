@@ -1,10 +1,14 @@
 - Y scrolling seems buggy in some Y values
+- sprites disappear too early on the left
+- nasty crash when starting a level != first level (worked before)
 - TODO: when writing an isolated tile (video_byte_dirty) check if in screen and find proper offset (not working right now
   picks a tile at wrong location)
 - TODO: depending on the level, do not mirror Y (level 1, level 4 don't need it)
 - grouping, seems to have issues with main character at tile 0 tile 0 seems
   to be a special case despite the precautions, use mockup to see what's happening
 - game over: game continues!
+- when starting the game, we should stop the music as it makes the game crash
+- level 6: no tiles display at all!
 - mask top of screen to avoid corkscrew effect to show
 - map: sceptre of player rendered on top too
 - doesn't seem to detect map context change at times (tiles OK but palette is broken)
