@@ -1,9 +1,8 @@
-- line 1142 uncommenting update_bg_tiles crashes directly!
-
+- TODO: when writing an isolated tile (video_byte_dirty) check if in screen and find proper offset
+- TODO: depending on the level, do not mirror Y (level 1, level 4 don't need it)
 - grouping, seems to have issues with main character at tile 0 tile 0 seems
   to be a special case despite the precautions, use mockup to see what's happening
-- update_bg_tile: store draw address first and act on first column tile on the right draw, to remove extra 16 pixels on the top (corkscrew)
-- game over: game locks up
+- game over: game continues!
 
 - level 1: first devil stays forever sometimes (unkillable) if we approach too closely without killing him
   no more enemies in level then same devil strange issue on level 3
@@ -14,8 +13,6 @@
   
 - inprint the tombstones in the background (for instance when drawing left & right tiles but also at start) to save
   cpu & reduce the shaking effect
-- add space (rows) before and after screens
-- Y=0 is address 2801
 - fix some sfx on channel 3, elaborate sound priorities
 - infinite lives trainer not working
 - level 4: wrong ripped bg tiles, missing bg tiles on screen: dump & submit to MAME

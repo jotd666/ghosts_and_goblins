@@ -9825,7 +9825,7 @@ C090: E6 1E       LDB    -$2,X
 C092: 58          ASLB
 C093: 33 C5       LEAU   B,U
 C095: EC 17       LDD    -$9,X
-C097: E3 C4       ADDD   ,U
+C097: E3 C4       ADDD   ,U		; [bank_address]
 C099: ED 17       STD    -$9,X
 C09B: E6 C4       LDB    ,U
 C09D: 1D          SEX
@@ -9884,9 +9884,9 @@ C10A: E7 C4       STB    ,U
 C10C: E6 88 1C    LDB    $1C,X
 C10F: 58          ASLB
 C110: 10 8E 4D 09 LDY    #$4D09
-C114: 10 AE A5    LDY    B,Y
+C114: 10 AE A5    LDY    B,Y		; [bank_address]
 C117: 10 AF 88 18 STY    $18,X
-C11B: EC 22       LDD    $2,Y
+C11B: EC 22       LDD    $2,Y		; [bank_address]
 C11D: BD FE F0    JSR    divmod_fef0
 C120: 10 AE C4    LDY    ,U
 C123: 86 7F       LDA    #$7F
@@ -11633,9 +11633,9 @@ D198: BD 90 74    JSR    $9074
 D19B: 6A 06       DEC    $6,X
 D19D: 26 15       BNE    $D1B4
 D19F: EE 07       LDU    $7,X
-D1A1: E6 C0       LDB    ,U+
+D1A1: E6 C0       LDB    ,U+		; [bank_address]
 D1A3: 2A 04       BPL    $D1A9
-D1A5: EE C4       LDU    ,U
+D1A5: EE C4       LDU    ,U		; [bank_address]
 D1A7: C4 7F       ANDB   #$7F
 D1A9: EF 07       STU    $7,X
 D1AB: E7 06       STB    $6,X
