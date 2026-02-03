@@ -48,7 +48,8 @@ GAME_MAX_SCROLL_X = 0x200
 GAME_MAX_SCROLL_Y = 0x200
 BG_TILE_WIDTH = 16
 
-BG_TILE_MAX_SIZE = 64000  | possibly less
+BG_TILE_MAX_SIZE = 80000  | possibly less
+BIGGEST_MUSIC_SIZE = 411000
 
 SCORE_FILE_SIZE = 0x23		| wrong
 
@@ -853,6 +854,7 @@ demo_game:
 	lea		level_12_music,a0
 	move.l	a0,current_music_name
 	lea		module_buffer,a1
+	move.l	#BIGGEST_MUSIC_SIZE,d0
 	jbsr	load_file
 	
 	
@@ -992,6 +994,7 @@ load_context:
 	move.w	#-1,saved_context   | cancel saved context
 	lea		bg_character_table_buffer,a1
 	move.l	a1,bg_character_table_buffer_ptr
+	move.l	#BG_TILE_MAX_SIZE,d0
 	jbsr	load_file
 	
 	
@@ -1220,10 +1223,23 @@ set_scroll_values:
 	
 * < A0: filename
 * < A1: buffer
+* < D0: max size
 load_file:
-	move.l	_resload,d0
+	move.l	_resload,d1
 	jeq		0f
-	move.l	d0,a2
+	move.l	d1,a2
+	movem.l	d0-d3/a0/a1,-(a7)
+	move.l	d0,d2		| store max size
+	move.l	a0,d3		| store filename
+	jbsr	resload_GetFileSizeDec(a2)
+	.ifndef	RELEASE
+	cmp.l	d0,d2
+	jcc		0f
+	BREAKPOINT	"file size too big vs buffer. D0=size, D2=max, D3=filename"
+0:
+	.endif
+	movem.l	(a7)+,d0-d3/a0/a1
+	
 	jbsr	resload_LoadFileDecrunch(a2)
 	rts
 0:
@@ -1971,6 +1987,12 @@ mirror_sprite_planes:
 	movem.l	(a7)+,d0-d2/a0
 	rts
 	
+
+* < A1: mirror table
+* < A2: bitmap
+* < D1+1: height
+* destroys d0-d2, a2
+
 mirror_16_bit_wide:
 	.ifdef	MC68020
 	moveq	#0,d0
@@ -1992,7 +2014,7 @@ mirror_16_bit_wide:
 	dbf		d1,10b		| next
 	rts
 
-mirror_32_bit_wide:	
+mirror_32_bit_wide:
 	.ifdef	MC68020
 	moveq	#0,d0
 	moveq	#0,d2
@@ -2003,20 +2025,25 @@ mirror_32_bit_wide:
 	moveq	#0,d0
 	moveq	#0,d2
 	.endif
-	move.w	(a2)+,d2
-	move.w	(a2),d0	
+	move.l	(a2)+,d2
+	jeq		14f		| if line is blank, no need to mirror
+	move.w	d2,d0
+	clr.w	d2
+	swap	d2
 	.ifndef	MC68020
 	add.l	d2,d2
 	add.l	d0,d0
-	move.w	(a1,d2.l),(a2)		| get mirror value
+	move.w	(a1,d2.l),-(a2)		| get mirror value
 	move.w	(a1,d0.l),-(a2)		| get mirror value
 	.else
-	move.w	(a1,d2.l*2),(a2)		| get mirror value
+	move.w	(a1,d2.l*2),-(a2)		| get mirror value
 	move.w	(a1,d0.l*2),-(a2)		| get mirror value
 	.endif
 	addq	#4,a2					| skip row
+14:
 	dbf		d1,10b
 	rts
+
 
 	.ifdef 	UNUSED
 mirror_48_bit_wide:
@@ -4266,6 +4293,7 @@ load_music_if_needed:
 	
 	move.l	a0,current_music_name
 	lea		module_buffer,a1
+	move.l	#BIGGEST_MUSIC_SIZE,d0
 	jbsr	load_file
 75:
 	movem.l	(a7)+,d0/a0
@@ -5021,12 +5049,13 @@ fourth_rows:
 		.section .bsschip
 
 module_buffer:
-	.skip	411000		| biggest tune
+	.skip	BIGGEST_MUSIC_SIZE		| biggest tune
 	
 hw_sprite_ram_buffer:
 	.skip	HW_SPRITE_BUFFER_SIZE*8	| 8 64-bit wide sprites + control words + align
 	
 background_restore_buffer:
+	.skip	BG_NB_BYTES_PER_ROW*CORKSCREW_NB_SCREENS		| margin for corkscrew
 	.skip	BG_SCREEN_SIZE
 		
 bobs_screen_buffer_1:

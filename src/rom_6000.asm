@@ -9827,7 +9827,7 @@ C093: 33 C5       LEAU   B,U
 C095: EC 17       LDD    -$9,X
 C097: E3 C4       ADDD   ,U		; [bank_address]
 C099: ED 17       STD    -$9,X
-C09B: E6 C4       LDB    ,U
+C09B: E6 C4       LDB    ,U		; [bank_address]
 C09D: 1D          SEX
 C09E: A9 16       ADCA   -$A,X
 C0A0: A7 16       STA    -$A,X
