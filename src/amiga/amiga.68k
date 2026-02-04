@@ -1995,7 +1995,7 @@ mirror_sprite_planes:
 
 mirror_16_bit_wide:
 	.ifdef	MC68020
-	moveq	#0,d0
+	moveq	#0,d2
 	.endif
 10:
 	.ifndef	MC68020
@@ -2017,13 +2017,11 @@ mirror_16_bit_wide:
 mirror_32_bit_wide:
 	.ifdef	MC68020
 	moveq	#0,d0
-	moveq	#0,d2
 	.endif
 10:
 	.ifndef	MC68020
 	* we have to do that each time as we must add offsets as long (table is 128k long)
 	moveq	#0,d0
-	moveq	#0,d2
 	.endif
 	move.l	(a2)+,d2
 	jeq		14f		| if line is blank, no need to mirror
