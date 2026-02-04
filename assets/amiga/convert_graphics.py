@@ -538,6 +538,7 @@ for context in context_list:
     # level starts with ice towers, but palette is then different
     # more annoying: after palette switch, the colors are there they're
     # just in another clut (clut 5 => clut 6) as the water needs displaying afterwards anyway
+    # so almost everything can be solved statically by switching the clut index
 
     if context=="level2":
         for t in level2_tiles_5to6:
@@ -557,7 +558,7 @@ for context in context_list:
         bg_tile_palette.update(tp)
 
     if context=="level2":
-        # change some tiles from clut 6 to clut 5 so the colors in ice towers are correct
+        # copy some tiles from clut 6 to clut 5 so the colors in ice towers are correct
         tc5 = bg_tile_set_list[5]
         tc6 = bg_tile_set_list[6]
         for t in level2_tiles_5to6:
