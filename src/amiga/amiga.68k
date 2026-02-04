@@ -156,12 +156,12 @@ NB_THIRD_ROWS = 0xE
 NB_FOURTH_ROWS = 0x20-NB_THIRD_ROWS
 FG_NB_LINES = 256
 BG_NB_LINES = 512+256
-Y_MAX = BG_NB_LINES
+Y_MAX = 512
 NB_PLAYFIELD_LINES = BG_NB_LINES
 
 VISIBLE_SCROLL_WIDTH = BG_NB_BYTES_PER_ROW*8-64
 
-BG_SCREEN_PLANE_SIZE = BG_NB_BYTES_PER_ROW*(BG_NB_LINES+16)
+BG_SCREEN_PLANE_SIZE = BG_NB_BYTES_PER_ROW*BG_NB_LINES
 
 BG_SCREEN_SIZE = BG_SCREEN_PLANE_SIZE*NB_PLAYFIELD_PLANES
 
@@ -2498,7 +2498,7 @@ platform_init:
 
 
  	*         VVHH
-    move.w #0x89+(Y_START<<8),d0
+    move.w #0x89+((Y_START+0x10)<<8),d0
     move.w #0x89+((Y_START-0x10)<<8),d1
 	cmp.l	#NTSC_MONITOR_ID,monitor
 	jne		0f
@@ -3089,8 +3089,7 @@ update_bg_tile:
 	jsr		(a0)
 	* lower part too
 	movem.l	(a7)+,d0-D3/a0-a6
-	move.w	d5,d6
-	lsr.w	#1,d6
+	move.w	#2*BG_SCREEN_PLANE_SIZE/3,d6
 	add.w	d6,a1
 	add.w	d6,a3
 	.ifne	OPT_ENABLE_DOUBLE_BUFFERING

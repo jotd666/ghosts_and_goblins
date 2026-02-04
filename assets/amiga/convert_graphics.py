@@ -518,12 +518,14 @@ for p in [fg_tile_lower_palette,fg_tile_upper_palette]:
     p += (16-len(p)) * [(0x10,0x20,0x30)]
 
 ###############
-# background: per level, 1=2
+# background: per level
 ###############
+water_tiles = list(range(0x35B,0x360))
+level2_tiles_5to6 = list(range(0x356,0x35B))+list(range(0x10,0x16))+water_tiles
 
 special_fade_palettes = []
 
-context_list = ["map","level1","level2","level3","level4","level5","level6","level7"]
+context_list = ["level2","level3","level4","level5","level6","level7","map","level1",]
 # palette is the same between level 1 and 2 except that
 # 1) used tiles are very different, so mixing them would mean quantize & color loss
 # 2) we use the steady palette values from level 2 (water is animated by color cycling on level 1, corrupting level 2 ice tower tiles)
@@ -532,6 +534,17 @@ for context in context_list:
     bg_tile_cluts = {}
     read_used_tiles(pathlib.Path(context)/"bg_used_tiles",bg_tile_cluts,BG_NB_TILES,BG_NB_CLUTS)
 
+    # stupid cornercase for level 2
+    # level starts with ice towers, but palette is then different
+    # more annoying: after palette switch, the colors are there they're
+    # just in another clut (clut 5 => clut 6) as the water needs displaying afterwards anyway
+
+    if context=="level2":
+        for t in level2_tiles_5to6:
+            bg_tile_cluts[t]=[6]
+        for t in water_tiles:
+            bg_tile_cluts[t]=[5,6]
+
     bg_tile_palette = set()
     bg_tile_set_list = []
 
@@ -539,8 +552,16 @@ for context in context_list:
         tp,tile_set = load_tileset(tsd,i,16,16,pathlib.Path(context) / "bg_tiles",dump_dir,dump=dump_it,
         cluts=bg_tile_cluts,
         name_dict=None)
+
         bg_tile_set_list.append(tile_set)
         bg_tile_palette.update(tp)
+
+    if context=="level2":
+        # change some tiles from clut 6 to clut 5 so the colors in ice towers are correct
+        tc5 = bg_tile_set_list[5]
+        tc6 = bg_tile_set_list[6]
+        for t in level2_tiles_5to6:
+            tc5[t] = tc6[t]
 
     if len(bg_tile_palette)>32:
         print(f"{context}: Too many colors in bg tiles ({len(bg_tile_palette)}), quantizing")

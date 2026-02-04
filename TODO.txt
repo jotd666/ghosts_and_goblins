@@ -1,23 +1,22 @@
 - Y scrolling seems buggy in some Y values
+- empty/hole tile on the top (cave) when scrolling
 - sprites disappear too early on the left
-- need to implement/test 48 and 64 bit swap
+- need to implement/test 48 and 64 bit swap (last boss)
 - TODO: when writing an isolated tile (video_byte_dirty) check if in screen and find proper offset (not working right now
   picks a tile at wrong location, also when forcing screen display misses totally if scroll=0x100 - level 6)
+  also when resuming level 2 it displays black screen too
 - TODO: depending on the level, do not mirror Y (level 1, level 4 don't need it)
 - grouping, seems to have issues with main character at tile 0 tile 0 seems
   to be a special case despite the precautions, use mockup to see what's happening
 - game over: game continues!
-- when starting the game, we should stop the music as it makes the game crash
+- when starting the game, we should stop the music as it makes the game crash: TBC
 - level 6: no tiles display at all!
-- mask top of screen to avoid corkscrew effect to show
 - map: sceptre of player rendered on top too
 - doesn't seem to detect map context change at times (tiles OK but palette is broken)
 - level 1: first devil stays forever sometimes (unkillable) if we approach too closely without killing him
   no more enemies in level then same devil strange issue on level 3
 - dynamic palette in water level 1 intercept it and simulate it
-- 
-- dynamic palette change on level 2: check 65D1 break or hack something (when houses appear)
-  we'd have to remove browns for ice palace first, then restore them
+- remove parasite tiles (in the end) because of levelskip some intro tiles are logged in levels 2+
   
 - inprint the tombstones (level 1 & 3) in the background (for instance when drawing left & right tiles but also at start) to save
   cpu & reduce the shaking effect
