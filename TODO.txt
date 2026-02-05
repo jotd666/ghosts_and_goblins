@@ -1,3 +1,10 @@
+- devil bug: would need to protect all jump tables:
+7413: CE 74 18    LDU    #jump_table_7418
+7416: 6E D5       JMP    [B,U]        ; [indirect_jump]
+more common case so get table, count the numbers of entries and change [indirect_jump] => [indirect_jump] (x cases) then change postproc
+to add arg in jxx macro
+
+- right now state of devil is altered because EB5 takes value 2 which is out of range for jump table at BBA5
 - when writing an isolated tile (video_byte_dirty) check if in screen and find proper offset (not working right now
   picks a tile at wrong location, also when forcing screen display misses totally if scroll=0x100 - level 6)
   also when resuming level 2 it displays black screen too

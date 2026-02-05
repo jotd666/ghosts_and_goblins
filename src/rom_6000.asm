@@ -8684,14 +8684,7 @@ B635: 54          LSRB
 B636: CE B6 3E    LDU    #$B63E
 B639: 33 C5       LEAU   B,U
 B63B: 7E B8 7E    JMP    $B87E
-B63E: 00 80       NEG    $80
-B640: 01 00       NEG    $00
-B642: 00 60       NEG    nb_lives_0060
-B644: 00 C0       NEG    $C0
-B646: 00 40       NEG    copy_of_dsw1_0040
-B648: 00 80       NEG    $80
-B64A: 00 20       NEG    counter_16_bit_0020
-B64C: 00 40       NEG    copy_of_dsw1_0040
+
 B64E: EC 13       LDD    -$D,X
 B650: 48          ASLA
 B651: CE B6 56    LDU    #jump_table_b656
@@ -14991,12 +14984,12 @@ EF7A: D6 73       LDB    weapon_type_0073
 EF7C: A6 85       LDA    B,X
 EF7E: 97 E4       STA    $E4
 EF80: 10 8E 05 40 LDY    #$0540
-EF84: C6 04       LDB    #$04
+EF84: C6 04       LDB    #$04		; 4 possible shots at the same time
 EF86: D7 E1       STB    $E1
-EF88: E6 30       LDB    -$10,Y
-EF8A: E4 31       ANDB   -$F,Y
+EF88: E6 30       LDB    -$10,Y		; $530,$570,..
+EF8A: E4 31       ANDB   -$F,Y		; $531,$571...
 EF8C: 10 27 00 83 LBEQ   $F013		; no shots in the air, no need to detect collision
-; player shot active
+; player shot active as 2 above variables = 1
 EF90: DC E8       LDD    $E8
 EF92: 30 A5       LEAX   B,Y
 EF94: 9F E6       STX    $E6
@@ -15037,7 +15030,7 @@ EFD7: 86 0C       LDA    #$0C
 EFD9: 34 20       PSHS   Y
 EFDB: BD 69 09    JSR    $6909
 EFDE: 35 20       PULS   Y
-EFE0: 68 50       ASL    -$10,U
+EFE0: 68 50       ASL    -$10,U		; kill enemy: state 1 => 2
 EFE2: CC 02 00    LDD    #$0200
 EFE5: ED 53       STD    -$D,U
 EFE7: E7 55       STB    -$B,U
@@ -15063,7 +15056,7 @@ F00B: 2B 02       BMI    $F00F
 F00D: C6 03       LDB    #$03
 F00F: 86 02       LDA    #$02
 F011: ED 33       STD    -$D,Y
-F013: 31 A8 40    LEAY   $40,Y
+F013: 31 A8 40    LEAY   $40,Y		; next player shot slot
 F016: 0A E1       DEC    $E1
 F018: 10 26 FF 6C LBNE   $EF88
 F01C: 35 90       PULS   X,PC
