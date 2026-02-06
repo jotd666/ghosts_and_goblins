@@ -1839,7 +1839,7 @@ l_5623:
 	.endif
 	lea	jump_table_563e,a2             	| [$5639: ldx    #jump_table_563e]
 	LOG_REGS	563c   | added by add_reg_log.py
-	JMP_B_INDEXED	a2  | [$563c: jmp    [b,x]] [indirect_jump]
+	JMP_B_INDEXED	a2,2  | [$563c: jmp    [b,x]] [indirect_jump] [nb_entries=2]
 
 
 jump_table_563e:
@@ -1879,7 +1879,7 @@ l_5655:
 	.endif
 	lea	jump_table_5692,a2             	| [$5658: ldx    #jump_table_5692]
 	LOG_REGS	565b   | added by add_reg_log.py
-	JSR_B_INDEXED	a2  | [$565b: jsr    [b,x]] [indirect_jump]
+	JSR_B_INDEXED	a2,3  | [$565b: jsr    [b,x]] [indirect_jump] [nb_entries=3]
 
 	LOG_REGS	565d   | added by add_reg_log.py
 	OP_R_ON_DP_ADDRESS	move,0x43,d1         | [$565d: ldb    $43]
@@ -1957,7 +1957,7 @@ l_5698:
 	.endif
 	lea	jump_table_56a0,a2             	| [$569b: ldx    #jump_table_56a0]
 	LOG_REGS	569e   | added by add_reg_log.py
-	JMP_B_INDEXED	a2  | [$569e: jmp    [b,x]] [indirect_jump]
+	JMP_B_INDEXED	a2,6  | [$569e: jmp    [b,x]] [indirect_jump] [nb_entries=6]
 
 
 jump_table_56a0:
@@ -2546,7 +2546,7 @@ l_58d8:
 	.endif
 	lea	jump_table_58e0,a2             	| [$58db: ldx    #jump_table_58e0]
 	LOG_REGS	58de   | added by add_reg_log.py
-	JMP_B_INDEXED	a2  | [$58de: jmp    [b,x]] [indirect_jump]
+	JMP_B_INDEXED	a2,6  | [$58de: jmp    [b,x]] [indirect_jump] [nb_entries=6]
 
 jump_table_58e0:
 	.long	l_56ac
@@ -2840,7 +2840,7 @@ l_59c0:
 	.endif
 	lea	jump_table_59c8,a2             	| [$59c3: ldx    #jump_table_59c8]
 	LOG_REGS	59c6   | added by add_reg_log.py
-	JMP_B_INDEXED	a2  | [$59c6: jmp    [b,x]] [indirect_jump]
+	JMP_B_INDEXED	a2,7  | [$59c6: jmp    [b,x]] [indirect_jump] [nb_entries=7]
 
 
 jump_table_59c8:
@@ -3101,7 +3101,7 @@ l_5a7e:
 	.endif
 	lea	jump_table_5a96,a2             	| [$5a91: ldx    #jump_table_5a96]
 	LOG_REGS	5a94   | added by add_reg_log.py
-	JMP_B_INDEXED	a2  | [$5a94: jmp    [b,x]] [indirect_jump]
+	JMP_B_INDEXED	a2,3  | [$5a94: jmp    [b,x]] [indirect_jump] [nb_entries=3]
 
 
 jump_table_5a96:
@@ -3352,7 +3352,7 @@ l_5b25:
 	.endif
 	lea	jump_table_5b49,a2             	| [$5b44: ldx    #jump_table_5b49]
 	LOG_REGS	5b47   | added by add_reg_log.py
-	JMP_B_INDEXED	a2  | [$5b47: jmp    [b,x]] [indirect_jump]
+	JMP_B_INDEXED	a2,2  | [$5b47: jmp    [b,x]] [indirect_jump] [nb_entries=2]
 
 
 jump_table_5b49:
@@ -3393,7 +3393,7 @@ l_5b63:
 	.endif
 	lea	jump_table_5b6b,a2             	| [$5b66: ldx    #jump_table_5b6b]
 	LOG_REGS	5b69   | added by add_reg_log.py
-	JMP_B_INDEXED	a2  | [$5b69: jmp    [b,x]] [indirect_jump]
+	JMP_B_INDEXED	a2,6  | [$5b69: jmp    [b,x]] [indirect_jump] [nb_entries=6]
 
 
 jump_table_5b6b:
@@ -3478,7 +3478,7 @@ l_5ba6:
 	LOG_REGS	5bab   | added by add_reg_log.py
 	asl.b	#1,d1                            	| [$5bab: aslb]
 	LOG_REGS	5bac   | added by add_reg_log.py
-	JSR_B_INDEXED	a4  | [$5bac: jsr    [b,u]] [indirect_jump]
+	JSR_B_INDEXED	a4,2  | [$5bac: jsr    [b,u]] [indirect_jump] [nb_entries=2]
 
 	LOG_REGS	5bae   | added by add_reg_log.py
 	OP_W_ON_DP_ADDRESS	addq,0x0b,#1         | [$5bae: inc    $0b]
@@ -3559,7 +3559,7 @@ l_5bf3:
 	LOG_REGS	5bfc   | added by add_reg_log.py
 	asl.b	#1,d1                            	| [$5bfc: aslb]
 	LOG_REGS	5bfd   | added by add_reg_log.py
-	JSR_B_INDEXED	a4  | [$5bfd: jsr    [b,u]] [indirect_jump]
+	JSR_B_INDEXED	a4,2  | [$5bfd: jsr    [b,u]] [indirect_jump] [nb_entries=2]
 
 	LOG_REGS	5bff   | added by add_reg_log.py
 	move.w	#0x1572,d3                      	| [$5bff: ldy    #$1572]

@@ -531,7 +531,7 @@ compute_bank_address_from_b_6378:
 6396: E6 13       LDB    -$D,X
 6398: 58          ASLB
 6399: CE 63 9E    LDU    #jump_table_639e
-639C: 6E D5       JMP    [B,U]		 ; [indirect_jump]
+639C: 6E D5       JMP    [B,U]		 ; [indirect_jump] [nb_entries=7]
 
 
 show_map_63ac:
@@ -660,7 +660,7 @@ irq_65c4:
 65EF: 58          ASLB
 ; only 3 states: 1: game not in play, 2: game in play
 65F0: 8E 65 BC    LDX    #jump_table_65bc
-65F3: AD 95       JSR    [B,X]		; [indirect_jump]
+65F3: AD 95       JSR    [B,X]		; [indirect_jump] [nb_entries=3]
 65F5: D6 D9       LDB    bankswitch_copy_d9
 65F7: F7 3E 00    STB    bankswitch_3e00
 65FA: 3B          RTI
@@ -673,7 +673,7 @@ update_a_palette_65fb:
 6604: B7 3E 00    STA    bankswitch_3e00
 6607: 58          ASLB
 6608: 8E 66 11    LDX    #jump_table_6611
-660B: 6E 95       JMP    [B,X]	; [indirect_jump]
+660B: 6E 95       JMP    [B,X]	; [indirect_jump] [nb_entries=4]
 
 update_tiles_palette_6619:
 6619: 96 DE       LDA    tiles_palette_change_command_00de
@@ -953,7 +953,7 @@ update_osd_palette_671c:
 684F: D6 05       LDB    sub_state_0005
 6851: 58          ASLB
 6852: 8E 68 57    LDX    #jump_table_6857
-6855: 6E 95       JMP    [B,X]	; [indirect_jump]
+6855: 6E 95       JMP    [B,X]	; [indirect_jump] [nb_entries=4]
 
 	
 685F: BD 68 DF    JSR    $68DF
@@ -1084,7 +1084,7 @@ game_not_playing_694d:
 694D: 96 05       LDA    sub_state_0005
 694F: 48          ASLA
 6950: 8E 69 5A    LDX    #jump_table_695a
-6953: AD 96       JSR    [A,X]		; [indirect_jump]
+6953: AD 96       JSR    [A,X]		; [indirect_jump] [nb_entries=8]
 6955: BD 69 CB    JSR    $69CB
 6958: 20 0A       BRA    $6964
 
@@ -1170,7 +1170,7 @@ display_title_69fc:
 69FC: D6 08       LDB    sub_sub_state_0008
 69FE: 58          ASLB
 69FF: 8E 6A 04    LDX    #jump_table_6a04
-6A02: 6E 95       JMP    [B,X]		; [indirect_jump]
+6A02: 6E 95       JMP    [B,X]		; [indirect_jump] [nb_entries=2]
 
 
 	
@@ -1206,7 +1206,7 @@ display_high_scores_6a4d:
 6A4D: D6 08       LDB    sub_sub_state_0008
 6A4F: 58          ASLB
 6A50: 8E 6A 55    LDX    #jump_table_6a55
-6A53: 6E 95       JMP    [B,X]	; [indirect_jump]
+6A53: 6E 95       JMP    [B,X]	; [indirect_jump] [nb_entries=3]
 
 6A5B: CC 01 15    LDD    #$0115
 6A5E: BD 69 09    JSR    $6909
@@ -1236,12 +1236,12 @@ attract_mode_6a8d:
 6A8D: D6 08       LDB    sub_sub_state_0008
 6A8F: 58          ASLB
 6A90: 8E 6A 95    LDX    #jump_table_6a95
-6A93: 6E 95       JMP    [B,X]	; [indirect_jump]
+6A93: 6E 95       JMP    [B,X]	; [indirect_jump] [nb_entries=4]
  
 6A9D: D6 0B       LDB    sub_sub_sub_state_000b
 6A9F: 58          ASLB
 6AA0: 8E 6A A5    LDX    #jump_table_6aa5
-6AA3: 6E 95       JMP    [B,X]	; [indirect_jump]
+6AA3: 6E 95       JMP    [B,X]	; [indirect_jump] [nb_entries=3]
 
 6AAB: CC 01 1B    LDD    #$011B
 6AAE: BD 69 09    JSR    $6909
@@ -1328,7 +1328,7 @@ start_game_screen_6b5e:
 6B5E: 96 08       LDA    sub_sub_state_0008
 6B60: 8E 6B 66    LDX    #jump_table_6b66
 6B63: 48          ASLA
-6B64: 6E 96       JMP    [A,X]	; [indirect_jump]
+6B64: 6E 96       JMP    [A,X]	; [indirect_jump] [nb_entries=3]
 
 
 6B6C: 0D F0       TST    $F0
@@ -1736,7 +1736,7 @@ game_in_play_70e3:
 70E8: 96 05       LDA    sub_state_0005
 70EA: 48          ASLA
 70EB: 8E 70 F1    LDX    #jump_table_70f1
-70EE: AD 96       JSR    [A,X]	; [indirect_jump]
+70EE: AD 96       JSR    [A,X]	; [indirect_jump] [nb_entries=2]
 70F0: 39          RTS
 
 
@@ -1757,7 +1757,7 @@ run_game_7115:
 7115: D6 08       LDB    sub_sub_state_0008
 7117: 58          ASLB
 7118: 8E 71 1D    LDX    #jump_table_711d
-711B: 6E 95       JMP    [B,X]	; [indirect_jump]
+711B: 6E 95       JMP    [B,X]	; [indirect_jump] [nb_entries=4]
 
 intro_and_get_ready_7125:
 7125: 8E 71 47    LDX    #jump_table_7147
@@ -1771,7 +1771,7 @@ intro_and_get_ready_7125:
 ; and sub state
 7134: D6 0B       LDB    sub_sub_sub_state_000b
 7136: 58          ASLB
-7137: 6E 95       JMP    [B,X]	; [special_indirect_jump]
+7137: 6E 95       JMP    [B,X]	; [special_indirect_jump] [nb_entries=3]
 
 ; depends on the level, only last level does different
 table_of_jump_tables_7139:
@@ -1906,12 +1906,12 @@ game_playing_7245:
 7245: D6 0B       LDB    sub_sub_sub_state_000b
 7247: 58          ASLB
 7248: 8E 72 4D    LDX    #jump_table_724d
-724B: 6E 95       JMP    [B,X]	; [indirect_jump]
+724B: 6E 95       JMP    [B,X]	; [indirect_jump] [nb_entries=2]
 
 7251: D6 0E       LDB    $0E                                         
 7253: 58          ASLB                                               
 7254: CE 72 59    LDU    #jump_table_7259
-7257: 6E D5       JMP    [B,U]	; [indirect_jump]
+7257: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 
 725F: CC 04 04    LDD    #$0404                                     
@@ -2001,7 +2001,7 @@ take_a_key_level_complete_72c9:
 7315: D6 0B       LDB    sub_sub_sub_state_000b
 7317: 58          ASLB
 7318: CE 73 1D    LDU    #jump_table_731d
-731B: 6E D5       JMP    [B,U]	; [indirect_jump]
+731B: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 7321: CC 0E 00    LDD    #$0E00
 7324: BD 69 09    JSR    $6909
@@ -2049,7 +2049,7 @@ take_a_key_level_complete_72c9:
 7389: D6 0B       LDB    sub_sub_sub_state_000b
 738B: 58          ASLB
 738C: CE 73 91    LDU    #jump_table_7391
-738F: 6E D5       JMP    [B,U]	; [indirect_jump]
+738F: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=4]
 
 7399: CC 02 2D    LDD    #$022D                                    
 739C: BD 69 09    JSR    $6909                                     
@@ -2102,7 +2102,7 @@ take_a_key_level_complete_72c9:
 7410: D6 0B       LDB    sub_sub_sub_state_000b
 7412: 58          ASLB
 7413: CE 74 18    LDU    #jump_table_7418
-7416: 6E D5       JMP    [B,U]        ; [indirect_jump]
+7416: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 741C: CC 0E 00    LDD    #$0E00
 741F: BD 69 09    JSR    $6909
@@ -2131,7 +2131,7 @@ take_a_key_level_complete_72c9:
 744F: D6 0B       LDB    sub_sub_sub_state_000b
 7451: 58          ASLB
 7452: CE 74 57    LDU    #jump_table_7457
-7455: 6E D5       JMP    [B,U]        ; [indirect_jump]
+7455: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=7]
 
 7465: CC 02 27    LDD    #$0227
 7468: BD 69 09    JSR    $6909
@@ -2230,7 +2230,7 @@ take_a_key_level_complete_72c9:
 7557: D6 0E       LDB    $0E
 7559: 58          ASLB
 755A: CE 75 5F    LDU    #jump_table_755f
-755D: 6E D5       JMP    [B,U]        ; [indirect_jump]
+755D: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=6]
 
 756B: 8E 05 40    LDX    #$0540
 756E: 4F          CLRA
@@ -2246,7 +2246,7 @@ take_a_key_level_complete_72c9:
 7584: E6 13       LDB    -$D,X
 7586: 58          ASLB
 7587: CE 75 8C    LDU    #jump_table_758c
-758A: 6E D5       JMP    [B,U]        ; [indirect_jump]
+758A: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=4]
 
 7594: E6 88 13    LDB    $13,X
 7597: 27 E0       BEQ    $7579
@@ -2396,12 +2396,12 @@ player_dead_777c:
 777C: D6 0B       LDB    sub_sub_sub_state_000b
 777E: 58          ASLB
 777F: 8E 77 84    LDX    #jump_table_7784
-7782: 6E 95       JMP    [B,X]        ; [indirect_jump]
+7782: 6E 95       JMP    [B,X]        ; [indirect_jump] [nb_entries=3]
 
 778A: D6 0E       LDB    $0E
 778C: 58          ASLB
 778D: 8E 77 92    LDX    #jump_table_7792
-7790: 6E 95       JMP    [B,X]        ; [indirect_jump]
+7790: 6E 95       JMP    [B,X]        ; [indirect_jump] [nb_entries=2]
 
 7796: CC 00 78    LDD    #$0078
 7799: DD 0C       STD    $0C
@@ -2468,12 +2468,12 @@ player_dead_777c:
 7813: D6 08       LDB    sub_sub_state_0008
 7815: 58          ASLB
 7816: CE 78 1B    LDU    #jump_table_781b
-7819: 6E D5       JMP    [B,U]        ; [indirect_jump]
+7819: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 7821: D6 0B       LDB    sub_sub_sub_state_000b
 7823: 58          ASLB
 7824: CE 78 29    LDU    #jump_table_7829
-7827: 6E D5       JMP    [B,U]        ; [indirect_jump]
+7827: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 7833: D6 F0       LDB    $F0
 7835: 26 02       BNE    $7839
@@ -2556,7 +2556,7 @@ player_dead_777c:
 78CD: D6 0B       LDB    sub_sub_sub_state_000b
 78CF: 58          ASLB
 78D0: CE 78 D5    LDU    #jump_table_78d5
-78D3: 6E D5       JMP    [B,U]        ; [indirect_jump]
+78D3: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 78DB: C6 01       LDB    #$01
 78DD: D7 F0       STB    $F0
@@ -2790,7 +2790,7 @@ l_7a14:
 7A70: D6 0E       LDB    $0E
 7A72: 58          ASLB
 7A73: CE 7A 78    LDU    #jump_table_7a78
-7A76: 6E D5       JMP    [B,U]        ; [indirect_jump]
+7A76: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 init_intro_sequence_7a7e:
 7A7E: 4F          CLRA
@@ -2841,7 +2841,7 @@ init_game_and_intro_scenery_7adc:
 7ADC: EC 13       LDD    -$D,X
 7ADE: 48          ASLA
 7ADF: CE 7A E4    LDU    #jump_table_7ae4
-7AE2: 6E D6       JMP    [A,U]		; [indirect_jump]
+7AE2: 6E D6       JMP    [A,U]		; [indirect_jump] [nb_entries=4]
 
 7AEC: C6 01       LDB    #$01
 7AEE: D7 AC       STB    armour_flag_00ac	; gives armour
@@ -2874,7 +2874,7 @@ init_game_and_intro_scenery_7adc:
 
 7B30: 58          ASLB                                                
 7B31: CE 7B 36    LDU    #jump_table_7b36
-7B34: 6E D5       JMP    [B,U]        ; [indirect_jump]
+7B34: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=4]
 
 7B4A: 6A 88 14    DEC    $14,X
 7B4D: 26 14       BNE    $7B63
@@ -2906,7 +2906,7 @@ init_game_and_intro_scenery_7adc:
 
 7B88: CE 7B 8E    LDU    #jump_table_7b8e
 7B8B: 58          ASLB
-7B8C: 6E D5       JMP    [B,U]        ; [indirect_jump]
+7B8C: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 7B94: CE 98 9F    LDU    #$989F
 7B97: BD 98 F3    JSR    $98F3
@@ -2934,7 +2934,7 @@ init_game_and_intro_scenery_7adc:
 7BD1: 39          RTS
 7BD2: 58          ASLB
 7BD3: CE 7B D8    LDU    #jump_table_7bd8
-7BD6: 6E D5       JMP    [B,U]        ; [indirect_jump]
+7BD6: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=5]
 
 7BE2: 6A 88 14    DEC    $14,X
 7BE5: 26 EA       BNE    $7BD1
@@ -2985,7 +2985,7 @@ mark_intro_as_played_7c3d:
 7C42: E6 13       LDB    -$D,X		; 15B5
 7C44: 58          ASLB
 7C45: CE 7C 4A    LDU    #jump_table_7c4a
-7C48: 6E D5       JMP    [B,U]        ; [indirect_jump]
+7C48: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=5]
 
 init_intro_7c54:
 7C54: CC 00 70    LDD    #$0070
@@ -3021,7 +3021,7 @@ devil_disappears_7c9b:
 7CA0: E6 13       LDB    -$D,X
 7CA2: 58          ASLB
 7CA3: CE 7C A8    LDU    #jump_table_7ca8
-7CA6: 6E D5       JMP    [B,U]        ; [indirect_jump]
+7CA6: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 7CAC: CC 00 50    LDD    #$0050
 7CAF: ED 16       STD    -$A,X
@@ -3043,7 +3043,7 @@ devil_disappears_7c9b:
 7CCC: 48          ASLA
 7CCD: 10 8E 7C E4 LDY    #$7CE4
 7CD1: CE 7C D6    LDU    #jump_table_7cd6
-7CD4: 6E D6       JMP    [A,U]        ; [indirect_jump]
+7CD4: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=7]
 
 7CEA: C6 04       LDB    #$04
 7CEC: E7 1F       STB    -$1,X
@@ -3091,7 +3091,7 @@ devil_disappears_7c9b:
 
 7D52: 58          ASLB
 7D53: CE 7D 58    LDU    #jump_table_7d58
-7D56: 6E D5       JMP    [B,U]        ; [indirect_jump]
+7D56: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 7D5C: CE 7D 4A    LDU    #$7D4A
 7D5F: BD 94 77    JSR    $9477
@@ -3149,7 +3149,7 @@ devil_takes_girl_7d80:
 7DD0: D6 0E       LDB    $0E
 7DD2: 58          ASLB
 7DD3: CE 7D D8    LDU    #jump_table_7dd8
-7DD6: 6E D5       JMP    [B,U]        ; [indirect_jump]
+7DD6: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 7DDC: 8E 05 10    LDX    #$0510
 7DDF: 8D 12       BSR    $7DF3
@@ -3162,7 +3162,7 @@ devil_takes_girl_7d80:
 7DF3: E6 13       LDB    -$D,X
 7DF5: 58          ASLB
 7DF6: CE 7D FB    LDU    #jump_table_7dfb
-7DF9: 6E D5       JMP    [B,U]        ; [indirect_jump]
+7DF9: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 7E01: BD 7A 43    JSR    $7A43
 7E04: CC 01 00    LDD    #$0100
@@ -3194,7 +3194,7 @@ devil_takes_girl_7d80:
 7E42: E6 13       LDB    -$D,X
 7E44: 58          ASLB
 7E45: CE 7E 4A    LDU    #jump_table_7e4a
-7E48: 6E D5       JMP    [B,U]        ; [indirect_jump]
+7E48: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 7E50: CC 00 B3    LDD    #$00B3
 7E53: ED 16       STD    -$A,X
@@ -3235,7 +3235,7 @@ devil_takes_girl_7d80:
 7EA9: E6 13       LDB    -$D,X
 7EAB: 58          ASLB
 7EAC: CE 7E B1    LDU    #jump_table_7eb1
-7EAF: 6E D5       JMP    [B,U]        ; [indirect_jump]
+7EAF: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 
 7EB7: CC 02 31    LDD    #$0231
@@ -3266,7 +3266,7 @@ devil_takes_girl_7d80:
 7EF9: 96 0B       LDA    sub_sub_sub_state_000b
 7EFB: 48          ASLA
 7EFC: CE 7F 01    LDU    #jump_table_7f01
-7EFF: 6E D6       JMP    [A,U]        ; [indirect_jump]
+7EFF: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=2]
 
 7F05: 4F          CLRA
 7F06: 5F          CLRB
@@ -3277,7 +3277,7 @@ devil_takes_girl_7d80:
 7F0F: A6 13       LDA    -$D,X
 7F11: 48          ASLA
 7F12: CE 7F 17    LDU    #jump_table_7f17
-7F15: 6E D6       JMP    [A,U]        ; [indirect_jump]
+7F15: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=5]
 
 7F21: FC 15 B8    LDD    $15B8
 7F24: A3 16       SUBD   -$A,X
@@ -3356,7 +3356,7 @@ devil_takes_girl_7d80:
 7FBC: 96 0E       LDA    $0E
 7FBE: 48          ASLA
 7FBF: CE 7F C4    LDU    #jump_table_7fc4
-7FC2: 6E D6       JMP    [A,U]        ; [indirect_jump]
+7FC2: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=4]
 
 7FCC: C6 01       LDB    #$01
 7FCE: E7 1F       STB    -$1,X
@@ -3397,7 +3397,7 @@ devil_takes_girl_7d80:
 8024: EC 13       LDD    -$D,X
 8026: 48          ASLA
 8027: CE 80 9C    LDU    #jump_table_809c
-802A: 6E D6       JMP    [A,U]        ; [indirect_jump]
+802A: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=3]
 
 802C: 8D 3B       BSR    $8069
 802E: DF E0       STU    $E0
@@ -3459,11 +3459,11 @@ devil_takes_girl_7d80:
 80A3: EC 13       LDD    -$D,X
 80A5: 48          ASLA
 80A6: CE 80 9C    LDU    #jump_table_809c
-80A9: 6E D6       JMP    [A,U]        ; [indirect_jump]
+80A9: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=3]
 
 80AB: 58          ASLB
 80AC: CE 80 B1    LDU    #jump_table_80b1
-80AF: 6E D5       JMP    [B,U]        ; [indirect_jump]
+80AF: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 	
 80B7: 8E 06 40    LDX    #$0640
@@ -5293,7 +5293,7 @@ update_tile_column_86b1:
 90BF: EC 13       LDD    -$D,X
 90C1: 48          ASLA
 90C2: CE 90 C7    LDU    #jump_table_90c7
-90C5: 6E D6       JMP    [A,U]        ; [indirect_jump]
+90C5: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=6]
 
 90D3: C6 01       LDB    #$01
 90D5: E7 10       STB    -$10,X
@@ -5339,7 +5339,7 @@ update_tile_column_86b1:
 912D: E6 15       LDB    -$B,X
 912F: 58          ASLB
 9130: CE 91 35    LDU    #jump_table_9135
-9133: 6E D5       JMP    [B,U]        ; [indirect_jump]
+9133: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 9139: BD 94 85    JSR    $9485
 913C: C6 0F       LDB    #$0F
@@ -5370,7 +5370,7 @@ update_tile_column_86b1:
 9170: E6 14       LDB    -$C,X
 9172: 58          ASLB
 9173: CE 91 78    LDU    #jump_table_9178
-9176: 6E D5       JMP    [B,U]        ; [indirect_jump]
+9176: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 917C: E6 0F       LDB    $F,X
 917E: 26 34       BNE    $91B4
@@ -5723,7 +5723,7 @@ update_tile_column_86b1:
 94AB: E6 14       LDB    -$C,X
 94AD: 58          ASLB
 94AE: CE 94 B3    LDU    #jump_table_94b3
-94B1: 6E D5       JMP    [B,U]        ; [indirect_jump]
+94B1: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 94B7: E6 88 18    LDB    $18,X
 94BA: 26 06       BNE    $94C2
@@ -5780,13 +5780,13 @@ update_tile_column_86b1:
 9526: E6 14       LDB    -$C,X
 9528: 58          ASLB
 9529: CE 95 3C    LDU    #jump_table_953c
-952C: AD D5       JSR    [B,U]        ; [indirect_jump]
+952C: AD D5       JSR    [B,U]        ; [indirect_jump] [nb_entries=3]
 952E: 7E 94 DD    JMP    $94DD
 9531: BD 95 82    JSR    $9582
 9534: E6 14       LDB    -$C,X
 9536: 58          ASLB
 9537: CE 95 3C    LDU    #jump_table_953c
-953A: 6E D5       JMP    [B,U]        ; [indirect_jump]
+953A: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 9542: C6 01       LDB    #$01
 9544: D7 99       STB    $99
@@ -5804,7 +5804,7 @@ update_tile_column_86b1:
 9574: E6 14       LDB    -$C,X
 9576: 58          ASLB
 9577: CE 95 7C    LDU    #jump_table_957c
-957A: 6E D5       JMP    [B,U]        ; [indirect_jump]
+957A: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=4]
 
 9580: 96 07       LDA    $07
 9582: BD 8D 1A    JSR    $8D1A
@@ -6026,7 +6026,7 @@ update_tile_column_86b1:
 9976: E6 15       LDB    -$B,X
 9978: 58          ASLB
 9979: CE 99 7E    LDU    #jump_table_997e
-997C: 6E D5       JMP    [B,U]        ; [indirect_jump]
+997C: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 9984: C6 81       LDB    #$81
 9986: D7 DF       STB    $DF
@@ -6069,7 +6069,7 @@ update_tile_column_86b1:
 99DA: E6 15       LDB    -$B,X
 99DC: 58          ASLB
 99DD: CE 99 E2    LDU    #jump_table_99e2
-99E0: 6E D5       JMP    [B,U]        ; [indirect_jump]
+99E0: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 99E8: CC 08 00    LDD    #$0800
 99EB: 7E 99 8B    JMP    $998B
@@ -6137,7 +6137,7 @@ update_tile_column_86b1:
 9A7E: E6 15       LDB    -$B,X
 9A80: 58          ASLB
 9A81: CE 9A 86    LDU    #jump_table_9a86
-9A84: 6E D5       JMP    [B,U]        ; [indirect_jump]
+9A84: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 9A8A: C6 0F       LDB    #$0F
 9A8C: E7 88 10    STB    $10,X
@@ -6154,7 +6154,7 @@ update_tile_column_86b1:
 9AFB: 10 26 01 3A LBNE   $9C39
 9AFF: 58          ASLB
 9B00: CE 9B 0F    LDU    #jump_table_9b0f
-9B03: AD D5       JSR    [B,U]        ; [indirect_jump]
+9B03: AD D5       JSR    [B,U]        ; [indirect_jump] [nb_entries=5]
 9B05: E6 0E       LDB    $E,X
 9B07: 5A          DECB
 9B08: 10 27 FA 76 LBEQ   $9582
@@ -6284,7 +6284,7 @@ update_tile_column_86b1:
 9C38: 39          RTS
 9C39: 58          ASLB
 9C3A: CE 9C 42    LDU    #jump_table_9c42
-9C3D: AD D5       JSR    [B,U]        ; [indirect_jump]
+9C3D: AD D5       JSR    [B,U]        ; [indirect_jump] [nb_entries=7]
 9C3F: 7E 9B 05    JMP    $9B05
 
 9C4E: CE 9C 54    LDU    #$9C54
@@ -6312,7 +6312,7 @@ update_tile_column_86b1:
 9C89: EE C5       LDU    B,U
 9C8B: EC 13       LDD    -$D,X
 9C8D: 48          ASLA
-9C8E: AD D6       JSR    [A,U]        ; [special_indirect_jump]
+9C8E: AD D6       JSR    [A,U]        ; [special_indirect_jump] [nb_entries=4]
 9C90: 30 88 40    LEAX   $40,X
 9C93: 0A E0       DEC    $E0
 9C95: 26 E5       BNE    $9C7C
@@ -6340,7 +6340,7 @@ table_of_jump_tables_9c98:
 
 9CC2: 58          ASLB
 9CC3: CE 9C C8    LDU    #jump_table_9cc8
-9CC6: 6E D5       JMP    [B,U]        ; [indirect_jump]
+9CC6: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=6]
 
 9CD4: CE 9D EB    LDU    #$9DEB
 9CD7: E6 05       LDB    $5,X
@@ -6416,7 +6416,7 @@ table_of_jump_tables_9c98:
 9D73: 20 10       BRA    $9D85
 9D75: 58          ASLB
 9D76: CE 9D 7B    LDU    #jump_table_9d7b
-9D79: 6E D5       JMP    [B,U]        ; [indirect_jump]
+9D79: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=5]
 
 9D85: CC 03 00    LDD    #$0300
 9D88: ED 13       STD    -$D,X
@@ -6475,11 +6475,11 @@ table_of_jump_tables_9c98:
 9E62: 39          RTS
 9E63: 58          ASLB
 9E64: CE 9E 69    LDU    #jump_table_9e69
-9E67: 6E D5       JMP    [B,U]        ; [indirect_jump]
+9E67: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=6]
 
 9E75: 58          ASLB
 9E76: CE 9E 7B    LDU    #jump_table_9e7b
-9E79: 6E D5       JMP    [B,U]        ; [indirect_jump]
+9E79: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=4]
 
 9E83: BD 9D 1B    JSR    $9D1B
 9E86: 24 0B       BCC    $9E93
@@ -6494,7 +6494,7 @@ table_of_jump_tables_9c98:
 
 9E9C: 58          ASLB
 9E9D: CE 9E A2    LDU    #jump_table_9ea2
-9EA0: 6E D5       JMP    [B,U]        ; [indirect_jump]
+9EA0: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 9EA8: 8D 16       BSR    $9EC0
 9EAA: C6 0F       LDB    #$0F
@@ -6635,7 +6635,7 @@ A04B: 39          RTS
 
 A06E: 58          ASLB
 A06F: CE A0 74    LDU    #jump_table_a074
-A072: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A072: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 
 A078: 7A 05 29    DEC    $0529
@@ -6656,12 +6656,12 @@ A0BE: BD 8E 41    JSR    $8E41
 A0C1: E6 05       LDB    $5,X
 A0C3: 58          ASLB
 A0C4: CE 45 44    LDU    #jump_table_4544
-A0C7: AD D5       JSR    [B,U]        ; [indirect_jump]
+A0C7: AD D5       JSR    [B,U]        ; [indirect_jump] [nb_entries=19]
 A0C9: D6 21       LDB    counter_8_bit_0021
 A0CB: C4 01       ANDB   #$01
 A0CD: 58          ASLB
 A0CE: CE 45 40    LDU    #jump_table_4540
-A0D1: AD D5       JSR    [B,U]        ; [indirect_jump]
+A0D1: AD D5       JSR    [B,U]        ; [indirect_jump] [nb_entries=2]
 A0D3: 30 88 30    LEAX   $30,X
 A0D6: 0A E0       DEC    $E0
 A0D8: 26 D8       BNE    $A0B2
@@ -6669,14 +6669,14 @@ A0DA: 39          RTS
 A0DB: EC 13       LDD    -$D,X
 A0DD: 48          ASLA
 A0DE: CE A0 E3    LDU    #jump_table_a0e3
-A0E1: 6E D6       JMP    [A,U]        ; [indirect_jump]
+A0E1: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=4]
 
 
 
 
 A0EB: 58          ASLB
 A0EC: CE A0 F1    LDU    #jump_table_a0f1
-A0EF: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A0EF: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=4]
 
 A0F9: C6 02       LDB    #$02
 A0FB: E7 10       STB    -$10,X
@@ -6723,7 +6723,7 @@ A14C: 39          RTS
 A14D: E6 15       LDB    -$B,X
 A14F: 58          ASLB
 A150: CE A1 55    LDU    #jump_table_a155
-A153: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A153: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 A159: CE 45 B4    LDU    #$45B4
 A15C: BD 90 6B    JSR    $906B
@@ -6743,7 +6743,7 @@ A17E: 39          RTS
 A17F: E6 15       LDB    -$B,X
 A181: 58          ASLB
 A182: CE A1 87    LDU    #jump_table_a187
-A185: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A185: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 A18B: E6 1E       LDB    -$2,X
 A18D: 58          ASLB
@@ -6776,7 +6776,7 @@ A1BC: E7 15       STB    -$B,X
 A1BE: 39          RTS
 A1BF: 58          ASLB
 A1C0: CE A1 C5    LDU    #jump_table_a1c5
-A1C3: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A1C3: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 A1CB: D6 E0       LDB    $E0
 A1CD: DB 21       ADDB   counter_8_bit_0021
@@ -6786,7 +6786,7 @@ A1D3: BD 79 C4    JSR    $79C4
 A1D6: E6 15       LDB    -$B,X
 A1D8: 58          ASLB
 A1D9: CE A1 E1    LDU    #jump_table_a1e1
-A1DC: AD D5       JSR    [B,U]        ; [indirect_jump]
+A1DC: AD D5       JSR    [B,U]        ; [indirect_jump] [nb_entries=2]
 A1DE: 7E A3 70    JMP    $A370
 
 A1E5: C6 01       LDB    #$01
@@ -6835,7 +6835,7 @@ A235: 39          RTS
 A23E: E6 15       LDB    -$B,X
 A240: 58          ASLB
 A241: CE 47 88    LDU    #jump_table_4788
-A244: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A244: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=8]
 A246: E6 1E       LDB    -$2,X
 A248: CE 47 98    LDU    #$4798
 A24B: 58          ASLB
@@ -6922,7 +6922,7 @@ A2F1: 39          RTS
 A2F2: E6 15       LDB    -$B,X
 A2F4: 58          ASLB
 A2F5: CE A2 FA    LDU    #jump_table_a2fa
-A2F8: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A2F8: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=4]
 
 A302: CE 45 C8    LDU    #$45C8
 A305: EC 16       LDD    -$A,X
@@ -6978,7 +6978,7 @@ A370: 31 88 10    LEAY   $10,X
 A373: A6 A4       LDA    ,Y
 A375: 48          ASLA
 A376: CE A3 7B    LDU    #jump_table_a37b
-A379: 6E D6       JMP    [A,U]        ; [indirect_jump]
+A379: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=2]
 
 A37F: D6 21       LDB    counter_8_bit_0021
 A381: DB E0       ADDB   $E0
@@ -7032,7 +7032,7 @@ A3DE: ED 14       STD    -$C,X
 A3E0: 39          RTS
 A3E1: 58          ASLB
 A3E2: CE A3 E7    LDU    #jump_table_a3e7
-A3E5: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A3E5: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 A3ED: EE 88 1E    LDU    $1E,X
 A3F0: 27 09       BEQ    $A3FB
@@ -7083,7 +7083,7 @@ A449: 39          RTS
 A44A: EC 13       LDD    -$D,X
 A44C: 48          ASLA
 A44D: CE A4 52    LDU    #jump_table_a452
-A450: 6E D6       JMP    [A,U]        ; [indirect_jump]
+A450: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=4]
 
 A45A: D6 9A       LDB    $9A
 A45D: 54          LSRB
@@ -7142,11 +7142,11 @@ A4CC: 39          RTS
 A4CD: A6 12       LDA    -$E,X
 A4CF: 48          ASLA
 A4D0: CE A4 D5    LDU    #jump_table_a4d5
-A4D3: 6E D6       JMP    [A,U]        ; [indirect_jump]
+A4D3: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=6]
 
 A4E1: 58          ASLB
 A4E2: CE A4 E7    LDU    #jump_table_a4e7
-A4E5: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A4E5: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 A4ED: EC 16       LDD    -$A,X
 A4EF: 93 9C       SUBD   $9C
@@ -7161,7 +7161,7 @@ A505: 39          RTS
 A506: E6 15       LDB    -$B,X
 A508: 58          ASLB
 A509: CE A5 0E    LDU    #jump_table_a50e
-A50C: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A50C: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=5]
 
 A518: BD A4 27    JSR    $A427
 A51B: BD A5 3E    JSR    $A53E
@@ -7268,12 +7268,12 @@ A5F4: BD 90 74    JSR    $9074
 A5F7: 7E 8F 62    JMP    $8F62
 A5FA: 58          ASLB
 A5FB: CE A6 00    LDU    #jump_table_a600
-A5FE: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A5FE: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 A606: E6 15       LDB    -$B,X
 A608: 58          ASLB
 A609: CE A6 0E    LDU    #jump_table_a60e
-A60C: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A60C: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 A612: C6 1E       LDB    #$1E
 A614: E7 0B       STB    $B,X
@@ -7294,12 +7294,12 @@ A630: 39          RTS
 
 A642: 58          ASLB
 A643: CE A6 48    LDU    #jump_table_a648
-A646: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A646: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=4]
 
 A650: E6 15       LDB    -$B,X
 A652: 58          ASLB
 A653: CE A6 58    LDU    #jump_table_a658
-A656: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A656: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 A65C: BD A6 6F    JSR    $A66F
 A65F: 6C 15       INC    -$B,X
@@ -7330,7 +7330,7 @@ A690: 39          RTS
 A691: E6 15       LDB    -$B,X
 A693: 58          ASLB
 A694: CE A6 99    LDU    #jump_table_a699
-A697: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A697: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 A6AD: BD 68 F9    JSR    $68F9
 A6B0: C4 0F       ANDB   #$0F
@@ -7376,7 +7376,7 @@ A6FE: 7E 8F 62    JMP    $8F62
 A701: E6 15       LDB    -$B,X
 A703: 58          ASLB
 A704: CE A7 09    LDU    #jump_table_a709
-A707: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A707: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 A70D: CC 49 52    LDD    #$4952
 A710: ED 1C       STD    -$4,X
@@ -7390,7 +7390,7 @@ A71F: BD 90 74    JSR    $9074
 A722: 7E 8F 62    JMP    $8F62
 A725: 58          ASLB
 A726: CE A7 2B    LDU    #jump_table_a72b
-A729: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A729: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 A72F: EC 16       LDD    -$A,X
 A731: 93 9C       SUBD   $9C
@@ -7410,7 +7410,7 @@ A754: 39          RTS
 A755: E6 15       LDB    -$B,X
 A757: 58          ASLB
 A758: CE A7 5D    LDU    #jump_table_a75d
-A75B: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A75B: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 A76B: E6 11       LDB    -$F,X
 A76D: 27 05       BEQ    $A774
@@ -7463,7 +7463,7 @@ A7CB: 7E 90 74    JMP    $9074
 A7DE: E6 15       LDB    -$B,X
 A7E0: 58          ASLB
 A7E1: CE A7 E6    LDU    #jump_table_a7e6
-A7E4: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A7E4: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 A7EA: BD A8 03    JSR    $A803
 A7ED: E7 1E       STB    -$2,X
@@ -7485,12 +7485,12 @@ A810: 4F          CLRA
 A811: 39          RTS
 A812: 58          ASLB
 A813: CE A8 18    LDU    #jump_table_a818
-A816: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A816: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 A81C: E6 15       LDB    -$B,X
 A81E: 58          ASLB
 A81F: CE A8 24    LDU    #jump_table_a824
-A822: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A822: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 A828: BD A8 55    JSR    $A855
 A82B: CC 49 62    LDD    #$4962
@@ -7503,12 +7503,12 @@ A839: BD 90 74    JSR    $9074
 A83C: 7E 8F 62    JMP    $8F62
 A83F: 58          ASLB
 A840: CE A8 45    LDU    #jump_table_a845
-A843: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A843: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 A849: E6 15       LDB    -$B,X
 A84B: 58          ASLB
 A84C: CE A8 51    LDU    #jump_table_a851
-A84F: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A84F: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 A855: A6 1E       LDA    -$2,X
 A857: 48          ASLA
@@ -7525,7 +7525,7 @@ A86C: 6F 02       CLR    $2,X
 A86E: 39          RTS
 A86F: 58          ASLB
 A870: CE A8 75    LDU    #jump_table_a875
-A873: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A873: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 A87B: BD 79 B5    JSR    $79B5
 A87E: CC 01 00    LDD    #$0100
@@ -7546,17 +7546,17 @@ A899: 7E 8E 0C    JMP    $8E0C
 A89C: EC 13       LDD    -$D,X
 A89E: 48          ASLA
 A89F: CE A8 A4    LDU    #jump_table_a8a4
-A8A2: 6E D6       JMP    [A,U]        ; [indirect_jump]
+A8A2: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=4]
 
 A8AC: E6 12       LDB    -$E,X
 A8AE: 58          ASLB
 A8AF: CE A8 B4    LDU    #jump_table_a8b4
-A8B2: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A8B2: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 A8BA: E6 14       LDB    -$C,X
 A8BC: 58          ASLB
 A8BD: CE A8 C2    LDU    #jump_table_a8c2
-A8C0: 6E D5       JMP    [B,U]        ; [indirect_jump]
+A8C0: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 A8C6: BD 8E 41    JSR    $8E41
 A8C9: 68 10       ASL    -$10,X
@@ -7662,7 +7662,7 @@ AB53: BD 79 8D    JSR    $798D
 AB56: E6 14       LDB    -$C,X
 AB58: 58          ASLB
 AB59: CE AB 67    LDU    #jump_table_ab67
-AB5C: AD D5       JSR    [B,U]        ; [indirect_jump]
+AB5C: AD D5       JSR    [B,U]        ; [indirect_jump] [nb_entries=4]
 AB5E: 6D 88 1C    TST    $1C,X
 AB61: 26 03       BNE    $AB66
 AB63: 7E B2 5E    JMP    $B25E
@@ -7671,7 +7671,7 @@ AB66: 39          RTS
 AB6F: E6 15       LDB    -$B,X
 AB71: 58          ASLB
 AB72: CE AB 77    LDU    #jump_table_ab77
-AB75: 6E D5       JMP    [B,U]        ; [indirect_jump]
+AB75: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 AB7B: BD AD 1E    JSR    $AD1E
 AB7E: A6 06       LDA    $6,X
@@ -7702,7 +7702,7 @@ ABB1: EF 1C       STU    -$4,X
 ABB3: BD A4 27    JSR    $A427
 ABB6: BD 90 74    JSR    $9074
 ABB9: 7E 8F 62    JMP    $8F62
-ABBC: AD D5       JSR    [B,U]	; [special_indirect_jump] (jumped to)
+ABBC: AD D5       JSR    [B,U]	; [special_indirect_jump] (jumped to)  [nb_entries=5]
 ABBE: BD A9 85    JSR    $A985
 ABC1: BD 90 74    JSR    $9074
 ABC4: 7E 8F 62    JMP    $8F62
@@ -7710,7 +7710,7 @@ ABC4: 7E 8F 62    JMP    $8F62
 ABCF: E6 15       LDB    -$B,X
 ABD1: 58          ASLB
 ABD2: CE AB D7    LDU    #jump_table_abd7
-ABD5: 6E D5       JMP    [B,U]        ; [indirect_jump]
+ABD5: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=4]
 
 ABDF: 6A 88 15    DEC    $15,X
 ABE2: 27 23       BEQ    $AC07
@@ -7761,7 +7761,7 @@ AC43: 7E AB BC    JMP    $ABBC
 AC46: E6 15       LDB    -$B,X
 AC48: 58          ASLB
 AC49: CE AC 4E    LDU    #jump_table_ac4e
-AC4C: 6E D5       JMP    [B,U]        ; [indirect_jump]
+AC4C: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=4]
 
 
 
@@ -7823,7 +7823,7 @@ ACD0: 7E AB BE    JMP    $ABBE
 ACD3: E6 15       LDB    -$B,X
 ACD5: 58          ASLB
 ACD6: CE AC DB    LDU    #jump_table_acdb
-ACD9: 6E D5       JMP    [B,U]        ; [indirect_jump]
+ACD9: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 ACDF: CE AC F0    LDU    #$ACF0
 ACE2: E6 0B       LDB    $B,X
@@ -8015,7 +8015,7 @@ AEA0: 39          RTS
 
 AEA1: 58          ASLB
 AEA2: CE AE A7    LDU    #jump_table_aea7
-AEA5: 6E D5       JMP    [B,U]        ; [indirect_jump]
+AEA5: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 AEAB: AE B6       LDX    [A,Y]
 AEAD: BD 79 B5    JSR    $79B5
@@ -8037,7 +8037,7 @@ AECB: 7E 8E 0C    JMP    $8E0C
 AECE: E6 15       LDB    -$B,X
 AED0: 58          ASLB
 AED1: CE AE D6    LDU    #jump_table_aed6
-AED4: 6E D5       JMP    [B,U]        ; [indirect_jump]
+AED4: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 AEDA: CC A6 31    LDD    #$A631
 AEDD: ED 03       STD    $3,X
@@ -8113,7 +8113,7 @@ AF74: 39          RTS
 AFFC: EC 13       LDD    -$D,X                                      
 AFFE: 48          ASLA
 AFFF: CE B0 04    LDU    #jump_table_b004
-B002: 6E D6       JMP    [A,U]        ; [indirect_jump]
+B002: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=4]
 
 B00C: 4F          CLRA 
 B00D: 5F          CLRB
@@ -8143,7 +8143,7 @@ B036: 39          RTS
 
 B077: 58          ASLB    
 B078: CE B0 89    LDU    #jump_table_b089
-B07B: AD D5       JSR    [B,U]	; [indirect_jump]
+B07B: AD D5       JSR    [B,U]	; [indirect_jump] [nb_entries=3]
 B07D: D6 21       LDB    counter_8_bit_0021
 B07F: 5C          INCB
 B080: C4 1F       ANDB   #$1F
@@ -8221,7 +8221,7 @@ B116: 39          RTS
 
 B117: 58          ASLB
 B118: CE B1 1D    LDU    #jump_table_b11d
-B11B: 6E D5       JMP    [B,U]        ; [indirect_jump]
+B11B: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 B123: BD 79 CE    JSR    $79CE
 B126: CC 01 00    LDD    #$0100
@@ -8243,18 +8243,18 @@ B143: 7E 8E 0C    JMP    $8E0C
 B146: EC 13       LDD    -$D,X
 B148: 48          ASLA
 B149: CE B1 4E    LDU    #jump_table_b14e
-B14C: 6E D6       JMP    [A,U]        ; [indirect_jump]
+B14C: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=4]
 
 B156: E6 12       LDB    -$E,X
 B158: 58          ASLB
 B159: CE B1 5E    LDU    #jump_table_b15e
-B15C: 6E D5       JMP    [B,U]        ; [indirect_jump]
+B15C: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 	
 B164: E6 14       LDB    -$C,X                  
 B166: 58          ASLB
 B167: CE B1 6C    LDU    #jump_table_b16c
-B16A: 6E D5       JMP    [B,U]        ; [indirect_jump]
+B16A: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 B170: EC 19       LDD    -$7,X
 B172: ED 06       STD    $6,X
@@ -8296,7 +8296,7 @@ B1BC: 39          RTS
 B1C5: E6 14       LDB    -$C,X
 B1C7: 58          ASLB
 B1C8: CE B1 CD    LDU    #jump_table_b1cd		; only 1 valid entry!
-B1CB: 6E D5       JMP    [B,U]        ; [indirect_jump]
+B1CB: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=4]
 
 B1D4: C4 0F       ANDB   #$0F
 B1D6: CB 0A       ADDB   #$0A
@@ -8344,7 +8344,7 @@ B22F: 39          RTS
 
 B238: 58          ASLB
 B239: CE B2 6A    LDU    #jump_table_b26a
-B23C: AD D5       JSR    [B,U]        ; [indirect_jump]
+B23C: AD D5       JSR    [B,U]        ; [indirect_jump] [nb_entries=6]
 B23E: 8D 1E       BSR    $B25E
 B240: 8D 03       BSR    $B245
 B242: 7E 8F 62    JMP    $8F62
@@ -8371,7 +8371,7 @@ B269: 39          RTS
 B276: E6 15       LDB    -$B,X
 B278: 58          ASLB
 B279: CE B2 89    LDU    #jump_table_b289
-B27C: AD D5       JSR    [B,U]    ; [indirect_jump]
+B27C: AD D5       JSR    [B,U]    ; [indirect_jump] [nb_entries=4]
 B27E: BD B6 30    JSR    $B630
 B281: 24 05       BCC    $B288
 B283: CC 02 00    LDD    #$0200
@@ -8412,7 +8412,7 @@ B308: 39          RTS
 B309: E6 15       LDB    -$B,X
 B30B: 58          ASLB
 B30C: CE B3 1C    LDU    #jump_table_b31c
-B30F: AD D5       JSR    [B,U]        ; [indirect_jump]
+B30F: AD D5       JSR    [B,U]        ; [indirect_jump] [nb_entries=4]
 B311: BD B6 30    JSR    $B630
 B314: 24 05       BCC    $B31B
 B316: CC 03 00    LDD    #$0300
@@ -8436,7 +8436,7 @@ B36E: 39          RTS
 B36F: E6 15       LDB    -$B,X
 B371: 58          ASLB
 B372: CE B3 77    LDU    #jump_table_b377
-B375: 6E D5       JMP    [B,U]        ; [indirect_jump]
+B375: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 B37F: C6 02       LDB    #$02
 B381: E7 1F       STB    -$1,X
@@ -8480,7 +8480,7 @@ B3CC: 39          RTS
 B3CD: E6 15       LDB    -$B,X
 B3CF: 58          ASLB
 B3D0: CE B3 D5    LDU    #jump_table_b3d5
-B3D3: 6E D5       JMP    [B,U]        ; [indirect_jump]
+B3D3: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 B3DB: CE B3 20    LDU    #$B320
 B3DE: BD 90 6B    JSR    $906B
@@ -8517,7 +8517,7 @@ B41D: 39          RTS
 B41E: E6 15       LDB    -$B,X
 B420: 58          ASLB
 B421: CE B4 26    LDU    #jump_table_b426
-B424: 6E D5       JMP    [B,U]        ; [indirect_jump]
+B424: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=6]
 
 B432: E6 11       LDB    -$F,X
 B434: 27 20       BEQ    $B456
@@ -8607,7 +8607,7 @@ B524: 25 11       BCS    $B537
 B526: CE B5 3F    LDU    #jump_table_b53f
 B529: E6 0F       LDB    $F,X
 B52B: 58          ASLB
-B52C: AD D5       JSR    [B,U]        ; [indirect_jump]
+B52C: AD D5       JSR    [B,U]        ; [indirect_jump] [nb_entries=3]
 B52E: BD A4 27    JSR    $A427
 B531: BD 90 74    JSR    $9074
 B534: 7E 8F 62    JMP    $8F62
@@ -8653,11 +8653,11 @@ B58A: 39          RTS
 B5F7: E6 15       LDB    -$B,X
 B5F9: 58          ASLB
 B5FA: CE B5 FF    LDU    #jump_table_b5ff
-B5FD: 6E D5       JMP    [B,U]        ; [indirect_jump]
+B5FD: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 B603: 58          ASLB
 B604: CE B6 09    LDU    #jump_table_b609
-B607: 6E D5       JMP    [B,U]        ; [indirect_jump]
+B607: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 
 	
@@ -8688,11 +8688,11 @@ B63B: 7E B8 7E    JMP    $B87E
 B64E: EC 13       LDD    -$D,X
 B650: 48          ASLA
 B651: CE B6 56    LDU    #jump_table_b656
-B654: 6E D6       JMP    [A,U]        ; [indirect_jump]
+B654: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=4]
 
 B65E: 58          ASLB
 B65F: CE B6 64    LDU    #jump_table_b664
-B662: 6E D5       JMP    [B,U]        ; [indirect_jump]
+B662: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=4]
 
 B66C: A6 12       LDA    -$E,X
 B66E: 44          LSRA
@@ -8707,7 +8707,7 @@ B67C: 39          RTS
 B67D: E6 15       LDB    -$B,X
 B67F: 58          ASLB
 B680: CE B6 85    LDU    #jump_table_b685
-B683: 6E D5       JMP    [B,U]        ; [indirect_jump]
+B683: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 B68B: C6 03       LDB    #$03
 B68D: E7 1F       STB    -$1,X
@@ -8743,7 +8743,7 @@ B6D4: 39          RTS
 B6D5: E6 15       LDB    -$B,X
 B6D7: 58          ASLB
 B6D8: CE B6 DD    LDU    #jump_table_b6dd
-B6DB: 6E D5       JMP    [B,U]        ; [indirect_jump]
+B6DB: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=5]
 
 B6E7: C6 02       LDB    #$02
 B6E9: E7 10       STB    -$10,X
@@ -8855,7 +8855,7 @@ B7CF: 7E 90 6B    JMP    $906B
 
 B7D6: 58          ASLB
 B7D7: CE B7 F4    LDU    #jump_table_b7f4
-B7DA: AD D5       JSR    [B,U]        ; [indirect_jump]
+B7DA: AD D5       JSR    [B,U]        ; [indirect_jump] [nb_entries=7]
 B7DC: BD B9 01    JSR    $B901
 B7DF: EC 19       LDD    -$7,X
 B7E1: 93 9E       SUBD   $9E
@@ -8870,7 +8870,7 @@ B7F3: 39          RTS
 B802: E6 15       LDB    -$B,X
 B804: 58          ASLB
 B805: CE B8 1C    LDU    #jump_table_b81c
-B808: AD D5       JSR    [B,U]        ; [indirect_jump]
+B808: AD D5       JSR    [B,U]        ; [indirect_jump] [nb_entries=2]
 B80A: BD B9 36    JSR    $B936
 B80D: BD B9 57    JSR    $B957
 B810: BD B9 75    JSR    $B975
@@ -8971,7 +8971,7 @@ B900: 39          RTS
 B901: E6 12       LDB    -$E,X
 B903: 58          ASLB
 B904: CE B9 09    LDU    #jump_table_b909
-B907: 6E D5       JMP    [B,U]        ; [indirect_jump]
+B907: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 B90F: CE 4A 8D    LDU    #$4A8D
 B912: E6 1F       LDB    -$1,X
@@ -9095,7 +9095,7 @@ B9FB: 39          RTS
 B9FC: E6 15       LDB    -$B,X
 B9FE: 58          ASLB
 B9FF: CE BA 13    LDU    #jump_table_ba13
-BA02: AD D5       JSR    [B,U]        ; [indirect_jump]
+BA02: AD D5       JSR    [B,U]        ; [indirect_jump] [nb_entries=7]
 BA04: E6 15       LDB    -$B,X
 BA06: C0 02       SUBB   #$02
 BA08: C1 01       CMPB   #$01
@@ -9218,7 +9218,7 @@ BB29: 39          RTS
 BB2A: CE BB 32    LDU    #jump_table_bb32
 BB2D: E6 15       LDB    -$B,X
 BB2F: 58          ASLB
-BB30: 6E D5       JMP    [B,U]        ; [indirect_jump]
+BB30: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=4]
 
 BB3A: C6 06       LDB    #$06
 BB3C: E7 06       STB    $6,X
@@ -9267,7 +9267,9 @@ BB92: 39          RTS
 BBA5: E6 15       LDB    -$B,X
 BBA7: 58          ASLB
 BBA8: CE BB B3    LDU    #jump_table_bbb3
-BBAB: AD D5       JSR    [B,U]	; [indirect_jump]
+BBAB: AD D5       JSR    [B,U]	; [indirect_jump] [nb_entries=2]
+BBAD: BD B9 36    JSR    $B936
+BBB0: 7E B8 6F    JMP    $B86F
 
 BBB7: 6F 0F       CLR    $F,X
 BBB9: DC A0       LDD    $A0
@@ -9316,7 +9318,7 @@ BC1F: 39          RTS
 BC20: E6 15       LDB    -$B,X
 BC22: 58          ASLB
 BC23: CE BC 28    LDU    #jump_table_bc28
-BC26: 6E D5       JMP    [B,U]	; [indirect_jump]
+BC26: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 BC2E: 68 10       ASL    -$10,X
 BC30: C6 0A       LDB    #$0A
@@ -9357,7 +9359,7 @@ BC75: 39          RTS
 BC76: E6 15       LDB    -$B,X
 BC78: 58          ASLB
 BC79: CE BC 8D    LDU    #jump_table_bc8d
-BC7C: AD D5       JSR    [B,U]        ; [indirect_jump]
+BC7C: AD D5       JSR    [B,U]        ; [indirect_jump] [nb_entries=6]
 BC7E: E6 15       LDB    -$B,X
 BC80: C0 02       SUBB   #$02
 BC82: C1 01       CMPB   #$01
@@ -9450,7 +9452,7 @@ BD40: 39          RTS
 BD4D: E6 15       LDB    -$B,X
 BD4F: 58          ASLB
 BD50: CE BD 55    LDU    #jump_table_bd55
-BD53: 6E D5       JMP    [B,U]        ; [indirect_jump]
+BD53: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=6]
 
 
 BD61: E6 1E       LDB    -$2,X
@@ -9600,7 +9602,7 @@ BE89: 39          RTS
 
 BE96: 58          ASLB
 BE97: CE BE 9C    LDU    #jump_table_be9c
-BE9A: 6E D5       JMP    [B,U]        ; [indirect_jump]
+BE9A: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 BEA2: BD 79 CE    JSR    $79CE
 BEA5: C6 3F       LDB    #$3F
@@ -9630,12 +9632,12 @@ BED2: 7E 8E 0C    JMP    $8E0C
 BED5: EC 13       LDD    -$D,X
 BED7: 48          ASLA
 BED8: CE BE DD    LDU    #jump_table_bedd
-BEDB: 6E D6       JMP    [A,U]        ; [indirect_jump]
+BEDB: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=4]
 
 BEE5: EC 14       LDD    -$C,X
 BEE7: 48          ASLA
 BEE8: CE BE ED    LDU    #jump_table_beed
-BEEB: 6E D6       JMP    [A,U]        ; [indirect_jump]
+BEEB: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=2]
 
 BEF1: C6 0A       LDB    #$0A                                         
 BEF3: E7 88 14    STB    $14,X                                        
@@ -9677,11 +9679,11 @@ BF3F: E7 10       STB    -$10,X
 BF41: 39          RTS
 BF42: 58          ASLB
 BF43: CE BF 48    LDU    #jump_table_bf48
-BF46: 6E D5       JMP    [B,U]	; [indirect_jump]
+BF46: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 BF4C: E6 15       LDB    -$B,X                                      
 BF4E: 58          ASLB
 BF4F: CE BF 57    LDU    #jump_table_bf57
-BF52: AD D5       JSR    [B,U]	; [indirect_jump]
+BF52: AD D5       JSR    [B,U]	; [indirect_jump] [nb_entries=4]
 BF54: 7E 8F 62    JMP    $8F62
 
 BF5F: 0C B5       INC    $B5                                         
@@ -9844,7 +9846,7 @@ C0BF: 27 F3       BEQ    $C0B4
 C0C1: E6 15       LDB    -$B,X
 C0C3: 58          ASLB
 C0C4: CE C0 CC    LDU    #jump_table_c0cc
-C0C7: AD D5       JSR    [B,U]  ; [indirect_jump]
+C0C7: AD D5       JSR    [B,U]  ; [indirect_jump] [nb_entries=5]
 C0C9: 7E 8F 62    JMP    $8F62
 
 C0D4: CC 00 01    LDD    #$0001
@@ -10097,7 +10099,7 @@ C353: 39          RTS
 
 C35C: 58          ASLB
 C35D: CE C3 62    LDU    #jump_table_c362
-C360: 6E D5       JMP    [B,U]	; [indirect_jump]
+C360: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 C368: BD 79       JSR    $79A1
 C36B: C6 3F       LDB    #$3F                                         
@@ -10130,7 +10132,7 @@ C3A0: 7E E8 44    JMP    $E844
 C3A3: EC 13       LDD    -$D,X
 C3A5: 48          ASLA
 C3A6: CE C3 AB    LDU    #jump_table_c3ab
-C3A9: 6E D6       JMP    [A,U]	; [indirect_jump]
+C3A9: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=4]
 
 C3B3: C6 02       LDB    #$02                                        
 C3B5: E7 10       STB    -$10,X                                      
@@ -10151,12 +10153,12 @@ C3D4: 6F 1E       CLR    -$2,X
 C3D6: 39          RTS
 C3D7: 58          ASLB
 C3D8: CE C3 DD    LDU    #jump_table_c3dd
-C3DB: 6E D5       JMP    [B,U]	; [indirect_jump]
+C3DB: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 C3E3: E6 15       LDB    -$B,X
 C3E5: 58          ASLB
 C3E6: CE C3 EB    LDU    #jump_table_c3eb
-C3E9: 6E D5       JMP    [B,U]        ; [indirect_jump]
+C3E9: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 
 C3EF: 86 3C       LDA    #$3C
@@ -10172,7 +10174,7 @@ C404: 39          RTS
 C405: E6 15       LDB    -$B,X
 C407: 58          ASLB
 C408: CE C4 0D    LDU    #jump_table_c40d
-C40B: 6E D5       JMP    [B,U]	; [indirect_jump]
+C40B: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 C413: 86 14       LDA    #$14
 C415: A7 88 18    STA    $18,X
@@ -10199,7 +10201,7 @@ C447: 39          RTS
 C448: E6 15       LDB    -$B,X
 C44A: 58          ASLB
 C44B: CE C4 50    LDU    #jump_table_c450
-C44E: 6E D5       JMP    [B,U]        ; [indirect_jump]
+C44E: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 C454: 86 3C       LDA    #$3C
 C456: A7 06       STA    $6,X
@@ -10246,7 +10248,7 @@ C4AC: E7 25       STB    $5,Y
 C4AE: 39          RTS
 C4AF: 58          ASLB
 C4B0: CE C4 B5    LDU    #jump_table_c4b5
-C4B3: 6E D5       JMP    [B,U]        ; [indirect_jump]
+C4B3: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 C4BB: BD 79 B5    JSR    $79B5
 C4BE: C6 3F       LDB    #$3F
@@ -10274,11 +10276,11 @@ C4E7: 7E 8E 0C    JMP    $8E0C
 C4EA: EC 13       LDD    -$D,X
 C4EC: 48          ASLA
 C4ED: CE C4 F2    LDU    #jump_table_c4f2
-C4F0: 6E D6       JMP    [A,U]	; [indirect_jump]
+C4F0: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=4]
 
 C4FA: 58          ASLB                                               
 C4FB: CE C5 00    LDU    #jump_table_c500
-C4FE: 6E D5       JMP    [B,U]	; [indirect_jump]
+C4FE: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 C504: 4F          CLRA
 C505: 5F          CLRB
@@ -10333,12 +10335,12 @@ C572: E7 15       STB    -$B,X
 C574: 39          RTS
 C575: 58          ASLB
 C576: CE C5 7B    LDU    #jump_table_c57b
-C579: 6E D5       JMP    [B,U]        ; [indirect_jump]
+C579: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=6]
 
 C587: E6 15       LDB    -$B,X
 C589: 58          ASLB
 C58A: CE C5 8F    LDU    #jump_table_c58f
-C58D: 6E D5       JMP    [B,U]        ; [indirect_jump]
+C58D: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 C593: BD 8C A7    JSR    $8CA7
 C596: 24 05       BCC    $C59D
@@ -10377,7 +10379,7 @@ C5DC: E7 15       STB    -$B,X
 C5DE: E6 15       LDB    -$B,X
 C5E0: 58          ASLB
 C5E1: CE C6 42    LDU    #jump_table_c642		; 2 entries
-C5E4: AD D5       JSR    [B,U]		; [indirect_jump]
+C5E4: AD D5       JSR    [B,U]		; [indirect_jump] [nb_entries=6]
 C5E6: BD CB 3A    JSR    $CB3A
 C5E9: E6 88 1B    LDB    $1B,X
 C5EC: 26 32       BNE    $C620
@@ -10554,7 +10556,7 @@ C7B8: 39          RTS
 C7C5: E6 15       LDB    -$B,X
 C7C7: 58          ASLB
 C7C8: CE C7 CD    LDU    #jump_table_c7cd
-C7CB: 6E D5       JMP    [B,U]        ; [indirect_jump]
+C7CB: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=8]
 
 C7DD: CC 00 06    LDD    #$0006
 C7E0: ED 0C       STD    $C,X
@@ -10805,7 +10807,7 @@ CA19: 39          RTS
 CA1A: E6 15       LDB    -$B,X
 CA1C: 58          ASLB
 CA1D: CE CA 22    LDU    #jump_table_ca22
-CA20: 6E D5       JMP    [B,U]	; [indirect_jump]
+CA20: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 CA32: DC A0       LDD    $A0                                         
 CA34: C3 00       ADDD   #$0010                                       10
@@ -10849,7 +10851,7 @@ CA8B: 39          RTS
 CA8C: E6 15       LDB    -$B,X
 CA8E: 58          ASLB
 CA8F: CE CA A4    LDU    #jump_table_caa4
-CA92: AD D5       JSR    [B,U]	; [indirect_jump]
+CA92: AD D5       JSR    [B,U]	; [indirect_jump] [nb_entries=3]
 CA94: D6 21       LDB    counter_8_bit_0021
 CA96: 5C          INCB
 CA97: C4 1F       ANDB   #$1F
@@ -11012,7 +11014,7 @@ CBF5: ED 14       STD    -$C,X
 CBF7: 39          RTS
 CBF8: 58          ASLB
 CBF9: CE CB FE    LDU    #jump_table_cbfe
-CBFC: 6E D5       JMP    [B,U]	; [indirect_jump]
+CBFC: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 CC04: BD 79 A1    JSR    $79A1
 CC07: C6 3F       LDB    #$3F
@@ -11049,11 +11051,11 @@ CC44: 39          RTS
 CC45: EC 13       LDD    -$D,X
 CC47: 48          ASLA
 CC48: CE CC 4D    LDU    #jump_table_cc4d
-CC4B: 6E D6       JMP    [A,U]	; [indirect_jump]
+CC4B: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=4]
 
 CC55: 58          ASLB                                                
 CC56: CE CC 5B    LDU    #jump_table_cc5b
-CC59: 6E D5       JMP    [B,U]	; [indirect_jump]
+CC59: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 CC5F: C6 00       LDB    #$00                                        
 CC61: E7 1F       STB    -$1,X
@@ -11083,13 +11085,13 @@ CC96: A7 30       STA    -$10,Y
 CC98: 83 CC 96    SUBD   #$CC96
 CC9B: 58          ASLB
 CC9C: CE CC A4    LDU    #jump_table_cca4
-CC9F: AD D5       JSR    [B,U]	; [indirect_jump]
+CC9F: AD D5       JSR    [B,U]	; [indirect_jump] [nb_entries=3]
 CCA1: 7E 8F 62    JMP    $8F62
 
 CCAA: E6 15       LDB    -$B,X
 CCAC: 58          ASLB
 CCAD: CE CC B2    LDU    #jump_table_ccb2
-CCB0: 6E D5       JMP    [B,U]	; [indirect_jump]
+CCB0: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 CCB8: CC CD 44    LDD    #$CD44
 CCBB: ED 1C       STD    -$4,X
@@ -11145,7 +11147,7 @@ CD23: 7E 90 74    JMP    $9074
 CD30: E6 15       LDB    -$B,X
 CD32: 58          ASLB
 CD33: CE CD 38    LDU    #jump_table_cd38
-CD36: 6E D5       JMP    [B,U]	; [indirect_jump]
+CD36: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=6]
 
 CD58: BD 79 E7    JSR    $79E7                                      
 CD5B: CC CD 44    LDD    #$CD44                                     
@@ -11242,7 +11244,7 @@ CE17: 7E 90 74    JMP    $9074
 CE3A: E6 15       LDB    -$B,X
 CE3C: 58          ASLB
 CE3D: CE CE 42    LDU    #jump_table_ce42
-CE40: 6E D5       JMP    [B,U]        ; [indirect_jump]
+CE40: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=5]
 
 CE4C: CC 4E F6    LDD    #$4EF6
 CE4F: ED 84       STD    ,X
@@ -11336,7 +11338,7 @@ CF04: ED 19       STD    -$7,X
 CF06: 39          RTS
 CF07: 58          ASLB
 CF08: CE CF 0D    LDU    #jump_table_cf0d
-CF0B: 6E D5       JMP    [B,U]        ; [indirect_jump]
+CF0B: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
 CF13: BD 79 B5    JSR    $79B5
 CF16: CC 01 00    LDD    #$0100
@@ -11358,11 +11360,11 @@ CF33: 7E 8E 0C    JMP    $8E0C
 CF36: EC 13       LDD    -$D,X
 CF38: 48          ASLA
 CF39: CE CF 3E    LDU    #jump_table_cf3e
-CF3C: 6E D6       JMP    [A,U]        ; [indirect_jump]
+CF3C: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=4]
 
 CF46: 58          ASLB
 CF47: CE CF 4C    LDU    #jump_table_cf4c
-CF4A: 6E D5       JMP    [B,U]        ; [indirect_jump]
+CF4A: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 CF50: C6 01       LDB    #$01              
 CF52: E7 1E       STB    -$2,X            
@@ -11411,7 +11413,7 @@ CFA6: A6 11       LDA    -$F,X
 CFA8: 27 17       BEQ    $CFC1
 CFAA: 58          ASLB
 CFAB: CE CF C2    LDU    #jump_table_cfc2
-CFAE: AD D5       JSR    [B,U]        ; [indirect_jump]
+CFAE: AD D5       JSR    [B,U]        ; [indirect_jump] [nb_entries=4]
 CFB0: E6 12       LDB    -$E,X
 CFB2: 27 0D       BEQ    $CFC1
 CFB4: CC 03 00    LDD    #$0300
@@ -11424,7 +11426,7 @@ CFC1: 39          RTS
 CFCA: E6 15       LDB    -$B,X                                       
 CFCC: 58          ASLB
 CFCD: CE CF D2    LDU    #jump_table_cfd2
-CFD0: 6E D5       JMP    [B,U]        ; [indirect_jump]
+CFD0: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 CFD6: 86 06       LDA    #$06
 CFD8: A7 88 13    STA    $13,X
@@ -11440,7 +11442,7 @@ CFED: 39          RTS
 CFEE: E6 15       LDB    -$B,X
 CFF0: 58          ASLB
 CFF1: CE CF F6    LDU    #jump_table_cff6
-CFF4: 6E D5       JMP    [B,U]	; [indirect_jump]
+CFF4: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 CFFC: CE 4F 26    LDU    #$4F26                                      
 CFFF: BD 90 6B    JSR    $906B                                       
@@ -11541,7 +11543,7 @@ D0CF: 39          RTS
 D0D0: E6 15       LDB    -$B,X
 D0D2: 58          ASLB
 D0D3: CE D0 D8    LDU    #jump_table_d0d8
-D0D6: 6E D5       JMP    [B,U]	; [indirect_jump]
+D0D6: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=5]
 
 D0E2: BD D0 A4    JSR    $D0A4
 D0E5: C6 00       LDB    #$00
@@ -11655,7 +11657,7 @@ D1D4: 39          RTS
 D1D5: E6 15       LDB    -$B,X
 D1D7: 58          ASLB
 D1D8: CE D1 DD    LDU    #jump_table_d1dd
-D1DB: 6E D5       JMP    [B,U]	; [indirect_jump]
+D1DB: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=4]
 
 D1E5: C6 00       LDB    #$00
 D1E7: E7 1E       STB    -$2,X
@@ -11747,7 +11749,7 @@ D29D: A7 15       STA    -$B,X
 D29F: 39          RTS
 D2A0: 58          ASLB
 D2A1: CE D2 A6    LDU    #jump_table_d2a6
-D2A4: 6E D5       JMP    [B,U]	; [indirect_jump]
+D2A4: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 D2AC: BD 79 CE    JSR    $79CE
 D2AF: C6 70       LDB    #$70
@@ -11776,16 +11778,16 @@ D2DA: 7E 8E 0C    JMP    $8E0C
 D2DD: EC 13       LDD    -$D,X
 D2DF: 48          ASLA
 D2E0: CE D2 E5    LDU    #jump_table_d2e5
-D2E3: 6E D6       JMP    [A,U]	; [indirect_jump]
+D2E3: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=4]
 
 D2ED: 58          ASLB
 D2EE: CE D2 F3    LDU    #jump_table_d2f3
-D2F1: 6E D5       JMP    [B,U]	; [indirect_jump]
+D2F1: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 D2F7: E6 15       LDB    -$B,X
 D2F9: 58          ASLB
 D2FA: CE D2 FF    LDU    #jump_table_d2ff
-D2FD: 6E D5       JMP    [B,U]	; [indirect_jump]
+D2FD: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=4]
 
 D307: C6 02       LDB    #$02
 D309: E7 10       STB    -$10,X
@@ -11839,7 +11841,7 @@ D379: 39          RTS
 D37A: E6 15       LDB    -$B,X
 D37C: 58          ASLB
 D37D: CE D3 82    LDU    #jump_table_d382
-D380: 6E D5       JMP    [B,U]	; [indirect_jump]
+D380: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 D386: C6 02       LDB    #$02
 D388: E7 10       STB    -$10,X
@@ -11878,13 +11880,13 @@ D3CB: A7 10       STA    -$10,X
 D3CD: 7E 90 74    JMP    $9074
 D3D0: 58          ASLB
 D3D1: CE D3 D9    LDU    #jump_table_d3d9
-D3D4: AD D5       JSR    [B,U]	; [indirect_jump]
+D3D4: AD D5       JSR    [B,U]	; [indirect_jump] [nb_entries=2]
 D3D6: 7E 8F 62    JMP    $8F62
 
 D3DD: E6 15       LDB    -$B,X
 D3DF: 58          ASLB
 D3E0: CE D3 E5    LDU    #jump_table_d3e5
-D3E3: 6E D5       JMP    [B,U]	; [indirect_jump]
+D3E3: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 D3EB: C6 01       LDB    #$01
 D3ED: E7 10       STB    -$10,X
@@ -11977,7 +11979,7 @@ D4A6: 39          RTS
 D4A7: E6 15       LDB    -$B,X
 D4A9: 58          ASLB
 D4AA: CE D4 AF    LDU    #jump_table_d4af
-D4AD: 6E D5       JMP    [B,U]	; [indirect_jump]
+D4AD: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 D4B3: C6 02       LDB    #$02
 D4B5: E7 10       STB    -$10,X
@@ -12005,7 +12007,7 @@ D4E4: E7 15       STB    -$B,X
 D4E6: 7E 90 74    JMP    $9074
 D4E9: 58          ASLB
 D4EA: CE D4 EF    LDU    #jump_table_d4ef
-D4ED: 6E D5       JMP    [B,U]	; [indirect_jump]
+D4ED: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 D4F5: BD 79 CE    JSR    $79CE
 D4F8: CC 01 00    LDD    #$0100
@@ -12027,16 +12029,16 @@ D515: 7E 8E 0C    JMP    $8E0C
 D518: EC 13       LDD    -$D,X
 D51A: 48          ASLA
 D51B: CE D5 20    LDU    #jump_table_d520
-D51E: 6E D6       JMP    [A,U]	; [indirect_jump]
+D51E: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=4]
 
 D528: A6 12       LDA    -$E,X
 D52A: 48          ASLA
 D52B: CE D5 30    LDU    #jump_table_d530
-D52E: 6E D6       JMP    [A,U]	; [indirect_jump]
+D52E: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=3]
 
 D536: 58          ASLB
 D537: CE D5 3C    LDU    #jump_table_d53c
-D53A: 6E D5       JMP    [B,U]	; [indirect_jump]
+D53A: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 D542: C6 00       LDB    #$00
 D544: E7 1E       STB    -$2,X
@@ -12229,7 +12231,7 @@ D6D4: D6 D1       LDB    $D1
 D6D6: A6 0D       LDA    $D,X
 D6D8: 48          ASLA
 D6D9: CE D7 06    LDU    #jump_table_d706
-D6DC: AD D6       JSR    [A,U]	; [indirect_jump]
+D6DC: AD D6       JSR    [A,U]	; [indirect_jump] [nb_entries=3]
 D6DE: D6 72       LDB    current_level_0072
 D6E0: C1 02       CMPB   #$02
 D6E2: 27 21       BEQ    $D705
@@ -12250,12 +12252,12 @@ D705: 39          RTS
 
 D70C: 58          ASLB
 D70D: CE D7 12    LDU    #jump_table_d712
-D710: 6E D5       JMP    [B,U]	; [indirect_jump]
+D710: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 D716: A6 15       LDA    -$B,X
 D718: 48          ASLA
 D719: CE D7 1E    LDU    #jump_table_d71e
-D71C: 6E D6       JMP    [A,U]	; [indirect_jump]
+D71C: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=5]
 
 D728: 10 AE 88 1E LDY    $1E,X
 D72C: A6 0A       LDA    $A,X
@@ -12575,7 +12577,7 @@ D9FE: 6F 02       CLR    $2,X
 DA00: 39          RTS
 DA01: 58          ASLB
 DA02: CE DA 07    LDU    #jump_table_da07
-DA05: 6E D5       JMP    [B,U]	; [indirect_jump]
+DA05: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=7]
 
 DA15: 33 84       LEAU   ,X
 DA17: E6 C8 1B    LDB    $1B,U
@@ -12669,11 +12671,11 @@ DAD8: 39          RTS
 DAD9: EC 13       LDD    -$D,X
 DADB: 48          ASLA
 DADC: CE DA E1    LDU    #jump_table_dae1
-DADF: 6E D6       JMP    [A,U]	; [indirect_jump]
+DADF: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=4]
 
 DAE9: 58          ASLB
 DAEA: CE DA EF    LDU    #jump_table_daef
-DAED: 6E D5       JMP    [B,U]	; [indirect_jump]
+DAED: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 DAF3: 9F A5       STX    $A5
 DAF5: C6 01       LDB    #$01
@@ -12733,7 +12735,7 @@ DB6B: A7 1E       STA    -$2,X
 DB6D: 39          RTS
 DB6E: 58          ASLB
 DB6F: CE DB 74    LDU    #jump_table_db74
-DB72: 6E D5       JMP    [B,U]	; [indirect_jump]
+DB72: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 DB7A: BD 68 F9    JSR    $68F9
 DB7D: C4 03       ANDB   #$03
@@ -12944,7 +12946,7 @@ DD64: ED 39       STD    -$7,Y
 DD66: 39          RTS
 DD67: 58          ASLB
 DD68: CE DD 6D    LDU    #jump_table_dd6d
-DD6B: 6E D5       JMP    [B,U]	; [indirect_jump]
+DD6B: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 DD73: BD 7A 66    JSR    $7A66
 DD76: BD 79 7E    JSR    $797E
@@ -13029,7 +13031,7 @@ DE20: BD 8E 41    JSR    $8E41
 DE23: CE 54 2A    LDU    #jump_table_542a		; in bank 3
 DE26: EC 13       LDD    -$D,X
 DE28: 48          ASLA
-DE29: 6E D6       JMP    [A,U]	; [indirect_jump]
+DE29: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=4]
 
 
 DE2B: CE 54 F7    LDU    #$54F7
@@ -13106,7 +13108,7 @@ DEB8: BD 8E 41    JSR    $8E41
 DEBB: CE DE C3    LDU    #jump_table_dec3
 DEBE: EC 13       LDD    -$D,X
 DEC0: 48          ASLA
-DEC1: 6E D6       JMP    [A,U]	; [indirect_jump]
+DEC1: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=4]
 
 DECB: C6 01       LDB    #$01
 DECD: E7 1F       STB    -$1,X
@@ -13136,7 +13138,7 @@ DEFD: 39          RTS
 
 DEFE: 58          ASLB
 DEFF: CE DF 04    LDU    #jump_table_df04
-DF02: 6E D5       JMP    [B,U]	; [indirect_jump]
+DF02: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 DF0A: E6 11       LDB    -$F,X
 DF0C: 27 02       BEQ    $DF10
@@ -13145,7 +13147,7 @@ DF10: 39          RTS
 DF11: E6 15       LDB    -$B,X
 DF13: 58          ASLB
 DF14: CE DF 19    LDU    #jump_table_df19
-DF17: 6E D5       JMP    [B,U]	; [indirect_jump]
+DF17: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 DF1D: C6 00       LDB    #$00
 DF1F: E7 1E       STB    -$2,X
@@ -13178,7 +13180,7 @@ DF58: 39          RTS
 DF59: E6 15       LDB    -$B,X
 DF5B: 58          ASLB
 DF5C: CE DF 61    LDU    #jump_table_df61
-DF5F: 6E D5       JMP    [B,U]	; [indirect_jump]
+DF5F: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 DF65: C6 18       LDB    #$18
 DF67: E7 0D       STB    $D,X
@@ -13209,7 +13211,7 @@ DF9C: ED 14       STD    -$C,X
 DF9E: 39          RTS
 DF9F: 58          ASLB
 DFA0: CE DF A5    LDU    #jump_table_dfa5
-DFA3: 6E D5       JMP    [B,U]	; [indirect_jump]
+DFA3: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 DFAB: BD 79 CE    JSR    $79CE
 DFAE: CC 01 00    LDD    #$0100
@@ -13233,7 +13235,7 @@ DFCF: BD 8E 41    JSR    $8E41
 DFD2: EC 13       LDD    -$D,X
 DFD4: 48          ASLA
 DFD5: CE DF DA    LDU    #jump_table_dfda
-DFD8: 6E D6       JMP    [A,U]	; [indirect_jump]
+DFD8: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=4]
 
 DFE2: C6 08       LDB    #$08                                       
 DFE4: E7 1F       STB    -$1,X
@@ -13271,7 +13273,7 @@ E024: E7 15       STB    -$B,X
 E026: 39          RTS
 E027: 58          ASLB
 E028: CE E0 2D    LDU    #jump_table_e02d
-E02B: 6E D5       JMP    [B,U]	; [indirect_jump]
+E02B: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=5]
 
 E037: E6 11       LDB    -$F,X
 E039: 27 02       BEQ    $E03D
@@ -13280,7 +13282,7 @@ E03D: 39          RTS
 E03E: E6 15       LDB    -$B,X
 E040: 58          ASLB
 E041: CE E0 50    LDU    #jump_table_e050
-E044: AD D5       JSR    [B,U]	; [indirect_jump]
+E044: AD D5       JSR    [B,U]	; [indirect_jump] [nb_entries=4]
 E046: E6 11       LDB    -$F,X
 E048: 26 05       BNE    $E04F
 E04A: CC 00 00    LDD    #$0000
@@ -13347,7 +13349,7 @@ E0C9: 39          RTS
 E0D2: E6 15       LDB    -$B,X
 E0D4: 58          ASLB
 E0D5: CE E0 DA    LDU    #jump_table_e0da
-E0D8: 6E D5       JMP    [B,U]	; [indirect_jump]
+E0D8: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=5]
 
 E0E4: C6 1E       LDB    #$1E
 E0E6: E7 0D       STB    $D,X
@@ -13462,7 +13464,7 @@ E1E1: 39          RTS
 E1E2: E6 15       LDB    -$B,X
 E1E4: 58          ASLB
 E1E5: CE E1 EA    LDU    #jump_table_e1ea
-E1E8: 6E D5       JMP    [B,U]	; [indirect_jump]
+E1E8: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=5]
 
 E1F4: D6 A7       LDB    $A7
 E1F6: 27 0A       BEQ    $E202
@@ -13494,7 +13496,7 @@ E228: 39          RTS
 E229: E6 15       LDB    -$B,X
 E22B: 58          ASLB
 E22C: CE E2 31    LDU    #jump_table_e231
-E22F: 6E D5       JMP    [B,U]	; [indirect_jump]
+E22F: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=5]
 
 E23B: D6 A7       LDB    $A7
 E23D: C1 02       CMPB   #$02
@@ -13529,7 +13531,7 @@ E278: E7 0D       STB    $D,X
 E27A: 39          RTS
 E27B: 58          ASLB
 E27C: CE E2 81    LDU    #jump_table_e281
-E27F: 6E D5       JMP    [B,U]	; [indirect_jump]
+E27F: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 E287: BD 79 CE    JSR    $79CE
 E28A: C6 3F       LDB    #$3F
@@ -13599,7 +13601,7 @@ E314: 39          RTS
 E315: EC 13       LDD    -$D,X
 E317: 48          ASLA
 E318: CE E3 1D    LDU    #jump_table_e31d
-E31B: 6E D6       JMP    [A,U]	; [indirect_jump]
+E31B: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=4]
 
 E325: 6F 1E       CLR    -$2,X
 E327: CE 56 67    LDU    #$5667
@@ -13633,7 +13635,7 @@ E35D: E7 15       STB    -$B,X
 E35F: 39          RTS
 E360: 58          ASLB
 E361: CE E3 66    LDU    #jump_table_e366
-E364: 6E D5       JMP    [B,U]	; [indirect_jump]
+E364: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 E36C: E6 05       LDB    $5,X
 E36E: CE 57 B6    LDU    #$57B6
@@ -13655,7 +13657,7 @@ E389: 39          RTS
 E38A: E6 05       LDB    $5,X
 E38C: 58          ASLB
 E38D: CE E3 9C    LDU    #jump_table_e39c
-E390: AD D5       JSR    [B,U]	; [indirect_jump]
+E390: AD D5       JSR    [B,U]	; [indirect_jump] [nb_entries=6]
 E392: BD E2 D5    JSR    $E2D5
 E395: 25 04       BCS    $E39B
 E397: C6 01       LDB    #$01
@@ -13665,7 +13667,7 @@ E39B: 39          RTS
 E3A8: E6 15       LDB    -$B,X
 E3AA: 58          ASLB
 E3AB: CE E3 B0    LDU    #jump_table_e3b0
-E3AE: 6E D5       JMP    [B,U]	; [indirect_jump]
+E3AE: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 E3B4: DC A0       LDD    $A0
 E3B6: 10 83 17 80 CMPD   #$1780
@@ -13696,7 +13698,7 @@ E3EF: E7 15       STB    -$B,X
 E3F1: E6 12       LDB    -$E,X
 E3F3: 58          ASLB
 E3F4: CE E3 FA    LDU    #jump_table_e3fa
-E3F7: 6E D5       JMP    [B,U]	; [indirect_jump]
+E3F7: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=4]
 E3F9: 39          RTS
 
 E402: D6 AC       LDB    armour_flag_00ac
@@ -13784,12 +13786,12 @@ E49C: 39          RTS
 E49D: E6 12       LDB    -$E,X
 E49F: 58          ASLB
 E4A0: CE E4 A5    LDU    #jump_table_e4a5
-E4A3: 6E D5       JMP    [B,U]	; [indirect_jump]
+E4A3: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 E4A9: A6 15       LDA    -$B,X                                      
 E4AB: 48          ASLA
 E4AC: CE E4 B1    LDU    #jump_table_e4b1
-E4AF: 6E D6       JMP    [A,U]	; [indirect_jump]
+E4AF: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=2]
 
 E4B5: E6 09       LDB    $9,X
 E4B7: 27 06       BEQ    $E4BF
@@ -13840,7 +13842,7 @@ E50A: 39          RTS
 E50B: E6 15       LDB    -$B,X
 E50D: 58          ASLB
 E50E: CE E5 13    LDU    #jump_table_e513
-E511: 6E D5       JMP    [B,U]	; [indirect_jump]
+E511: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 E517: 6F 0F       CLR    $F,X
 E519: 6C 15       INC    -$B,X
@@ -13938,7 +13940,7 @@ E5EB: 6C 0F       INC    $F,X
 E5ED: 39          RTS
 E5EE: 58          ASLB
 E5EF: CE E5 F4    LDU    #jump_table_e5f4
-E5F2: 6E D5       JMP    [B,U]	; [indirect_jump]
+E5F2: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 E5F8: C6 1E       LDB    #$1E                                       
 E5FA: E7 0E       STB    $E,X
@@ -13972,7 +13974,7 @@ E632: 39          RTS
 E633: EC 13       LDD    -$D,X
 E635: 48          ASLA
 E636: CE E6 3B    LDU    #jump_table_e63b
-E639: 6E D6       JMP    [A,U]	; [indirect_jump]
+E639: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=4]
 
 
 E643: 6F 1E       CLR    -$2,X
@@ -14001,13 +14003,13 @@ E670: 86 04       LDA    #$04
 E672: B7 3E 00    STA    bankswitch_3e00
 E675: 58          ASLB
 E676: CE E6 7E    LDU    #jump_table_e67e
-E679: AD D5       JSR    [B,U]	; [indirect_jump]
+E679: AD D5       JSR    [B,U]	; [indirect_jump] [nb_entries=4]
 E67B: 7E 8F 62    JMP    $8F62
 
 E686: CE E6 A8    LDU    #jump_table_e6a8                                     
 E689: E6 15       LDB    -$B,X                                      
 E68B: 58          ASLB
-E68C: AD D5       JSR    [B,U]	; [indirect_jump]
+E68C: AD D5       JSR    [B,U]	; [indirect_jump] [nb_entries=2]
 E68E: EE 0E       LDU    $E,X
 E690: E6 50       LDB    -$10,U
 E692: 27 0C       BEQ    $E6A0
@@ -14049,7 +14051,7 @@ E6DB: 39          RTS
 E6DC: E6 15       LDB    -$B,X
 E6DE: 58          ASLB
 E6DF: CE E6 E4    LDU    #jump_table_e6e4
-E6E2: 6E D5       JMP    [B,U]	; [indirect_jump]
+E6E2: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 E6E8: CC E6 6B    LDD    #$E66B                                  
 E6EB: ED 84       STD    ,X                                      
@@ -14090,7 +14092,7 @@ E72F: 39          RTS
 E730: E6 15       LDB    -$B,X
 E732: 58          ASLB
 E733: CE E7 38    LDU    #jump_table_e738
-E736: 6E D5       JMP    [B,U]	; [indirect_jump]
+E736: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 E73C: C6 0A       LDB    #$0A
 E73E: E7 08       STB    $8,X
@@ -14136,7 +14138,7 @@ E795: CE 5A 66    LDU    #jump_table_5a66
 E798: E6 12       LDB    -$E,X
 E79A: 58          ASLB
 ; picking bonus
-E79B: 6E D5       JMP    [B,U]	; [indirect_jump]
+E79B: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=20]
 
 
 
@@ -14208,7 +14210,7 @@ E81E: E9 48       ADCB   $8,U
 E820: 0C 12       INC    task_pointer_0012
 E822: 58          ASLB
 E823: CE E8 28    LDU    #jump_table_e828
-E826: 6E D5       JMP    [B,U]	; [indirect_jump]
+E826: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 E82C: C6 1E       LDB    #$1E
 E82E: E7 0E       STB    $E,X
@@ -14239,7 +14241,7 @@ E85A: 39          RTS
 E85B: E6 15       LDB    -$B,X
 E85D: CE E8 63    LDU    #jump_table_e863
 E860: 58          ASLB
-E861: 6E D5       JMP    [B,U]	; [indirect_jump]
+E861: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 E867: C6 03       LDB    #$03
 E869: E7 1F       STB    -$1,X
@@ -14258,7 +14260,7 @@ E885: 39          RTS
 E886: E6 15       LDB    -$B,X
 E888: CE E8 8E    LDU    #jump_table_e88e
 E88B: 58          ASLB
-E88C: 6E D5       JMP    [B,U]	; [indirect_jump]
+E88C: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 E892: C6 03       LDB    #$03
 E894: E7 1F       STB    -$1,X
@@ -14273,7 +14275,7 @@ E8A6: 39          RTS
 E8A7: E6 15       LDB    -$B,X
 E8A9: CE E8 AF    LDU    #jump_table_e8af
 E8AC: 58          ASLB
-E8AD: 6E D5       JMP    [B,U]	; [indirect_jump]
+E8AD: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 E8B5: 6A 1E       DEC    -$2,X
 E8B7: 10 26 A7 B9 LBNE   $9074
@@ -14290,7 +14292,7 @@ E8CF: 39          RTS
 E8D0: E6 15       LDB    -$B,X
 E8D2: CE E8 D8    LDU    #jump_table_e8d8
 E8D5: 58          ASLB
-E8D6: 6E D5       JMP    [B,U]	; [indirect_jump]
+E8D6: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 E8DE: C6 03       LDB    #$03
 E8E0: E7 1F       STB    -$1,X
@@ -14337,11 +14339,11 @@ E974: 27 F8       BEQ    $E96E
 E976: EC 13       LDD    -$D,X
 E978: 48          ASLA
 E979: CE E9 7E    LDU    #jump_table_e97e
-E97C: 6E D6       JMP    [A,U]	; [indirect_jump]
+E97C: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=2]
 
 E982: CE E9 88    LDU    #jump_table_e988
 E985: 58          ASLB
-E986: 6E D5       JMP    [B,U]	; [indirect_jump]
+E986: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 E98C: E6 84       LDB    ,X                                        
 E98E: 4F          CLRA                                             
@@ -14411,7 +14413,7 @@ E9F4: C4 0F       ANDB   #$0F
 E9F6: 39          RTS
 E9F7: 58          ASLB
 E9F8: CE E9 FD    LDU    #jump_table_e9fd
-E9FB: 6E D5       JMP    [B,U]	; [indirect_jump]
+E9FB: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 EA01: C6 0A       LDB    #$0A
 EA03: E7 1F       STB    -$1,X
@@ -14445,7 +14447,7 @@ EA37: 27 08       BEQ    $EA41
 EA39: EC 13       LDD    -$D,X
 EA3B: 48          ASLA
 EA3C: CE EA 49    LDU    #jump_table_ea49
-EA3F: AD D6       JSR    [A,U]	; [indirect_jump]
+EA3F: AD D6       JSR    [A,U]	; [indirect_jump] [nb_entries=3]
 EA41: 30 88 20    LEAX   counter_16_bit_0020,X
 EA44: 0A E0       DEC    $E0
 EA46: 26 ED       BNE    $EA35
@@ -14471,7 +14473,7 @@ EA6A: 39          RTS
 
 EA7B: 58          ASLB
 EA7C: CE EA 81    LDU    #jump_table_ea81
-EA7F: 6E D5       JMP    [B,U]	; [indirect_jump]
+EA7F: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 EA87: 39          RTS
 EA88: E6 05       LDB    $5,X
@@ -14494,7 +14496,7 @@ EAA8: 6C 14       INC    -$C,X
 EAAA: E6 05       LDB    $5,X
 EAAC: 58          ASLB
 EAAD: CE EA E8    LDU    #jump_table_eae8
-EAB0: 6E D5       JMP    [B,U]	; [indirect_jump]
+EAB0: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=16]
 EAB2: 39          RTS
 EAB3: D6 93       LDB    $93
 EAB5: 27 FB       BEQ    $EAB2
@@ -14505,7 +14507,7 @@ EABE: 27 F2       BEQ    $EAB2
 EAC0: E6 05       LDB    $5,X
 EAC2: 58          ASLB
 EAC3: CE EA C8    LDU    #jump_table_eac8
-EAC6: 6E D5       JMP    [B,U]	; [indirect_jump]
+EAC6: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=32]
 
 EB08: E6 02       LDB    $2,X
 EB0A: C5 02       BITB   #$02
@@ -14621,7 +14623,7 @@ EBDF: 5F          CLRB
 EBE0: D7 7D       STB    $7D
 EBE2: 10 8E EB EC LDY    #jump_table_ebec
 EBE6: 58          ASLB
-EBE7: AD B5       JSR    [B,Y]	; [indirect_jump]
+EBE7: AD B5       JSR    [B,Y]	; [indirect_jump] [nb_entries=7]
 EBE9: E7 52       STB    -$E,U
 EBEB: 39          RTS
 
@@ -14724,7 +14726,7 @@ ECDF: 6C 14       INC    -$C,X
 ECE1: 39          RTS
 ECE2: 58          ASLB
 ECE3: CE EC E8    LDU    #jump_table_ece8
-ECE6: 6E D5       JMP    [B,U]	; [indirect_jump]
+ECE6: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 ECEE: E6 02       LDB    $2,X
 ECF0: C5 02       BITB   #$02
@@ -14779,7 +14781,7 @@ ED57: 39          RTS
 ED58: D6 81       LDB    $81
 ED5A: 58          ASLB
 ED5B: 8E ED 60    LDX    #jump_table_ed60
-ED5E: 6E 95       JMP    [B,X]	; [indirect_jump]
+ED5E: 6E 95       JMP    [B,X]	; [indirect_jump] [nb_entries=2]
 
 ED64: D6 72       LDB    current_level_0072
 ED66: 58          ASLB
@@ -14811,7 +14813,7 @@ EDA6: 26 1C       BNE    $EDC4
 EDA8: D6 63       LDB    $63
 EDAA: 58          ASLB
 EDAB: 8E ED B0    LDX    #jump_table_edb0
-EDAE: 6E 95       JMP    [B,X]	; [indirect_jump]
+EDAE: 6E 95       JMP    [B,X]	; [indirect_jump] [nb_entries=3]
 
 EDB6: 8D 32       BSR    $EDEA
 EDB8: 24 0A       BCC    $EDC4
@@ -14863,7 +14865,7 @@ EE0A: 54          LSRB
 EE0B: 96 72       LDA    current_level_0072
 EE0D: 48          ASLA
 EE0E: CE EE 13    LDU    #jump_table_ee13
-EE11: 6E D6       JMP    [A,U]	; [indirect_jump]
+EE11: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=7]
 
 	
 EE21: CE EE 7F    LDU    #$EE7F
@@ -14912,7 +14914,7 @@ EECF: 39          RTS
 EED0: D6 72       LDB    current_level_0072
 EED2: 58          ASLB
 EED3: 8E EE D8    LDX    #jump_table_eed8
-EED6: 6E 95       JMP    [B,X]	; [indirect_jump]
+EED6: 6E 95       JMP    [B,X]	; [indirect_jump] [nb_entries=7]
 
 EEE6: DC 58       LDD    $58
 EEE8: C3 01 00    ADDD   #$0100
@@ -15402,7 +15404,7 @@ F85A: D7 E7       STB    $E7
 F85C: CE F8 7A    LDU    #jump_table_f87a
 F85F: E6 1F       LDB    -$1,X
 F861: 58          ASLB
-F862: 6E D5       JMP    [B,U]	; [indirect_jump]
+F862: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=11]
 
 F890: D6 29       LDB    $29
 F892: 27 15       BEQ    $F8A9
@@ -15872,12 +15874,12 @@ FC77: 39          RTS
 FC78: EC 13       LDD    -$D,X
 FC7A: 48          ASLA
 FC7B: CE FC 80    LDU    #jump_table_fc80
-FC7E: 6E D6       JMP    [A,U]	; [indirect_jump]
+FC7E: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=4]
 
 FC88: A6 05       LDA    $5,X                                      
 FC8A: 48          ASLA                                             
 FC8B: CE FC 90    LDU    #jump_table_fc90
-FC8E: 6E D6       JMP    [A,U]	; [indirect_jump]
+FC8E: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=12]
 
 FCA8: C6 00       LDB    #$00                                        
 FCAA: E7 1F       STB    -$1,X
@@ -15962,7 +15964,7 @@ FD4C: 39          RTS
 FE83: A6 05       LDA    $5,X
 FE85: 48          ASLA
 FE86: CE FE 8B    LDU    #jump_table_fe8b
-FE89: 6E D6       JMP    [A,U]	; [indirect_jump]
+FE89: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=12]
 
 FEA3: BD 8E 41    JSR    $8E41                                     
 FEA6: BD A4 27    JSR    $A427
@@ -16058,7 +16060,7 @@ jump_table_4544:
 	dc.w	$D518	; $455c
 	dc.w	$DAD9	; $455e
 	dc.w	$DE18	; $4560
-    	dc.w	$FFFF	; $4562
+    dc.w	$FFFF	; $4562
 	dc.w	$DEB0	; $4564
 	dc.w	$DEB0	; $4566
 	dc.w	$DFC7	; $4568
@@ -16473,14 +16475,7 @@ jump_table_abd7:
 	dc.w	$ac0d	; $abd9
 	dc.w	$ac25	; $abdb
 	dc.w	$ac33	; $abdd
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
+
 jump_table_abc7:
 	dc.w	$acf4	; $abc7
 	dc.w	$ad09	; $abc9
@@ -16599,8 +16594,7 @@ jump_table_ba13:
 	dc.w	$bab8	; $ba1b
 	dc.w	$bac5	; $ba1d
 	dc.w	$baea	; $ba1f
-	dc.w	$ffff	; $ba21 ba25 bogus
-	dc.w	$ffff	; $ba23
+
 jump_table_bb32:
 	dc.w	$bb3a	; $bb32
 	dc.w	$bb4e	; $bb34
@@ -16983,14 +16977,7 @@ jump_table_eae8:
 	dc.w	$eb08	; $eb02
 	dc.w	$eb34	; $eb04
 	dc.w	$eb34	; $eb06
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
+
 jump_table_eac8:
 	dc.w	$eb43	; $eac8
 	dc.w	$eb43	; $eaca
@@ -17102,26 +17089,12 @@ jump_table_fe8b:
 	dc.w	$febe	; $fe9d
 	dc.w	$fea3	; $fe9f
 	dc.w	$febe	; $fea1
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
+
 jump_table_80b1:
 	dc.w	$80B7	; $80b1
 	dc.w	$8119	; $80b3
 	dc.w	$8132	; $80b5
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
+
 jump_table_7829:
 	dc.w	$783a	; $7829
 	dc.w	$7833	; $782b
@@ -17151,9 +17124,7 @@ jump_table_a066:
 	dc.w	$A06E	; $a068
 	dc.w	$9D75	; $a06a
 	dc.w	$A078	; $a06c
-	dc.w	$ffff	; $a06e 58CEbogus
-	dc.w	$ffff	; $a070 A074bogus
-	dc.w	$ffff	; $a072 6ED5bogus
+
 jump_table_a074:
 	dc.w	$9CD4	; $a074
 	dc.w	$9EB8	; $a076
@@ -17179,80 +17150,35 @@ jump_table_b609:
 	dc.w	$B60F	; $b609
 	dc.w	$E85B	; $b60b
 	dc.w	$B618	; $b60d
-	dc.w	$ffff	; $b60f
-	dc.w	$ffff	; $b611
-	dc.w	$ffff	; $b613
-	dc.w	$ffff	; $b615
+
 jump_table_e988:
 	dc.w	$e98c	; $e988
 	dc.w	$e9a8	; $e98a
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
+
 jump_table_e6a8:
 	dc.w	$e6ac	; $e6a8
 	dc.w	$e6cb	; $e6aa
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
+
 jump_table_e4b1:
 	dc.w	$e4b5	; $e4b1
 	dc.w	$e4c0	; $e4b3
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
+
 jump_table_daef:
 	dc.w	$daf3	; $daef
 	dc.w	$db29	; $daf1
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
+
 jump_table_d71e:
 	dc.w	$d728	; $d71e
 	dc.w	$d73d	; $d720
 	dc.w	$d797	; $d722
 	dc.w	$d7b9	; $d724
 	dc.w	$d7c0	; $d726
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
+
 jump_table_d530:
 	dc.w	$d536	; $d530
 	dc.w	$d64b	; $d532
 	dc.w	$d690	; $d534
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
+
 jump_table_b664:
 	dc.w	$b66c	; $b664
 	dc.w	$b67d	; $b666
@@ -17265,14 +17191,7 @@ jump_table_d3e5:
 	dc.w	$d3eb	; $d3e5
 	dc.w	$d436	; $d3e7
 	dc.w	$d47e	; $d3e9
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
+
 jump_table_a60e:
 	dc.w	$a612	; $a60e
 	dc.w	$a618	; $a610
@@ -17310,28 +17229,14 @@ jump_table_cf4c:
 jump_table_d2f3:
 	dc.w	$d2f7	; $d2f3
 	dc.w	$d37a	; $d2f5
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
+
 jump_table_7792:
 	dc.w	$7796	; $7792
 	dc.w	$779d	; $7794
 jump_table_beed:
 	dc.w	$bef1	; $beed
 	dc.w	$bf1e	; $beef	
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
+
 jump_table_6188:
 	dc.w	clear_screen_and_show_status_4800	; $6188
 	dc.w	$485C	; $618a
@@ -17352,14 +17257,7 @@ jump_table_6188:
 	dc.w	$5180	; $61a8
 	dc.w	$5975	; $61aa
 	dc.w	$6B46	; $61ac
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
-	dc.w	$ffff   ; bogus auto-insert
+
 
 jump_table_7147:
 	dc.w	init_game_intro_sequence_7159	   ; $7147 game intro with princess

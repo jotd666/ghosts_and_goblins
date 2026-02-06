@@ -1,19 +1,10 @@
-- devil bug: would need to protect all jump tables:
-7413: CE 74 18    LDU    #jump_table_7418
-7416: 6E D5       JMP    [B,U]        ; [indirect_jump]
-more common case so get table, count the numbers of entries and change [indirect_jump] => [indirect_jump] (x cases) then change postproc
-to add arg in jxx macro
-
-- right now state of devil is altered because EB5 takes value 2 which is out of range for jump table at BBA5
+- missing water tile from intro / level 1 / level 2 WTF
 - when writing an isolated tile (video_byte_dirty) check if in screen and find proper offset (not working right now
   picks a tile at wrong location, also when forcing screen display misses totally if scroll=0x100 - level 6)
   also when resuming level 2 it displays black screen too
   probably responsible for buggy tiles when scrolling up
 - level 6: no tiles display at all!
 - start at level 5: tries to load level 2 then loads level 5
-- missing water tile from intro / level 2
-- empty/hole tile on the top (cave) when scrolling
-- cave: black row appearing up when standing on tomb.
 - sprites disappear too early on the left
 - need to implement/test 48 and 64 bit swap (last boss)
 - depending on the level, do not mirror Y (level 1, level 4 don't need it)
@@ -23,8 +14,6 @@ to add arg in jxx macro
 - when starting the game, we should stop the music as it makes the game crash: TBC
 - map: sceptre of player rendered on top too
 - doesn't seem to detect map context change at times (tiles OK but palette is broken)
-- level 1: first devil stays forever sometimes (unkillable) if we approach too closely without killing him
-  no more enemies in level then same devil strange issue on level 3
 - dynamic palette in water level 1 intercept it and simulate it
 - remove parasite tiles (in the end) because of levelskip some intro tiles are logged in levels 2+
   

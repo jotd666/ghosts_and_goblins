@@ -74,7 +74,12 @@
 	.endm
 
 	.macro	CHECK_MAX	reg,arg
-	ERROR  "insert check max table function index here"
+	.ifndef	RELEASE
+	cmp.b	#\arg*2,\reg
+	jcs		okay\@
+	BREAKPOINT	"\reg exceeds \arg*2"
+okay\@:
+	.endif
 	.endm
 
 	.macro	COM	reg
@@ -183,15 +188,15 @@
 
 * 68020 compliant & optimized
 
-	.macro    JXX_A_INDEXED    inst,reg
+	.macro    JXX_A_INDEXED    inst,reg,nb_cases
 	and.w    #0xFF,d0  | mask 8 bits
-	*CHECK_MAX    d0,\nb_cases
+	CHECK_MAX    d0,\nb_cases
 	\inst    ([\reg,d0.W*2])
 	.endm
 
-	.macro    JXX_B_INDEXED    inst,reg
+	.macro    JXX_B_INDEXED    inst,reg,nb_cases
 	and.w    #0xFF,d1  | mask 8 bits
-	*CHECK_MAX    d1,\nb_cases
+	CHECK_MAX    d1,\nb_cases
 	\inst    ([\reg,d1.W*2])
 	.endm
 
@@ -237,17 +242,17 @@
 
 * 68000 compliant
 
-    .macro    JXX_A_INDEXED    inst,reg
+    .macro    JXX_A_INDEXED    inst,reg,nb_cases
     and.w    #0xFF,d0  | mask 8 bits
-    *CHECK_MAX   d0,\nb_cases
+    CHECK_MAX   d0,\nb_cases
     add.w    d0,d0    | *2 (16 -> 32 bits)
     move.l    (\reg,d0.w),\reg
     \inst    (\reg)
     .endm
 
-    .macro    JXX_B_INDEXED    inst,reg
+    .macro    JXX_B_INDEXED    inst,reg,nb_cases
     and.w    #0xFF,d1  | mask 8 bits
-    *CHECK_MAX   d1,\nb_cases
+    CHECK_MAX   d1,\nb_cases
     add.w    d1,d1    | *2 (16 -> 32 bits)
     move.l    (\reg,d1.w),\reg
     \inst    (\reg)
@@ -311,17 +316,17 @@
 	move.w	(sp)+,ccr
 	.endm
 
-    .macro    JSR_A_INDEXED    reg
-    JXX_A_INDEXED	jsr,\reg
+    .macro    JSR_A_INDEXED    reg,nb_cases
+    JXX_A_INDEXED	jsr,\reg,\nb_cases
     .endm
-    .macro    JMP_A_INDEXED    reg
-    JXX_A_INDEXED	jmp,\reg
+    .macro    JMP_A_INDEXED    reg,nb_cases
+    JXX_A_INDEXED	jmp,\reg,\nb_cases
     .endm
-    .macro    JSR_B_INDEXED    reg
-    JXX_B_INDEXED	jsr,\reg
+    .macro    JSR_B_INDEXED    reg,nb_cases
+    JXX_B_INDEXED	jsr,\reg,\nb_cases
     .endm
-    .macro    JMP_B_INDEXED    reg
-    JXX_B_INDEXED	jmp,\reg
+    .macro    JMP_B_INDEXED    reg,nb_cases
+    JXX_B_INDEXED	jmp,\reg,\nb_cases
     .endm
 
 

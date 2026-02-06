@@ -690,7 +690,7 @@ l_54ff:
 5636: D6 05       LDB    $05
 5638: 58          ASLB
 5639: 8E 56 3E    LDX    #jump_table_563e
-563C: 6E 95       JMP    [B,X]		; [indirect_jump]
+563C: 6E 95       JMP    [B,X]		; [indirect_jump] [nb_entries=2]
 
 jump_table_563e:
 	.word	$5642	; $563E
@@ -708,7 +708,7 @@ jump_table_563e:
 5655: D6 08       LDB    $08
 5657: 58          ASLB
 5658: 8E 56 92    LDX    #jump_table_5692
-565B: AD 95       JSR    [B,X]		; [indirect_jump]
+565B: AD 95       JSR    [B,X]		; [indirect_jump] [nb_entries=3]
 565D: D6 43       LDB    $43
 565F: 53          COMB
 5660: D4 42       ANDB   $42
@@ -745,7 +745,7 @@ jump_table_5692:
 5698: D6 0B       LDB    $0B                                         
 569A: 58          ASLB                                               
 569B: 8E 56 A0    LDX    #jump_table_56a0
-569E: 6E 95       JMP    [B,X]		; [indirect_jump]
+569E: 6E 95       JMP    [B,X]		; [indirect_jump] [nb_entries=6]
 
 jump_table_56a0:
 	.word	$56AC 
@@ -1003,7 +1003,7 @@ l_58ce:
 58D8: D6 0B       LDB    $0B
 58DA: 58          ASLB
 58DB: 8E 58 E0    LDX    #jump_table_58e0
-58DE: 6E 95       JMP    [B,X]		; [indirect_jump]
+58DE: 6E 95       JMP    [B,X]		; [indirect_jump] [nb_entries=6]
 jump_table_58e0:
 	.word	$56AC 
 	.word	$58EC 
@@ -1117,7 +1117,7 @@ l_5975:
 59C0: D6 0B       LDB    $0B
 59C2: 58          ASLB
 59C3: 8E 59 C8    LDX    #jump_table_59c8
-59C6: 6E 95       JMP    [B,X]	; [indirect_jump]
+59C6: 6E 95       JMP    [B,X]	; [indirect_jump] [nb_entries=7]
 
 jump_table_59c8:
 	.word	$56AC
@@ -1227,7 +1227,7 @@ jump_table_59c8:
 5A8E: D6 08       LDB    $08
 5A90: 58          ASLB
 5A91: 8E 5A 96    LDX    #jump_table_5a96
-5A94: 6E 95       JMP    [B,X]	; [indirect_jump]
+5A94: 6E 95       JMP    [B,X]	; [indirect_jump] [nb_entries=3]
 
 jump_table_5a96:
 	.word	$5A9C 
@@ -1322,7 +1322,7 @@ jump_table_5a96:
 5B41: D6 08       LDB    $08
 5B43: 58          ASLB
 5B44: 8E 5B 49    LDX    #jump_table_5b49
-5B47: 6E 95       JMP    [B,X]	; [indirect_jump]
+5B47: 6E 95       JMP    [B,X]	; [indirect_jump] [nb_entries=2]
 
 jump_table_5b49:
 	.word	$5B4D
@@ -1341,7 +1341,7 @@ jump_table_5b49:
 5B63: D6 0B       LDB    $0B
 5B65: 58          ASLB
 5B66: 8E 5B 6B    LDX    #jump_table_5b6b
-5B69: 6E 95       JMP    [B,X]	; [indirect_jump]
+5B69: 6E 95       JMP    [B,X]	; [indirect_jump] [nb_entries=6]
 
 jump_table_5b6b:
 	.word	$5B77 
@@ -1375,7 +1375,7 @@ jump_table_5b6b:
 5BA6: CE 5B CA    LDU    #jump_table_5bca
 5BA9: E6 2C       LDB    $C,Y
 5BAB: 58          ASLB
-5BAC: AD D5       JSR    [B,U]	; [indirect_jump]
+5BAC: AD D5       JSR    [B,U]	; [indirect_jump] [nb_entries=2]
 5BAE: 0C 0B       INC    $0B
 5BB0: 39          RTS
 5BB1: AE 2E       LDX    $E,Y
@@ -1412,7 +1412,7 @@ l_5bdd:
 5BF6: CE 5B CE    LDU    #jump_table_5bce
 5BF9: F6 15 7E    LDB    $157E
 5BFC: 58          ASLB
-5BFD: AD D5       JSR    [B,U]	; [indirect_jump]
+5BFD: AD D5       JSR    [B,U]	; [indirect_jump] [nb_entries=2]
 5BFF: 10 8E 15 72 LDY    #$1572
 5C03: 86 04       LDA    #$04
 5C05: A7 2D       STA    $D,Y
