@@ -4,6 +4,7 @@
   also when resuming level 2 it displays black screen too
   probably responsible for buggy tiles when scrolling up
 - level 6: no tiles display at all!
+- big devil (level 5 boss) symmetry not working (3-group tiles)
 - start at level 5: tries to load level 2 then loads level 5
 - sprites disappear too early on the left
 - need to implement/test 48 and 64 bit swap (last boss)

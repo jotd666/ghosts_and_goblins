@@ -113,9 +113,11 @@ MAP_CONTEXT = 7
 
 OPT_ENABLE_LOGGING = 0           | DO NOT CHANGE THIS
 OPT_DEBUG_BANKSWITCH = 0          | DO NOT CHANGE THIS
+OPT_MIRROR_TEST = 0
 	.else
 OPT_ENABLE_LOGGING = 1
 OPT_DEBUG_BANKSWITCH = 0
+OPT_MIRROR_TEST = 0				| all sprites are mirrored
 	.endif
 	
 
@@ -1806,6 +1808,12 @@ update_one_bob:
 	* 
 	*
 	move.b	(TARGET_SPRITE_ATTRIBUTES,a0),d3
+	
+	.if		OPT_MIRROR_TEST==1
+	bset	#MIRROR_BIT,d3
+	move.b	d3,(TARGET_SPRITE_ATTRIBUTES,a0)
+	.endif
+	
 	lea		sprite_group_table(pc),a3
 	add.w	d2,d2				| code times 2
 	move.w	(a3,d2.w),d4
@@ -1866,7 +1874,6 @@ update_one_bob:
 
 	btst	#MIRROR_BIT,d3
 	sne		d3		| convert attribute to boolean 0/ff for mirror_sprite_planes
-
 
 	move.w	(a0)+,d4		| height
 	move.w	(a0)+,d5		| width
@@ -2043,23 +2050,43 @@ mirror_32_bit_wide:
 	rts
 
 
-	.ifdef 	UNUSED
 mirror_48_bit_wide:
-
 	moveq	#0,d0
 10:
+	.ifndef	MC68020
+	* we have to do that each time as we must add offsets as long (table is 128k long)
+	moveq	#0,d0
+	moveq	#0,d2
+	.endif
 	move.w	(a2),d2
 	move.w	(4,a2),d0
 	* edges
+	.ifndef	MC68020
+	add.l	d2,d2
+	add.l	d0,d0
+	move.w	(a1,d2.l),(4,a2)		| get mirror value
+	move.w	(a1,d0.l),(a2)+		| get mirror value
+	.else
 	move.w	(a1,d2.l*2),(4,a2)		| get mirror value
 	move.w	(a1,d0.l*2),(a2)+		| get mirror value
+	.endif
 	* center
+	.ifndef	MC68020
+	* we have to do that each time as we must add offsets as long (table is 128k long)
+	moveq	#0,d2
+	.endif
 	move.w	(a2),d2
+	.ifndef	MC68020
+	add.l	d2,d2
+	move.w	(a1,d2.l),(a2)
+	.else
 	move.w	(a1,d2.l*2),(a2)
+	.endif
 	addq	#4,a2					| skip row
 	dbf		d1,10b
 	rts
 
+	.ifdef 	UNUSED
 * this is !untested!
 mirror_64_bit_wide:
 	
@@ -2085,7 +2112,7 @@ mirror_function_table:
 	.long	nope
 	.long	mirror_16_bit_wide
 	.long	mirror_32_bit_wide
-	.long	nope  | not used right now
+	.long	mirror_48_bit_wide
 	.long	nope  | not used right now
 	.long	nope		| just in case, but there are no such objects
 	.long	nope
