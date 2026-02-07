@@ -9,7 +9,7 @@ clear_screen_and_show_status_4800:
 480B: E7 E4       STB    ,S			; do it 32 times
 480D: 86 20       LDA    #$20
 480F: C6 00       LDB    #$00
-4811: E7 89 04 00 STB    $0400,X		; [video_address]
+4811: E7 89 04 00 STB    $0400,X		; [unchecked_address]
 4815: A7 80       STA    ,X+		    ; [video_address]
 4817: 6A E4       DEC    ,S				; count one iteration
 4819: 26 F6       BNE    $4811
@@ -48,7 +48,7 @@ l_485c:
 4866: D7 FC       STB    $FC
 4868: 86 20       LDA    #$20
 486A: C6 00       LDB    #$00
-486C: E7 89 04 00 STB    $0400,X	; [video_address]
+486C: E7 89 04 00 STB    $0400,X	; [unchecked_address]
 4870: A7 80       STA    ,X+	; [video_address]
 4872: 0A FC       DEC    $FC
 4874: 26 F6       BNE    $486C
@@ -65,7 +65,7 @@ l_485c:
 4889: 1F 01       TFR    D,X
 488B: 86 20       LDA    #$20
 488D: C6 00       LDB    #$00
-488F: E7 89 04 00 STB    $0400,X	; [video_address]
+488F: E7 89 04 00 STB    $0400,X	; [unchecked_address]
 4893: A7 80       STA    ,X+	; [video_address]
 4895: 8C 23 FF    CMPX   #$23FF
 4898: 23 F5       BLS    $488F
@@ -83,7 +83,7 @@ l_489b:
 48AD: 27 0C       BEQ    $48BB
 48AF: C1 2F       CMPB   #$2F
 48B1: 27 F4       BEQ    $48A7
-48B3: A7 89 04 00 STA    $0400,X	; [video_address]
+48B3: A7 89 04 00 STA    $0400,X	; [unchecked_address]
 48B7: E7 80       STB    ,X+		; [video_address]
 48B9: 20 F0       BRA    $48AB
 48BB: 35 C0       PULS   U,PC
@@ -99,7 +99,7 @@ l_48bd:
 48CD: 27 EC       BEQ    $48BB
 48CF: C1 2F       CMPB   #$2F
 48D1: 27 F2       BEQ    $48C5
-48D3: A7 89 04 00 STA    $0400,X		; [video_address]
+48D3: A7 89 04 00 STA    $0400,X		; [unchecked_address]
 48D7: C6 20       LDB    #$20
 48D9: E7 80       STB    ,X+		; [video_address]
 48DB: 20 EE       BRA    $48CB
@@ -141,7 +141,7 @@ write_one_digit_to_screen_5051:
 5057: 8D 02       BSR    $505B
 5059: A6 A0       LDA    ,Y+
 505B: 84 0F       ANDA   #$0F
-505D: E7 89 04 00 STB    $0400,X		; [video_address]
+505D: E7 89 04 00 STB    $0400,X		; [unchecked_address]
 5061: A7 80       STA    ,X+		; [video_address]
 5063: 39          RTS
 5064: 34 10       PSHS   X
@@ -197,12 +197,12 @@ coin_inserted_50a0:
 50DF: 27 68       BEQ    $5149
 50E1: BD 50 64    JSR    $5064
 50E4: C6 20       LDB    #$20
-50E6: E7 84       STB    ,X			; [video_address]
-50E8: E7 01       STB    $1,X       ; [video_address]
-50EA: E7 02       STB    $2,X       ; [video_address]
-50EC: E7 03       STB    $3,X       ; [video_address]
-50EE: E7 04       STB    $4,X       ; [video_address]
-50F0: E7 05       STB    $5,X       ; [video_address]
+50E6: E7 84       STB    ,X			; [unchecked_address]
+50E8: E7 01       STB    $1,X       ; [unchecked_address]
+50EA: E7 02       STB    $2,X       ; [unchecked_address]
+50EC: E7 03       STB    $3,X       ; [unchecked_address]
+50EE: E7 04       STB    $4,X       ; [unchecked_address]
+50F0: E7 05       STB    $5,X       ; [unchecked_address]
 50F2: 96 F1       LDA    $F1
 50F4: 30 89 04 00 LEAX   $0400,X
 50F8: A7 84       STA    ,X         ; [video_address]
@@ -256,8 +256,8 @@ l_513b:
 5156: 39          RTS
 5157: 10 8E 51 74 LDY    #$5174
 515B: CC 0D 0D    LDD    #$0D0D
-515E: ED 89 04 00 STD    $0400,X		; [video_address]
-5162: ED 89 03 E0 STD    $03E0,X		; [video_address]
+515E: ED 89 04 00 STD    $0400,X		; [unchecked_address]
+5162: ED 89 03 E0 STD    $03E0,X		; [unchecked_address]
 5166: EC A1       LDD    ,Y++       ; [bank_address]
 5168: ED 88 E0    STD    -$20,X		; [video_address]
 516B: EC A4       LDD    ,Y       ; [bank_address]
@@ -281,7 +281,7 @@ l_5180:
 518A: D7 FD       STB    $FD
 518C: C6 16       LDB    #$16
 518E: 86 47       LDA    #$47
-5190: A7 C9 04 00 STA    $0400,U	; [video_address]
+5190: A7 C9 04 00 STA    $0400,U	; [unchecked_address]
 5194: A6 80       LDA    ,X+	; [bank_address]
 5196: A7 C0       STA    ,U+	; [video_address]
 5198: 5A          DECB
@@ -322,9 +322,9 @@ write_framed_weapon_523f:
 5254: 58          ASLB
 5255: 33 C5       LEAU   B,U
 5257: EC C1       LDD    ,U++		; [bank_address]
-5259: ED 84       STD    ,X			; [video_address]
+5259: ED 84       STD    ,X			; [unchecked_address]
 525B: EC C1       LDD    ,U++		; [bank_address]
-525D: ED 88 20    STD    $20,X			; [video_address]
+525D: ED 88 20    STD    $20,X			; [unchecked_address]
 5260: CC 0F 0F    LDD    #$0F0F
 5263: ED 89 04 00 STD    $0400,X			; [video_address]
 5267: ED 89 04 20 STD    $0420,X			; [video_address]
@@ -336,11 +336,11 @@ write_weapon_frame_526d:
 5273: C6 04       LDB    #$04
 5275: D7 FC       STB    $FC
 5277: EC C1       LDD    ,U++		; [bank_address]
-5279: ED 84       STD    ,X			; [video_address]
+5279: ED 84       STD    ,X			; [unchecked_address]
 527B: CC 0E 0E    LDD    #$0E0E
 527E: ED 89 04 00 STD    $0400,X	; [video_address]
 5282: EC C1       LDD    ,U++		; [bank_address]
-5284: ED 02       STD    $2,X		; [video_address]
+5284: ED 02       STD    $2,X		; [unchecked_address]
 5286: CC 0E 0E    LDD    #$0E0E
 5289: ED 89 04 02 STD    $0402,X	; [video_address]
 528D: 30 88 20    LEAX   $20,X
@@ -358,9 +358,9 @@ compute_and_display_time_52b9:
 52CA: 37 06       PULU   D
 52CC: 8E 20 A2    LDX    #$20A2
 52CF: 86 0B       LDA    #$0B
-52D1: A7 89 04 00 STA    $0400,X	; [video_address]
+52D1: A7 89 04 00 STA    $0400,X	; [unchecked_address]
 52D5: E7 80       STB    ,X+	; [video_address]
-52D7: A7 89 04 00 STA    $0400,X	; [video_address]
+52D7: A7 89 04 00 STA    $0400,X	; [unchecked_address]
 52DB: C6 3A       LDB    #$3A
 52DD: E7 80       STB    ,X+	; [video_address]
 52DF: 34 12       PSHS   X,A
@@ -368,10 +368,10 @@ compute_and_display_time_52b9:
 52E3: BD 50 64    JSR    $5064
 52E6: 35 12       PULS   A,X
 52E8: 33 44       LEAU   $4,U
-52EA: A7 89 04 00 STA    $0400,X	; [video_address]
+52EA: A7 89 04 00 STA    $0400,X	; [unchecked_address]
 52EE: E6 C0       LDB    ,U+
 52F0: E7 80       STB    ,X+	; [video_address]
-52F2: A7 89 04 00 STA    $0400,X	; [video_address]
+52F2: A7 89 04 00 STA    $0400,X	; [unchecked_address]
 52F6: E6 C0       LDB    ,U+
 52F8: E7 80       STB    ,X+	; [video_address]
 52FA: 39          RTS
@@ -412,7 +412,7 @@ l_5347:
 534D: 8E 15 82    LDX    #$1582
 5350: 10 8E 21 E8 LDY    #$21E8
 5354: 86 00       LDA    #$00
-5356: A7 A9 04 00 STA    $0400,Y	; [video_address]
+5356: A7 A9 04 00 STA    $0400,Y	; [unchecked_address]
 535A: A6 03       LDA    $3,X
 535C: 8B 30       ADDA   #$30
 535E: A7 A0       STA    ,Y+	; [video_address]
@@ -423,7 +423,7 @@ l_5347:
 536A: 4A          DECA
 536B: 27 0A       BEQ    $5377
 536D: 86 00       LDA    #$00
-536F: A7 A9 04 00 STA    $0400,Y	; [video_address]
+536F: A7 A9 04 00 STA    $0400,Y	; [unchecked_address]
 5373: 86 53       LDA    #$53
 5375: A7 A0       STA    ,Y+	; [video_address]
 5377: 31 23       LEAY   $3,Y
@@ -438,7 +438,7 @@ l_5347:
 538A: E6 80       LDB    ,X+	; [bank_address]
 538C: C1 40       CMPB   #$40
 538E: 27 08       BEQ    $5398
-5390: A7 A9 04 00 STA    $0400,Y	; [video_address]
+5390: A7 A9 04 00 STA    $0400,Y	; [unchecked_address]
 5394: E7 A0       STB    ,Y+	; [video_address]
 5396: 20 F2       BRA    $538A
 5398: 39          RTS
@@ -474,7 +474,7 @@ copy_highscores_53a3:
 53E1: 86 03       LDA    #$03
 53E3: 34 02       PSHS   A			; do it 3 times
 53E5: A6 A0       LDA    ,Y+		; source in RAM
-53E7: E7 89 04 00 STB    $0400,X	; [video_address]
+53E7: E7 89 04 00 STB    $0400,X	; [unchecked_address]
 53EB: A7 80       STA    ,X+	; [video_address]
 53ED: 6A E4       DEC    ,S			; count one iteration
 53EF: 26 F4       BNE    $53E5
@@ -537,7 +537,7 @@ l_54e3:
 54EC: 10 8E 04 00 LDY    #$0400
 54F0: 86 00       LDA    #$00
 54F2: 5F          CLRB
-54F3: A7 80       STA    ,X+	; [video_address]
+54F3: A7 80       STA    ,X+	; [unchecked_address]
 54F5: E7 C0       STB    ,U+	; [video_address]
 54F7: 31 3F       LEAY   -$1,Y
 54F9: 26 F8       BNE    $54F3
@@ -1223,6 +1223,7 @@ jump_table_59c8:
 5A89: 39          RTS
 
 
+l_5a8a:
 5A8A: 10 8E 15 72 LDY    #$1572
 5A8E: D6 08       LDB    $08
 5A90: 58          ASLB
@@ -1317,6 +1318,7 @@ jump_table_5a96:
 5B37: E7 C4       STB    ,U
 5B39: 39          RTS
 
+l_5b3a:
 5B3A: BD 69 1C    JSR    $691C
 5B3D: 10 8E 15 72 LDY    #$1572
 5B41: D6 08       LDB    $08
@@ -1440,13 +1442,13 @@ l_5bdd:
 5C37: A7 22       STA    $2,Y
 5C39: 39          RTS
 5C3A: 8E 5C 7F    LDX    #$5C7F
-5C3D: EE 81       LDU    ,X++
+5C3D: EE 81       LDU    ,X++		; [bank_address]
 5C3F: C6 0D       LDB    #$0D
 5C41: 34 04       PSHS   B			; do it 13 times
 5C43: C6 41       LDB    #$41
 5C45: 86 0B       LDA    #$0B
-5C47: A7 C9 04 00 STA    $0400,U
-5C4B: E7 C1       STB    ,U++
+5C47: A7 C9 04 00 STA    $0400,U	; [unchecked_address]
+5C4B: E7 C1       STB    ,U++  		; [video_address]
 5C4D: C1 5A       CMPB   #$5A
 5C4F: 26 02       BNE    $5C53
 5C51: C6 60       LDB    #$60
@@ -1471,7 +1473,7 @@ l_5bdd:
 5C7A: 33 5E       LEAU   -$2,U
 5C7C: EF 23       STU    $3,Y
 5C7E: 39          RTS
-5C7F: 20 C4       BRA    $5C45
+
 
 5C8E: 6C 22       INC    $2,Y
 5C90: A6 22       LDA    $2,Y

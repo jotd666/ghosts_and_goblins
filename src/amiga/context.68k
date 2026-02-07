@@ -48,7 +48,7 @@ level4_path:
 level5_path:
 	.asciz	"level5"
 level6_path:
-	.asciz	"level1"
+	.asciz	"level6"
 level7_path:
 	.asciz	"level7"
 map_path:

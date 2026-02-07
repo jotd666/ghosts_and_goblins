@@ -1137,7 +1137,6 @@ set_scroll_values:
 	cmp.w	min_scroll_x,d0
 	jcc		0f
 	* min overshoot: we have to do something on the left
-	COLOR0_FLASH	0x00F
 	jbsr	draw_left_tiles
 	sub.w	#BG_TILE_WIDTH,max_scroll_x
 	sub.w	#BG_TILE_WIDTH,min_scroll_x
@@ -1149,7 +1148,6 @@ set_scroll_values:
 	cmp.w	max_scroll_x,d0
 	jcs		5f
 	* max overshoot: we have to do something on the right: draw the tiles
-	COLOR0_FLASH	0x0F0
 	jbsr	draw_right_tiles
 	add.w	#BG_TILE_WIDTH,max_scroll_x
 	add.w	#BG_TILE_WIDTH,min_scroll_x
@@ -2940,8 +2938,7 @@ update_bg_tile:
 	jsr		(a0)
 	* lower part too
 	movem.l	(a7)+,d0-D3/a0-a6
-	move.w	d5,d6
-	lsr.w	#1,d6
+	move.w	#2*BG_SCREEN_PLANE_SIZE/3,d6
 	add.w	d6,a1
 	add.w	d6,a3
 	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
@@ -3595,7 +3592,28 @@ level2_interrupt:
 *			0);
 *}
 
+print_tile_1:
+	movem.l	d0-a6,-(a7)
+	GET_MEMORY_START_AND_DP
+	lea	(0x28C8,a6),a0
+	move.b	#0xE9,(a0)
+	move.b	#0x41,(0x400,a0)
 
+	jbsr	osd_video_byte_dirty
+	movem.l	(a7)+,d0-a6
+	rts
+	
+print_tile_2:
+	movem.l	d0-a6,-(a7)
+	GET_MEMORY_START_AND_DP
+	lea	(0x2AC8,a6),a0
+	move.b	#0xE9,(a0)
+	move.b	#0x41,(0x400,a0)
+
+	jbsr	osd_video_byte_dirty
+	movem.l	(a7)+,d0-a6
+	rts
+	
 	
 handle_keyboard:
 	movem.l	D0/A0/A5,-(a7)
@@ -3656,19 +3674,18 @@ handle_keyboard:
 	* cheat keys
 
 
-	cmp.b	#0x50,d0	| F1 key: toggle invincible
+	cmp.b	#0x50,d0	| F1 key: print a central tile on screen 1 (left)
 	bne.b	0f
-	st.b	cheat_used
-	not.b	invincible_flag
 	COLOR0_FLASH	0x0FF
-
+	jbsr	print_tile_1
 	
 0:
-	cmp.b	#0x51,d0	| F2 key: skip level TODO
+	cmp.b	#0x51,d0	| F2 key: print a central tile on screen 2 (left)
 	bne.b	0f
 	st.b	cheat_used
 	
 	COLOR0_FLASH	0x0FF
+	jbsr	print_tile_2
 	
 0:
 	cmp.b	#0x52,d0	| F3 key: change weapon

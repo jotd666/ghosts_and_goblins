@@ -1736,7 +1736,7 @@ game_in_play_70e3:
 70E8: 96 05       LDA    sub_state_0005
 70EA: 48          ASLA
 70EB: 8E 70 F1    LDX    #jump_table_70f1
-70EE: AD 96       JSR    [A,X]	; [indirect_jump] [nb_entries=2]
+70EE: AD 96       JSR    [A,X]	; [indirect_jump] [nb_entries=5]
 70F0: 39          RTS
 
 
@@ -1771,7 +1771,7 @@ intro_and_get_ready_7125:
 ; and sub state
 7134: D6 0B       LDB    sub_sub_sub_state_000b
 7136: 58          ASLB
-7137: 6E 95       JMP    [B,X]	; [special_indirect_jump] [nb_entries=3]
+7137: 6E 95       JMP    [B,X]	; [special_indirect_jump] [nb_entries=6] (6 at most)
 
 ; depends on the level, only last level does different
 table_of_jump_tables_7139:
@@ -2003,6 +2003,8 @@ take_a_key_level_complete_72c9:
 7318: CE 73 1D    LDU    #jump_table_731d
 731B: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
+; the part when it says that you need the shield to progress to last level
+; this weapon has no effect, try again with a ...
 7321: CC 0E 00    LDD    #$0E00
 7324: BD 69 09    JSR    $6909
 7327: BD 68 DF    JSR    $68DF
@@ -2012,15 +2014,16 @@ take_a_key_level_complete_72c9:
 7333: CE 73 56    LDU    #$7356
 7336: CC 06 06    LDD    #$0606
 7339: 10 AE C1    LDY    ,U++
-733C: 10 AF 84    STY    ,X
-733F: ED 89 04 00 STD    $0400,X
+733C: 10 AF 84    STY    ,X			; [unchecked_address]
+733F: ED 89 04 00 STD    $0400,X		; [video_address]
 7343: 10 AE C4    LDY    ,U
-7346: 10 AF 88 20 STY    counter_16_bit_0020,X
-734A: ED 89 04 20 STD    $0420,X
+7346: 10 AF 88 20 STY    $0020,X   ; [unchecked_address]
+734A: ED 89 04 20 STD    $0420,X	; [video_address]
 734E: CC 00 F0    LDD    #$00F0
 7351: DD 09       STD    $09
 7353: 0C 0B       INC    sub_sub_sub_state_000b
 7355: 39          RTS
+
 7356: 86 87       LDA    #$87
 7358: 96 97       LDA    $97
 735A: 9E 09       LDX    $09
@@ -2465,6 +2468,7 @@ player_dead_777c:
 780E: 31 3F       LEAY   -$1,Y
 7810: 26 F4       BNE    $7806
 7812: 39          RTS
+
 7813: D6 08       LDB    sub_sub_state_0008
 7815: 58          ASLB
 7816: CE 78 1B    LDU    #jump_table_781b
@@ -2473,7 +2477,7 @@ player_dead_777c:
 7821: D6 0B       LDB    sub_sub_sub_state_000b
 7823: 58          ASLB
 7824: CE 78 29    LDU    #jump_table_7829
-7827: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
+7827: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=5]
 
 7833: D6 F0       LDB    $F0
 7835: 26 02       BNE    $7839
@@ -8540,6 +8544,7 @@ B45C: EE 88 16    LDU    $16,X
 B45F: 10 AE 88 18 LDY    $18,X
 B463: 86 87       LDA    #$87
 B465: C6 87       LDB    #$87
+; level 2 windows opening
 B467: ED A9 04 00 STD    $0400,Y  ; [unchecked_address]
 B46B: EC C1       LDD    ,U++
 B46D: ED A4       STD    ,Y  		; [video_address]
@@ -16153,6 +16158,9 @@ jump_table_6b66:
 jump_table_70f1:
 	dc.w	init_new_game_70fb	; $70f1
 	dc.w	run_game_7115	; $70f3
+	dc.w	$5a8a
+	dc.w	$5b3a
+	dc.w	$7813
 jump_table_711d:
 	dc.w	intro_and_get_ready_7125	; $711d
 	dc.w	game_playing_7245	; $711f
@@ -17098,6 +17106,11 @@ jump_table_80b1:
 jump_table_7829:
 	dc.w	$783a	; $7829
 	dc.w	$7833	; $782b
+	dc.w	$7850
+	dc.w	$7833
+	dc.w	$785d 
+	
+	
 jump_table_9ca4:
 	dc.w	$9CAC	; $9ca4
 	dc.w	$9CC2	; $9ca6
@@ -17270,4 +17283,7 @@ jump_table_7151:
 	dc.w	init_restart_7197    ; $7151 for last level
 	dc.w	continue_restart_71ac    ; $7153
 	dc.w	do_restart_last_level_71fa    ; $7155
+	dc.w	$ffff    ; contains 732a but prob. bogus    ; $7157	
+	dc.w	$ffff    ; contains 732a but prob. bogus    ; $7157	
+	dc.w	$ffff    ; contains 732a but prob. bogus    ; $7157	
 	dc.w	$ffff    ; contains 732a but prob. bogus    ; $7157	

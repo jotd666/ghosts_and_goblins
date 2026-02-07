@@ -163,6 +163,8 @@ l_53f4
 compute_and_display_time_52b9
 l_58ce
 l_54e3
+l_5a8a
+l_5b3a
 l_5910
 l_5180
 l_5975""".splitlines():

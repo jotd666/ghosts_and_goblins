@@ -1056,7 +1056,6 @@ load_context:
 
 force_all_screen_redraw:
 	GET_MEMORY_START_IN_A6
-
 	* given the current scroll X/Y, draw all tiles on screen
 	move.w	game_scroll_x,d0
 	move.w	d0,previous_scroll_x
@@ -1071,6 +1070,7 @@ force_all_screen_redraw:
 	
 	move.w	d0,d5				| save scroll X
 	lea		(bg_tiles_address_2800,a6),a5
+	move.w	game_scroll_x,d0
 	lsr.w	#4,D0	| divide by 16 to get real X tile offset
 	* now compute start address to fetch data from
 	move.w	#1,d7		| first row is not visible with scroll=0, visible with=$10
@@ -2850,15 +2850,24 @@ bg_tile:
 	add.b	#0x11,d0			| visible tile span (including invisible scroll column)
 	cmp.b	d0,d2
 	jcc		osd_w_videoram_out	| tile x+screen width < scroll x
+
+
+	jbsr	compute_x_offset
+	jmi		osd_w_videoram_out
 	
 	* tile is in screen considered the current scrolling: update it
 	* (don't check Y we need update no matter when in that case)
+	
 	
 	lea		(BG_SCREEN_TILE_ADDRESS,a6),a0
 	move.b	(a0,d7.w),d0
 	lea		(BG_SCREEN_COLOR_ADDRESS,a6),a0
 	move.b	(a0,d7.w),d1
 
+	* here we have to compute x_offset, this is the game displaying a random
+	* tile on screen
+	
+	
 	jbsr	update_bg_tile
 
 	jra		osd_w_videoram_out
@@ -2881,6 +2890,61 @@ bg_tile:
 	add.l	d5,a2
 	.endm
 
+
+* < D7: address (0-0x400)
+* > D0: x_offset or -1 if not in visible screen
+compute_x_offset:
+	movem.w	d1-d2,-(a7)
+	* we need to see if the tile is on screen considering X scolling
+	* positions. Compute first X & last X coord visible
+
+	move.w	d7,d2
+	lsr.w	#5,d2
+	
+	* establish min & max bounds including invisible tile used for scroll
+	* which is outside the screen
+	move.w	game_scroll_x,d0  | left of screen
+	lsr.w	#4,d0		| divide by 16 match tile
+	move.w	d0,d1
+	add.w	#0x12,d1	| right part
+	
+	* is min X < d2
+	cmp.b	d0,d2
+	jcc		0f
+	move.w	d1,d3
+	and.w	#0x1F,d3
+	cmp.w	d0,d3
+	jcc		0f
+	* handle wrap
+	add.w	#0x20,d2
+0:
+	cmp.w	d0,d2
+	jcs		10f
+	add.w	#0x11,d0			| visible tile span (including invisible scroll column)
+	cmp.b	d0,d2
+	jcc		10f	| tile x+screen width < scroll x
+
+	* tile is in screen: return x offset (0, 0x40, 0x80 ...)
+	
+	move.w	d7,d2
+	lsr.w	#5,d2		| this is our Y
+	* now we have D2 between 0 and 0x1F
+	lsl.w	#4,d2		| in X coords
+	move.w	host_scroll_x,d0
+	* add host scroll
+	add.w	d2,d0
+	* now reduce 0x200 => 0x40
+	lsr.w	#8,d0
+	lsr.w	#1,d0
+	lsl.w	#6,d0
+	move.w	d0,x_offset	
+2:
+	movem.w	(a7)+,d1-d2
+	rts
+10:
+	moveq	#-1,d0
+	jra		2b
+	
 * create 2 caches
 
 cache_bg_tiles_address:
@@ -2924,7 +2988,7 @@ cache_bg_tiles_address:
 * uses x_offset computed from scrolling current params
 
 update_bg_tile:
-	
+	move.b	#0,0x110
 	moveq	#0,d2			| mask up to 255
 	move.b	d0,d2			| tile code
 	moveq	#0,d3
@@ -3866,6 +3930,7 @@ log_used_sprites:
 	.endif
 	
 redraw_bg_tiles:
+	BREAKPOINT	"redr"
 	movem.l	d0-a6,-(a7)
 	jbsr 	force_all_screen_redraw
 	movem.l	(a7)+,d0-a6
@@ -3958,6 +4023,10 @@ handle_keyboard:
 0:
 
 	
+	cmp.b	#0x55,d0	| F6 key: debug params
+	bne.b	0f
+	jbsr	redraw_bg_tiles
+0:
 	cmp.b	#0x56,d0	| F7 key: debug params
 	bne.b	0f
 	eor.b		#1,osd_debug_active

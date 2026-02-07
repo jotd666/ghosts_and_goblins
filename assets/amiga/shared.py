@@ -148,7 +148,7 @@ def get_sprite_names():
     rval[0x275] = "arthur_passing_armor"
     rval[0xE4] = "platform"
     rval[0x7F] = "coin_bonus"
-    rval[0x268] = rval[0x26A] = rval[0x26C] = "statue_bonus"
+    rval[0x26D] = rval[0x268] = rval[0x26A] = rval[0x26C] = "statue_bonus"
 
     rval[0xF7] = "small_fire_bullet"
     rval[0x38] = rval[0x39] = "axe"
@@ -161,6 +161,7 @@ def get_sprite_names():
     rval[0x277] = "king_bonus"
     rval[0x27F] = "pot"
     rval[0xD7] = "key"
+    rval[0x264] = "trousers_bonus"  # worth 2000
 
     rval[0x1b6] = rval[0x1b7] = "plant_bullet"
     rval[0x54] = "spear"
