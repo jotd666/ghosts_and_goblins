@@ -3012,7 +3012,6 @@ update_bg_tile:
 	* compute address
 	
 	move.w	d7,d0
-	
 	lsr.w	#5,d0	| divide by 0x20
 	add.w	d0,d0	| 16 pixels
 	add.w 	x_offset,d0		| add corkscrew makeup offset

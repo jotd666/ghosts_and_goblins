@@ -1,6 +1,8 @@
 - level 6: up the ladder: 2 faulty tiles. Addresses are 2800 (not refreshed) and 2820 (black, bad refresh)
-  suspecting whole first row not properly processed!
-- sometimes lateral scroller doesn't seem to update tiles off-screen  
+  OR processed correctly then overwritten: debug by using memory watch after the tile has been copied
+  
+- sometimes lateral scroller doesn't seem to update tiles off-screen, specially on vertical levels (level that scroll up)
+  doesn't happen on level 1 or 4 only on parts where it scrolls up
 - grouping, seems to have issues with main character at tile 0 tile 0 seems
   to be a special case despite the precautions, use mockup to see what's happening
 - sprites disappear too early on the left
