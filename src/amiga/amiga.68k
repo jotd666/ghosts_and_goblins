@@ -3,6 +3,7 @@
 *
 * (c) JOTD 2026
 *
+OPT_BLIT_CHAIN_MODE = 0
 
 start:
 	move.l	a7,old_stack
@@ -18,6 +19,7 @@ start:
 	.include "lvo/graphics_lvos.i"
 
 	.include "include.inc"
+	.include "blitter_macros.inc"
 	.include "sounds.inc"
 	.include "data.inc"
 	.include "utility_macros.inc"
@@ -39,6 +41,9 @@ START_X = 0
 START_Y = 0
 CORKSCREW_NB_SCREENS = 20
 BORDERBLANK = 1
+START_HOST_SCROLL_X = (CORKSCREW_NB_SCREENS/2)*0x100
+START_HOST_SCROLL_X = 0
+
 
 PREVIOUS_SPRITE_SIZE = 8
 CURRENT_SPRITE_SIZE = 4
@@ -74,9 +79,10 @@ FG_TILE_LOG_LENGTH = FG_TILE_NB_CLUTS*FG_TILE_COUNT
 BG_TILE_LOG_LENGTH = BG_TILE_NB_CLUTS*BG_TILE_COUNT
 
 SPRITE_X_CORRECTION = 0
-SPRITE_Y_CORRECTION = 0
+SPRITE_Y_CORRECTION = -BG_TILE_WIDTH
 HW_SPRITE_X_CORRECTION = 0
 HW_SPRITE_Y_CORRECTION = 0
+
 
 * start displaying earlier in ntsc mode, allowing
 * full display
@@ -1059,7 +1065,7 @@ force_all_screen_redraw:
 	* given the current scroll X/Y, draw all tiles on screen
 	move.w	game_scroll_x,d0
 	move.w	d0,previous_scroll_x
-	add.w	#(CORKSCREW_NB_SCREENS/2)*0x100,d0			| give us some leeway to the left: 10 screens before havoc
+	add.w	#START_HOST_SCROLL_X,d0			| give us some leeway to the left: 10 screens before havoc
 	move.w	d0,host_scroll_x
 	move.w	d0,min_scroll_x
 	move.w	d0,d1
@@ -1106,6 +1112,7 @@ force_all_screen_redraw:
 	add.w	#0x20,d6
 	add.w	#BG_TILE_WIDTH,d5	| keep track of current "scroll"
 	dbf		d2,0b
+	clr.w	x_offset
 	rts
 	
 	
@@ -1623,14 +1630,14 @@ blit_background:
     
     * blitter registers set
 
-	move.l d3,bltcon0(a5)	| sets con0 and con1
+	WRITE_BLITTER_REG_LONG	d3,bltcon0	| sets con0 and con1
 
-    move.w  d1,bltamod(a5)	|A modulo
-    move.w  d1,bltdmod(a5)	|D modulo
+	WRITE_BLITTER_REG_WORD	d1,bltamod	|A modulo
+	WRITE_BLITTER_REG_WORD	d1,bltdmod	|D modulo
 							
-	move.l a0,bltapt(a5)	|source graphic top left corner
-	move.l a1,bltdpt(a5)	|destination top (bottom) left corner
-	move.w  d4,bltsize(a5)	|rectangle size, starts blit
+	WRITE_BLITTER_REG_LONG	a0,bltapt	|source graphic top left corner
+	WRITE_BLITTER_REG_LONG	a1,bltdpt	|destination top (bottom) left corner
+	WRITE_BLITTER_REG_SIZE	d4	|rectangle size, starts blit
 	
 	.rept	NB_PLAYFIELD_PLANES-1
 	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
@@ -1642,9 +1649,9 @@ blit_background:
 	.endif
 	WAIT_BLIT
 	* second bitplane
-	move.l a0,bltapt(a5)	|source graphic top left corner
-	move.l a1,bltdpt(a5)	|destination top (bottom) left corner
-	move.w  d4,bltsize(a5)	|rectangle size, starts blit
+	WRITE_BLITTER_REG_LONG	a0,bltapt	|source graphic top left corner
+	WRITE_BLITTER_REG_LONG	a1,bltdpt	|destination top (bottom) left corner
+	WRITE_BLITTER_REG_SIZE	d4	|rectangle size, starts blit
 	.endr
 	
 	movem.l	(a7)+,d2-d6/a0-a5
@@ -1696,7 +1703,7 @@ really_update_sprites:
 	move.l	playfield_drawed_screen_ptr(pc),a1
 	move.w	#NB_TARGET_SPRITES-1,d7
 	WAIT_BLIT
-	move.l	#-1,bltalwm(a5)		| needed for blit_background
+	WRITE_BLITTER_REG_LONG	#-1,bltalwm		| needed for blit_background
 1:
 	move.w	(a4),d0
 	bmi.b	11f		| x=0: inactive
@@ -2173,16 +2180,16 @@ clear_planes_any_blitter_internal:
     * now just wait for blitter ready to write all registers
 	WAIT_BLIT
     
-	move.l	d2,bltafwm(a5)
-	move.l d1,bltcon0(a5)	
-    move.w  d0,bltdmod(a5)	|D modulo
+	WRITE_BLITTER_REG_LONG	d2,bltafwm
+	WRITE_BLITTER_REG_LONG	d1,bltcon0	
+	WRITE_BLITTER_REG_WORD	d0,bltdmod	|D modulo
 	
 	subq	#1,d3
 	jeq		4f
 3:
 	WAIT_BLIT
-	move.l a1,bltdpt(a5)	|destination top left corner
-	move.w  d4,bltsize(a5)	|rectangle size, starts blit
+	WRITE_BLITTER_REG_LONG	a1,bltdpt	|destination top left corner
+	WRITE_BLITTER_REG_SIZE	d4	|rectangle size, starts blit
 32:
 	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
 	add.l	#BG_SCREEN_PLANE_SIZE,a1
@@ -2287,33 +2294,33 @@ blit_planes_any_internal_cookie_cut:
     
     * blitter registers set
 
-	move.w d2,bltamod(a5)		|A modulo=bytes to skip between lines
-	move.w d2,bltbmod(a5)		|B modulo=bytes to skip between lines
+	WRITE_BLITTER_REG_WORD	d2,bltamod		|A modulo=bytes to skip between lines
+	WRITE_BLITTER_REG_WORD	d2,bltbmod		|B modulo=bytes to skip between lines
 	moveq	#0,d2
-    move.w  d2,bltalwm(a5)	    | so the -2 modulo trick works
+	WRITE_BLITTER_REG_WORD	d2,bltalwm	    | so the -2 modulo trick works
 	
-    move.w  d0,bltcmod(a5)	|C modulo
-    move.w  d0,bltdmod(a5)	|D modulo
+	WRITE_BLITTER_REG_WORD	d0,bltcmod	|C modulo
+	WRITE_BLITTER_REG_WORD	d0,bltdmod	|D modulo
 					
 	subq	#1,d3
-	beq.b	7f
+	jeq	7f
 	subq	#1,d3
 6:
-	move.l a3,bltapt(a5)	|source graphic top left corner (mask)
-	bsr.b	start_process_1_plane
+	WRITE_BLITTER_REG_LONG	a3,bltapt	|source graphic top left corner (mask)
+	jbsr	start_process_1_plane
 	
-	move.l	a1,bltcpt(a5)	|pristine background top (bottom) left corner
-	move.l	a1,bltdpt(a5)	|destination top (bottom) left corner
-	move.w  d4,bltsize(a5)	|rectangle size, starts blit
+	WRITE_BLITTER_REG_LONG	a1,bltcpt	|pristine background top (bottom) left corner
+	WRITE_BLITTER_REG_LONG	a1,bltdpt	|destination top (bottom) left corner
+	WRITE_BLITTER_REG_SIZE	d4	|rectangle size, starts blit
 	add.l		#BG_SCREEN_PLANE_SIZE,a1
 	WAIT_BLIT
 	dbf		d3,6b
 7:
-	move.l a3,bltapt(a5)	|source graphic top left corner (mask)
-	bsr.b	start_process_1_plane
-	move.l	a1,bltcpt(a5)	|pristine background top (bottom) left corner
-	move.l	a1,bltdpt(a5)	|destination top (bottom) left corner
-	move.w  d4,bltsize(a5)	|rectangle size, starts blit
+	WRITE_BLITTER_REG_LONG	a3,bltapt	|source graphic top left corner (mask)
+	jbsr	start_process_1_plane
+	WRITE_BLITTER_REG_LONG	a1,bltcpt	|pristine background top (bottom) left corner
+	WRITE_BLITTER_REG_LONG	a1,bltdpt	|destination top (bottom) left corner
+	WRITE_BLITTER_REG_SIZE	d4	|rectangle size, starts blit
 10:
     movem.l (a7)+,d0-d7/a4
     rts
@@ -2326,13 +2333,13 @@ start_process_1_plane:
 	bra.b	61f
 60:
 	* source is 0: just apply mask (less bandwidth lost) and change bltcon
-	move.l	d6,bltcon0(a5)	| sets con0 and con1: C-A->D cookie cut, B fixed
- 	move.w	d2,bltbdat(a5)	|B word is zero
+	WRITE_BLITTER_REG_LONG	d6,bltcon0	| sets con0 and con1: C-A->D cookie cut, B fixed
+	WRITE_BLITTER_REG_WORD	d2,bltbdat	|B word is zero
 	rts
 61:
 	* non-zero: set data source & bltcon
-	move.l	d7,bltcon0(a5)	| sets con0 and con1: C-A+B->D cookie cut full
-	move.l	a4,bltbpt(a5)	|source graphic top left corner
+	WRITE_BLITTER_REG_LONG	d7,bltcon0	| sets con0 and con1: C-A+B->D cookie cut full
+	WRITE_BLITTER_REG_LONG	a4,bltbpt	|source graphic top left corner
 	rts
 
 	.macro	GEN_MINTERM_TABLE	name,value
@@ -2504,7 +2511,7 @@ platform_init:
 	move.w	#0x7FFF,dmacon(a5)
 	move.w	#0x7FFF,intena(a5)
 	* set blitter parameters once and for all
-    move.l  #-1,bltafwm(a5)
+	WRITE_BLITTER_REG_LONG	#-1,bltafwm
 	
 	move.l	monitor,d0
 	cmp.l	#NTSC_MONITOR_ID,D0
@@ -2864,10 +2871,35 @@ bg_tile:
 	lea		(BG_SCREEN_COLOR_ADDRESS,a6),a0
 	move.b	(a0,d7.w),d1
 
+	cmp.w	#0x0EE,d7
+	jne		0f
+	cmp.b	#0x5E,d0
+	jne		0f
+	*BREAKPOINT	"FUCK"
+	jbsr	compute_x_offset
+	tst.w	x_offset
+	lea		(BG_SCREEN_TILE_ADDRESS,a6),a0
+	move.b	(a0,d7.w),d0
+	lea		(BG_SCREEN_COLOR_ADDRESS,a6),a0
+	move.b	(a0,d7.w),d1
+
+0:
+	cmp.w	#0x0CE,d7
+	jne		0f
+
+	*BREAKPOINT	"ok"
+	jbsr	compute_x_offset
+	tst.w	x_offset
+	lea		(BG_SCREEN_TILE_ADDRESS,a6),a0
+	move.b	(a0,d7.w),d0
+	lea		(BG_SCREEN_COLOR_ADDRESS,a6),a0
+	move.b	(a0,d7.w),d1
+
+0:
+
 	* here we have to compute x_offset, this is the game displaying a random
 	* tile on screen
-	
-	
+
 	jbsr	update_bg_tile
 
 	jra		osd_w_videoram_out
@@ -2988,7 +3020,6 @@ cache_bg_tiles_address:
 * uses x_offset computed from scrolling current params
 
 update_bg_tile:
-	move.b	#0,0x110
 	moveq	#0,d2			| mask up to 255
 	move.b	d0,d2			| tile code
 	moveq	#0,d3
@@ -3001,25 +3032,24 @@ update_bg_tile:
 	add.w	d4,d2			| full tile code
 
 
-	moveq	#0,d0
-	moveq	#0,d1
 	* compute address
 	
 
 	move.w	d7,d0
 	
-	
 	lsr.w	#5,d0	| divide by 0x20
 
-	
-	asr.w	#4,d1	| tiles are 16 pix wide
-	add.w 	d1,d0	| correct nb bytes
-
 	add.w	d0,d0	| 16 pixels
+	nop
+	nop
+	nop
 	add.w 	x_offset,d0
-	
+	nop
+	nop
+	nop
 
 	move.w	d7,d1
+	subq.w	#1,d1		| first row is not shown with y scroll = 0
 	and.w	#0x1F,d1	| modulus 0x20
 	cmp.w	#0x10,d1
 	scs		d6			| repeat tile draw if Y tile  < 0x10
@@ -3598,6 +3628,7 @@ set_bobs_bitplanes:
 	
 	move.w	(a2)+,fine_x_scroll_value
 	move.w	host_scroll_x,d2
+	sub.w	#START_HOST_SCROLL_X,d2
 	lsr.w	#6,d2
 	lsl.w	#3,d2
 	add.w	d2,d0
@@ -3930,9 +3961,31 @@ log_used_sprites:
 	.endif
 	
 redraw_bg_tiles:
-	BREAKPOINT	"redr"
 	movem.l	d0-a6,-(a7)
 	jbsr 	force_all_screen_redraw
+	movem.l	(a7)+,d0-a6
+	rts
+	
+skip_level:
+	movem.l	d0-a6,-(a7)
+	GET_MEMORY_START_IN_A6
+	cmp.b	#1,(sub_sub_state_0008,a6)
+	jne		0f
+	cmp.b	#6,(current_level_0072,a6)
+	jcc		0f
+	clr.b	(sub_sub_state_0008,a6)
+	clr.b	(sub_sub_sub_state_000b,a6)
+	clr.b	(0xE,a6)
+	addq.b	#1,(current_level_0072,a6)
+0:
+	movem.l	(a7)+,d0-a6
+	rts
+	
+warp_on_top_of_screen:
+	movem.l	d0-a6,-(a7)
+	GET_MEMORY_START_IN_A6
+	st.b	(0x50A,a6)
+
 	movem.l	(a7)+,d0-a6
 	rts
 	
@@ -3988,10 +4041,10 @@ handle_keyboard:
 	COLOR0_FLASH	0x0FF
 	
 0:
-	cmp.b	#0x51,d0	| F2 key: skip level TODO
+	cmp.b	#0x51,d0	| F2 key: skip level
 	bne.b	0f
 	st.b	cheat_used
-	
+	jbsr	skip_level
 	COLOR0_FLASH	0x0FF
 	
 0:
@@ -4002,11 +4055,11 @@ handle_keyboard:
 	
 0:
 
-	cmp.b	#0x53,d0	| F4 key
+	cmp.b	#0x53,d0	| F4 key: warp on top of scren
 	bne.b	0f
 	st.b	cheat_used
 	COLOR0_FLASH	0x0FF
-
+	jbsr	warp_on_top_of_screen
 0:
 *	cmp.b	#0x54,d0	| F5 key
 *	bne.b	0f
@@ -4025,6 +4078,7 @@ handle_keyboard:
 	
 	cmp.b	#0x55,d0	| F6 key: debug params
 	bne.b	0f
+	COLOR0_FLASH	0x0FF
 	jbsr	redraw_bg_tiles
 0:
 	cmp.b	#0x56,d0	| F7 key: debug params
@@ -4245,6 +4299,12 @@ osd_sound_start:
 	movem.l	d0/d1/d2/a0/a1/a6,-(a7)
 	lea		_custom,a6
 	
+	* special case if game starts cut the music that could remain from attract
+	cmp.b	#INTRO_36_SND,d0
+	jne		0f
+	jbsr	osd_music_stop
+0:
+
 	moveq	#0,d2
 	
 	and.w	#0xFF,d0

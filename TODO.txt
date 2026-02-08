@@ -1,36 +1,37 @@
-- compute_x_offset doesn't work properly when drawing a random tile
-- implement level skipper
-- level 2/5: goblins trajectory is strange: they "warp"
-- level 5: dying: no "dead" music
-- missing water tile from intro / level 1 / level 2 WTF: ex 35E/5 at 298E (+18E) see what's done
 - when writing an isolated tile (video_byte_dirty) check if in screen and find proper offset (not working right now
   picks a tile at wrong location)
-- when resuming level 2 it displays black screen: because mid-level palette is different not recognized
-  by context switcher
+- compute_x_offset doesn't work properly when drawing a random tile: ex level 2 windows
 - sometimes lateral scroller doesn't seem to update tiles off-screen  
-- level 6 to level 7: crash
-- start at level 5: tries to load level 2 then loads level 5
-- sprites disappear too early on the left
-- need to implement/test 64 bit swap (last boss)
-- depending on the level, do not mirror Y (level 1, level 4 don't need it)
 - grouping, seems to have issues with main character at tile 0 tile 0 seems
   to be a special case despite the precautions, use mockup to see what's happening
-- game over: game continues!
-- when starting the game, we should stop the music as it makes the game crash: TBC
+- sprites disappear too early on the left
+
+=> this could lead to a new video, ex level 3
+
+- level 6 to level 7: crash: start on level 6, skip level and bang!
+
+- level 2/5: goblins trajectory is strange: they "warp"
+
+- level 5: dying: no "dead" music: IM76 contacted
+- use 16-bit table for mirror but not mirror routine as it's in place
+- when resuming level 2 it displays black screen: because mid-level palette is different not recognized
+  by context switcher
+- start at level 5: tries to load level 2 then loads level 5
+- need to implement/test 64 bit swap (last boss)
+- depending on the level, do not mirror Y (level 1, level 4 don't need it)
 - map: sceptre of player rendered on top too
 - doesn't seem to detect map context change at times (tiles OK but palette is broken)
 - dynamic palette in water level 1 intercept it and simulate it, level 4 may have this too (flames)
 - remove parasite tiles (in the end) because of levelskip some intro tiles are logged in levels 2+
 - inprint the tombstones (level 1 & 3) in the background (for instance when drawing left & right tiles but also at start) to save
   cpu & reduce the shaking effect
-- fix some sfx on channel 3, elaborate sound priorities
+- fix some sfx on channel 3, elaborate sound priorities, maybe remove goblin sounds as they cut off the music too much
 - infinite lives trainer not working
 - restore_background: should restore 5 first bitplanes, then clear the last one
 - check if game tries to load music from level 1 to 2 or if it's cached
 - tombstone easter egg shot seems wrong
 - bottom left life icon not erased by "credit" message
 - log tiles (per level): with zone filtering (first level only upper part)
-- use 16-bit table for mirror
 - fg layer: lives colors are not good. Black!=transparent, maybe rework or rip with changed
   palette to separate black from background
 - option to start without music, in which case all sounds except a given list should use automatic channel

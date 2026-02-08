@@ -1464,9 +1464,9 @@ l_5bdd:
 5C65: 33 C8 26    LEAU   $26,U
 5C68: C6 0D       LDB    #$0D
 5C6A: E7 E4       STB    ,S
-5C6C: E6 80       LDB    ,X+
-5C6E: A7 C9 04 00 STA    $0400,U
-5C72: E7 C1       STB    ,U++
+5C6C: E6 80       LDB    ,X+		; [bank_address]
+5C6E: A7 C9 04 00 STA    $0400,U    ; [unchecked_address]
+5C72: E7 C1       STB    ,U++       ; [video_address]
 5C74: 6A E4       DEC    ,S
 5C76: 26 F4       BNE    $5C6C
 5C78: 32 61       LEAS   $1,S
