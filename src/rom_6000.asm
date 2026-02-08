@@ -4951,7 +4951,7 @@ update_tile_column_86b1:
 8CBA: A3 C4       SUBD   ,U
 8CBC: 35 40       PULS   U
 8CBE: DD EE       STD    $EE
-8CC0: BD 8D D2    JSR    $8DD2
+8CC0: BD 8D D2    JSR    compute_screen_address_8dd2
 8CC3: 10 AF 7E    STY    -$2,S		; [select_address]
 8CC6: DD E8       STD    $E8
 8CC8: E6 A9 04 00 LDB    $0400,Y	; [video_address]
@@ -4998,7 +4998,7 @@ update_tile_column_86b1:
 8D21: EC 19       LDD    -$7,X
 8D23: 83 00 08    SUBD   #$0008
 8D26: DD EE       STD    $EE
-8D28: BD 8D D2    JSR    $8DD2
+8D28: BD 8D D2    JSR    compute_screen_address_8dd2
 8D2B: E6 A9 04 00 LDB    $0400,Y	; [video_address]
 8D2F: C4 C0       ANDB   #$C0
 8D31: 26 14       BNE    $8D47
@@ -5021,7 +5021,7 @@ update_tile_column_86b1:
 8D53: EC 19       LDD    -$7,X
 8D55: 83 00 08    SUBD   #$0008
 8D58: DD EE       STD    $EE
-8D5A: BD 8D D2    JSR    $8DD2
+8D5A: BD 8D D2    JSR    compute_screen_address_8dd2
 8D5D: E6 A9 04 00 LDB    $0400,Y	; [video_address]
 8D61: C4 C0       ANDB   #$C0
 8D63: 26 10       BNE    $8D75
@@ -5037,6 +5037,10 @@ update_tile_column_86b1:
 8D77: 1A 01       ORCC   #$01
 8D79: 39          RTS
 
+; < $EC.W: ?
+; < $EE.W: ?
+; > Y: screen address
+compute_screen_address_8dd2:
 8DD2: DC EE       LDD    $EE
 8DD4: C4 0F       ANDB   #$0F
 8DD6: 34 04       PSHS   B
@@ -5047,7 +5051,7 @@ update_tile_column_86b1:
 8DDD: 54          LSRB
 8DDE: 54          LSRB
 8DDF: 54          LSRB
-8DE0: 86 28       LDA    #$28
+8DE0: 86 28       LDA    #$28		; base address 2800
 8DE2: C4 1F       ANDB   #$1F
 8DE4: CB 00       ADDB   #$00
 8DE6: DD EA       STD    $EA
@@ -5275,15 +5279,17 @@ update_tile_column_86b1:
 9096: 39          RTS
 9097: 6A 02       DEC    $2,X
 9099: 39          RTS
+
 909A: D6 AD       LDB    $AD
 909C: 27 0C       BEQ    $90AA
 909E: CE A6 31    LDU    #$A631
 90A1: D6 21       LDB    counter_8_bit_0021
 90A3: 54          LSRB
-90A4: 24 02       BCC    $90A8
+90A4: 24 02       BCC    $90A8		; 50% chance of doing something
 90A6: EE 84       LDU    ,X
 90A8: EF 03       STU    $3,X
 90AA: 39          RTS
+
 90AB: 8E 05 10    LDX    #$0510
 90AE: 8D 0B       BSR    $90BB
 90B0: 8D E8       BSR    $909A
@@ -5562,7 +5568,7 @@ update_tile_column_86b1:
 9313: DD EC       STD    $EC
 9315: EC 19       LDD    -$7,X
 9317: DD EE       STD    $EE
-9319: BD 8D D2    JSR    $8DD2
+9319: BD 8D D2    JSR    compute_screen_address_8dd2
 931C: E6 A9 04 00 LDB    $0400,Y	; [video_address]
 9320: C4 C0       ANDB   #$C0
 9322: 26 EB       BNE    $930F
@@ -5593,7 +5599,7 @@ update_tile_column_86b1:
 934E: EC 19       LDD    -$7,X
 9350: 83 00 12    SUBD   #$0012
 9353: DD EE       STD    $EE
-9355: BD 8D D2    JSR    $8DD2
+9355: BD 8D D2    JSR    compute_screen_address_8dd2
 9358: E6 A9 04 00 LDB    $0400,Y	; [video_address]
 935C: C4 C0       ANDB   #$C0
 935E: 26 AF       BNE    $930F
@@ -7064,6 +7070,7 @@ A41E: ED 10       STD    -$10,X
 A420: ED 13       STD    -$D,X
 A422: E7 15       STB    -$B,X
 A424: 7E 8E 0C    JMP    $8E0C
+
 A427: EE 1C       LDU    -$4,X
 A429: E6 1E       LDB    -$2,X
 A42B: 58          ASLB
@@ -8244,6 +8251,7 @@ B13D: ED 10       STD    -$10,X
 B13F: ED 13       STD    -$D,X
 B141: E7 15       STB    -$B,X
 B143: 7E 8E 0C    JMP    $8E0C
+
 B146: EC 13       LDD    -$D,X
 B148: 48          ASLA
 B149: CE B1 4E    LDU    #jump_table_b14e
@@ -8518,11 +8526,13 @@ B419: 4F          CLRA
 B41A: 5F          CLRB
 B41B: ED 14       STD    -$C,X
 B41D: 39          RTS
+
 B41E: E6 15       LDB    -$B,X
 B420: 58          ASLB
 B421: CE B4 26    LDU    #jump_table_b426
 B424: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=6]
 
+init_opening_window_b432:
 B432: E6 11       LDB    -$F,X
 B434: 27 20       BEQ    $B456
 B436: CE B4 95    LDU    #$B495
@@ -8532,12 +8542,15 @@ B43F: EC 16       LDD    -$A,X
 B441: DD EC       STD    $EC
 B443: EC 19       LDD    -$7,X
 B445: DD EE       STD    $EE
-B447: BD 8D D2    JSR    $8DD2
+B447: BD 8D D2    JSR    compute_screen_address_8dd2
 B44A: 31 A8 E0    LEAY   -$20,Y
-B44D: 10 AF 88 18 STY    $18,X
+B44D: 10 AF 88 18 STY    $18,X		; store window screen address (house at level 2)
 B451: BD 79 AB    JSR    $79AB
 B454: 6C 15       INC    -$B,X
 B456: 39          RTS
+
+* < Y: window address
+update_opening_window_tiles_b457:
 B457: 6D 88 15    TST    $15,X
 B45A: 26 2A       BNE    $B486
 B45C: EE 88 16    LDU    $16,X
@@ -8601,12 +8614,14 @@ B507: 6F 88 14    CLR    $14,X
 B50A: 6C 15       INC    -$B,X
 B50C: BD 90 74    JSR    $9074
 B50F: 39          RTS
+
 B510: 6F 88 15    CLR    $15,X
 B513: CE B4 A9    LDU    #$B4A9
 B516: EF 88 16    STU    $16,X
 B519: 6C 15       INC    -$B,X
-B51B: BD B4 57    JSR    $B457
+B51B: BD B4 57    JSR    update_opening_window_tiles_b457
 B51E: 7E B5 21    JMP    $B521
+
 B521: BD 8C A7    JSR    $8CA7
 B524: 25 11       BCS    $B537
 B526: CE B5 3F    LDU    #jump_table_b53f
@@ -16551,8 +16566,8 @@ jump_table_b3d5:
 	dc.w	$b3e3	; $b3d7
 	dc.w	$b402	; $b3d9
 jump_table_b426:
-	dc.w	$b432	; $b426
-	dc.w	$b457	; $b428
+	dc.w	init_opening_window_b432	; $b426
+	dc.w	update_opening_window_tiles_b457	; $b428
 	dc.w	$b4bd	; $b42a
 	dc.w	$b510	; $b42c
 	dc.w	$b51b	; $b42e

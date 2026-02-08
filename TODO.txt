@@ -1,11 +1,9 @@
-- when writing an isolated tile (video_byte_dirty) check if in screen and find proper offset (not working right now
-  picks a tile at wrong location)
-- compute_x_offset doesn't work properly when drawing a random tile: ex level 2 windows
 - sometimes lateral scroller doesn't seem to update tiles off-screen  
 - grouping, seems to have issues with main character at tile 0 tile 0 seems
   to be a special case despite the precautions, use mockup to see what's happening
 - sprites disappear too early on the left
-- level 2/5: goblins trajectory is strange: they "warp" when going up. log X/Y of enemies (RE to do)
+- level 2/5: goblins trajectory is strange: they "warp" when going up at some exact Y position. log X/Y of enemies (RE to do)
+  specially after ice towers or on fire bridge or on level 5
 
 => this could lead to a new video, ex level 3
 

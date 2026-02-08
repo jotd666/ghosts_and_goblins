@@ -832,6 +832,7 @@ demo_game:
 	WRITE_TEXT	x_offset_text,2
 	*WRITE_TEXT	xl_offset_text,2
 
+	jbsr	test_x_offset
 	
 	
 	jbsr	osd_enable_interrupts
@@ -2644,6 +2645,21 @@ osd_w_videoram_out:
 	OSD_EXIT
 	rts	
 
+test_x_offset:
+	BREAKPOINT	"TEST"
+	move.w	#0xAC4,host_scroll_x
+	move.w	#0xC4,game_scroll_x
+	move.w	#0x2E2,d7
+	jbsr	compute_x_offset
+	move.w	x_offset,d0
+	
+	move.w	#0xAC4,host_scroll_x
+	move.w	#0xC4,game_scroll_x
+	move.w	#0x2C6,d7
+	jbsr	compute_x_offset
+	move.w	x_offset,d0
+	rts
+	
 * < D7: address (0-0x400)
 * > D0: x_offset or -1 if not in visible screen
 compute_x_offset:
@@ -2679,13 +2695,7 @@ compute_x_offset:
 
 	* tile is in screen: return x offset (0, 0x40, 0x80 ...)
 	
-	move.w	d7,d2
-	lsr.w	#5,d2		| this is our Y
-	* now we have D2 between 0 and 0x1F
-	lsl.w	#4,d2		| in X coords
 	move.w	host_scroll_x,d0
-	* add host scroll
-	add.w	d2,d0
 	* now reduce 0x200 => 0x40
 	lsr.w	#8,d0
 	lsr.w	#1,d0
@@ -2697,7 +2707,6 @@ compute_x_offset:
 10:
 	moveq	#-1,d0
 	jra		2b
-		
 	
 bg_tile:
 	and.w	#0x3FF,d7

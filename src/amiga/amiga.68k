@@ -1430,11 +1430,13 @@ level3_interrupt:
 	WRITE_TEXT	scrollx_text,2
 	WRITE_TEXT	scrolly_text,2
 	WRITE_TEXT	hscrollx_text,2
+	WRITE_TEXT	last_x_offset_text,2
 
 	.set		row,2
 	WRITE_HEX	game_scroll_x,3
 	WRITE_HEX	game_scroll_y,3
 	WRITE_HEX	host_scroll_x,3
+	WRITE_HEX	x_offset,3
 0:
 	.endif
 
@@ -2889,31 +2891,6 @@ bg_tile:
 	lea		(BG_SCREEN_COLOR_ADDRESS,a6),a0
 	move.b	(a0,d7.w),d1
 
-	cmp.w	#0x0EE,d7
-	jne		0f
-	cmp.b	#0x5E,d0
-	jne		0f
-	*BREAKPOINT	"FUCK"
-	jbsr	compute_x_offset
-	tst.w	x_offset
-	lea		(BG_SCREEN_TILE_ADDRESS,a6),a0
-	move.b	(a0,d7.w),d0
-	lea		(BG_SCREEN_COLOR_ADDRESS,a6),a0
-	move.b	(a0,d7.w),d1
-
-0:
-	cmp.w	#0x0CE,d7
-	jne		0f
-
-	*BREAKPOINT	"ok"
-	jbsr	compute_x_offset
-	tst.w	x_offset
-	lea		(BG_SCREEN_TILE_ADDRESS,a6),a0
-	move.b	(a0,d7.w),d0
-	lea		(BG_SCREEN_COLOR_ADDRESS,a6),a0
-	move.b	(a0,d7.w),d1
-
-0:
 
 	* here we have to compute x_offset, this is the game displaying a random
 	* tile on screen
@@ -2976,13 +2953,7 @@ compute_x_offset:
 
 	* tile is in screen: return x offset (0, 0x40, 0x80 ...)
 	
-	move.w	d7,d2
-	lsr.w	#5,d2		| this is our Y
-	* now we have D2 between 0 and 0x1F
-	lsl.w	#4,d2		| in X coords
 	move.w	host_scroll_x,d0
-	* add host scroll
-	add.w	d2,d0
 	* now reduce 0x200 => 0x40
 	lsr.w	#8,d0
 	lsr.w	#1,d0
@@ -4546,6 +4517,9 @@ hscrollx_text:
 	.byte	0xff
 scrolly_text:
 	.ascii	"Game ScrollY "
+	.byte	0xff	
+last_x_offset_text:
+	.ascii	"Last Xoffset "
 	.byte	0xff	
 	.endif
 	
