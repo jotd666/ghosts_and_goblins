@@ -1,3 +1,5 @@
+- level 6: up the ladder: 2 faulty tiles. Addresses are 2800 (not refreshed) and 2820 (black, bad refresh)
+  suspecting whole first row not properly processed!
 - sometimes lateral scroller doesn't seem to update tiles off-screen  
 - grouping, seems to have issues with main character at tile 0 tile 0 seems
   to be a special case despite the precautions, use mockup to see what's happening

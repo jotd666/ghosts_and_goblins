@@ -2866,19 +2866,6 @@ bg_tile:
 	* we need to see if the tile is on screen considering X scolling
 	* positions. Compute first X & last X coord visible
 
-	move.w	d7,d2
-	lsr.w	#5,d2
-	
-	move.w	game_scroll_x,d0
-	lsr.w	#4,d0		| divide by 16 match tile
-	* is min X < d2
-	cmp.b	d0,d2
-	jcs		osd_w_videoram_out	| tile x < scroll x
-	add.b	#0x11,d0			| visible tile span (including invisible scroll column)
-	cmp.b	d0,d2
-	jcc		osd_w_videoram_out	| tile x+screen width < scroll x
-
-
 	jbsr	compute_x_offset
 	jmi		osd_w_videoram_out
 	
@@ -2917,9 +2904,11 @@ bg_tile:
 	add.l	d5,a2
 	.endm
 
-
+* compute X offset (0,0x40,0x80 ...) that makes up for
+* corkscrew effect
 * < D7: address (0-0x400)
-* > D0: x_offset or -1 if not in visible screen
+* > N: set not in visible screen
+* > x_offset: updated
 compute_x_offset:
 	movem.w	d1-d2,-(a7)
 	* we need to see if the tile is on screen considering X scolling
@@ -3020,22 +3009,13 @@ update_bg_tile:
 	add.w	d4,d4
 	add.w	d4,d2			| full tile code
 
-
 	* compute address
 	
-
 	move.w	d7,d0
 	
 	lsr.w	#5,d0	| divide by 0x20
-
 	add.w	d0,d0	| 16 pixels
-	nop
-	nop
-	nop
-	add.w 	x_offset,d0
-	nop
-	nop
-	nop
+	add.w 	x_offset,d0		| add corkscrew makeup offset
 
 	move.w	d7,d1
 	subq.w	#1,d1		| first row is not shown with y scroll = 0
