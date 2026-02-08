@@ -42,7 +42,7 @@ START_Y = 0
 CORKSCREW_NB_SCREENS = 20
 BORDERBLANK = 1
 START_HOST_SCROLL_X = (CORKSCREW_NB_SCREENS/2)*0x100
-START_HOST_SCROLL_X = 0
+
 
 
 PREVIOUS_SPRITE_SIZE = 8
@@ -3646,7 +3646,6 @@ set_bobs_bitplanes:
 	
 	move.w	(a2)+,fine_x_scroll_value
 	move.w	host_scroll_x,d2
-	sub.w	#START_HOST_SCROLL_X,d2
 	lsr.w	#6,d2
 	lsl.w	#3,d2
 	add.w	d2,d0

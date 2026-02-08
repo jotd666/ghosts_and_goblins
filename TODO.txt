@@ -5,20 +5,19 @@
 - grouping, seems to have issues with main character at tile 0 tile 0 seems
   to be a special case despite the precautions, use mockup to see what's happening
 - sprites disappear too early on the left
-- if we make up for corkscrew screens the problem is that we can't go backwards as bitplane area is not defined
+- level 2/5: goblins trajectory is strange: they "warp" when going up. log X/Y of enemies (RE to do)
 
 => this could lead to a new video, ex level 3
 
 - level 6 to level 7: crash: start on level 6, skip level and bang!
 
-- level 2/5: goblins trajectory is strange: they "warp"
 
-- how to continue play?
+- how to continue play? (in MAME)
 - level 5: dying: no "dead" music: IM76 contacted
 - use 16-bit table for mirror but not mirror routine as it's in place
 - start at level 5: tries to load level 2 then loads level 5
 - need to implement/test 64 bit swap (last boss)
-- depending on the level, do not mirror Y (level 1, level 4 don't need it)
+- depending on the level, do not mirror Y (intro, level 1, level 4, level 7 don't need it)
 - map: sceptre of player rendered on top too
 - doesn't seem to detect map context change at times (tiles OK but palette is broken)
 - dynamic palette in water level 1 intercept it and simulate it, level 4 may have this too (flames)
@@ -27,7 +26,6 @@
   cpu & reduce the shaking effect
 - fix some sfx on channel 3, elaborate sound priorities, maybe remove goblin sounds as they cut off the music too much
 - infinite lives trainer not working
-- restore_background: should restore 5 first bitplanes, then clear the last one
 - check if game tries to load music from level 1 to 2 or if it's cached
 - tombstone easter egg shot seems wrong
 - bottom left life icon not erased by "credit" message
