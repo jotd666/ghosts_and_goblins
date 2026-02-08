@@ -893,6 +893,7 @@ osd_set_tile_palette:
 	move.b	(a0,d0.w),d2
 	lsl.w	#8,d2
 	move.b	(0x40,a0,d0.w),d2
+	
 	lea		context_data,a1
 	lsr.w	#4,d2
 0:
@@ -1639,7 +1640,9 @@ blit_background:
 	WRITE_BLITTER_REG_LONG	a1,bltdpt	|destination top (bottom) left corner
 	WRITE_BLITTER_REG_SIZE	d4	|rectangle size, starts blit
 	
-	.rept	NB_PLAYFIELD_PLANES-1
+	* all bitplanes but not the last one that we'll clear
+	
+	.rept	NB_PLAYFIELD_PLANES-2
 	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
 	add.l	#BG_SCREEN_PLANE_SIZE,a0
 	add.l	#BG_SCREEN_PLANE_SIZE,a1
@@ -1648,12 +1651,29 @@ blit_background:
 	add.w	#BG_SCREEN_PLANE_SIZE,a1
 	.endif
 	WAIT_BLIT
-	* second bitplane
+	* other bitplanes
 	WRITE_BLITTER_REG_LONG	a0,bltapt	|source graphic top left corner
 	WRITE_BLITTER_REG_LONG	a1,bltdpt	|destination top (bottom) left corner
 	WRITE_BLITTER_REG_SIZE	d4	|rectangle size, starts blit
 	.endr
 	
+	* last bitplane: just clear: just add to dest
+	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
+	add.l	#BG_SCREEN_PLANE_SIZE,a1
+	.else
+	add.w	#BG_SCREEN_PLANE_SIZE,a1
+	.endif
+	
+	* reuse d1 for bltcon0
+	moveq	#1,d1
+	ror.l	#8,d1     | AKA move.l  #0x01000000,d1   | minterm useD & rect clear (0xA) 
+
+   * now just wait for blitter ready to write all registers
+	WAIT_BLIT
+    
+	WRITE_BLITTER_REG_LONG	d1,bltcon0	
+	WRITE_BLITTER_REG_LONG	a1,bltdpt	|destination top left corner
+	WRITE_BLITTER_REG_SIZE	d4	|rectangle size, starts blit
 	movem.l	(a7)+,d2-d6/a0-a5
 	rts
 
@@ -1729,8 +1749,6 @@ really_update_sprites:
 	* draw current BOBs *
 	*********************
 	
-
-
 	GET_MEMORY_START_IN_A6
 	lea		(SPRITE_ADDRESS+SPRITE_BUFFER_SIZE-CURRENT_SPRITE_SIZE,a6),a0
 	*lea		mockup,a0

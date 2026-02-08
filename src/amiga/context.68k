@@ -5,7 +5,9 @@
 unique_color_index:
 	.word	39
 context_data:
-	.word	0x08a0  | rgb for color 39, context level1 or 2
+	.word	0x08a0  | rgb for color 39, context level1 or 2 (start of level 2)
+	.word	0  | context index
+	.word	0x0054  | rgb for color 39, context 2 (mid level 2 has different color)
 	.word	0  | context index
 	.word	0x0b30  | rgb for color 39, context level3
 	.word	2  | context index

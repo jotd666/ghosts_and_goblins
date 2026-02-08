@@ -5,6 +5,7 @@
 - grouping, seems to have issues with main character at tile 0 tile 0 seems
   to be a special case despite the precautions, use mockup to see what's happening
 - sprites disappear too early on the left
+- if we make up for corkscrew screens the problem is that we can't go backwards as bitplane area is not defined
 
 => this could lead to a new video, ex level 3
 
@@ -12,10 +13,9 @@
 
 - level 2/5: goblins trajectory is strange: they "warp"
 
+- how to continue play?
 - level 5: dying: no "dead" music: IM76 contacted
 - use 16-bit table for mirror but not mirror routine as it's in place
-- when resuming level 2 it displays black screen: because mid-level palette is different not recognized
-  by context switcher
 - start at level 5: tries to load level 2 then loads level 5
 - need to implement/test 64 bit swap (last boss)
 - depending on the level, do not mirror Y (level 1, level 4 don't need it)
