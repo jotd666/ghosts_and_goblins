@@ -17,10 +17,11 @@ Instructions:
 1/2: start game
 arrows/joystick: move
 red/ctrl: shoot
-blue/alt: change weapon
+blue/alt: jump
+continue: 1P start+fire
 
 Cheat keys:
 
-F1: skip level
-F3: add 10000 points
-F4: toggle invincibility
+F1: 
+F3: 
+F4: 

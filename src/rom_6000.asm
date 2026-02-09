@@ -1694,7 +1694,8 @@ start_game_screen_6b5e:
 6EA9: ED 88 20    STD    counter_16_bit_0020,X
 6EAC: 39          RTS
 
-6ED0: D6 72       LDB    $72
+; start of a level, get current level
+6ED0: D6 72       LDB    current_level_0072
 6ED2: 8E 6E C9    LDX    #$6EC9
 6ED5: A6 85       LDA    B,X
 6ED7: 97 B6       STA    $B6
@@ -9038,7 +9039,7 @@ B962: ED 14       STD    -$C,X
 B964: EE 88 1A    LDU    $1A,X
 B967: E6 C0       LDB    ,U+		; [bank_address]
 B969: 26 04       BNE    $B96F
-B96B: EE C4       LDU    ,U
+B96B: EE C4       LDU    ,U			; [bank_address]
 B96D: E6 C0       LDB    ,U+		; [bank_address]
 B96F: E7 07       STB    $7,X
 B971: EF 88 1A    STU    $1A,X
@@ -9055,26 +9056,11 @@ B985: EE 88 1C    LDU    $1C,X
 B988: E6 C0       LDB    ,U+		; [bank_address]
 B98A: 26 04       BNE    $B990
 B98C: EE C4       LDU    ,U		; [bank_address]
-B98E: E6 C0       LDB    ,U+
+B98E: E6 C0       LDB    ,U+	; [bank_address]
 B990: E7 08       STB    $8,X
 B992: EF 88 1C    STU    $1C,X
 B995: 39          RTS
-B996: 00 30       NEG    $30
-B998: 00 40       NEG    copy_of_dsw1_0040
-B99A: 00 28       NEG    game_in_play_0028
-B99C: 00 48       NEG    $48
-B99E: 00 20       NEG    counter_16_bit_0020
-B9A0: 00 50       NEG    $50
-B9A2: 00 18       NEG    $18
-B9A4: 00 58       NEG    $58
-B9A6: 00 10       NEG    $10
-B9A8: 00 60       NEG    nb_lives_0060
-B9AA: 00 0C       NEG    $0C
-B9AC: 00 64       NEG    $64
-B9AE: 00 0C       NEG    $0C
-B9B0: 00 64       NEG    $64
-B9B2: 00 0C       NEG    $0C
-B9B4: 00 64       NEG    $64
+
 B9B6: CE B9 96    LDU    #$B996
 B9B9: D6 9A       LDB    $9A
 B9BB: C4 30       ANDB   #$30

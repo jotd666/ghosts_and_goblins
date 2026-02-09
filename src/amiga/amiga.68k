@@ -1811,9 +1811,11 @@ update_one_bob:
 	cmp.w	#240,d1		| too low: scrap it
 	jcc		2f
 	tst.w	d0
-	* if X < 0 don't display it
-	jmi		2f
-	
+	* if X < -32 don't display it (-16 doesn't seem enough)
+	jpl		0f
+	cmp.w	#-32,d0
+	jcs 	2f
+0:
 	* handle custom amiga horizontal grouping (saves a lot of blitter masking)
 	* the table holds several info bits
 	* - if 0, this is a normal sprite, no horizontal grouping
@@ -1887,9 +1889,13 @@ update_one_bob:
 	move.b	d3,d2
 	lsr.b	#4,d2
 	and.b	#0x3,d2
+	.ifdef MC68020
+	move.l	(a0,d2.w*4),d4
+	.else
 	add.w	d2,d2
 	add.w	d2,d2
 	move.l	(a0,d2.w),d4
+	.endif
 	jeq		2f		| invalid clut: can happen in transition phases
 	move.l	d4,a0
 
@@ -2906,6 +2912,8 @@ bg_tile:
 
 * compute X offset (0,0x40,0x80 ...) that makes up for
 * corkscrew effect
+* !only valable for a single random tile poke, not for a scroll column update
+* that computes its own x_offset!
 * < D7: address (0-0x400)
 * > N: set not in visible screen
 * > x_offset: updated
@@ -2913,7 +2921,7 @@ compute_x_offset:
 	movem.w	d1-d2,-(a7)
 	* we need to see if the tile is on screen considering X scolling
 	* positions. Compute first X & last X coord visible
-
+	clr.w	x_offset
 	move.w	d7,d2
 	lsr.w	#5,d2
 	
@@ -2933,6 +2941,7 @@ compute_x_offset:
 	jcc		0f
 	* handle wrap
 	add.w	#0x20,d2
+	move.w	#0x40,x_offset		| wrapped: add 0x40 offset
 0:
 	cmp.w	d0,d2
 	jcs		10f
@@ -2947,7 +2956,7 @@ compute_x_offset:
 	lsr.w	#8,d0
 	lsr.w	#1,d0
 	lsl.w	#6,d0
-	move.w	d0,x_offset	
+	add.w	d0,x_offset	
 2:
 	movem.w	(a7)+,d1-d2
 	rts
