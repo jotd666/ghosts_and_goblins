@@ -1344,7 +1344,6 @@ start_game_screen_6b5e:
 6B81: D7 F0       STB    $F0
 6B83: 0C 08       INC    sub_sub_state_0008
 6B85: 39          RTS
-6B86: 40          NEGA
 
 6B8E: 0D F0    TST    $F0
 6B90: 26 63    BNE    $6BF5
@@ -7098,6 +7097,7 @@ A44D: CE A4 52    LDU    #jump_table_a452
 A450: 6E D6       JMP    [A,U]        ; [indirect_jump] [nb_entries=4]
 
 A45A: D6 9A       LDB    $9A
+A45C: 54          LSRB
 A45D: 54          LSRB
 A45E: 54          LSRB
 A45F: 54          LSRB
@@ -10107,7 +10107,7 @@ C35C: 58          ASLB
 C35D: CE C3 62    LDU    #jump_table_c362
 C360: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
-C368: BD 79       JSR    $79A1
+C368: BD 79 A1    JSR    $79A1
 C36B: C6 3F       LDB    #$3F                                         
 C36D: E7 0A       STB    $A,X
 C36F: CC 01 00    LDD    #$0100
@@ -10816,7 +10816,7 @@ CA1D: CE CA 22    LDU    #jump_table_ca22
 CA20: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 CA32: DC A0       LDD    $A0                                         
-CA34: C3 00       ADDD   #$0010                                       10
+CA34: C3 00 10    ADDD   #$0010                                       10
 CA37: ED 88 1C    STD    $1C,X
 CA3A: C6 01       LDB    #$01
 CA3C: E7 1E       STB    -$2,X

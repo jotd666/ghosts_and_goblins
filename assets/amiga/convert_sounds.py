@@ -12,7 +12,7 @@ sound_settings_dict = { 0x2 : {"channel":2,"priority":100},
 0x23 : {"channel":3,"priority":100},
 0x1 : {"channel":2,"priority":100},  # lose armour
 0x19 : {"channel":3,"priority":100},  # bag enemies
-0xc : {"channel":3,"priority":100},  # giant stomps
+#0xc : {"channel":3,"priority":100},  # giant stomps
 0xf : {"channel":3,"priority":100},
 0x21 : {"channel":3,"priority":100},  # dragon
 }

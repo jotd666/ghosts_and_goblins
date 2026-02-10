@@ -48,7 +48,7 @@ sr2 = lambda a,b : set(range(a,b,2))
 sr3 = lambda a,b : set(range(a,b,3))
 sr4 = lambda a,b : set(range(a,b,4))
 
-group_sprite_pairs = (sr2(2,0x30) | # player
+group_sprite_pairs = (sr2(0,0x30) | # player
 sr2(0x100,0x134) | # player (underwear)
 sr2(0x136,0x13C) | # player
 sr2(0x13E,0x15F) | # player / dead
