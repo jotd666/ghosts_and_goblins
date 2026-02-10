@@ -6654,7 +6654,7 @@ A07B: 7E 9E 8B    JMP    $9E8B
 A0A6: C6 04       LDB    #$04
 A0A8: F7 3E 00    STB    bankswitch_3e00
 A0AB: 8E 08 90    LDX    #$0890
-A0AE: C6 28       LDB    #$28
+A0AE: C6 28       LDB    #$28	; 40 different slots!
 A0B0: D7 E0       STB    $E0
 A0B2: E6 10       LDB    -$10,X
 A0B4: 27 1D       BEQ    $A0D3
@@ -6670,9 +6670,10 @@ A0C7: AD D5       JSR    [B,U]        ; [indirect_jump] [nb_entries=19]
 A0C9: D6 21       LDB    counter_8_bit_0021
 A0CB: C4 01       ANDB   #$01
 A0CD: 58          ASLB
+; alternates between check enemy collision and something else
 A0CE: CE 45 40    LDU    #jump_table_4540
 A0D1: AD D5       JSR    [B,U]        ; [indirect_jump] [nb_entries=2]
-A0D3: 30 88 30    LEAX   $30,X
+A0D3: 30 88 30    LEAX   $30,X			; next enemy
 A0D6: 0A E0       DEC    $E0
 A0D8: 26 D8       BNE    $A0B2
 A0DA: 39          RTS
@@ -12987,6 +12988,7 @@ DDB0: ED 13       STD    -$D,X
 DDB2: BD 8E 0C    JSR    $8E0C
 DDB5: 7E E8 44    JMP    $E844
 DDB8: 39          RTS
+
 DDB9: A6 05       LDA    $5,X
 DDBB: 81 0D       CMPA   #$0D
 DDBD: 27 01       BEQ    $DDC0
@@ -14957,10 +14959,16 @@ EF27: BD F5 30    JSR    $F530
 EF2A: 7E F7 62    JMP    $F762
 
 EF49: 39          RTS
+
+; some enemy structure fields
+;  -$10  active
+;  -$F   active
+;  -$9   X
+;  -$6   Y
 enemy_shot_collision_ef4a:
 EF4A: E6 10       LDB    -$10,X
 EF4C: E4 11       ANDB   -$F,X
-EF4E: 27 F9       BEQ    $EF49		; no enemies in sight: return
+EF4E: 27 F9       BEQ    $EF49		; enemy not active: return
 ; there are enemies to shoot
 EF50: 4F          CLRA
 EF51: D6 E0       LDB    $E0
