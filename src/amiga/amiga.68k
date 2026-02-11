@@ -279,6 +279,8 @@ osd_enter_\@:
 	.global	force_sound_stop
 	.global music_tick
 	.global	music_track_start_number
+	
+	.global	osd_display_value
 	.global	osd_get_last_known_pc
 	.global	osd_dump_logs
 	.global	osd_log_cpu
@@ -1431,12 +1433,43 @@ level3_interrupt:
 	WRITE_TEXT	scrolly_text,2
 	WRITE_TEXT	hscrollx_text,2
 	WRITE_TEXT	last_x_offset_text,2
+	WRITE_TEXT	debug_1_text,4
+	WRITE_TEXT	debug_2_text,4
+	WRITE_TEXT	debug_3_text,4
 
 	.set		row,2
 	WRITE_HEX	game_scroll_x,3
 	WRITE_HEX	game_scroll_y,3
 	WRITE_HEX	host_scroll_x,3
 	WRITE_HEX	x_offset,3
+	lea		display_slots,a2
+	tst.b	(a2)
+	jeq		10f
+	move.w	(2,a2),d0
+	move.w	(a6,d0.w),d0
+	WRITE_HEX	d0,3
+	.set	row,row-1	
+10:
+	.set	row,row+1	
+	addq	#4,a2
+	tst.b	(a2)
+	jeq		10f
+	move.w	(2,a2),d0
+	move.w	(a6,d0.w),d0
+	WRITE_HEX	d0,3
+	.set	row,row-1		
+10:
+	.set	row,row+1	
+	addq	#4,a2
+	tst.b	(a2)
+	jeq		10f
+	move.w	(2,a2),d0
+	move.w	(a6,d0.w),d0
+	WRITE_HEX	d0,3
+	.set	row,row-1		
+10:
+	
+	
 0:
 	.endif
 
@@ -4507,7 +4540,38 @@ scrolly_text:
 	.byte	0xff	
 last_x_offset_text:
 	.ascii	"Last Xoffset "
-	.byte	0xff	
+	.byte	0xff
+debug_1_text:
+	.ascii	"User 1 "
+	.byte	0xff
+debug_2_text:
+	.ascii	"User 2 "
+	.byte	0xff
+debug_3_text:
+	.ascii	"User 3 "
+	.byte	0xff
+
+
+	.align	2
+* < D0.W address of value to display (like this it is watched at each irq)
+* < D1.W slot (0-3)
+osd_display_value:
+	movem.l	a0/d1,-(a7)
+	lea		display_slots,a0
+	and.w	#3,d1
+	add.w	d1,d1
+	add.w	d1,d1
+	add.w	d1,a0
+	st.b	(a0)
+	move.w	d0,(2,a0)
+	movem.l	(a7)+,a0/d1
+	rts
+	
+display_slots:
+	.long	0
+	.long	0
+	.long	0
+	.long	0
 	.endif
 	
 	.ifne	OPT_ENABLE_LOGGING

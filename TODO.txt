@@ -1,16 +1,5 @@
-
-- level 2/5: goblins trajectory is strange: they "warp" when going up at some exact Y position. log X/Y of enemies (RE to do)
-  specially after ice towers or on fire bridge or on level 5
-; some enemy structure fields
-;  -$10  active
-;  -$F   active
-;  -$9   X
-;  -$6   Y   <= debug after ice towers step by step check changes on that active struct value (break at EF50)
-   something must wrap somewhere
-
-=> this could lead to a videos, level 2/level 5
-
-- rip door tiles from levels: 2?, 5, 6?
+- sprites clipped too low (devil on level 5, player level 2 on towers?)
+- rip door tiles from levels: 6?
 - 6ED0 called at the start of a level, maybe try to load context there first
 - 9900 points => 10000: score resets to 0
 - level 6 to level 7: crash: start on level 6, skip level and bang!

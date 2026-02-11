@@ -6745,8 +6745,8 @@ A165: 83 00 10    SUBD   #$0010
 A168: 10 83 00 E0 CMPD   #$00E0
 A16C: 23 09       BLS    $A177
 A16E: BD 90 74    JSR    $9074
-A171: BD A4 27    JSR    $A427
-A174: 7E A4 27    JMP    $A427
+A171: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
+A174: 7E A4 27    JMP    apply_xy_speeds_to_enemy_a427
 A177: CC 01 00    LDD    #$0100
 A17A: ED 13       STD    -$D,X
 A17C: E7 15       STB    -$B,X
@@ -6809,7 +6809,7 @@ A1F1: C5 02       BITB   #$02
 A1F3: 26 00       BNE    $A1F5
 A1F5: 6C 15       INC    -$B,X
 A1F7: 39          RTS
-A1F8: BD A4 27    JSR    $A427
+A1F8: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 A1FB: BD 90 74    JSR    $9074
 A1FE: 8D 03       BSR    $A203
 A200: 7E 8F 62    JMP    $8F62
@@ -6895,7 +6895,7 @@ A2A2: A6 98 0E    LDA    [$0E,X]		; [bank_address]
 A2A5: A7 0B       STA    $B,X
 A2A7: 6C 15       INC    -$B,X
 A2A9: 39          RTS
-A2AA: BD A4 27    JSR    $A427
+A2AA: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 A2AD: BD 90 74    JSR    $9074
 A2B0: 6A 0B       DEC    $B,X
 A2B2: 26 1E       BNE    $A2D2
@@ -7072,26 +7072,30 @@ A420: ED 13       STD    -$D,X
 A422: E7 15       STB    -$B,X
 A424: 7E 8E 0C    JMP    $8E0C
 
+* < X: enemy structure (ex: $C80)
+
+apply_xy_speeds_to_enemy_a427:
 A427: EE 1C       LDU    -$4,X
 A429: E6 1E       LDB    -$2,X
 A42B: 58          ASLB
 A42C: 58          ASLB
 A42D: 33 C5       LEAU   B,U
 A42F: EC 17       LDD    -$9,X
-A431: E3 C4       ADDD   ,U		; [select_address]
+A431: E3 C4       ADDD   ,U		; [select_address] apply X speed on 16 word X
 A433: ED 17       STD    -$9,X
 A435: E6 C4       LDB    ,U		; [select_address]
 A437: 1D          SEX
 A438: A9 16       ADCA   -$A,X
 A43A: A7 16       STA    -$A,X
 A43C: EC 1A       LDD    -$6,X
-A43E: E3 42       ADDD   $2,U		; [select_address]
+A43E: E3 42       ADDD   $2,U		; [select_address] apply Y speed on 16 word Y
 A440: ED 1A       STD    -$6,X
 A442: E6 42       LDB    $2,U		; [select_address]
 A444: 1D          SEX
 A445: A9 19       ADCA   -$7,X
 A447: A7 19       STA    -$7,X
 A449: 39          RTS
+
 A44A: EC 13       LDD    -$D,X
 A44C: 48          ASLA
 A44D: CE A4 52    LDU    #jump_table_a452
@@ -7167,8 +7171,8 @@ A4F1: 83 00 10    SUBD   #$0010
 A4F4: 10 83 00 E0 CMPD   #$00E0
 A4F8: 23 09       BLS    $A503
 A4FA: BD 90 74    JSR    $9074
-A4FD: BD A4 27    JSR    $A427
-A500: 7E A4 27    JMP    $A427
+A4FD: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
+A500: 7E A4 27    JMP    apply_xy_speeds_to_enemy_a427
 A503: 6C 14       INC    -$C,X
 A505: 39          RTS
 A506: E6 15       LDB    -$B,X
@@ -7176,7 +7180,7 @@ A508: 58          ASLB
 A509: CE A5 0E    LDU    #jump_table_a50e
 A50C: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=5]
 
-A518: BD A4 27    JSR    $A427
+A518: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 A51B: BD A5 3E    JSR    $A53E
 A51E: BD 90 74    JSR    $9074
 A521: 8D 03       BSR    $A526
@@ -7257,7 +7261,7 @@ A5B4: E7 0F       STB    $F,X
 A5B6: 6C 15       INC    -$B,X
 A5B8: 39          RTS
 
-A5C1: BD A4 27    JSR    $A427
+A5C1: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 A5C4: BD A5 3E    JSR    $A53E
 A5C7: BD 90 74    JSR    $9074
 A5CA: BD 8F 62    JSR    $8F62
@@ -7272,10 +7276,10 @@ A5DD: CC 49 5A    LDD    #$495A
 A5E0: ED 1C       STD    -$4,X
 A5E2: 6C 15       INC    -$B,X
 A5E4: 39          RTS
-A5E5: BD A4 27    JSR    $A427
+A5E5: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 A5E8: BD 90 74    JSR    $9074
 A5EB: 7E 8F 62    JMP    $8F62
-A5EE: BD A4 27    JSR    $A427
+A5EE: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 A5F1: BD A5 3E    JSR    $A53E
 A5F4: BD 90 74    JSR    $9074
 A5F7: 7E 8F 62    JMP    $8F62
@@ -7365,7 +7369,7 @@ A6CE: E3 19       ADDD   -$7,X
 A6D0: ED 06       STD    $6,X
 A6D2: 6C 15       INC    -$B,X
 A6D4: 39          RTS
-A6D5: BD A4 27    JSR    $A427
+A6D5: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 A6D8: EC 09       LDD    $9,X
 A6DA: C3 03 00    ADDD   #$0300
 A6DD: ED 09       STD    $9,X
@@ -7397,7 +7401,7 @@ A712: 86 10       LDA    #$10
 A714: A7 0C       STA    $C,X
 A716: 6C 15       INC    -$B,X
 A718: 39          RTS
-A719: BD A4 27    JSR    $A427
+A719: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 A71C: BD A5 3E    JSR    $A53E
 A71F: BD 90 74    JSR    $9074
 A722: 7E 8F 62    JMP    $8F62
@@ -7416,8 +7420,8 @@ A740: C3 00 10    ADDD   #$0010
 A743: 10 83 FF F0 CMPD   #$FFF0
 A747: 24 09       BCC    $A752
 A749: BD 90 74    JSR    $9074
-A74C: BD A4 27    JSR    $A427
-A74F: 7E A4 27    JMP    $A427
+A74C: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
+A74F: 7E A4 27    JMP    apply_xy_speeds_to_enemy_a427
 A752: 6C 14       INC    -$C,X
 A754: 39          RTS
 A755: E6 15       LDB    -$B,X
@@ -7485,7 +7489,7 @@ A7F2: CC 49 6A    LDD    #$496A
 A7F5: ED 1C       STD    -$4,X
 A7F7: 6C 15       INC    -$B,X
 A7F9: 39          RTS
-A7FA: BD A4 27    JSR    $A427
+A7FA: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 A7FD: BD 90 74    JSR    $9074
 A800: 7E 8F 62    JMP    $8F62
 A803: BD 8F E4    JSR    $8FE4
@@ -7510,7 +7514,7 @@ A82B: CC 49 62    LDD    #$4962
 A82E: ED 1C       STD    -$4,X
 A830: 6C 15       INC    -$B,X
 A832: 39          RTS
-A833: BD A4 27    JSR    $A427
+A833: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 A836: BD A5 3E    JSR    $A53E
 A839: BD 90 74    JSR    $9074
 A83C: 7E 8F 62    JMP    $8F62
@@ -7649,7 +7653,8 @@ A97D: CC 01 00    LDD    #$0100
 A980: ED 13       STD    -$D,X
 A982: E7 15       STB    -$B,X
 A984: 39          RTS
-A985: BD A4 27    JSR    $A427
+
+A985: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 A988: EC 19       LDD    -$7,X
 A98A: 10 83 00 35 CMPD   #$0035
 A98E: 22 05       BHI    $A995
@@ -7712,9 +7717,10 @@ ABAA: C6 01       LDB    #$01
 ABAC: E7 10       STB    -$10,X
 ABAE: CE AA 7F    LDU    #$AA7F
 ABB1: EF 1C       STU    -$4,X
-ABB3: BD A4 27    JSR    $A427
+ABB3: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 ABB6: BD 90 74    JSR    $9074
 ABB9: 7E 8F 62    JMP    $8F62
+
 ABBC: AD D5       JSR    [B,U]	; [special_indirect_jump] (jumped to)  [nb_entries=5]
 ABBE: BD A9 85    JSR    $A985
 ABC1: BD 90 74    JSR    $9074
@@ -7752,7 +7758,7 @@ AC14: EE 88 19    LDU    $19,X
 AC17: EF 1C       STU    -$4,X
 AC19: 6C 15       INC    -$B,X
 AC1B: 39          RTS
-AC1C: CE AB C7    LDU    #$ABC7
+AC1C: CE AB C7    LDU    #jump_table_abc7
 AC1F: E6 0B       LDB    $B,X
 AC21: 58          ASLB
 AC22: 7E AB BC    JMP    $ABBC
@@ -8194,7 +8200,7 @@ B0C7: 6C 14       INC    -$C,X
 B0C9: 5F          CLRB
 B0CA: E7 09       STB    $9,X
 B0CC: 39          RTS
-B0CD: BD A4 27    JSR    $A427
+B0CD: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 B0D0: BD 90 74    JSR    $9074
 B0D3: E6 10       LDB    -$10,X
 B0D5: 2A 0B       BPL    $B0E2
@@ -8293,8 +8299,8 @@ B197: 83 00 10    SUBD   #$0010
 B19A: 10 83 00 E0 CMPD   #$00E0
 B19E: 23 09       BLS    $B1A9
 B1A0: 7E 90 74    JMP    $9074
-B1A3: BD A4 27    JSR    $A427
-B1A6: 7E A4 27    JMP    $A427
+B1A3: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
+B1A6: 7E A4 27    JMP    apply_xy_speeds_to_enemy_a427
 B1A9: D6 9A       LDB    $9A
 B1AB: C4 30       ANDB   #$30
 B1AD: 54          LSRB
@@ -8410,7 +8416,7 @@ B2E5: CC 02 00    LDD    #$0200
 B2E8: ED 14       STD    -$C,X
 B2EA: 39          RTS
 B2EB: BD 90 74    JSR    $9074
-B2EE: BD A4 27    JSR    $A427
+B2EE: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 B2F1: EC 19       LDD    -$7,X
 B2F3: 83 00 01    SUBD   #$0001
 B2F6: ED 19       STD    -$7,X
@@ -8443,7 +8449,7 @@ B35C: E7 0D       STB    $D,X
 B35E: 6C 15       INC    -$B,X
 B360: BD 90 74    JSR    $9074
 B363: 6A 0D       DEC    $D,X
-B365: 10 26 F0 BE LBNE   $A427
+B365: 10 26 F0 BE LBNE   apply_xy_speeds_to_enemy_a427
 B369: CC 03 00    LDD    #$0300
 B36C: ED 14       STD    -$C,X
 B36E: 39          RTS
@@ -8468,7 +8474,7 @@ B399: C4 01       ANDB   #$01
 B39B: E6 C5       LDB    B,U
 B39D: E7 0C       STB    $C,X
 B39F: 6C 15       INC    -$B,X
-B3A1: BD A4 27    JSR    $A427
+B3A1: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 B3A4: BD 90 74    JSR    $9074
 B3A7: EC 09       LDD    $9,X
 B3A9: C3 04 00    ADDD   #$0400
@@ -8499,7 +8505,7 @@ B3D3: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 B3DB: CE B3 20    LDU    #$B320
 B3DE: BD 90 6B    JSR    $906B
 B3E1: 6C 15       INC    -$B,X
-B3E3: BD A4 27    JSR    $A427
+B3E3: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 B3E6: BD 90 74    JSR    $9074
 B3E9: EC 09       LDD    $9,X
 B3EB: C3 04 00    ADDD   #$0400
@@ -8514,7 +8520,7 @@ B3FC: ED 19       STD    -$7,X
 B3FE: 39          RTS
 B3FF: 6C 15       INC    -$B,X
 B401: 39          RTS
-B402: BD A4 27    JSR    $A427
+B402: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 B405: BD 90 74    JSR    $9074
 B408: EC 19       LDD    -$7,X
 B40A: C3 FF FE    ADDD   #$FFFE
@@ -8630,7 +8636,7 @@ B526: CE B5 3F    LDU    #jump_table_b53f
 B529: E6 0F       LDB    $F,X
 B52B: 58          ASLB
 B52C: AD D5       JSR    [B,U]        ; [indirect_jump] [nb_entries=3]
-B52E: BD A4 27    JSR    $A427
+B52E: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 B531: BD 90 74    JSR    $9074
 B534: 7E 8F 62    JMP    $8F62
 B537: BD B1 70    JSR    $B170
@@ -10476,7 +10482,7 @@ C6F9: 5C          INCB
 C6FA: C4 1F       ANDB   #$1F
 C6FC: 26 03       BNE    $C701
 C6FE: BD 79 92    JSR    $7992
-C701: BD A4 27    JSR    $A427
+C701: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 C704: 20 10       BRA    $C716
 C706: E6 88 13    LDB    $13,X
 C709: E7 1E       STB    -$2,X
@@ -10837,7 +10843,7 @@ CA5A: 5C          INCB
 CA5B: C4 0F       ANDB   #$0F
 CA5D: 26 03       BNE    $CA62
 CA5F: BD 79 92    JSR    $7992
-CA62: BD A4 27    JSR    $A427
+CA62: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 CA65: BD 90 74    JSR    $9074
 CA68: BD 90 74    JSR    $9074
 CA6B: E6 1E       LDB    -$2,X
@@ -10904,7 +10910,7 @@ CAF2: 5A          DECB
 CAF3: 27 E2       BEQ    $CAD7
 CAF5: 6A 15       DEC    -$B,X
 CAF7: 39          RTS
-CAF8: BD A4 27    JSR    $A427
+CAF8: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 CAFB: BD 90 74    JSR    $9074
 CAFE: EC 16       LDD    -$A,X
 CB00: 93 A0       SUBD   $A0
@@ -10914,7 +10920,7 @@ CB09: 22 05       BHI    $CB10
 CB0B: CC 01 01    LDD    #$0101
 CB0E: ED 14       STD    -$C,X
 CB10: 39          RTS
-CB11: BD A4 27    JSR    $A427
+CB11: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 CB14: BD 90 74    JSR    $9074
 CB17: EC 16       LDD    -$A,X
 CB19: 93 A0       SUBD   $A0
@@ -11494,7 +11500,7 @@ D052: 88 01       EORA   #$01
 D054: A7 1E       STA    -$2,X
 D056: CE 4F 26    LDU    #$4F26
 D059: BD 90 6B    JSR    $906B
-D05C: BD A4 27    JSR    $A427
+D05C: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 D05F: BD 90 74    JSR    $9074
 D062: 6A 09       DEC    $9,X
 D064: 26 2D       BNE    $D093
@@ -11620,7 +11626,7 @@ D176: BD 90 6B    JSR    $906B
 D179: E6 1E       LDB    -$2,X
 D17B: CB 02       ADDB   #$02
 D17D: E7 1E       STB    -$2,X
-D17F: BD A4 27    JSR    $A427
+D17F: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 D182: E6 1E       LDB    -$2,X
 D184: C0 02       SUBB   #$02
 D186: E7 1E       STB    -$2,X
@@ -11929,7 +11935,7 @@ D429: ED 1C       STD    -$4,X
 D42B: 6C 15       INC    -$B,X
 D42D: 39          RTS
 
-D436: BD A4 27 JSR    $A427
+D436: BD A4 27 JSR    apply_xy_speeds_to_enemy_a427
 D439: BD 90 74    JSR    $9074
 D43C: EC 19       LDD    -$7,X
 D43E: 83 00 02    SUBD   #$0002
@@ -11964,7 +11970,7 @@ D476: 26 05       BNE    $D47D
 D478: CC 01 00    LDD    #$0100
 D47B: ED 14       STD    -$C,X
 D47D: 39          RTS
-D47E: BD A4 27    JSR    $A427
+D47E: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 D481: 8D 0C       BSR    $D48F
 D483: 6A 07       DEC    $7,X
 D485: 10 26 BB EB LBNE   $9074
@@ -12289,7 +12295,7 @@ D751: A7 27       STA    $7,Y
 D753: E7 26       STB    $6,Y
 D755: 86 01       LDA    #$01
 D757: A7 A8 18    STA    $18,Y
-D75A: 7E A4 27    JMP    $A427
+D75A: 7E A4 27    JMP    apply_xy_speeds_to_enemy_a427
 D75D: C6 09       LDB    #$09
 D75F: 33 84       LEAU   ,X
 D761: 86 01       LDA    #$01
@@ -12367,7 +12373,7 @@ D80A: BD 68 F9    JSR    $68F9
 D80D: D7 EB       STB    $EB
 D80F: 8D 07       BSR    $D818
 D811: BD D9 81    JSR    $D981
-D814: 7E A4 27    JMP    $A427
+D814: 7E A4 27    JMP    apply_xy_speeds_to_enemy_a427
 D817: 39          RTS
 D818: 6A 0A       DEC    $A,X
 D81A: 26 FB       BNE    $D817
@@ -12502,7 +12508,7 @@ D941: 20 BD       BRA    $D900
 D94B: A6 88 13    LDA    $13,X
 D94E: 26 30       BNE    $D980
 D950: 8D 03       BSR    $D955
-D952: 7E A4 27    JMP    $A427
+D952: 7E A4 27    JMP    apply_xy_speeds_to_enemy_a427
 D955: E6 88 18    LDB    $18,X
 D958: 27 26       BEQ    $D980
 D95A: 6A 07       DEC    $7,X
@@ -12725,7 +12731,7 @@ DB44: DB E0       ADDB   $E0
 DB46: C4 1F       ANDB   #$1F
 DB48: 26 03       BNE    $DB4D
 DB4A: BD 79 92    JSR    $7992
-DB4D: BD A4 27    JSR    $A427
+DB4D: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 DB50: EC 16       LDD    -$A,X
 DB52: 10 A3 0B    CMPD   $B,X
 DB55: 22 07       BHI    $DB5E
@@ -15981,7 +15987,7 @@ FE86: CE FE 8B    LDU    #jump_table_fe8b
 FE89: 6E D6       JMP    [A,U]	; [indirect_jump] [nb_entries=12]
 
 FEA3: BD 8E 41    JSR    $8E41                                     
-FEA6: BD A4 27    JSR    $A427
+FEA6: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 FEA9: BD 8F 62    JSR    $8F62
 FEAC: BD 8C A7    JSR    $8CA7
 FEAF: 24 0C       BCC    $FEBD
@@ -15993,7 +15999,7 @@ FEB9: ED 13       STD    -$D,X
 FEBB: E7 15       STB    -$B,X
 FEBD: 39          RTS
 FEBE: BD 8E 41    JSR    $8E41
-FEC1: BD A4 27    JSR    $A427
+FEC1: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 FEC4: BD 90 74    JSR    $9074
 FEC7: 7E 8F 62    JMP    $8F62
 FECA: 6C 13       INC    -$D,X

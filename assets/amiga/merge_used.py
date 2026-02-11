@@ -35,5 +35,5 @@ def merge(used_name,nb_items,nb_cluts):
             f.write(contents)
 
 merge("fg_used_tiles",0x400,16)
-merge("level3/bg_used_tiles",0x400,8)
+merge("level5/bg_used_tiles",0x400,8)
 merge("used_sprites",0x400,4)
