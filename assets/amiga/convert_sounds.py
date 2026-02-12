@@ -266,6 +266,10 @@ def convert():
             fst.write(f" | 0x{i:02x}\n")
 
     music_list = {v["index"] for v in music_dict.values()}
+
+    for f in sound_dir.glob("*.mod"):
+        shutil.copy(f,data_dir)
+
     unused_indexes = set(range(0,0x3E))-sfx_list-dummy_sounds-music_list
     print("Unmapped sound indexes: ")
     print(sorted(hex(x) for x in unused_indexes))

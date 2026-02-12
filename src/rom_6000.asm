@@ -1897,6 +1897,7 @@ do_restart_last_level_71fa:
 7233: FD 15 B5    STD    $15B5
 7236: FD 08 83    STD    $0883
 7239: 39          RTS
+
 723A: D6 71       LDB    game_intro_played_0071
 723C: C1 02       CMPB   #$02
 723E: 10 26 0B 89 LBNE   $7DCB
@@ -17298,7 +17299,7 @@ jump_table_7151:
 	dc.w	init_restart_7197    ; $7151 for last level
 	dc.w	continue_restart_71ac    ; $7153
 	dc.w	do_restart_last_level_71fa    ; $7155
-	dc.w	$ffff    ; contains 732a but prob. bogus    ; $7157	
-	dc.w	$ffff    ; contains 732a but prob. bogus    ; $7157	
+	dc.w	$723a   ; $7157	
+	dc.w	$bf7a   ; $7159	
 	dc.w	$ffff    ; contains 732a but prob. bogus    ; $7157	
 	dc.w	$ffff    ; contains 732a but prob. bogus    ; $7157	

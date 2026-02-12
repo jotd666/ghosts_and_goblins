@@ -119,7 +119,7 @@ dump=False,name_dict=None,cluts=None,tile_number=0,is_bob=False):
                     other_tile_index = tile_number+1
                     other_tile = tileset_1[other_tile_index]
                     if not other_tile:
-                        raise Exception(f"pair: other tile index 0x{other_tile_index:02x} not found")
+                        raise Exception(f"pair: 0x{tile_number:02x} ok but other tile index 0x{other_tile_index:02x} not found")
                     new_tile = Image.new("RGB",(wtile.size[0]*2,wtile.size[1]))
 
                     new_tile.paste(wtile)
@@ -525,7 +525,7 @@ level2_tiles_5to6 = list(range(0x356,0x35B))+list(range(0x10,0x16))+water_tiles
 
 special_fade_palettes = []
 
-context_list = ["level2","level3","level4","level5","level6","level7","map","level1",]
+context_list = ["level1","level2","level3","level4","level5","level6","level7","map"]
 # palette is the same between level 1 and 2 except that
 # 1) used tiles are very different, so mixing them would mean quantize & color loss
 # 2) we use the steady palette values from level 2 (water is animated by color cycling on level 1, corrupting level 2 ice tower tiles)
@@ -621,7 +621,7 @@ for context in context_list:
 
 sprite_palette = set()
 sprite_set_list = []
-
+print("Sprites:")
 for i,tsd in sprite_sheet_dict.items():
     tp,tile_set = load_tileset(tsd,i,16,16,"sprites",dump_dir,dump=dump_it,
     cluts=sprite_cluts,
