@@ -482,7 +482,7 @@ copy_highscores_53a3:
 
 53F3: 39          RTS
 
-; when game starts scoring probably
+; when game starts scoring
 l_53f4:
 53F4: 96 28       LDA    $28
 53F6: 27 FB       BEQ    $53F3
@@ -1363,12 +1363,12 @@ jump_table_5b6b:
 5B89: 9F 09       STX    $09
 5B8B: 6F 26       CLR    $6,Y
 5B8D: 8E 5B D2    LDX    #$5BD2
-5B90: E6 80       LDB    ,X+
-5B92: EE 81       LDU    ,X++
+5B90: E6 80       LDB    ,X+	; [bank_address]
+5B92: EE 81       LDU    ,X++	; [bank_address]
 5B94: 86 0B       LDA    #$0B
-5B96: A7 C9 04 00 STA    $0400,U
-5B9A: A6 80       LDA    ,X+
-5B9C: A7 C0       STA    ,U+
+5B96: A7 C9 04 00 STA    $0400,U  ; [unchecked_address]
+5B9A: A6 80       LDA    ,X+	; [bank_address]
+5B9C: A7 C0       STA    ,U+	; [video_address]
 5B9E: 5A          DECB
 5B9F: 26 F3       BNE    $5B94
 5BA1: EF 27       STU    $7,Y
@@ -1481,8 +1481,8 @@ l_5bdd:
 5C94: 25 34       BCS    $5CCA
 5C96: EE 23       LDU    $3,Y
 5C98: 86 0B       LDA    #$0B
-5C9A: A7 C9 04 00 STA    $0400,U
-5C9E: A6 C4       LDA    ,U
+5C9A: A7 C9 04 00 STA    $0400,U		; [video_address]
+5C9E: A6 C4       LDA    ,U   ; [unchecked_address]
 5CA0: 81 1F       CMPA   #$1F
 5CA2: 27 13       BEQ    $5CB7
 5CA4: EC 23       LDD    $3,Y
@@ -1510,8 +1510,8 @@ l_5bdd:
 5CD1: 25 32       BCS    $5D05
 5CD3: EE 23       LDU    $3,Y
 5CD5: 86 0B       LDA    #$0B
-5CD7: A7 C9 04 00 STA    $0400,U
-5CDB: A6 C4       LDA    ,U
+5CD7: A7 C9 04 00 STA    $0400,U		; [video_address]
+5CDB: A6 C4       LDA    ,U   ; [unchecked_address]
 5CDD: 81 41       CMPA   #$41
 5CDF: 27 13       BEQ    $5CF4
 5CE1: EC 23       LDD    $3,Y
@@ -1558,7 +1558,7 @@ l_5bdd:
 5D38: 25 23       BCS    $5D5D
 5D3A: EE 23       LDU    $3,Y
 5D3C: 86 0B       LDA    #$0B
-5D3E: A7 C9 04 00 STA    $0400,U
+5D3E: A7 C9 04 00 STA    $0400,U		; [video_address]
 5D42: CE 20 DC    LDU    #$20DC
 5D45: 11 A3 23    CMPU   $3,Y
 5D48: 24 0A       BCC    $5D54
@@ -1580,11 +1580,11 @@ l_5bdd:
 5D68: 81 10       CMPA   #$10
 5D6A: 27 07       BEQ    $5D73
 5D6C: 86 08       LDA    #$08
-5D6E: A7 C9 04 00 STA    $0400,U
+5D6E: A7 C9 04 00 STA    $0400,U	; [video_address]
 5D72: 39          RTS
 5D73: 6F 25       CLR    $5,Y
 5D75: 86 0B       LDA    #$0B
-5D77: A7 C9 04 00 STA    $0400,U
+5D77: A7 C9 04 00 STA    $0400,U	; [video_address]
 5D7B: 39          RTS
 5D7C: D6 4B       LDB    $4B
 5D7E: C4 10       ANDB   #$10
@@ -1599,7 +1599,7 @@ l_5bdd:
 5D8B: 81 03       CMPA   #$03
 5D8D: 26 4D       BNE    $5DDC
 5D8F: EE 23       LDU    $3,Y
-5D91: A6 C4       LDA    ,U
+5D91: A6 C4       LDA    ,U			; [unchecked_address]
 5D93: 81 40       CMPA   #$40
 5D95: 26 02       BNE    $5D99
 5D97: 86 20       LDA    #$20
@@ -1612,8 +1612,8 @@ l_5bdd:
 5DA5: A7 85       STA    B,X
 5DA7: EE 27       LDU    $7,Y
 5DA9: C6 08       LDB    #$08
-5DAB: E7 C9 04 00 STB    $0400,U
-5DAF: A7 C0       STA    ,U+
+5DAB: E7 C9 04 00 STB    $0400,U   	; [unchecked_address]
+5DAF: A7 C0       STA    ,U+    	; [video_address]
 5DB1: EF 27       STU    $7,Y
 5DB3: 6C 26       INC    $6,Y
 5DB5: A6 26       LDA    $6,Y

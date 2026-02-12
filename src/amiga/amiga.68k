@@ -127,7 +127,7 @@ OPT_MIRROR_TEST = 0				| all sprites are mirrored
 	.endif
 	
 
-OPT_ENABLE_DOUBLE_BUFFERING = 0
+OPT_ENABLE_DOUBLE_BUFFERING = 1
 
 _custom = 0xDFF000
 
@@ -1064,6 +1064,8 @@ load_context:
 	
 
 force_all_screen_redraw:
+	lea		_custom,a5
+	REALLY_WAIT_BLIT
 	GET_MEMORY_START_IN_A6
 	* given the current scroll X/Y, draw all tiles on screen
 	move.w	game_scroll_x,d0
@@ -1400,6 +1402,7 @@ level3_interrupt:
 	
 	jbsr	call_nmi
 	
+	
 	GET_MEMORY_START_IN_A6
 	move.w	(scroll_x_register_lsb_3b08,a6),d0
 	ror.w	#8,d0		| hardware is in little endian
@@ -1423,6 +1426,10 @@ level3_interrupt:
 	
 	jbsr	set_scroll_values
 	jbsr	really_update_sprites
+
+	* store current scroll values for next time, as the drawn buffer is not
+	* the displayed buffer
+
 	
 	.ifndef	RELEASE
 	tst.b	osd_debug_active
@@ -1586,12 +1593,42 @@ osd_wait:
 	bne.b	2b
 	rts
 
+add_to_score:
+	movem.l	a6/d0-d3,-(a7)
+	GET_MEMORY_START_IN_A6
+	moveq	#0,d0
+	abcd 	d0,d0		| clear X
+	move.b	(player_score_0068+2,a6),d0
+	move.b	(player_score_0068+1,a6),d1
+	move.b	(player_score_0068,a6),d2
+	move.b	#0x90,d3		| 9000 points
+	abcd	d3,d0
+	jcc		0f
+	moveq	#0,d3
+	abcd	d3,d1
+	jcc		0f
+	abcd	d3,d2
 
-* "0x00">Torch
-* "0x01">Lance	
-* "0x02">Axe	
-* "0x03">Shield
-* "0x04">Sword
+0:
+	move.b	d0,(player_score_0068+2,a6)
+	move.b	d1,(player_score_0068+1,a6)
+	move.b	d2,(player_score_0068,a6)
+	movem.l	(a7)+,a6/d0-d3
+	rts
+
+lose_all_lives:
+	movem.l	a6/d0-d3,-(a7)
+	GET_MEMORY_START_IN_A6
+	move.b	#1,(nb_lives_0060,a6)
+	move.w	#1,(time_00aa,a6)
+	movem.l	(a7)+,a6/d0-d3
+	rts
+
+* "0x00">Torch (crap)
+* "0x01">Lance (okay)	
+* "0x02">Axe (useless shit weapon)	
+* "0x03">Shield (must have for last levels, but rather crap)
+* "0x04">Sword (the best!)
 
 cycle_weapon:
 	movem.l	a6/d0,-(a7)
@@ -1949,8 +1986,8 @@ update_one_bob:
 	jbsr	mirror_sprite_planes
 	
 	* BOBs must follow screen scroll
-	add.w	game_scroll_y,d1
-	add.w 	host_scroll_x,d0
+	add.w	bobs_game_scroll_y,d1
+	add.w 	bobs_host_scroll_x,d0
 	
 	* D0 and D1 are already set
 	move.l	(NB_PLAYFIELD_PLANES*4,a0),d2
@@ -2852,7 +2889,9 @@ osd_video_word_dirty:
 * 2800: background
 osd_video_byte_dirty:
 	OSD_ENTER
-	movem.l	d0-d7/a0-a2,-(a7)
+	movem.l	d0-d7/a0-a2/a5,-(a7)
+	lea		_custom,a5
+	REALLY_WAIT_BLIT
 	move.b	(a0),d0
 	move.l	a0,d7		| save address
 	sub.l	a6,d7
@@ -2894,7 +2933,7 @@ osd_video_byte_dirty:
 	jbsr	update_fg_tile
 
 osd_w_videoram_out:
-	movem.l	(a7)+,d0-d7/a0-a2
+	movem.l	(a7)+,d0-d7/a0-a2/a5
 	OSD_EXIT
 	rts	
 	
@@ -3171,19 +3210,7 @@ update_bg_tile:
 	.endr	
 	.endm
 	
-*	.macro	COPY_TILE_PLANE_ROW_BACKBUFFER
-*	COPY_TILE_PLANE_ROW
-*	move.b	d0,(offset,a3)  | backbuffer
-*	.endm
-*	
-*	.macro	CLEAR_TILE_PLANE_BACKBUFFER
-*	.set	offset,0
-*	.rept	8
-*	clr.b	(offset,a1)
-*	clr.b	(offset,a3)
-*	.set	offset,offset+BG_NB_BYTES_PER_ROW
-*	.endr	
-*	.endm
+
 	
 	.macro	TILE16_NEXT_PLANE
 	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
@@ -3273,7 +3300,8 @@ flipped_tile16:
 
 	
 mirror_tile16:
-	lea		mirror_bits(pc),a4
+	move.l	a5,-(a7)
+	lea		mirror_bits(pc),a5
 	moveq	#0,d1
 4:
 	move.l	(a2)+,d0		| next plane
@@ -3282,12 +3310,11 @@ mirror_tile16:
 	.set	offset,0
 	.rept	16
 	move.b	(a0)+,d1
-	move.b	(a4,d1.w),d0	| mirror
+	move.b	(a5,d1.w),d0	| mirror
 	ror.w	#8,d0
 	move.b	(a0)+,d1
-	move.b	(a4,d1.w),d0	| mirror
+	move.b	(a5,d1.w),d0	| mirror
 	ror.w	#8,d0
-	* not working, needs 16 bit mirror
 	COPY_TILE16_PLANE_ROW
 
 	.set	offset,offset+BG_NB_BYTES_PER_ROW
@@ -3295,9 +3322,8 @@ mirror_tile16:
 41:
 	TILE16_NEXT_PLANE
 	dbf		d4,4b
-	
-
 0:
+	move.l	(a7)+,a5
 	rts
 1:
 
@@ -3306,7 +3332,8 @@ mirror_tile16:
 	jra		41b
 	
 mirror_flipped_tile16:
-	lea		mirror_bits(pc),a4
+	move.l	a5,-(a7)
+	lea		mirror_bits(pc),a5
 	moveq	#0,d1
 4:
 	move.l	(a2)+,d0		| next plane
@@ -3316,8 +3343,7 @@ mirror_flipped_tile16:
 	.rept	16
 	.set	offset,offset-BG_NB_BYTES_PER_ROW
 	move.b	(a0)+,d1
-	move.b	(a4,d1.w),d0	| mirror
-	* not working, needs 16 bit mirror
+	move.b	(a5,d1.w),d0	| mirror
 	COPY_TILE16_PLANE_ROW
 
 	.endr
@@ -3326,6 +3352,7 @@ mirror_flipped_tile16:
 	dbf		d4,4b
 
 0:
+	move.l	(a7)+,a5
 	rts
 
 5:
@@ -4069,12 +4096,13 @@ handle_keyboard:
 	COLOR0_FLASH	0x0FF
 	jbsr	warp_on_top_of_screen
 0:
-*	cmp.b	#0x54,d0	| F5 key
-*	bne.b	0f
-*	st.b	cheat_used
-*	COLOR0_FLASH	0x0FF
-*0:
-*
+	cmp.b	#0x54,d0	| F5 key
+	bne.b	0f
+	st.b	cheat_used
+	COLOR0_FLASH	0x0FF
+	jbsr	add_to_score
+0:
+
 10:
 	.ifndef	RELEASE
 	cmp.b	#34,d0
@@ -4096,7 +4124,7 @@ handle_keyboard:
 	* last life, if killed, direct game over
 	cmp.b	#0x57,d0	| F8 key: set time at 0
 	bne.b	0f
-	nop
+	jbsr	lose_all_lives
 
 0:
 	cmp.b	#0x58,d0	| F9 key crashes game (restarts whdload)
@@ -4444,6 +4472,18 @@ load_music_if_needed:
 	jeq		70f
 	lea		level_56_music,a0
 	cmp.w	#LEVEL56_TUNE_SND*8,d0
+	jeq		70f
+	lea		first_place_music,a0
+	cmp.w	#FIRST_PLACE_TUNE_SND*8,d0
+	jeq		70f
+	lea		first_place_jingle_music,a0
+	cmp.w	#FIRST_PLACE_JINGLE_TUNE_SND*8,d0
+	jeq		70f
+	lea		second_place_jingle_music,a0
+	cmp.w	#SECOND_PLACE_JINGLE_TUNE_SND*8,d0
+	jeq		70f
+	lea		second_place_music,a0
+	cmp.w	#SECOND_PLACE_TUNE_SND*8,d0
 	jeq		70f
 	jra		75f
 70:
@@ -4817,6 +4857,14 @@ level_34_music:
 	.asciz	"level_34.mod"
 level_56_music:
 	.asciz	"level_56.mod"
+first_place_music:
+	.asciz	"first_place.mod"
+first_place_jingle_music:
+	.asciz	"jingle_first_place.mod"
+second_place_music:
+	.asciz	"second_place.mod"
+second_place_jingle_music:
+	.asciz	"jingle_second_place.mod"
 	
 
 	.align	2
@@ -4883,18 +4931,6 @@ system_vbr:
 target_ssp_value:
 	.word	0
 
-game_scroll_y:
-	.word	0
-game_scroll_x:
-	.word	0
-xr_offset:
-	.word	0
-xl_offset:
-	.word	0
-x_offset:
-	.word	0
-host_scroll_y:
-	.word	0
 host_scroll_x:
 	.word	0
 min_scroll_x:
@@ -4905,6 +4941,18 @@ previous_scroll_y:
 	.word	0
 previous_scroll_x:
 	.word	0
+
+game_scroll_x:
+	.word	0
+game_scroll_y:
+	.word	0
+
+bobs_game_scroll_y = game_scroll_y
+bobs_host_scroll_x = host_scroll_x
+	
+x_offset:
+	.word	0
+
 
 
 

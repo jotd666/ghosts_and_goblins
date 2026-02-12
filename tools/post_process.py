@@ -130,6 +130,19 @@ for i,line in enumerate(lines):
         # manual read of d3 value from the stack
         line = change_instruction("move.l\t(sp),d3",lines,i)
 
+    # fix score (using subq #1,d3 to adjust pointer kills X flag)
+    if address in {0x5402,0x5409,0x5410,0x5417}:
+        lines[i+1] = ""
+    # so hardcode offset
+    if address == 0x5404:
+        line = line.replace("0,d3","-1,d3")
+    elif address == 0x540b:
+        line = line.replace("0,d3","-2,d3")
+    elif address == 0x5412:
+        line = line.replace("0,d3","-3,d3")
+    elif address == 0x5419:
+        line = line.replace("0,d3","-4,d3")
+
     # here it's ok to fully use target stack
     if address in {0x4807,0x480b,0X4817,0X481f,0x5035,0x53C3,
     0x53d9,0x53dd,0x53ed,0x59f1,0x59f5,0x59f9,0x5a02,0x5a0a,

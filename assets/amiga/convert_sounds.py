@@ -12,7 +12,7 @@ sound_settings_dict = { 0x2 : {"channel":2,"priority":100},
 0x23 : {"channel":3,"priority":100},
 0x1 : {"channel":2,"priority":100},  # lose armour
 0x19 : {"channel":3,"priority":100},  # bag enemies
-#0xc : {"channel":3,"priority":100},  # giant stomps
+0xc : {"channel":3,"priority":1},  # giant stomps
 0xf : {"channel":3,"priority":100},
 0x21 : {"channel":3,"priority":100},  # dragon
 }
@@ -38,7 +38,7 @@ def convert():
     EMPTY_SND = "EMPTY_SND"
 
     dummy_sounds = {
-    # 7,8: sound exists but seem unused
+    0x28,  # second part of highscore (2nd place) tune
     9,0xA,22,     # unused/silence
     0x3F,  # stop tune
     0,     # stop ???
@@ -65,7 +65,7 @@ def convert():
                     extra_info = sound_settings_dict.get(index) or dict()
 
                     sfx_sample_rate = extra_info.get("sample_rate",lq_sample_rate)
-                    sound_dict[entry] = {"channel":extra_info.get("channel",-1),
+                    sound_dict[entry] = {"channel":extra_info.get("channel",3),  # default: not auto!
                     "priority":extra_info.get("priority",40),"index":index,"sample_rate":sfx_sample_rate}
             except ValueError:
                 pass
@@ -75,16 +75,20 @@ def convert():
 
 
     music_dict = {
-    "LEVEL12_TUNE_SND"      :{"index":0x2B,"pattern":0,"volume":32},
-    "LEVEL34_TUNE_SND"      :{"index":0x33,"pattern":0,"volume":32},
+    "LEVEL12_TUNE_SND"      :{"index":0x2B,"pattern":0,"volume":24},
+    "LEVEL34_TUNE_SND"      :{"index":0x33,"pattern":0,"volume":24},
     "LEVEL56_TUNE_SND"      :{"index":0x29,"pattern":0,"volume":32},
     "BOSS34_TUNE_SND"      :{"index":0x34,"pattern":0x10,"volume":32},
     "KILLED_TUNE_SND"      :{"index":0x31,"pattern":7,"volume":32},
     "GAME_OVER_SND"      :{"index":0x2F,"pattern":9,"volume":32},
     "BOSS12_TUNE_SND"      :{"index":0x2D,"pattern":0xD,"volume":32},
     "BOSS56_TUNE_SND"      :{"index":0x2E,"pattern":0x10,"volume":32},
-    "HURRY_UP_SND"      :{"index":0x18,"pattern":0xc,"volume":32},
+    "HURRY_UP_SND"      :{"index":0x18,"pattern":0xc,"volume":24},
     "OPEN_DOOR_TUNE_SND"      :{"index":0x3B,"pattern":0x11,"volume":32},
+    "FIRST_PLACE_TUNE_SND"      :{"index":0x26,"pattern":0,"volume":32},
+    "FIRST_PLACE_JINGLE_TUNE_SND"      :{"index":0x25,"pattern":0,"volume":32},
+    "SECOND_PLACE_TUNE_SND"      :{"index":0x2C,"pattern":0,"volume":32},
+    "SECOND_PLACE_JINGLE_TUNE_SND"      :{"index":0x27,"pattern":0,"volume":32},
     "LEVEL_COMPLETE_TUNE_SND"      :{"index":0x3E,"pattern":0xf,"volume":32},
     "LEVEL_START_TUNE_SND"      :{"index":0x30,"pattern":0xB,"volume":32},
     }

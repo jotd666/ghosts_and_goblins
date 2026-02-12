@@ -1,4 +1,4 @@
-; JailBreak AGA slave
+; GnG AGA slave
 	INCDIR	Include:
 	INCLUDE	whdload.i
 	INCLUDE	whdmacros.i
@@ -10,7 +10,7 @@ EXPMEM = 0
 	ELSE
 EXPMEM = $800000
 	ENDC
-CHIPSIZE = $200000
+CHIPSIZE = $1E0000
 
 _base	SLAVE_HEADER					; ws_security + ws_id
 	dc.w	17					; ws_version (was 10)
@@ -62,7 +62,11 @@ DECL_VERSION:MACRO
 	ENDC
 	ENDM
 _data   dc.b    "data",0
-_name	dc.b	"Ghosts'N'Goblins",0
+_name	dc.b	"Ghosts'N'Goblins"
+	IFD	CHIP_ONLY
+	dc.b	" (CD32)"
+	ENDC
+	dc.b	0
 _copy	dc.b	'2026 JOTD',0
 _info
     dc.b    "Music by IM76",0

@@ -66,6 +66,7 @@ bank_address_4000 = $4000
 sound_index_3a00 = $3a00
 game_in_play_0028 = $28
 level_music_index_00bd = $bd
+player_score_0068 = $68
 
 SND_STOP_00 = $00
 SND_UNKNOWN_FF = $FF 
@@ -1433,7 +1434,7 @@ start_game_screen_6b5e:
 6C41: DD 66       STD    $66
 6C43: 4F          CLRA
 6C44: 5F          CLRB
-6C45: DD 68       STD    $68
+6C45: DD 68       STD    player_score_0068
 6C47: DD 6A       STD    $6A
 6C49: DD 2C       STD    $2C
 6C4B: DD 2E       STD    $2E
@@ -14823,14 +14824,14 @@ ED9C: C5 07       BITB   #$07
 ED9E: 26 24       BNE    $EDC4
 EDA0: D6 90       LDB    $90
 EDA2: 26 20       BNE    $EDC4
-EDA4: D6 68       LDB    $68
+EDA4: D6 68       LDB    player_score_0068
 EDA6: 26 1C       BNE    $EDC4
 EDA8: D6 63       LDB    $63
 EDAA: 58          ASLB
 EDAB: 8E ED B0    LDX    #jump_table_edb0
 EDAE: 6E 95       JMP    [B,X]	; [indirect_jump] [nb_entries=3]
 
-EDB6: 8D 32       BSR    $EDEA
+EDB6: 8D 32       BSR    check_if_award_extra_life_edea
 EDB8: 24 0A       BCC    $EDC4
 EDBA: DE 55       LDU    $55
 EDBC: 33 44       LEAU   $4,U
@@ -14838,7 +14839,8 @@ EDBE: EC C4       LDD    ,U
 EDC0: DD 64       STD    $64
 EDC2: 0C 63       INC    $63
 EDC4: 39          RTS
-EDC5: 8D 23       BSR    $EDEA
+
+EDC5: 8D 23       BSR    check_if_award_extra_life_edea
 EDC7: 24 FB       BCC    $EDC4
 EDC9: 8D 0C       BSR    $EDD7
 EDCB: 0C 63       INC    $63
@@ -14846,7 +14848,7 @@ EDCD: 39          RTS
 EDCE: D6 54       LDB    $54
 EDD0: 54          LSRB
 EDD1: 24 F1       BCC    $EDC4
-EDD3: 8D 15       BSR    $EDEA
+EDD3: 8D 15       BSR    check_if_award_extra_life_edea
 EDD5: 24 ED       BCC    $EDC4
 EDD7: DE 55       LDU    $55
 EDD9: 33 48       LEAU   $8,U
@@ -14859,8 +14861,10 @@ EDE4: A9 C4       ADCA   ,U
 EDE6: 19          DAA
 EDE7: 97 64       STA    $64
 EDE9: 39          RTS
+
+check_if_award_extra_life_edea:
 EDEA: DC 64       LDD    $64
-EDEC: 10 93 68    CMPD   $68
+EDEC: 10 93 68    CMPD   player_score_0068
 EDEF: 22 0D       BHI    $EDFE
 EDF1: 0C 60       INC    nb_lives_0060
 EDF3: CC 07 00    LDD    #$0700
@@ -14870,6 +14874,7 @@ EDFC: 53          COMB
 EDFD: 39          RTS
 EDFE: 5F          CLRB
 EDFF: 39          RTS
+
 EE00: D6 21       LDB    counter_8_bit_0021
 EE02: C5 07       BITB   #$07
 EE04: 27 01       BEQ    $EE07
@@ -14903,6 +14908,7 @@ EE43: 39          RTS
 ; water in level 1 is done using dynamic palette change
 ; in level 2 water color remains static, probably because else all
 ; ice towers would change too
+; flames in level 4 also change
 change_a_few_colors_ee44:
 EE44: 10 8E 16 32 LDY    #tiles_palette_in_ram_1632
 EE48: 31 A5       LEAY   B,Y

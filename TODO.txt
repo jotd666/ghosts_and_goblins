@@ -1,37 +1,33 @@
-- Unmapped sound indexes: ['0x11', '0x13', '0x15', '0x25', '0x26', '0x27', '0x28', '0x2c', '0x32', '0x39']
-- sync scroll (double buffering)
-- adjust modules volumes, also vs sound: stomp sound channel 3 low pri
+- Unmapped sound indexes: ['0x11', '0x13', '0x15', '0x32', '0x39']
 - fix some sfx on channel 3, elaborate sound priorities, maybe remove goblin sounds as they cut off the music too much
 - log sprites level 7? pb with existing pairs WTF
 - no music on level 7, but then no music at all
-- change weapon trainer: call the routine to redraw weapon
 - sprites clipped too low (devil on level 5, player level 2 on towers?)
-- 9900 points => 10000: score resets to 0
 - map: sometimes map context not detected, which leads to no map or corrupt colors map (depending on the levels)
+- dynamic palette in water level 1 intercept it and simulate it, level 4 has this too (flames): change_a_few_colors_ee44
+- infinite lives trainer not working
 
-
+- CD32 version to test with release exe
 - insert coin with fire/start with up/down
-- cheat to add 5000 points/cheat to lose all lives to test highscore screen
-- force tile draw cheat screws up host_scroll and tile feed
-- level 5: dying: no "dead" music: IM76 contacted
 - use 16-bit table for mirror but not mirror routine as it's in place
 - start at level 5: tries to load level 2 then loads level 5
-- need to implement/test 64 bit swap (last boss)
+- fg layer: lives colors are not good. Black!=transparent, maybe rework or rip with changed
+  palette to separate black from background- need to implement/test 64 bit swap (last boss)
 - depending on the level, do not mirror Y (intro, level 1, level 4, level 7 don't need it)
-- map: sceptre of player rendered on top too sometimes
-- dynamic palette in water level 1 intercept it and simulate it, level 4 has this too (flames)
-- remove parasite tiles (in the end) because of levelskip some intro tiles are logged in levels 2+
-- inprint the tombstones (level 1 & 3) in the background (for instance when drawing left & right tiles but also at start) to save
-  cpu & reduce the shaking effect
-- infinite lives trainer not working
 - check if game tries to load music from level 1 to 2 or if it's cached
 - tombstone easter egg shot seems wrong
 - bottom left life icon not erased by "credit" message
 - log tiles (per level): with zone filtering (first level only upper part)
-- fg layer: lives colors are not good. Black!=transparent, maybe rework or rip with changed
-  palette to separate black from background
+- map: sceptre of player rendered on top too sometimes: still ??? to test
+
 - option to start without music, in which case all sounds except a given list should use automatic channel
 - 6ED0 called at the start of a level, maybe try to load context there first
+- force tile draw cheat screws up host_scroll and tile feed
+- remove parasite tiles (in the end) because of levelskip some intro tiles are logged in levels 2+
+- inprint the tombstones (level 1 & 3) in the background (for instance when drawing left & right tiles but also at start) to save
+  cpu & reduce the shaking effect
+- change weapon trainer: call the routine to redraw weapon: not from interrupt!! if must be done, force to call "a new
+  weapon is picked up" with a flag
 
 
 - 0x38, # last boss music (resolve your battle)
