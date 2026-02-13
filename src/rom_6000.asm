@@ -9033,7 +9033,7 @@ B943: EE 88 18    LDU    $18,X
 B946: E6 C0       LDB    ,U+		; [bank_address]
 B948: 26 04       BNE    $B94E
 B94A: EE C4       LDU    ,U		; [bank_address]
-B94C: E6 C0       LDB    ,U+
+B94C: E6 C0       LDB    ,U+		; [bank_address]
 B94E: E7 06       STB    $6,X
 B950: EF 88 18    STU    $18,X
 B953: 39          RTS

@@ -908,7 +908,11 @@ osd_set_tile_palette:
 	* we recognized our context
 	* but actually it's way more complex as the game performs
 	* dynamic color changes. Better rely on the level number
-	* at this point
+	* at this point, except for map context, which has priority
+	move.w	(-2,a1),d0
+	cmp.w	#MAP_CONTEXT,d0
+	jeq		2f
+	
 	* level 3 or 4. Check the level number in RAM color to find out
 	* as both levels share the exact same palette, but we want
 	* a different context load as it's cleaner that way
@@ -2185,15 +2189,34 @@ mirror_48_bit_wide:
 	dbf		d1,10b
 	rts
 
-	.ifdef 	UNUSED
-* this is !untested!
+
 mirror_64_bit_wide:
-	
 	moveq	#0,d0
 10:
+	.ifndef	MC68020
+	moveq	#0,d0
+	moveq	#0,d2
+	.endif
+	
 	move.w	(a2),d2
 	move.w	(6,a2),d0
 	* swap edges
+	.ifndef	MC68020
+	add.l	d2,d2
+	add.l	d0,d0
+	move.w	(a1,d2.l),(6,a2)		| get mirror value
+	move.w	(a1,d0.l),(a2)+		| get mirror value
+	* swap center words
+	moveq	#0,d0
+	moveq	#0,d2
+	move.w	(a2)+,d2
+	move.w	(a2),d0
+	add.l	d2,d2
+	add.l	d0,d0
+	move.w	(a1,d2.l),(a2)
+	move.w	(a1,d0.l),-(a2)
+	.else
+	* 68020+ is handy here as scaling doesn't corrupt MSW
 	move.w	(a1,d2.l*2),(6,a2)		| get mirror value
 	move.w	(a1,d0.l*2),(a2)+		| get mirror value
 	* swap center words
@@ -2201,10 +2224,11 @@ mirror_64_bit_wide:
 	move.w	(a2),d0
 	move.w	(a1,d2.l*2),(a2)
 	move.w	(a1,d0.l*2),-(a2)
+	.endif
 	addq	#6,a2					| skip row
 	dbf		d1,10b
 	rts
-	.endif
+
 	
 mirror_function_table:
 	.long	nope
@@ -2212,7 +2236,7 @@ mirror_function_table:
 	.long	mirror_16_bit_wide
 	.long	mirror_32_bit_wide
 	.long	mirror_48_bit_wide
-	.long	nope  | not used right now
+	.long	mirror_64_bit_wide
 	.long	nope		| just in case, but there are no such objects
 	.long	nope
 
@@ -2926,6 +2950,21 @@ osd_video_byte_dirty:
 	lea		(FG_SCREEN_COLOR_ADDRESS,a6),a0
 	move.b	(a0,d7.w),d1
 
+	* special case to get proper shield color
+	cmp.w	#0x1F9,d7
+	jne		0f
+	* special location where the shield is
+	* when the message appears if you kill level 6 bosses without it
+	
+	cmp.b	#0x86,d0
+	jne		1f
+	* shield is here: make palette change earlier
+	move.w	#COPPER_NOP,weapon_palette_wait
+	jra		0f
+1:
+	* shield is not here: palette change at the bottom
+	move.w	#0xF001,weapon_palette_wait
+0:
 
 	jbsr	update_fg_tile
 
@@ -5222,7 +5261,10 @@ pal_intreq_block_game:
 	.word	 intreq,0x8014  | call copper interrupt in the middle of a frame, also flag so copper interrupt knows that we're going to call copper int
 	* here was second_rows (before I disabled it)
 	
-	* wait just before weapon displays
+	* wait just before weapon displays (unless disabled in which case palette change happens in the middle
+	* which is perfect so the shield of the infamous "this weapon has no effect" message has the proper color
+	* (the "try again" text doesn't have the proper color, but who cares?)
+weapon_palette_wait:
 	.word	0xF001,0xFFFE
 osd_lower_palette_switch_address:
 	* dynamic palette for weapons & lives on OSD
