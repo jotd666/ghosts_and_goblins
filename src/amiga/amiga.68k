@@ -5227,6 +5227,8 @@ pal_intreq_block_game:
 	.word	 intreq,0x8014  | call copper interrupt in the middle of a frame, also flag so copper interrupt knows that we're going to call copper int
 	* here was second_rows (before I disabled it)
 	
+	* wait just before weapon displays
+	.word	0xF001,0xFFFE
 osd_lower_palette_switch_address:
 	* dynamic palette for weapons & lives on OSD
 	.word	cop2lc,0

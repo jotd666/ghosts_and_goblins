@@ -1,16 +1,22 @@
 - Unmapped sound indexes: ['0x11', '0x13', '0x15', '0x32', '0x39']
-- fix some sfx on channel 3, elaborate sound priorities, maybe remove goblin sounds as they cut off the music too much
+- level 3 => level 4: crash 
+- intro: music stops as soon as player wears armour
+- fix some sfx on channel 3, elaborate sound priorities, maybe remove goblin sounds (only in some levels) as they cut off the music too much
 - log sprites level 7? pb with existing pairs WTF
 - no music on level 7, but then no music at all
 - sprites clipped too low (devil on level 5, player level 2 on towers?)
 - map: sometimes map context not detected, which leads to no map or corrupt colors map (depending on the levels)
 - dynamic palette in water level 1 intercept it and simulate it, level 4 has this too (flames): change_a_few_colors_ee44
 - infinite lives trainer not working
-
+- random wrong tile display issue on real HW
+- highscore reached: doesn't load level 1 music during attract mode
+- demo: scroll resets but probably min/max scroll not recomputed properly which leads to visible scroll update
+- load/save highscores
+- when "this weapon has no effect" message displays, is the shield of proper color? probably not anymore
+  solution would be to kill wait 0xF001 temporarily and change palette earlier
 - CD32 version to test with release exe
 - insert coin with fire/start with up/down
 - use 16-bit table for mirror but not mirror routine as it's in place
-- start at level 5: tries to load level 2 then loads level 5
 - fg layer: lives colors are not good. Black!=transparent, maybe rework or rip with changed
   palette to separate black from background- need to implement/test 64 bit swap (last boss)
 - depending on the level, do not mirror Y (intro, level 1, level 4, level 7 don't need it)
@@ -19,6 +25,8 @@
 - bottom left life icon not erased by "credit" message
 - log tiles (per level): with zone filtering (first level only upper part)
 - map: sceptre of player rendered on top too sometimes: still ??? to test
+- start at level 5: tries to load level 2 then loads level 5
+- scrolling and double buffering can it be improved?
 
 - option to start without music, in which case all sounds except a given list should use automatic channel
 - 6ED0 called at the start of a level, maybe try to load context there first

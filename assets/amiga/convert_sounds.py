@@ -75,14 +75,14 @@ def convert():
 
 
     music_dict = {
-    "LEVEL12_TUNE_SND"      :{"index":0x2B,"pattern":0,"volume":24},
-    "LEVEL34_TUNE_SND"      :{"index":0x33,"pattern":0,"volume":24},
+    "LEVEL12_TUNE_SND"      :{"index":0x2B,"pattern":0,"volume":20},
+    "LEVEL34_TUNE_SND"      :{"index":0x33,"pattern":0,"volume":20},
     "LEVEL56_TUNE_SND"      :{"index":0x29,"pattern":0,"volume":32},
-    "BOSS34_TUNE_SND"      :{"index":0x34,"pattern":0x10,"volume":32},
+    "BOSS34_TUNE_SND"      :{"index":0x34,"pattern":0x12,"volume":32},
     "KILLED_TUNE_SND"      :{"index":0x31,"pattern":7,"volume":32},
     "GAME_OVER_SND"      :{"index":0x2F,"pattern":9,"volume":32},
     "BOSS12_TUNE_SND"      :{"index":0x2D,"pattern":0xD,"volume":32},
-    "BOSS56_TUNE_SND"      :{"index":0x2E,"pattern":0x10,"volume":32},
+    "BOSS56_TUNE_SND"      :{"index":0x2E,"pattern":0x12,"volume":32},
     "HURRY_UP_SND"      :{"index":0x18,"pattern":0xc,"volume":24},
     "OPEN_DOOR_TUNE_SND"      :{"index":0x3B,"pattern":0x11,"volume":32},
     "FIRST_PLACE_TUNE_SND"      :{"index":0x26,"pattern":0,"volume":32},
@@ -223,11 +223,9 @@ def convert():
                 if amp_ratio > 1:
                     print(f"{wav}: volume peaked {amp_ratio}")
                     amp_ratio = 1
-                ticks = details.get("ticks")
-                if not ticks:
-                    ticks = int(len(signed_data)/used_sampling_rate*170)+1  # inflate time (else speech is too fast)
+
                 sound_table[sound_index] = "    SOUND_ENTRY {},{},{},{},{},{},{}\n".format(wav,len(signed_data)//2,channel,
-                            used_sampling_rate,int(64*amp_ratio),used_priority,ticks)
+                            used_sampling_rate,int(64*amp_ratio),used_priority,0)
                 sound_table_set_1[sound_index] = f"\t.word\t1,{int(details.get('loops',0))}\n\t.long\t{wav}_sound"
 
                 if amp_ratio > 0:

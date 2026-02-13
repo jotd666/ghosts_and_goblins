@@ -161,7 +161,9 @@ def get_sprite_names():
     rval[0x277] = "king_bonus"
     rval[0x27F] = "pot"
     rval[0xD7] = "key"
+    rval[0x263] = "ham_bonus"  # worth ??
     rval[0x264] = "trousers_bonus"  # worth 2000
+    rval[0x265] = "crown_bonus"  # worth ??
 
     rval[0x1b6] = rval[0x1b7] = "plant_bullet"
     rval[0x54] = "spear"
