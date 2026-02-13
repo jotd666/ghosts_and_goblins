@@ -3340,15 +3340,15 @@ devil_takes_girl_7d80:
 7F8A: 6C 13       INC    -$D,X
 7F8C: 39          RTS
 
-
+; during end sequence
 7F95: 10 AE 0B    LDY    $B,X
 7F98: D6 21       LDB    counter_8_bit_0021
 7F9A: C4 0F       ANDB   #$0F
 7F9C: 26 16       BNE    $7FB4
 7F9E: C6 60       LDB    #$60
-7FA0: E7 A4       STB    ,Y
+7FA0: E7 A4       STB    ,Y				; [unchecked_address]
 7FA2: C6 05       LDB    #$05
-7FA4: E7 A9 04 00 STB    $0400,Y
+7FA4: E7 A9 04 00 STB    $0400,Y		; [video_address]
 7FA8: 31 A8 E0    LEAY   -$20,Y
 7FAB: 10 AF 0B    STY    $B,X
 7FAE: 6A 0A       DEC    $A,X

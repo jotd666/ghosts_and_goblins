@@ -1,8 +1,8 @@
-- Unmapped sound indexes: ['0x11', '0x13', '0x15', '0x32', '0x39']
-- level 3 => level 4: crash 
+
+- boss music levels 5/6 doesn't loop anymore!
+- Unmapped sound indexes: ['0x11', '0x13', '0x15', '0x39']
 - intro: music stops as soon as player wears armour
 - fix some sfx on channel 3, elaborate sound priorities, maybe remove goblin sounds (only in some levels) as they cut off the music too much
-- log sprites level 7? pb with existing pairs WTF
 - no music on level 7, but then no music at all
 - sprites clipped too low (devil on level 5, player level 2 on towers?)
 - map: sometimes map context not detected, which leads to no map or corrupt colors map (depending on the levels)
@@ -21,7 +21,6 @@
   palette to separate black from background- need to implement/test 64 bit swap (last boss)
 - depending on the level, do not mirror Y (intro, level 1, level 4, level 7 don't need it)
 - check if game tries to load music from level 1 to 2 or if it's cached
-- tombstone easter egg shot seems wrong
 - bottom left life icon not erased by "credit" message
 - log tiles (per level): with zone filtering (first level only upper part)
 - map: sceptre of player rendered on top too sometimes: still ??? to test

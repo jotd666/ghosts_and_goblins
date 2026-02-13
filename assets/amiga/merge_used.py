@@ -14,8 +14,11 @@ def merge(used_name,nb_items,nb_cluts):
 
     # merge sprites with existing file + moves from level 1
     used_dump = data_dir / os.path.basename(used_name)
-    with open(used_dump,"rb") as f:
-        new_contents = f.read()
+    if used_dump.exists():
+        with open(used_dump,"rb") as f:
+            new_contents = f.read()
+    else:
+        new_contents = bytearray(nb_cluts*nb_items)
 
     old_used = merged_path_file / used_name
     if old_used.exists():
@@ -35,8 +38,6 @@ def merge(used_name,nb_items,nb_cluts):
             if a!=b:
                 code,clut = divmod(i,nb_cluts)
                 print(f"{used_name}: New: code={code:02x}, clut={clut:02x}")
-    for x in range(0x1A0,0x1BB):
-        rem(contents,x,2,nb_cluts)
 
     with open(merged_path_file / used_name,"wb") as f:
         f.write(contents)

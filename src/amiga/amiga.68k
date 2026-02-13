@@ -1999,14 +1999,15 @@ update_one_bob:
 	* now 2 cases: if Y is negative, we have to clip, else normal
 	tst		d1
 	jpl		8f
-	* negative: can happen with ball for instance
+	* negative: can happen specially on vertical levels
 	* convert that to clip
 	add.w	d1,d4		| reduce height
 	jeq		2f
 	jmi		2f			| too high => skip
 	neg		d1			| make it positive again
 	* now multiply d1 by number of bytes per bob source row
-	* we only have 2 cases here: 4 and 6
+	* we only have 2 cases here: 4 and 6 (technically big boss 
+	* could qualify but it doesn't happen)
 	add.w	d1,d1		| times 2
 	cmp.w	#6,d5
 	jne		7f
@@ -2016,8 +2017,6 @@ update_one_bob:
 	move.w	d1,d5		| set Y offset
 	moveq	#0,d1		| and coord = 0
 
-	tst.b	dont_store_blitted_coords
-	jne		9f
 	
 	* store attributes for clipped sprite erase (unless blocked)
 	move.w	d0,(a6)+			| store current sprite attributes to previous ones
@@ -2034,15 +2033,14 @@ update_one_bob:
 	* note down that this bob will have to be erased
 	* store attributes for non-clipped sprite erase
 
-	tst.b	dont_store_blitted_coords
-	jne		91f
+
 
 	* store attributes for clipped sprite erase (unless blocked)
 	move.w	d0,(a6)+			| store current sprite attributes to previous ones
 	move.w	d1,(a6)+			| store current sprite attributes to previous ones
 	move.w	d4,(a6)+			| store height
 	move.w	d5,(a6)+			| store width in bytes
-91:
+
 	move.w	d5,d2			| width in bytes, 4 for 16 pixels+shift
 	moveq	#0,d5			| Y-offset
 
@@ -2050,7 +2048,6 @@ update_one_bob:
 	moveq	#NB_PLAYFIELD_PLANES,d3
 
 	jbsr	blit_planes_any_internal_cookie_cut
-	clr.b	dont_store_blitted_coords
 2:
 	move.l	(a7)+,a0
 	rts
@@ -3297,6 +3294,9 @@ flipped_tile16:
 	
 0:
 	rts
+5:
+	CLEAR_TILE16_PLANE
+	jra		41b
 
 	
 mirror_tile16:
@@ -3322,10 +3322,8 @@ mirror_tile16:
 41:
 	TILE16_NEXT_PLANE
 	dbf		d4,4b
-0:
 	move.l	(a7)+,a5
 	rts
-1:
 
 5:
 	CLEAR_TILE16_PLANE
@@ -3350,8 +3348,6 @@ mirror_flipped_tile16:
 41:
 	TILE16_NEXT_PLANE
 	dbf		d4,4b
-
-0:
 	move.l	(a7)+,a5
 	rts
 
@@ -4812,8 +4808,7 @@ coin2_requested:
 	.byte	0
 music_playing:
 	.byte	0
-dont_store_blitted_coords:
-	.byte	0
+
 
 music_loops:
 	.byte	0

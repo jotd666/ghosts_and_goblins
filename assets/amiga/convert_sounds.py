@@ -41,6 +41,7 @@ def convert():
     0x28,  # second part of highscore (2nd place) tune
     9,0xA,22,     # unused/silence
     0x3F,  # stop tune
+    0x32,  # end music
     0,     # stop ???
 0x38, # last boss music (resolve your battle)
 0x2A, # boss music (in game)

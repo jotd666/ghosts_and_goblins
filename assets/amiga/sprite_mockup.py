@@ -82,7 +82,7 @@ def doit(binname):
 
     layer.save(f"{binname}.png")
 
-doit("graves")
+doit("end_sprites")
 
 
 
