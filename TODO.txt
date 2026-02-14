@@ -1,16 +1,22 @@
-- Unmapped sound indexes: ['0x11', '0x13', '0x15', '0x39']
+- 25 or 50 hz by default?
+- RE only one loop (use MAME snapshots maybe when killing monster)
+- little hearts when princess is freed (parasite sprite issues)
+- level 3 still tile issues (part 2, hard left after big ladder, only seen on real hw)
+- real hardware sometimes scrolling seems to reset. Increase delta x scroll to trigger full refresh
+- continue play: part of the map is black
 - intro: music stops as soon as player wears armour (regression!)
-- fix some sfx on channel 3, elaborate sound priorities, maybe remove goblin sounds (only in some levels) as they cut off the music too much
-- no music on level 7, but then no music at all in levels 1 and 2 after looping
+- fix some sfx on channel 3, elaborate sound priorities
+- after level 7 is completed once, no music at all in levels 1 and 2 after looping
 - sprites clipped too low (devil on level 5, player level 2 on towers?): mockup it!
-- dynamic palette in water level 1 intercept it and simulate it, level 4 has this too (flames): change_a_few_colors_ee44
+- dynamic palette level 4 to test (flames): change_a_few_colors_ee44
 - infinite lives trainer not working
-- random wrong tile display issue on real HW: maybe gone now: to retest
 - highscore reached: doesn't load level 1 music during attract mode
 - demo: scroll resets but probably min/max scroll not recomputed properly which leads to visible scroll update
 - load/save highscores
 - CD32 version to test with release exe: ATM too much mem needed. but not including 400k music buffer will help!
+  => need to record the tunes with several loops using service mode and 3F to stop sound
 - insert coin with fire/start with up/down
+- try to apply patches to fix some original game bugs / difficulty level HP for monsters
 - use 16-bit table for mirror but not mirror routine as it's in place
 - fg layer: lives colors are not good. Black!=transparent, maybe rework or rip with changed
   0x4B4 and next colors: try to get sheet D correct. 0x9A life tile. Why frame has black ?? should be transparent
@@ -19,10 +25,14 @@
 - depending on the level, do not mirror Y (intro, level 1, level 4, level 7 don't need it)
 - check if game tries to load music from level 1 to 2 or if it's cached
 - bottom left life icon not erased by "credit" message
-- log tiles (per level): with zone filtering (first level only upper part)
+- log tiles (per level): with zone filtering (first level only upper part) or just clean the log by dumping game memory
+  at levels 1, 4 and 7 extract the tiles only used in unseen regions
 - start at level 5: tries to load level 2 then loads level 5
 - scrolling and double buffering can it be improved?
 
+
+- diff with world version 3 see if the fixes are visible
+- add foreground tiles (grass, bridge)
 - option to start without music, in which case all sounds except a given list should use automatic channel
 - 6ED0 called at the start of a level, maybe try to load context there first
 - force tile draw cheat screws up host_scroll and tile feed
@@ -35,8 +45,10 @@
 
 - 0x38, # last boss music (resolve your battle)
 - 0x2A, # boss music (in game)
-
+- 0x39, # unused jingle
 - 0x29, # castle music (lev 5)
+- 0x11: unused sfx (it seems)
+- 0x32: win
 
 hacks:
 
@@ -47,6 +59,40 @@ fill $3841,1,$F0
 fill $3941,1,$F0
 
 
+21:A03
+22:C04
+23:A03
+24:F50
+25:C04
+26:F50
+27:F70
+
+21:A03
+22:C04
+23:000
+24:000
+25:C04
+26:F50
+27:F50
+
+21:000
+22:000
+23:A03
+24:C04
+25:C04
+26:F50
+27:F70
+
+21:A03
+22:C04
+23:000
+24:000
+25:C04
+26:F50
+27:F50
+
+
+
 replace division: 
 
 bpset FED8,,{temp0=A;A /= B; B = A % B;PC=FEEF;g}
@@ -55,7 +101,10 @@ bpset FEF0,,{temp0=w@U; temp1=temp0/D; w@U=temp1; D = temp0%D; PC=$feef; g}
 log sounds: bpset 7942,,{print B;g}
 skip sounds: bpset 7942,B == $17,{PC=$792F;g}
 record sounds: bpset 791D,B != $FF,{B=$E;g}
+or simply service mode!!
 
+log dyn colors:
+wpset 1632,40,W,,{printf "%02X:%03X",wpaddr-$1632,((wpdata<<8)+(b@(wpaddr+$40)))>>4;g}
 
 remove music:
 
@@ -64,3 +113,6 @@ bpset 7A39,,{PC=7945;g}
 bpset 794B,,{PC=7945;g}
 bpset 7A4D,,{PC=7945;g}
 bpset 8FCE,,{PC=8FD1;g}
+
+longplay: https://www.youtube.com/watch?v=SaqtjNWOESs&t=2557s
+vgms: https://vgmrips.net/packs/pack/ghosts-n-goblins-arcade

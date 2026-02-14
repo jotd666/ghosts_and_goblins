@@ -39,13 +39,12 @@ def convert():
 
     dummy_sounds = {
     0x28,  # second part of highscore (2nd place) tune
-    9,0xA,22,     # unused/silence
     0x3F,  # stop tune
-    0x32,  # end music
     0,     # stop ???
-0x38, # last boss music (resolve your battle)
-0x2A, # boss music (in game)
-0x1C, # end music (maybe loop 1)
+    0x39,  # unused jingle
+    0x11,  # unused?
+    0x13,  # unused step
+    0x15, 0x16, 0x9, 0xa,  # unmapped by game (skipped in self-test!)
     0xFF}
 
 
@@ -84,6 +83,10 @@ def convert():
     "GAME_OVER_SND"      :{"index":0x2F,"pattern":9,"volume":32},
     "BOSS12_TUNE_SND"      :{"index":0x2D,"pattern":0xD,"volume":32},
     "BOSS56_TUNE_SND"      :{"index":0x2E,"pattern":0x12,"volume":32},
+    "LEVEL7_END1_SND"      :{"index":0x1C,"pattern":0x10,"volume":32},
+    "LEVEL7_END2_SND"      :{"index":0x32,"pattern":0x11,"volume":32},
+    "BOSS7_TUNE_SND"      :{"index":0x2A,"pattern":0x2,"volume":32},
+    "BOSS7_RESOLVE_TUNE_SND"      :{"index":0x38,"pattern":0,"volume":32},
     "HURRY_UP_SND"      :{"index":0x18,"pattern":0xc,"volume":24},
     "OPEN_DOOR_TUNE_SND"      :{"index":0x3B,"pattern":0x11,"volume":32},
     "FIRST_PLACE_TUNE_SND"      :{"index":0x26,"pattern":0,"volume":32},

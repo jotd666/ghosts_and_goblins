@@ -255,6 +255,7 @@ osd_enter_\@:
 	.global osd_enable_interrupts
 	.global osd_disable_interrupts
 	.global osd_set_tile_palette
+	.global osd_colors_cycled
 	.global osd_break		| for debug	
 	.global osd_blitz		| for debug
 	.global osd_read_dsw1
@@ -883,8 +884,99 @@ dump_and_quit:
 	illegal
 	.endif
 
+osd_colors_cycled:
+
 * < A0: tile palette in RAM (but shadows hardware palette)
 * format (RGB4) is: offset=$RG, offset+$40=$B0
+* I imagine that on NeoGeo we just set the palette and so be it but here we have eliminated
+* duplicate entries for tiles and were lucky enough on level 1 for instance to keep the exact unique
+* colors for the tiles. So the RGB values used are the same as in the game, but the game uses 4 slots
+* and we only have 3 slots. We'll have to adapt I doubt it will be noticeable
+	OSD_ENTER
+	movem.l	d0-a6,-(a7)
+	GET_MEMORY_START_IN_A6
+	move.b	(current_level_0072,a6),d0
+	jne		0f
+	* graveyard, get 2 first palette entries
+	move.w	#0x2A,d0
+	move.b	(a0,d0.w),d2
+	lsl.w	#8,d2
+	move.b	(0x40,a0,d0.w),d2
+	swap	d2
+	move.w	#0x2B,d0
+	move.b	(a0,d0.w),d2
+	lsl.w	#8,d2
+	move.b	(0x40,a0,d0.w),d2
+	* we track 3 values (there are 4 possibilities actually)
+	moveq	#0,d0
+	cmp.l	#0x059008A0,d2
+	jeq		1f
+	moveq	#6,d0
+	cmp.l	#0x08A008A0,d2
+	jeq		1f
+	*cmp.l	#0x08A00590,d2
+	moveq	#12,d0
+1:
+	lea		water_color_table,a2
+	jbsr	cycle_colors
+	jra		10f
+0:
+	cmp.b	#4,(current_level_0072,a6)		| bridge
+	jne		10f
+	* bridge
+	
+10:
+	movem.l	(a7)+,d0-a6
+	rts
+
+cycle_colors:
+	* change some colors (water animation in level 1)
+	lea		dyn_color_indexes,a0
+	add.w	d0,a2
+	moveq	#2,d3
+	lea		copperlist_colors+4,a1		| skip bplcon3
+2:
+	move.w	(a0)+,d0		| color index times 4
+	move.w	(a2)+,d1
+	move.w	d1,(2,a1,d0.w)		| change color in copperlist
+	dbf		d3,2b
+	rts
+	
+water_color_table:
+	.word	0x08A
+	.word	0x059
+	.word	0x6AC
+	.word	0x059
+	.word	0x08A
+	.word	0x6AC
+	.word	0x6AC
+	.word	0x059
+	.word	0x08A
+*2A:
+*2B:
+*2C:
+*2D:6AC
+*
+*2A:08A
+*2B:08A
+*2C:6AC
+*2D:000
+*
+*2A:059
+*2B:08A
+*2C:000
+*2D:6AC
+*
+*2A:08A
+*2B:08A
+*2C:6AC
+*2D:000
+	
+* very important for the amiga version as it allows to detect level/context switches
+* and load the relevant parts (we can't have everything in memory)
+* on 68k non-amiga versions (if done one day) derived on this port, this could be much simpler.
+* I imagine that on NeoGeo we just set the palette and so be it.
+
 osd_set_tile_palette:
 	OSD_ENTER
 	movem.l	d0-a6,-(a7)
@@ -953,6 +1045,35 @@ osd_set_tile_palette:
 	move.l	color_copper_pointers,a1	| entries 0-31
 	move.w	#TOTAL_NB_COLORS/2,d0
 	jbsr	load_palette
+	* locate interesting colors in palette for levels 1 and 4 (bridge) to color-cycle tiles
+	move.l	bg_character_table_buffer_ptr,a0
+	lea		dyn_color_indexes,a2
+	lea		interesting_colors_level_1,a1
+	tst.b	(current_level_0072,a6)
+	jeq		10f
+	lea		interesting_colors_level_4,a1	
+10:
+	moveq	#0,d0
+	move.w	(a1),d2		| load first interesting color, look it up
+100:
+
+	move.w	(a0)+,d1
+	cmp.w	d2,d1
+	jne		101f
+	* store index*4
+	move.w	d0,(a2)+
+	* load next interesting color
+	move.w 	(a1)+,d2
+	jmi		102f			| no more interesting color
+	moveq	#0,d0
+	* reset search
+	move.l	bg_character_table_buffer_ptr,a0
+	jra		100b
+101:
+	addq	#4,d0
+	cmp.w	#TOTAL_NB_COLORS/2,d0
+	jne		100b
+102:
 	movem.l	(a7)+,d0-a6
 	OSD_EXIT
 	rts
@@ -963,6 +1084,17 @@ osd_set_tile_palette:
 	lea		fade_palettes,a0
 	add.w	d0,a0
 	jra		6b
+	
+interesting_colors_level_1:
+	.word	0x008a
+	.word	0x0059
+	.word	0x06ac
+	.word	-1
+interesting_colors_level_4:
+	.word	0x008a
+	.word	0x008a
+	.word	0x008a
+	.word	-1
 	
 * < D0: context name
 load_context:
@@ -4508,6 +4640,9 @@ load_music_if_needed:
 	lea		level_56_music,a0
 	cmp.w	#LEVEL56_TUNE_SND*8,d0
 	jeq		70f
+	lea		level_7_music,a0
+	cmp.w	#BOSS7_RESOLVE_TUNE_SND*8,d0
+	jeq		70f
 	lea		first_place_music,a0
 	cmp.w	#FIRST_PLACE_TUNE_SND*8,d0
 	jeq		70f
@@ -4815,6 +4950,10 @@ mirror_bits:
 
 
 	.align	2
+dyn_color_indexes:
+	.word	0
+	.word	0
+	.word	0
 difficulty_table:
 	.byte	0x02		| easy  from us vball!!!
 	.byte	0x03		| medium
@@ -4891,6 +5030,8 @@ level_34_music:
 	.asciz	"level_34.mod"
 level_56_music:
 	.asciz	"level_56.mod"
+level_7_music:
+	.asciz	"level_7.mod"
 first_place_music:
 	.asciz	"first_place.mod"
 first_place_jingle_music:
