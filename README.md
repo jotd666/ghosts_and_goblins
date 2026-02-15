@@ -26,4 +26,5 @@ Cheat keys:
 F1: toggle invincibility
 F2: level skip
 F3: switch weapon (not visible in the HUD at once)
-F4: add to score
+F4: warp higher (useful in tower levels)
+F5: add to score
