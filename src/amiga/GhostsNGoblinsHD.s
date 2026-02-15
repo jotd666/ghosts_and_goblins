@@ -63,14 +63,15 @@ DECL_VERSION:MACRO
 	ENDC
 	ENDM
 _data   dc.b    "data",0
-_name	dc.b	"Ghosts'N'Goblins"
+_name	dc.b	"Ghosts'N'Goblins (arcade)"
 	IFD	CHIP_ONLY
 	dc.b	" (CD32)"
 	ENDC
 	dc.b	0
 _copy	dc.b	'2026 JOTD',0
 _info
-    dc.b    "Music by IM76",0
+    dc.b    "Music by IM76",10
+    dc.b    "Original 1985 Capcom",0
 	dc.b	0
 _kickname   dc.b    0
 ;--- version id

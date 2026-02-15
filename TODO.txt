@@ -1,15 +1,17 @@
+- big issue (cycle exact+release) completely trashed at level start (random, any level)
+  could it be the removal of sprite clipping? tile mirror?
 - water animation: red in it!
 - when loading level 1 context, also load level12.mod
 - level 3 still tile issues (part 2, hard left after big ladder, only seen on real hw): to test real hw
 - real hardware sometimes scrolling seems to reset. Increase delta x scroll to trigger full refresh: to test real hw
 - continue play: part of the map is black: not always???
-- highscore reached: doesn't load level 1 music during attract mode
+- highscore reached: doesn't load level 1 music during attract mode, stuck on highscore .mod
 - load/save highscores
 - CD32 version to test with release exe: ATM too much mem needed. but not including 400k music buffer will help!
   => need to record the tunes with several loops using service mode and 3F to stop sound: finish wav splitting
 - option to start without music, in which case all sounds except a given list should use automatic channel
   => use that in CD32
-- insert coin with fire/start with up/down
+- implement dip difficulty
 - fg layer: lives colors are not good. Black!=transparent, maybe rework or rip with changed
   0x4B4 and next colors: try to get sheet D correct. 0x9A life tile. Why frame has black ?? should be transparent
   palette to separate black from background: make it magenta on all sheets to extract black properly.
