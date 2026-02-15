@@ -525,6 +525,8 @@ _user:
 	sne		infinite_lives_flag
 	btst	#2,d0
 	sne		infinite_time_flag
+	btst	#2,d0
+	sne		skip_first_loop_flag
 	move.b	d0,d1
 	and.b	#3,d1
 	jeq		2f
@@ -1035,7 +1037,7 @@ osd_set_tile_palette:
 
 	
 	cmp.w	#0x100,d0
-	jcc		7f			| special context
+	jcc		7f			| special context: palette change but no context load
 2:
 	jbsr	load_context
 5:
@@ -1189,6 +1191,12 @@ load_context:
 	lea		(TOTAL_NB_COLORS,a0),a0		| skip 32 color palette
 	move.l	a0,bg_tile_character_table				| set character table pointer
 	
+	* optimize: should we mirror Y tiles? only in some contexts
+	move.w	current_context,d0
+	lea		mirror_y_tile_table,a0
+	tst.b	(a0,d0.w)
+	sne		must_mirror_y_tiles
+	
 	* at start redraw everything
 	move.w	#START_X,game_scroll_x
 	move.w	#START_Y,game_scroll_y
@@ -1326,13 +1334,18 @@ set_scroll_values:
 1:
 
 0:
+	* now let's check absolute value of scroll diff
 	move.w	d2,d3
 	jpl	2f
 	neg.w	d3
 2:
-	cmp.w	#BG_TILE_WIDTH,d3
+	cmp.w	#BG_TILE_WIDTH*2,d3
 	jcs		3f
 	* before/after diff is too big: redraw all
+	* note that this screws the column updates if triggered
+	* from somewhere else than a starting point. It could happen on
+	* real hardware with BG_TILE_WIDTH value (screen "shake" because of high
+	* object redraw time + erratic behaviour from the player :))
 	jbsr	force_all_screen_redraw
 	
 	rts
@@ -3267,9 +3280,19 @@ update_bg_tile:
 	move.w	d7,d1
 	subq.w	#1,d1		| first row is not shown with y scroll = 0
 	and.w	#0x1F,d1	| modulus 0x20
+	tst.b	must_mirror_y_tiles
+	jeq		666f
 	cmp.w	#0x10,d1
 	scs		d6			| repeat tile draw if Y tile  < 0x10
-
+	jra		667f
+666:
+	* full horizontal level: don't draw anything below tile 0x10, don't mirror
+	sf		d6
+	cmp.w	#0x10,d1
+	jcs		667f
+	* do nothing, this tile will never be shown
+	rts
+667:
 	* updating bitplanes
 	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
 	move.l	#BG_SCREEN_PLANE_SIZE,d5
@@ -3420,8 +3443,7 @@ update_bg_tile:
 	.endif
 	move.w	#NB_BG_PLANES-1,d4
 0:
-	jsr		(a0)
-	rts
+	jmp		(a0)
 
 standard_tile16:
 
@@ -4525,7 +4547,7 @@ osd_sound_start:
 	move.w	(2,a0,d0.w),d1
 	move.l	(4,a0,d0.w),a0
 	lea		_custom,a6
-	tst.w	d1
+	tst		d1
 	jeq	3f
 	
 	* looped sound
@@ -5141,7 +5163,7 @@ flip_flop:
 	.byte	0
 bank_value:
 	.byte	0
-higher_gfxset:
+must_mirror_y_tiles:
 	.byte	0
 current_rom_bank:
 	.byte	0
@@ -5149,6 +5171,16 @@ p1_joystick_slot:
 	.byte	1
 p2_joystick_slot:
 	.byte	0
+	
+* this table indicates the tile engine if Y mirror is needed
+mirror_y_tile_table:
+	.byte	0       | level 1 graveyard
+	.byte	1       | level 2 town 
+	.byte	1       | level 3 cave
+	.byte	0       | level 4 bridge
+	.byte	1       | level 5 castle 1
+	.byte	1       | level 6 castle 2
+	.byte	0       | map
 	.align	2
 
 rows_table:

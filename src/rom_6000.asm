@@ -67,6 +67,7 @@ sound_index_3a00 = $3a00
 game_in_play_0028 = $28
 level_music_index_00bd = $bd
 player_score_0068 = $68
+game_first_loop_done_007f = $7f
 
 SND_STOP_00 = $00
 SND_UNKNOWN_FF = $FF 
@@ -1246,7 +1247,7 @@ attract_mode_6a8d:
 
 6AAB: CC 01 1B    LDD    #$011B
 6AAE: BD 69 09    JSR    $6909
-6AB1: BD 6C 03    JSR    $6C03
+6AB1: BD 6C 03    JSR    set_player_game_start_values_6c03
 6AB4: D6 20       LDB    counter_16_bit_0020
 6AB6: C4 0C       ANDB   #$0C
 6AB8: 8E 6A F0    LDX    #$6AF0
@@ -1401,6 +1402,8 @@ start_game_screen_6b5e:
 6BFE: 0F 05       CLR    sub_state_0005
 6C00: 0F 08       CLR    sub_sub_state_0008
 6C02: 39          RTS
+
+set_player_game_start_values_6c03:
 6C03: 8E 40 00    LDX    #bank_address_4000
 6C06: 9F 6C       STX    background_screen_location_006c
 6C08: C6 01       LDB    #$01
@@ -1410,8 +1413,8 @@ start_game_screen_6b5e:
 6C0F: DD 61       STD    $61
 6C11: D7 71       STB    game_intro_played_0071
 6C13: D7 80       STB    $80
-6C15: D7 72       STB    current_level_0072
-6C17: D7 7F       STB    $7F
+6C15: D7 72       STB    current_level_0072			; first level, re-cleared at 7AF2!
+6C17: D7 7F       STB    game_first_loop_done_007f		; first loop of 2 loops to complete game
 6C19: 8D 18       BSR    $6C33
 6C1B: 5F          CLRB
 6C1C: D7 81       STB    $81
@@ -1750,7 +1753,7 @@ init_new_game_70fb:
 7106: BD 69 09    JSR    $6909
 7109: CC 00 00    LDD    #$0000
 710C: BD 69 09    JSR    $6909
-710F: BD 6C 03    JSR    $6C03
+710F: BD 6C 03    JSR    set_player_game_start_values_6c03
 7112: 0C 05       INC    sub_state_0005	; now run game
 7114: 39          RTS
 
@@ -2038,7 +2041,7 @@ take_a_key_level_complete_72c9:
 7368: 0F 0B       CLR    sub_sub_sub_state_000b
 736A: 0F 0E       CLR    $0E
 736C: 39          RTS
-736D: D6 7F       LDB    $7F
+736D: D6 7F       LDB    game_first_loop_done_007f
 736F: 26 10       BNE    $7381
 7371: D6 71       LDB    game_intro_played_0071
 7373: 5A          DECB
@@ -2048,7 +2051,7 @@ take_a_key_level_complete_72c9:
 737C: 0F 0B       CLR    sub_sub_sub_state_000b
 737E: 0F 0E       CLR    $0E
 7380: 39          RTS
-7381: D6 7F       LDB    $7F
+7381: D6 7F       LDB    game_first_loop_done_007f
 7383: C1 02       CMPB   #$02
 7385: 10 26 0B 53 LBNE   $7EDC
 7389: D6 0B       LDB    sub_sub_sub_state_000b
@@ -2095,7 +2098,7 @@ take_a_key_level_complete_72c9:
 73F3: C6 01       LDB    #$01
 73F5: D7 DE       STB    tiles_palette_change_command_00de
 73F7: 0F 71       CLR    game_intro_played_0071
-73F9: 0F 7F       CLR    $7F
+73F9: 0F 7F       CLR    game_first_loop_done_007f
 73FB: 20 49       BRA    $7446
 73FD: 39          RTS
 73FE: BD F7 88    JSR    $F788
@@ -2126,7 +2129,7 @@ take_a_key_level_complete_72c9:
 743C: DF 09       STU    $09
 743E: 26 0E       BNE    $744E
 7440: C6 01       LDB    #$01
-7442: D7 7F       STB    $7F
+7442: D7 7F       STB    game_first_loop_done_007f
 7444: D7 71       STB    game_intro_played_0071
 7446: 0F 72       CLR    current_level_0072
 7448: 0F 08       CLR    sub_sub_state_0008
@@ -3356,7 +3359,7 @@ devil_takes_girl_7d80:
 7FB2: 6C 13       INC    -$D,X
 7FB4: 39          RTS
 7FB5: C6 02       LDB    #$02
-7FB7: D7 7F       STB    $7F
+7FB7: D7 7F       STB    game_first_loop_done_007f
 7FB9: 0F 0B       CLR    sub_sub_sub_state_000b
 7FBB: 39          RTS
 7FBC: 96 0E       LDA    $0E
@@ -12965,7 +12968,7 @@ DD6B: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
 DD73: BD 7A 66    JSR    $7A66
 DD76: BD 79 7E    JSR    $797E
-DD79: 0D 7F       TST    $7F
+DD79: 0D 7F       TST    game_first_loop_done_007f
 DD7B: 27 05       BEQ    $DD82
 DD7D: BD 7A 34    JSR    $7A34
 DD80: 20 03       BRA    $DD85
@@ -12977,7 +12980,7 @@ DD8B: 39          RTS
 DD8C: C6 02       LDB    #$02
 DD8E: E7 1F       STB    -$1,X
 DD90: CE E9 4C    LDU    #$E94C
-DD93: D6 7F       LDB    $7F
+DD93: D6 7F       LDB    game_first_loop_done_007f
 DD95: 26 03       BNE    $DD9A
 DD97: CE E9 48    LDU    #$E948
 DD9A: EF 03       STU    $3,X
@@ -17285,7 +17288,7 @@ jump_table_6188:
 	dc.w	$5347	; $619a from bank 3 
 	dc.w	$52FB	; $619c all <$6000 from bank 3 ofc
 	dc.w	copy_highscores_53a3	; $619e
-	dc.w	$53F4	; $61a0
+	dc.w	add_to_score_53f4	; $61a0
 	dc.w	compute_and_display_time_52b9	; $61a2
 	dc.w	$54E3	; $61a4
 	dc.w	$5910	; $61a6

@@ -1,11 +1,9 @@
 - 25 or 50 hz by default?
 - RE only one loop (use MAME snapshots maybe when killing monster)
 - little hearts when princess is freed (parasite sprite issues)
-- level 3 still tile issues (part 2, hard left after big ladder, only seen on real hw)
-- real hardware sometimes scrolling seems to reset. Increase delta x scroll to trigger full refresh
+- level 3 still tile issues (part 2, hard left after big ladder, only seen on real hw): to test real hw
+- real hardware sometimes scrolling seems to reset. Increase delta x scroll to trigger full refresh: to test real hw
 - continue play: part of the map is black
-- intro: music stops as soon as player wears armour (regression!)
-- fix some sfx on channel 3, elaborate sound priorities
 - after level 7 is completed once, no music at all in levels 1 and 2 after looping
 - sprites clipped too low (devil on level 5, player level 2 on towers?): mockup it!
 - dynamic palette level 4 to test (flames): change_a_few_colors_ee44
@@ -22,7 +20,6 @@
   0x4B4 and next colors: try to get sheet D correct. 0x9A life tile. Why frame has black ?? should be transparent
   palette to separate black from background: make it magenta on all sheets to extract black properly.
   maybe just brute convert black to magenta, then adjust the frame & lives icon, the others don't need black
-- depending on the level, do not mirror Y (intro, level 1, level 4, level 7 don't need it)
 - check if game tries to load music from level 1 to 2 or if it's cached
 - bottom left life icon not erased by "credit" message
 - log tiles (per level): with zone filtering (first level only upper part) or just clean the log by dumping game memory
@@ -30,7 +27,7 @@
 - start at level 5: tries to load level 2 then loads level 5
 - scrolling and double buffering can it be improved?
 
-
+- elaborate sound priorities
 - diff with world version 3 see if the fixes are visible
 - add foreground tiles (grass, bridge)
 - option to start without music, in which case all sounds except a given list should use automatic channel

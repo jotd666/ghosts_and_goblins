@@ -6,6 +6,7 @@
 	.global invincible_flag
 	.global start_level_flag
 	.global skip_intro_flag
+	.global skip_first_loop_flag
 	.global vb_ticks_count
 	.global break_at_startup_flag
 	.global log_ptr
@@ -65,6 +66,8 @@ invincible_flag:
 infinite_lives_flag:
 	.byte	0
 infinite_time_flag:
+	.byte	0
+skip_first_loop_flag:
 	.byte	0
 music_off_flag:
 	.byte 	0

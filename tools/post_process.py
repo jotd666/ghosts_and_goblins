@@ -172,7 +172,7 @@ write_framed_weapon_523f
 l_5347
 l_52fb
 copy_highscores_53a3
-l_53f4
+add_to_score_53f4
 compute_and_display_time_52b9
 l_58ce
 l_54e3
@@ -289,6 +289,9 @@ for i,line in enumerate(lines):
         line = change_instruction("addq.w\t#4*2,sp   | pop up both d1 pushes",lines,i)
     elif address == 0xff0e:
         line = change_instruction("add.w\t#4*3,sp   | pop up 3 dx pushes",lines,i)
+    elif address == 0x6C17:
+        # change value of B so game will go straight to second loop (no more "this room is an illusion" shit)
+        line = "\tmove.b\tskip_first_loop_flag,d1\n\tneg.b\td1\n"+line
     elif address == 0x7AF2:
         line = "\tmove.b\tstart_level_flag,d0\n"+change_instruction("OP_W_ON_DP_ADDRESS    move,current_level_0072,d0",lines,i)
     elif address == 0x7183:

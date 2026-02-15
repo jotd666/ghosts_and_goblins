@@ -483,7 +483,7 @@ copy_highscores_53a3:
 53F3: 39          RTS
 
 ; when game starts scoring
-l_53f4:
+add_to_score_53f4:
 53F4: 96 28       LDA    $28
 53F6: 27 FB       BEQ    $53F3
 53F8: 34 40       PSHS   U
