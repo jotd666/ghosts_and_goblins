@@ -525,7 +525,7 @@ _user:
 	sne		infinite_lives_flag
 	btst	#2,d0
 	sne		infinite_time_flag
-	btst	#2,d0
+	btst	#3,d0
 	sne		skip_first_loop_flag
 	move.b	d0,d1
 	and.b	#3,d1
@@ -837,6 +837,16 @@ demo_game:
 	move.b	(a0)+,(a1)+
 	jne		0b
 	
+	lea	bank3_4000,A1
+	move.b	#0x53,(0xEFA,a1)		| fix "PROGRES"
+	move.b	#0x45,(0xF80,a1)		| fix "STRONGTH"
+	* change bogus message to "YOU FEEL STRENGTH WELLING UP IN YOU"
+	lea		(0xF90,a1),a0
+	move.l	#0x0B555020,(a0)+
+	move.l	#0x494E2059,(a0)+
+	move.l	#0x4F552020,(a0)+
+	move.b	#0x20,(a0)
+	
 	* install bank 4 in 0x4000, we may as well use that space
 	* plus it allows simpler code ex at 9088 where game accesses
 	* ROM or bank ROM in bank 4
@@ -923,10 +933,38 @@ osd_colors_cycled:
 	jbsr	cycle_colors
 	jra		10f
 0:
-	cmp.b	#4,(current_level_0072,a6)		| bridge
+	move.b	#0,0x110
+	cmp.b	#3,(current_level_0072,a6)		| bridge
 	jne		10f
 	* bridge
-	
+	move.w	#0x21,d0
+	move.b	(a0,d0.w),d2
+	lsl.w	#8,d2
+	move.b	(0x40,a0,d0.w),d2
+	swap	d2
+	move.w	#0x23,d0
+	move.b	(a0,d0.w),d2
+	lsl.w	#8,d2
+	move.b	(0x40,a0,d0.w),d2
+	move.w	#0x23,d0
+	move.b	(a0,d0.w),d2
+	lsl.w	#8,d2
+	move.b	(0x40,a0,d0.w),d2
+
+
+	* there are 3 possibilities
+	moveq	#0,d0
+	cmp.l	#0xA030A030,d2	| first color combo
+	jeq		1f
+	moveq	#8,d0
+	cmp.l	#0xA030,d2
+	jeq		1f
+	moveq	#16,d0
+	*cmp.l	#0xA0300000,d2
+	*jeq		1f
+1:
+	lea		bridge_color_table,a2
+	jbsr	cycle_colors	
 10:
 	movem.l	(a7)+,d0-a6
 	rts
@@ -935,15 +973,18 @@ cycle_colors:
 	* change some colors (water animation in level 1)
 	lea		dyn_color_indexes,a0
 	add.w	d0,a2
-	moveq	#2,d3
 	lea		copperlist_colors+4,a1		| skip bplcon3
 2:
 	move.w	(a0)+,d0		| color index times 4
+	jmi		3f
 	move.w	(a2)+,d1
 	move.w	d1,(2,a1,d0.w)		| change color in copperlist
-	dbf		d3,2b
+	jra		2b
+3:
 	rts
 	
+* the color scheme is simplified compared to the original
+* but it should work all right
 water_color_table:
 	.word	0x08A
 	.word	0x059
@@ -954,26 +995,28 @@ water_color_table:
 	.word	0x6AC
 	.word	0x059
 	.word	0x08A
-*2A:
-*2B:
-*2C:
-*2D:6AC
-*
-*2A:08A
-*2B:08A
-*2C:6AC
-*2D:000
-*
-*2A:059
-*2B:08A
-*2C:000
-*2D:6AC
-*
-*2A:08A
-*2B:08A
-*2C:6AC
-*2D:000
+bridge_color_table:
+	.word	0xA03
+	.word	0xC04
+	.word	0xF50
+	.word	0xF70
 	
+	.word	0xC04
+	.word	0xA03
+	.word	0xF70
+	.word	0xF50
+	
+	.word	0x0
+	.word	0xF50
+	.word	0x0
+	.word	0xA03
+	
+	.word	0xF50
+	.word	0x0
+	.word	0xC04
+	.word	0xF70
+
+	          
 * very important for the amiga version as it allows to detect level/context switches
 * and load the relevant parts (we can't have everything in memory)
 * on 68k non-amiga versions (if done one day) derived on this port, this could be much simpler.
@@ -1072,10 +1115,11 @@ osd_set_tile_palette:
 	move.l	bg_character_table_buffer_ptr,a0
 	jra		100b
 101:
-	addq	#4,d0
-	cmp.w	#TOTAL_NB_COLORS/2,d0
+	addq	#4,d0		| next index times 4
+	cmp.w	#TOTAL_NB_COLORS*2,d0
 	jne		100b
 102:
+	move.w	#-1,(a2)		| terminate list
 	movem.l	(a7)+,d0-a6
 	OSD_EXIT
 	rts
@@ -1093,9 +1137,10 @@ interesting_colors_level_1:
 	.word	0x06ac
 	.word	-1
 interesting_colors_level_4:
-	.word	0x008a
-	.word	0x008a
-	.word	0x008a
+	.word	0x0F70
+	.word	0x0F50
+	.word	0x0C04
+	.word	0x0A03
 	.word	-1
 	
 * < D0: context name
@@ -1792,26 +1837,23 @@ cycle_weapon:
 	movem.l	(a7)+,a6/d0
 	rts
 	
-* Z: set if not playing
+* Z: set if playing
 is_game_playing:
+	movem.l	d0/a6,-(a7)
+	GET_MEMORY_START_IN_A6
+	* if game is in "continue play", consider that game is not playing
+	* check that first
+	move.w	(0x216A,a6),d0
+	cmp.w	#0x434F,d0
+	jeq		0f
+	move.b	(global_state_0002,a6),d0
+	cmp.w	#2,d0
+1:
+	movem.l	(a7)+,d0/a6
 	rts
-	
-*	move.l	a6,-(a7)
-*	GET_MEMORY_START_IN_A6
-*	* both flags are at 1 when actual game is playing (not demo)
-*	tst.b	(game_playing_flag_36,a6)
-*	jeq		0f
-*	* game seen as "playing". But if "CONTINUE PLAY" is shown we
-*	* consider that game is not playing (so fire works to insert coins)
-*	cmp.b	#0x63,(c_address_of_continue_2949,a6)		| 'c'
-*	jeq		0f
-*	* same for in-between match player select screen
-*	cmp.b	#0x63,(0x2B6,a6)   | 'credit'
-*0:
-*	movem.l	(a7)+,a6
-	rts
-
-
+0:
+	moveq	#1,d0
+	jra		1b
 	
 * what: blits data on bg plane, no horizontal shifting (erase)
 * args:
@@ -3901,25 +3943,7 @@ osd_read_p1_inputs:
 	move.b	 player_1_controls,d0
 	rts
 
-	move.b	player_1_controls,d0
-	movem.l	d1/A0,-(a7)
-	lea		keyboard_table(pc),a0
-	tst.b	(1,a0)		| "1" key like in MAME
-	beq.b	0f
-	bclr	#BIT_START_1P,d0
-0:
-	jbsr		is_game_playing
-	jne	0f
-	move.l	joypad_1_state,d1
-	* game not playing, we can start with joypad
-	btst	#JPB_BTN_UP,d1		| "1" key like in MAME
-	beq.b	0f
-	bclr	#BIT_START_1P,d0
-0:
 
-	movem.l	(a7)+,a0/d1
-	rts
-	
 osd_read_p2_inputs:
 	st.B	d0
 	rts
@@ -4059,19 +4083,29 @@ osd_read_system:
 	st.b	detect_controllers
 	bclr	#BIT_START_2P,d0
 0:	
-*
-*	jbsr		is_game_playing
-*	jne	1f
-*	move.l	joypad_1_state,d1
-*
-*	* game not playing, we can insert coin/start with joypad
-*	btst	#JPB_BTN_RED,d1		| "5" key like in MAME
-*	jeq		0f
-*	st.b	detect_controllers
-*	bclr	#BIT_COIN1,d0
-*0:
-*
-*1:	
+
+	jbsr		is_game_playing
+	jeq	1f
+	move.l	joypad_1_state,d1
+
+	* game not playing, we can insert coin/start with joypad
+	btst	#JPB_BTN_RED,d1		| "5" key like in MAME
+	jeq		0f
+	st.b	detect_controllers
+	bclr	#BIT_COIN1,d0
+0:
+	btst	#JPB_BTN_UP,d1		| "1" key like in MAME
+	jeq		0f
+	st.b	detect_controllers
+	bclr	#BIT_START_1P,d0
+0:
+	btst	#JPB_BTN_DOWN,d1		| "2" key like in MAME
+	jeq		0f
+	st.b	detect_controllers
+	bclr	#BIT_START_2P,d0
+0:
+
+1:	
 	movem.l	(a7)+,a0/d1
 	rts
 
@@ -4123,7 +4157,15 @@ log_used_bg_tiles:
 log_any_tiles:
 	move.w	#0x800-1,d7
 0:
-	
+	tst.b	must_mirror_y_tiles
+	jne		1f
+	* if Y is > 0x10 don't log (that will be trash from previous level)
+	move.w	d7,d0
+	and.w	#0x1F,d0
+	cmp.w	#0x10,d0
+	jcs		1f
+	sub.w	#0x10,d7		| skip 10 rows
+1:
 	moveq	#0,d1
 	moveq	#0,d0
 	move.b	(a5,d7.w),d0	| tile code
@@ -4976,6 +5018,8 @@ dyn_color_indexes:
 	.word	0
 	.word	0
 	.word	0
+	.word	0
+	.word	-1
 difficulty_table:
 	.byte	0x02		| easy  from us vball!!!
 	.byte	0x03		| medium

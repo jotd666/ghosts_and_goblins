@@ -446,6 +446,9 @@ for i,line in enumerate(lines):
         line = "\ttst.b\tinvincible_flag\n\tjne\tl_f150\n"+line
     elif address == 0x77A7:
         line = "\ttst.b\tinfinite_lives_flag\n\tjne\tl_77bb\n"+line
+    elif address == 0x9bae:
+        line = "\ttst.b\tinfinite_lives_flag\n\tjne\tl_9bb6\n"+line
+
     elif address in {0x661D,0x6697,0x671c,0x6716}:
         # no need to update palette hardware registers, it takes time for nothing
         line = change_instruction("rts",lines,i)

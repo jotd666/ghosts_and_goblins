@@ -10,6 +10,7 @@ Credits:
 - IM76: music
 - PascalDe73: icons
 - Capcom: original game
+- English Amiga Board forum members: support and suggestions
 
 Instructions:
 
@@ -22,6 +23,7 @@ continue: 1P start+fire
 
 Cheat keys:
 
-F1: 
-F3: 
-F4: 
+F1: toggle invincibility
+F2: level skip
+F3: switch weapon (not visible in the HUD at once)
+F4: add to score
