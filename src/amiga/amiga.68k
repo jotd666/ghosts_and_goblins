@@ -262,7 +262,6 @@ osd_enter_\@:
 	.global osd_read_dsw2
 	.global	osd_set_bank
 	.global	osd_read_system
-	.global	osd_sound_command
 	.global	osd_read_p1_inputs
 	.global	osd_read_p2_inputs
 	
@@ -897,7 +896,6 @@ dump_and_quit:
 	.endif
 
 osd_colors_cycled:
-
 * < A0: tile palette in RAM (but shadows hardware palette)
 * format (RGB4) is: offset=$RG, offset+$40=$B0
 * I imagine that on NeoGeo we just set the palette and so be it but here we have eliminated
@@ -933,7 +931,6 @@ osd_colors_cycled:
 	jbsr	cycle_colors
 	jra		10f
 0:
-	move.b	#0,0x110
 	cmp.b	#3,(current_level_0072,a6)		| bridge
 	jne		10f
 	* bridge
@@ -967,6 +964,7 @@ osd_colors_cycled:
 	jbsr	cycle_colors	
 10:
 	movem.l	(a7)+,d0-a6
+	OSD_EXIT
 	rts
 
 cycle_colors:
@@ -4572,6 +4570,7 @@ osd_music_stop:
 	rts
 
 force_sound_stop:
+	OSD_ENTER
 	movem.l	d0-d1/a0/a6,-(a7)
 	lea		_custom,a6
 	move.b	#-1,music_track_start_number
@@ -4582,6 +4581,7 @@ force_sound_stop:
     jsr		_mt_end
 0:
 	movem.l	(a7)+,d0-d1/a0/a6
+	OSD_EXIT
 	rts
 	
 * < D0.B sound index
@@ -4965,6 +4965,7 @@ osd_log_cpu:
 	rts
 
 osd_dump_logs:
+	OSD_ENTER
 	move.w	sr,-(a7)
 	move.w	#0x2700,SR
 	movem.l	d0-a6,-(a7)
@@ -4996,6 +4997,7 @@ osd_dump_logs:
 	
     movem.l (a7)+,d0-a6
 	move.w	(a7)+,SR
+	OSD_EXIT
 	rts
 
 
