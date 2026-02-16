@@ -1004,7 +1004,7 @@ bridge_color_table:
 	.word	0xF70
 	.word	0xF50
 	
-	.word	0x0
+	.word	0xF70
 	.word	0xF50
 	.word	0x0
 	.word	0xA03
@@ -1073,7 +1073,11 @@ osd_set_tile_palette:
 	tst.b	(current_level_0072,a6)
 	jeq		2f			| level 1 all right
 	addq	#1,d0
-	jra		2f			| level 2
+	cmp.b	#1,(current_level_0072,a6)
+	jeq		2f			| level 2
+	* neither level 1 or 2. Must have used a start level cheat
+	* ignore the context load, it will load properly later
+	jra		103f
 1:
 
 	
@@ -1097,7 +1101,7 @@ osd_set_tile_palette:
 	lea		interesting_colors_level_4,a1	
 10:
 	moveq	#0,d0
-	move.w	(a1),d2		| load first interesting color, look it up
+	move.w	(a1)+,d2		| load first interesting color, look it up
 100:
 
 	move.w	(a0)+,d1
@@ -1118,6 +1122,7 @@ osd_set_tile_palette:
 	jne		100b
 102:
 	move.w	#-1,(a2)		| terminate list
+103:
 	movem.l	(a7)+,d0-a6
 	OSD_EXIT
 	rts
@@ -1231,6 +1236,12 @@ load_context:
 	tst.b	(a0,d0.w)
 	sne		must_mirror_y_tiles
 	
+	* if level 1 set (intro), pre-load level 12 music as may has been overwritten by highscore tune
+	tst.w	current_context
+	jne		0f
+	move.w	#LEVEL12_TUNE_SND*8,d0
+	jbsr	load_music_if_needed
+0:
 	* at start redraw everything
 	move.w	#START_X,game_scroll_x
 	move.w	#START_Y,game_scroll_y
@@ -4719,7 +4730,7 @@ no_tune:
 	jra		5b
 	
 load_music_if_needed:
- 	movem.l	d0/a0,-(a7)
+ 	movem.l	d0/a0/a1,-(a7)
 	lea		level_12_music,a0
 	cmp.w	#LEVEL12_TUNE_SND*8,d0
 	jeq		70f
@@ -4756,7 +4767,7 @@ load_music_if_needed:
 	move.l	#BIGGEST_MUSIC_SIZE,d0
 	jbsr	load_file
 75:
-	movem.l	(a7)+,d0/a0
+	movem.l	(a7)+,d0/a0/a1
 	rts
 	
 * all level modules have the same structure but in fact not atm...

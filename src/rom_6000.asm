@@ -68,6 +68,7 @@ game_in_play_0028 = $28
 level_music_index_00bd = $bd
 player_score_0068 = $68
 game_first_loop_done_007f = $7f
+nb_credits_0022 = $22
 
 SND_STOP_00 = $00
 SND_UNKNOWN_FF = $FF 
@@ -100,7 +101,7 @@ SND_UNKNOWN_1E = $1E
 SND_UNKNOWN_1F = $1F
 SND_UNKNOWN_20 = $20
 SND_DRAGON_WOOOS_21 = $21
-SND_UNKNOWN_22 = $22
+SND_UNKNOWN_22 = nb_credits_0022
 SND_UNKNOWN_23 = $23
 SND_UNKNOWN_24 = $24
 SND_UNKNOWN_25 = $25
@@ -881,10 +882,10 @@ update_osd_palette_671c:
 67C8: D6 E0       LDB    $E0
 67CA: C1 03       CMPB   #$03
 67CC: 26 0C       BNE    $67DA
-67CE: DC 22       LDD    $22
+67CE: DC 22       LDD    nb_credits_0022
 67D0: C3 00 01    ADDD   #$0001
 67D3: 27 05       BEQ    $67DA
-67D5: DD 22       STD    $22
+67D5: DD 22       STD    nb_credits_0022
 67D7: 7E 79 50    JMP    play_credit_sound_7950
 67DA: 39          RTS
 67DB: 8E 15 82    LDX    #$1582
@@ -948,9 +949,9 @@ update_osd_palette_671c:
 6841: 25 0B       BCS    $684E
 6843: E6 04       LDB    $4,X
 6845: 4F          CLRA
-6846: D3 22       ADDD   $22
+6846: D3 22       ADDD   nb_credits_0022
 6848: 25 02       BCS    $684C
-684A: DD 22       STD    $22
+684A: DD 22       STD    nb_credits_0022
 684C: 6F 01       CLR    $1,X
 684E: 39          RTS
 
@@ -1092,7 +1093,7 @@ game_not_playing_694d:
 6955: BD 69 CB    JSR    $69CB
 6958: 20 0A       BRA    $6964
 
-6964: D6 22       LDB    $22
+6964: D6 22       LDB    nb_credits_0022
 6966: DA 23       ORB    $23
 6968: DA 51       ORB    $51
 696A: 27 36       BEQ    $69A2
@@ -1108,8 +1109,8 @@ game_not_playing_694d:
 697D: 0D 51       TST    $51
 697F: 26 07       BNE    $6988
 6981: 1D          SEX
-6982: D3 22       ADDD   $22
-6984: DD 22       STD    $22
+6982: D3 22       ADDD   nb_credits_0022
+6984: DD 22       STD    nb_credits_0022
 6986: DD 24       STD    $24
 6988: 86 01       LDA    #$01
 698A: 97 28       STA    game_in_play_0028
@@ -1130,7 +1131,7 @@ game_not_playing_694d:
 69A5: 34 01       PSHS   CC
 69A7: 0D 51       TST    $51
 69A9: 26 04       BNE    $69AF
-69AB: 9E 22       LDX    $22
+69AB: 9E 22       LDX    nb_credits_0022
 69AD: 27 18       BEQ    $69C7
 69AF: 30 1F       LEAX   -$1,X
 69B1: 27 0A       BEQ    $69BD
@@ -1147,7 +1148,7 @@ game_not_playing_694d:
 69C7: 1C FE       ANDCC  #$FE
 69C9: 35 84       PULS   B,PC	; just pop the stack, no CC restore, B was not saved
 
-69CB: DC 22       LDD    $22
+69CB: DC 22       LDD    nb_credits_0022
 69CD: 10 93 24    CMPD   $24
 69D0: 27 18       BEQ    $69EA
 69D2: DD 24       STD    $24
@@ -1320,7 +1321,7 @@ attract_mode_6a8d:
 6B4C: D7 0B       STB    sub_sub_sub_state_000b
 6B4E: D7 0E       STB    $0E
 6B50: 0C 05       INC    sub_state_0005
-6B52: DC 22       LDD    $22
+6B52: DC 22       LDD    nb_credits_0022
 6B54: 26 07       BNE    $6B5D
 6B56: D6 51       LDB    $51
 6B58: 26 03       BNE    $6B5D
@@ -1373,7 +1374,7 @@ start_game_screen_6b5e:
 6BB1: CC 02 05    LDD    #$0205
 6BB4: BD 69 09    JSR    $6909
 6BB7: CC 02 08    LDD    #$0208
-6BBA: 9E 22       LDX    $22
+6BBA: 9E 22       LDX    nb_credits_0022
 6BBC: 30 1F       LEAX   -$1,X
 6BBE: 27 01       BEQ    $6BC1
 6BC0: 5C          INCB
@@ -2516,7 +2517,7 @@ player_dead_777c:
 786D: 34 01       PSHS   CC
 786F: D6 51       LDB    $51
 7871: 26 04       BNE    $7877
-7873: 9E 22       LDX    $22
+7873: 9E 22       LDX    nb_credits_0022
 7875: 27 08       BEQ    $787F
 7877: D6 42       LDB    $42
 7879: C5 03       BITB   #$03
@@ -2530,9 +2531,9 @@ player_dead_777c:
 7888: 27 16       BEQ    $78A0
 788A: 8D E0       BSR    $786C
 788C: 24 12       BCC    $78A0
-788E: 9E 22       LDX    $22
+788E: 9E 22       LDX    nb_credits_0022
 7890: 30 1F       LEAX   -$1,X
-7892: 9F 22       STX    $22
+7892: 9F 22       STX    nb_credits_0022
 7894: BD 6C 33    JSR    $6C33
 7897: C6 02       LDB    #$02
 7899: D7 08       STB    sub_sub_state_0008
@@ -6351,7 +6352,7 @@ table_of_jump_tables_9c98:
 9CB2: 7E 9E 40    JMP    $9E40
 9CB5: CC FF FF    LDD    #$FFFF
 9CB8: ED 88 20    STD    counter_16_bit_0020,X
-9CBB: ED 88 22    STD    $22,X
+9CBB: ED 88 22    STD    nb_credits_0022,X
 9CBE: ED 88 24    STD    $24,X
 9CC1: 39          RTS
 
@@ -15569,7 +15570,7 @@ F98D: E7 A8 1E    STB    $1E,Y
 F990: C0 10       SUBB   #$10
 F992: E7 2A       STB    $A,Y
 F994: E7 A8 16    STB    $16,Y
-F997: E7 A8 22    STB    $22,Y
+F997: E7 A8 22    STB    nb_credits_0022,Y
 F99A: DC E4       LDD    $E4
 F99C: E7 23       STB    $3,Y
 F99E: E7 27       STB    $7,Y
@@ -15676,7 +15677,7 @@ FA79: 50          NEGB
 FA7A: C0 10       SUBB   #$10
 FA7C: E7 22       STB    $2,Y
 FA7E: E7 A8 12    STB    task_pointer_0012,Y
-FA81: E7 A8 22    STB    $22,Y
+FA81: E7 A8 22    STB    nb_credits_0022,Y
 FA84: E7 A8 32    STB    $32,Y
 FA87: C0 10       SUBB   #$10
 FA89: E7 26       STB    $6,Y

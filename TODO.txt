@@ -1,12 +1,9 @@
-- big issue (cycle exact+release) completely trashed at level start (random, any level)
-  could it be the removal of sprite clipping? tile mirror?
-- water animation: red in it!
-- when loading level 1 context, also load level12.mod
+- big issue (cycle exact+release) completely trashed at level start (random, any level, not always grrrr)
 - level 3 still tile issues (part 2, hard left after big ladder, only seen on real hw): to test real hw
 - real hardware sometimes scrolling seems to reset. Increase delta x scroll to trigger full refresh: to test real hw
 - continue play: part of the map is black: not always???
-- highscore reached: doesn't load level 1 music during attract mode, stuck on highscore .mod
 - load/save highscores
+- is_game_playing probably buggy, which explains 87 credits after a game
 - CD32 version to test with release exe: ATM too much mem needed. but not including 400k music buffer will help!
   => need to record the tunes with several loops using service mode and 3F to stop sound: finish wav splitting
 - option to start without music, in which case all sounds except a given list should use automatic channel
@@ -16,11 +13,11 @@
   0x4B4 and next colors: try to get sheet D correct. 0x9A life tile. Why frame has black ?? should be transparent
   palette to separate black from background: make it magenta on all sheets to extract black properly.
   maybe just brute convert black to magenta, then adjust the frame & lives icon, the others don't need black
-- check if game tries to load music from level 1 to 2 or if it's cached
 - bottom left life icon not erased by "credit" message
-- start at level 5: tries to load level 2 then loads level 5
 - elaborate sound priorities
 - add foreground tiles (grass, bridge)
+- demo resets scroll and makes column update buggy at times
+- we should load level 1 context at the end of highscores (else tiles are garbled for a while)
 
 - 50Hz to do with blitter chaining: risk of flickering because we can't store mirrored copies
 - scrolling and double buffering can it be improved? (also in other games!)
@@ -35,13 +32,6 @@
   weapon is picked up" with a flag
 - demo: scroll resets but probably min/max scroll not recomputed properly which leads to visible scroll update: maybe solved
 
-
-- 0x38, # last boss music (resolve your battle)
-- 0x2A, # boss music (in game)
-- 0x39, # unused jingle
-- 0x29, # castle music (lev 5)
-- 0x11: unused sfx (it seems)
-- 0x32: win
 
 hacks:
 
