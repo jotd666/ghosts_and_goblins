@@ -537,10 +537,10 @@ _user:
 
 0:
 1:
-	move.b	difficulty_level+3,d0
-	and.w	#3,d0
-	lea		difficulty_table,a0
-	move.b	(a0,d0.w),difficulty_dsw
+*	move.b	difficulty_level+3,d0
+*	and.w	#3,d0
+*	lea		difficulty_table,a0
+*	move.b	(a0,d0.w),difficulty_dsw
 	
 	
 	move.b	start_level+3,start_level_flag
@@ -1131,17 +1131,6 @@ osd_set_tile_palette:
 	add.w	d0,a0
 	jra		6b
 	
-interesting_colors_level_1:
-	.word	0x008a
-	.word	0x0059
-	.word	0x06ac
-	.word	-1
-interesting_colors_level_4:
-	.word	0x0F70
-	.word	0x0F50
-	.word	0x0C04
-	.word	0x0A03
-	.word	-1
 	
 * < D0: context name
 load_context:
@@ -1151,6 +1140,8 @@ load_context:
 	rts
 0:
 	movem.l	d0-a6,-(a7)
+	jbsr	osd_disable_interrupts
+	
 	.ifne	OPT_ENABLE_LOGGING
 	* reset logged tiles
 	lea	bg_tile_log_table,a0
@@ -1247,6 +1238,8 @@ load_context:
 	move.w	#START_Y,game_scroll_y
 	move.w	game_scroll_x,previous_scroll_x
 	jbsr force_all_screen_redraw
+
+	jbsr	osd_enable_interrupts
 
 	movem.l	(a7)+,d0-a6
 	rts
@@ -3123,9 +3116,7 @@ osd_video_byte_dirty:
 	move.b	(a0),d0
 	move.l	a0,d7		| save address
 	sub.l	a6,d7
-	.ifndef	RELEASE
-	jmi		2f
-	.endif
+	jmi		osd_w_videoram_out
 
 	* we now suppose that we're in 2000-3000
 	* check that in debug mode
@@ -5052,12 +5043,18 @@ dyn_color_indexes:
 	.word	0
 	.word	0
 	.word	-1
-difficulty_table:
-	.byte	0x02		| easy  from us vball!!!
-	.byte	0x03		| medium
-	.byte	0x01		| hard
-	.byte	0x00		| very hard
 
+interesting_colors_level_1:
+	.word	0x008a
+	.word	0x0059
+	.word	0x06ac
+	.word	-1
+interesting_colors_level_4:
+	.word	0x0F70
+	.word	0x0F50
+	.word	0x0C04
+	.word	0x0A03
+	.word	-1
 
 looped_sound_enabled:
 	.long	0

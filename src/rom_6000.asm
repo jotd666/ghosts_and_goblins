@@ -434,7 +434,7 @@ change_background_62ab:
 62E2: D6 FC       LDB    $FC
 62E4: 9F FC       STX    $FC
 62E6: BD 63 78    JSR    compute_bank_address_from_b_6378
-62E9: BD 63 81    JSR    $6381
+62E9: BD 63 81    JSR    compute_screen_start_address_6381
 62EC: 33 41       LEAU   $1,U
 62EE: 32 7E       LEAS   -$2,S
 62F0: C6 04       LDB    #$04	; loop 4 times
@@ -463,12 +463,12 @@ change_background_62ab:
 631C: D6 FC       LDB    $FC
 631E: 9F FC       STX    $FC
 6320: 8D 56       BSR    compute_bank_address_from_b_6378
-6322: 8D 5D       BSR    $6381
+6322: 8D 5D       BSR    compute_screen_start_address_6381
 6324: 33 41       LEAU   $1,U
 6326: 32 7E       LEAS   -$2,S
-6328: C6 08       LDB    #$08
+6328: C6 08       LDB    #$08		; do that 8 times
 632A: E7 61       STB    $1,S
-632C: C6 08       LDB    #$08
+632C: C6 08       LDB    #$08		; do that 8 times, 64 times total
 632E: E7 E4       STB    ,S
 6330: 8D 0D       BSR    write_4_bg_tiles_633f
 6332: 6A E4       DEC    ,S
@@ -521,15 +521,17 @@ compute_bank_address_from_b_6378:
 637E: 30 8B       LEAX   D,X
 6380: 39          RTS
 
+compute_screen_start_address_6381:
 6381: CE 28 0F    LDU    #$280F
 6384: D6 FF       LDB    $FF
 6386: C5 01       BITB   #$01
 6388: 27 04       BEQ    $638E
-638A: 33 C9 02 00 LEAU   $0200,U
+638A: 33 C9 02 00 LEAU   $0200,U	; starts right half
 638E: C5 20       BITB   #$20
 6390: 27 03       BEQ    $6395
-6392: 33 C8 10    LEAU   $10,U
+6392: 33 C8 10    LEAU   $10,U		; starts bottom half
 6395: 39          RTS
+
 6396: E6 13       LDB    -$D,X
 6398: 58          ASLB
 6399: CE 63 9E    LDU    #jump_table_639e
