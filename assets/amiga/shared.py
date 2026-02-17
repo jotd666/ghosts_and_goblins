@@ -102,7 +102,8 @@ weapons = [
 ]
 
 lower_osd_tiles = {
-0x9A,0x9B,  # lives
+0x8A,0x8B,  # lives upper
+0x9A,0x9B,  # lives lower
 } | sr(0xA0,0xD4)
 
 for w in weapons:

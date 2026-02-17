@@ -25,7 +25,7 @@ for file in ["readme.md",f"{gamename}_aga.slave"]:  #f"{gamename}.slave",
     shutil.copy(progdir / file,outdir)
 
 assets = progdir /"assets"/"amiga"
-shutil.copy(assets/"GhostNGoblinsAGA.info",outdir)
+shutil.copy(assets/"GhostsNGoblins.info",outdir)
 
 dataout = outdir / "data"
 if dataout.exists():

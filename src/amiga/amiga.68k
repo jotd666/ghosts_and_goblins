@@ -501,7 +501,7 @@ _user:
 	move.w	#16,d0
 	jbsr	load_palette
 		
-	* load palette for bottom tiles (in-game)
+	* load palette for bottom tiles (in-game), skipping first color (transparent, for sprites)
 	lea		fg_tile_lower_palette+2,a0
 	lea		osd_lower_palette,a1
 	move.w	#15,d0
@@ -1846,10 +1846,10 @@ is_game_playing:
 	* if game is in "continue play", consider that game is not playing
 	* check that first
 	move.w	(0x216A,a6),d0
-	cmp.w	#0x434F,d0
+	cmp.w	#0x434F,d0		| "CO"
 	jeq		0f
 	move.b	(global_state_0002,a6),d0
-	cmp.w	#2,d0
+	cmp.b	#2,d0
 1:
 	movem.l	(a7)+,d0/a6
 	rts
@@ -5133,13 +5133,13 @@ normal_hiscorename:
 	
 
 level_12_music:
-	.asciz	"level_12.mod"
+	.asciz	"GnG_Stage_1-2.mod"
 level_34_music:
-	.asciz	"level_34.mod"
+	.asciz	"GnG_Stage_3-4.mod"
 level_56_music:
-	.asciz	"level_56.mod"
+	.asciz	"GnG_Stage_5-6.mod"
 level_7_music:
-	.asciz	"level_7.mod"
+	.asciz	"GnG_Stage_7-END.mod"
 first_place_music:
 	.asciz	"first_place.mod"
 first_place_jingle_music:
@@ -5148,6 +5148,8 @@ second_place_music:
 	.asciz	"second_place.mod"
 second_place_jingle_music:
 	.asciz	"jingle_second_place.mod"
+cd32_music:
+	.asciz	"GnG_Stage_CD32.mod"
 	
 
 	.align	2

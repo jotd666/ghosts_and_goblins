@@ -458,7 +458,7 @@ for i,tsd in fg_tile_sheet_dict.items():
     name_dict=None)
 
     # we need to separate the palettes for OSD because 1) there are too many of them and quantize sucks
-    # and 2) the colors of the weapons in the panel is
+    # and 2) the colors of the weapons in the panel is dynamic
 
     upper_tile_set = [None] * len(tile_set)
     lower_tile_set = [None] * len(tile_set)
@@ -479,11 +479,16 @@ for i,tsd in fg_tile_sheet_dict.items():
 # pad
 if len(fg_tile_upper_palette)>16:
     print(f"Too many colors in fg upper tiles ({len(fg_tile_upper_palette)}), quantizing")
-    fg_replacement_dict = quantize_palette(fg_tile_upper_palette,"foreground_upper_tiles",16,transparent=None,dump_it=dump_it)
+    fg_replacement_dict = quantize_palette(fg_tile_upper_palette,"foreground_upper_tiles",16,transparent=magenta,dump_it=dump_it)
     apply_color_replacement(fg_tile_upper_set_list,fg_replacement_dict)
     fg_tile_upper_palette = sorted(set(fg_replacement_dict.values()))
 else:
     fg_tile_upper_palette = sorted(fg_tile_upper_palette)
+
+# magenta first
+fg_tile_upper_palette.remove(magenta)
+fg_tile_upper_palette.insert(0,magenta)
+
 
 if len(fg_tile_lower_palette)>16:
     # this is going to be hell to find matching colors for dynamic color changes
@@ -503,9 +508,10 @@ else:
     # place reference colors first: remove them from list to add them later
     for r in rgb32:
         fg_tile_lower_palette.remove(r)
+    fg_tile_lower_palette.remove(magenta)
 
     # sort: zero first, then respect order of original image palette (important!!)
-    fg_tile_lower_palette = [(0, 0, 0)] + rgb32[:3] + list(fg_tile_lower_palette)
+    fg_tile_lower_palette = [magenta] + rgb32[:3] + [(0,0,0)] + list(fg_tile_lower_palette)
 
     if dump_it:
         bitplanelib.palette_dump(fg_tile_lower_palette,dump_dir / "fg_lower_palette.png",bitplanelib.PALETTE_FORMAT_PNG)
@@ -632,7 +638,7 @@ for i,tsd in sprite_sheet_dict.items():
             name = get_sprite_names().get(j)
             if name and name.startswith("frog"):
                 bitplanelib.replace_color_from_dict(tile,frog_colors_replacement_dict)
-                tile.save(name+f"{j}.png")
+                #tile.save(name+f"{j}.png")
     sprite_set_list.append(tile_set)
     sprite_palette.update(tp)
 
