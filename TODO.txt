@@ -1,25 +1,20 @@
-- boss 34/boss 56 and all others shifted by 1 pattern: IM76 on it
-- replace door opening by real sound?
-- level 3 still tile issues (part 2, hard left after big ladder, only seen on real hw): to test real hw
+- after continue play: load level 1 again if counter reaches 0 (some RE to do)
+- level 3 still tile issues (part 2, hard left after big ladder, even on emulation, try to reproduce as not systematic)
 - real hardware sometimes scrolling seems to reset. Increase delta x scroll to trigger full refresh: to test real hw
 - continue play: part of the map is black: not always???
 - load/save highscores
 - don't play a tune if same module / same pattern already playing (avoids to repeat music when there's a E8 trigger)
-- is_game_playing probably buggy, which explains 87 credits after a game: fixed test again
-- CD32 version to test with release exe: ATM too much mem needed. but not including 400k music buffer will help!
+- CD32 version to test with release exe: works with 1E0000 base chip!!
   => need to record the tunes with several loops using service mode and 3F to stop sound: finish wav splitting
-- option to start without music, in which case all sounds except a given list should use automatic channel
-  => use that in CD32
+  => put cdplay, cdstop functions at start (offset 4,8) so game can call them, cd32slave is easy to code
 - implement dip difficulty
-- fg layer: Black!=transparent (shadow color black = 0x4B4)
-  0x8A/0x9A life tile. Why frame has black and life tile has transparent for black!!!!
 - bottom left life icon not erased by "credit" message
-
 - 50Hz to do with blitter chaining: risk of flickering because we can't store mirrored copies
+
+
 - try to apply patches to fix some original game bugs / difficulty level HP for monsters
 - scrolling and double buffering can it be improved? (also in other games!)
 - add foreground tiles (grass, bridge)
-- we should load level 1 context at the end of highscores (else tiles are garbled for a while)
 - demo resets scroll and makes column update buggy at times
 - level 2 see if we can use dynamic color change, see if separating ice towers from rest of game tiles (except house right after)
   allows a neat 32+32 colors. In that case, it's doable to use dynamic color change on some colors
@@ -67,5 +62,6 @@ bpset 7A4D,,{PC=7945;g}
 bpset 8FCE,,{PC=8FD1;g}
 
 longplay: https://www.youtube.com/watch?v=SaqtjNWOESs&t=2557s
+japanese longplay: https://youtu.be/DwemSrKpchA
 vgms: https://vgmrips.net/packs/pack/ghosts-n-goblins-arcade
 strategy: https://strategywiki.org/wiki/Ghosts_%27n_Goblins/Stage_1

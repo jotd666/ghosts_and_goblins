@@ -39,9 +39,10 @@ def merge(used_name,nb_items,nb_cluts):
                 code,clut = divmod(i,nb_cluts)
                 print(f"{used_name}: New: code={code:02x}, clut={clut:02x}")
 
+
     with open(merged_path_file / used_name,"wb") as f:
         f.write(contents)
 
-#merge("fg_used_tiles",0x400,16)
+merge("fg_used_tiles",0x400,16)
 #merge("level2/bg_used_tiles",0x400,8)
-merge("used_sprites",0x400,4)
+#merge("used_sprites",0x400,4)

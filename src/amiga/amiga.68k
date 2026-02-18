@@ -4,7 +4,17 @@
 * (c) JOTD 2026
 *
 OPT_BLIT_CHAIN_MODE = 0
+OPT_CD32_VERSION = 1
 
+	.ifne	OPT_CD32_VERSION
+boot:
+	bra.w	start	| don't optimize to bra.b or jra!!
+	* 2 functions that need to be at 4, 8
+cd32_track_play:
+	.long	0
+cd32_track_stop:
+	.long	0
+	.endif
 start:
 	move.l	a7,old_stack
 	jra		_user
@@ -30,6 +40,7 @@ AFB_68020 = 1
 
 *NO68020 = 1
 
+
 NB_PLAYFIELD_PLANES = 6  | this is externally defined!!
 	.ifndef	NB_PLAYFIELD_PLANES
 	.error	"NB_PLAYFIELD_PLANES must be defined via --defsym"
@@ -54,8 +65,12 @@ GAME_MAX_SCROLL_Y = 0x200
 BG_TILE_WIDTH = 16
 
 BG_TILE_MAX_SIZE = 0x14000
-BIGGEST_MUSIC_SIZE = 411000
-
+	.if		OPT_CD32_VERSION==0
+BIGGEST_MUSIC_SIZE = 385000
+	.else
+BIGGEST_MUSIC_SIZE = 96000
+	.endif
+	
 SCORE_FILE_SIZE = 0x23		| wrong
 
 LOG_BUFFER_SIZE = 0x100000
@@ -550,6 +565,12 @@ _user:
 	seq		frameskip
 	btst	#1,d1
 	sne		skip_intro_flag
+	btst	#2,d1
+	sne		no_level_music_flag
+	.ifne	OPT_CD32_VERSION
+	* force the flag
+	st		no_level_music_flag
+	.endif
 
 
 	move.l	cheat_flags,d0
@@ -873,13 +894,21 @@ demo_game:
 	jbsr	cache_bg_tiles_address
 
 	* load level 1 music
+	.ifeq	OPT_CD32_VERSION
 	lea		level_12_music,a0
+	.else
+	lea		cd32_music,a0
+	.endif
 	move.l	a0,current_music_name
 	lea		module_buffer,a1
 	move.l	#BIGGEST_MUSIC_SIZE,d0
 	jbsr	load_file
 	
-	
+	tst.b	no_level_music_flag
+	jeq		0f
+	jbsr	make_automatic_sound_channels
+0:
+
 	moveq	#0,d0
 	jbsr	osd_set_bank
 	GET_MEMORY_START_AND_DP	
@@ -895,6 +924,34 @@ dump_and_quit:
 	illegal
 	.endif
 
+make_automatic_sound_channels:
+	* if music is off, set most sounds in automatic channel
+	lea		sound_table,a0
+	moveq	#0,d1
+1:
+	st	d2
+	* skip those, leave in fixed channel else they saturate the channels
+	cmp.w	#SHOT_FIRED_06_SND,d1
+	jeq		0f
+	cmp.w	#ENEMY_HIT_1A_SND,d1
+	jeq		0f
+	cmp.w	#SHIELD_FLYING_1F_SND,d1
+	jne		2f
+	move.b	#1,d2		| switch to channel 1
+2:
+	move.w	(a0),d0
+	cmp.w	#1,d0
+	jne		0f
+	move.l	(4,a0),a1	| pointer on sound
+	
+	move.b	d2,(10,a1)	| change sound channel
+0:
+	add.w	#8,a0		| sound entry size
+	addq	#1,d1
+	cmp.w	#0x3F,d1
+	jne		1b
+	rts
+	
 osd_colors_cycled:
 * < A0: tile palette in RAM (but shadows hardware palette)
 * format (RGB4) is: offset=$RG, offset+$40=$B0
@@ -1500,6 +1557,7 @@ call_nmi:
 	
 	jra	irq_65c4
 	
+
 * just in case some hardware calls nmi
 _nmi:
 	move.w	#0x7FFF,_custom+intreq
@@ -1523,6 +1581,8 @@ level3_interrupt:
 	* music
 	tst.b	_mt_E8Trigger
 	jeq		0f
+	cmp.b	#2,_mt_E8Trigger
+	jeq		777f
 	* trigger: map/level start music ended: time to start level music
 	* if queued
 	clr.b	_mt_E8Trigger
@@ -1532,6 +1592,17 @@ level3_interrupt:
 	clr.b	play_level_1_tune_after_music_stop
 	move.w	#LEVEL12_TUNE_SND,d0
 	jbsr	osd_sound_start
+	jra		0f
+777:
+	clr.b	_mt_E8Trigger
+	* high score entry tune ended: load current level music
+	* (don't play it)
+	moveq	#0,d0
+	move.b	(current_level_0072,a6),d0
+	lea		current_level_music_table,a0
+	add.w	d0,d0
+	move.w 	(a0,d0.w),d0
+	jbsr	load_music_if_needed
 0:
 	tst.b	detect_controllers
 	jeq	0f
@@ -4730,8 +4801,22 @@ no_tune:
 	jra		5b
 	
 load_music_if_needed:
- 	movem.l	d0/a0/a1,-(a7)
-	lea		level_12_music,a0
+	movem.l	d0/a0/a1,-(a7)
+	tst.b	no_level_music_flag
+	jeq		0f
+	* no music: don't load level tunes
+ 	lea		cd32_music,a0
+	cmp.w	#LEVEL12_TUNE_SND*8,d0
+	jeq		70f
+	cmp.w	#LEVEL34_TUNE_SND*8,d0
+	jeq		70f
+	cmp.w	#LEVEL56_TUNE_SND*8,d0
+	jeq		70f
+	cmp.w	#BOSS7_RESOLVE_TUNE_SND*8,d0
+	jeq		70f
+	jra		1f
+0:
+ 	lea		level_12_music,a0
 	cmp.w	#LEVEL12_TUNE_SND*8,d0
 	jeq		70f
 	lea		level_34_music,a0
@@ -4743,6 +4828,7 @@ load_music_if_needed:
 	lea		level_7_music,a0
 	cmp.w	#BOSS7_RESOLVE_TUNE_SND*8,d0
 	jeq		70f
+1:
 	lea		first_place_music,a0
 	cmp.w	#FIRST_PLACE_TUNE_SND*8,d0
 	jeq		70f
@@ -4771,22 +4857,17 @@ load_music_if_needed:
 	rts
 	
 * all level modules have the same structure but in fact not atm...
-* Pattern 0-2     = Game music
-* Pattern 4        = empty block in loop
-* Pattern 8        = Low time
-* Pattern 11      = Open gate sfx
-* Pattern 12-15 = Dragon boss music	
-	
-* Pattern 0-x     = Game music
-
-* levels 1-2:
-* Pattern 7        = death
-* Pattern 9     = game over 
-* Pattern B        = Map
-* Pattern C        = Low time
-* Pattern D        = boss
-* Pattern F   = stage clear
-* Pattern 11   = Open gate sfx
+* 0-9              stage music + boss
+* 10               empty block in loop      
+* 11               low time                 
+* 12               death                    
+* 13               MAP                     
+* 14-15          game over                
+* 16-17          Key         
+* 
+* (only last boss mod)             
+* 16                bad ending
+* 17-22           good ending
 	
 
 quit_to_os:
@@ -5151,8 +5232,16 @@ second_place_jingle_music:
 cd32_music:
 	.asciz	"GnG_Stage_CD32.mod"
 	
-
 	.align	2
+current_level_music_table:	
+	.word	LEVEL12_TUNE_SND*8
+	.word	LEVEL12_TUNE_SND*8
+	.word	LEVEL34_TUNE_SND*8
+	.word	LEVEL34_TUNE_SND*8
+	.word	LEVEL56_TUNE_SND*8
+	.word	LEVEL56_TUNE_SND*8
+	.word	BOSS7_RESOLVE_TUNE_SND*8
+	
 
 bg_tile_xy2address_cache:
 	.skip	0x800
@@ -5208,6 +5297,8 @@ dip_switches_2:
 	.byte	0
 ntsc_flag:
 	.byte 	0
+no_level_music_flag:
+	.byte	0
 mid_screen_interrupt_count:
 	.byte	0
 	.align	2

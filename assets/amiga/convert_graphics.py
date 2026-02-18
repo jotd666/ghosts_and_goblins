@@ -225,7 +225,7 @@ plane_orientations = [("standard",lambda x:x),
 ("mirror",ImageOps.mirror),
 ("flip_mirror",lambda x:ImageOps.flip(ImageOps.mirror(x)))]
 
-def read_tileset(img_set_list,palette,plane_orientation_flags,cache,is_bob,nb_cluts,next_cache_id = 1):
+def read_tileset(img_set_list,palette,plane_orientation_flags,cache,is_bob,nb_cluts,mask_color,next_cache_id = 1):
     nb_planes = int(math.log2(len(palette)))
 
     tile_table = []
@@ -256,7 +256,7 @@ def read_tileset(img_set_list,palette,plane_orientation_flags,cache,is_bob,nb_cl
                             y_start,wtile = bitplanelib.autocrop_y(wtile,mask_color=magenta)
                             height = wtile.size[1]
                             width = wtile.size[0]//8 + 2
-                            bitplane_data = bitplanelib.palette_image2raw(wtile,None,palette,generate_mask=True,mask_color=magenta)
+                            bitplane_data = bitplanelib.palette_image2raw(wtile,None,palette,generate_mask=True,mask_color=mask_color)
                             # add sprite data if eligible: player frame, not mirrored
 
 ##                            if i in possible_hw_sprites:
@@ -270,7 +270,7 @@ def read_tileset(img_set_list,palette,plane_orientation_flags,cache,is_bob,nb_cl
                             height = 8
                             width = 1
                             y_start = 0
-                            bitplane_data = bitplanelib.palette_image2raw(wtile,None,palette)
+                            bitplane_data = bitplanelib.palette_image2raw(wtile,None,palette,mask_color=mask_color)
 
                         plane_size = len(bitplane_data) // actual_nb_planes
                         bitplane_plane_ids = []
@@ -598,7 +598,8 @@ for context in context_list:
                 json.dump(bg_tile_cluts_dict,f,indent=2)
 
     bg_tile_plane_cache = {}
-    bg_tile_table,_ = read_tileset(bg_tile_set_list,bg_tile_palette,[True,False,False,False],cache=bg_tile_plane_cache, is_bob=False, nb_cluts=BG_NB_CLUTS)
+    bg_tile_table,_ = read_tileset(bg_tile_set_list,bg_tile_palette,[True,False,False,False],cache=bg_tile_plane_cache,
+    is_bob=False, nb_cluts=BG_NB_CLUTS, mask_color=(0,0,0))
 
     map_context = context == "map"
 
@@ -680,9 +681,9 @@ empty_32_cols = [(1,1,1)]*len(bg_tile_palette)
 
 tile_plane_cache = {}
 bob_plane_cache = {}
-fg_tile_upper_table,next_id = read_tileset(fg_tile_upper_set_list,fg_tile_upper_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=FG_NB_CLUTS)
-fg_tile_lower_table,_ = read_tileset(fg_tile_lower_set_list,fg_tile_lower_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=FG_NB_CLUTS, next_cache_id = next_id)
-sprite_table,_ = read_tileset(sprite_set_list,empty_32_cols+sprite_palette,[True,False,False,False],cache=bob_plane_cache, is_bob=True, nb_cluts=SPRITE_NB_CLUTS)
+fg_tile_upper_table,next_id = read_tileset(fg_tile_upper_set_list,fg_tile_upper_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=FG_NB_CLUTS, mask_color=magenta)
+fg_tile_lower_table,_ = read_tileset(fg_tile_lower_set_list,fg_tile_lower_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=FG_NB_CLUTS, mask_color=magenta, next_cache_id = next_id)
+sprite_table,_ = read_tileset(sprite_set_list,empty_32_cols+sprite_palette,[True,False,False,False],cache=bob_plane_cache, is_bob=True, mask_color=magenta, nb_cluts=SPRITE_NB_CLUTS)
 
 
 
@@ -721,6 +722,11 @@ for i in group_sprite_quadruplets:
     gs_array[i],gs_array[i+3] = gen_codes(i)
     gs_array[i+1] = BLOCK_DISPLAY_MASK    # never display alone!
     gs_array[i+2] = BLOCK_DISPLAY_MASK    # never display alone!
+
+used_sprite_codes = set(sprite_cluts) | {i for i,g in enumerate(gs_array) if g}
+unused_sprite_codes = set(range(0,0x300))-used_sprite_codes
+# it's normal that some sprite codes aren't used at all
+print("Unused sprite codes: {}".format(",".join(sorted(f"0x{x:03x}" for x in unused_sprite_codes))))
 
 with open(src_dir / "sprite_groups.68k","w") as f:
     f.write(generated_message)

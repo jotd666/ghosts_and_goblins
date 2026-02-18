@@ -42,6 +42,7 @@ _config
 	dc.b	"C1:X:cheat keys:4;"
 	dc.b	"C2:X:50 Hz update:0;"
 	dc.b	"C2:X:skip intro/map sequence:1;"
+	dc.b	"C2:X:no level music:2;"
 
 	dc.b	"C4:L:start level:graveyard,town,cave,bridge,tower 1,tower 2,boss;"
 	dc.b	"C5:L:difficulty level:easy,normal,difficult,very difficult;"
