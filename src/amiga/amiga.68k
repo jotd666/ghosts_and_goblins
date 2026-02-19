@@ -3,7 +3,9 @@
 *
 * (c) JOTD 2026
 *
-OPT_BLIT_CHAIN_MODE = 0
+OPT_BLIT_CHAIN_MODE = 0		| enable blitter chaining
+OPT_VBLIT_MIRROR_MODE = 1		| we need to mirror sprites on the fly, just before blitting them if needed
+OPT_VBLIT_SCROLL_MODE = 1		| we need to store scrolling values else BOBs can shake
 OPT_CD32_VERSION = 0
 
 	.ifne	OPT_CD32_VERSION
@@ -46,6 +48,9 @@ NB_PLAYFIELD_PLANES = 6  | this is externally defined!!
 	.error	"NB_PLAYFIELD_PLANES must be defined via --defsym"
 	.endif
 
+
+* proportional to the number of bitplanes
+BLITTER_LIST_SIZE = 10000*NB_PLAYFIELD_PLANES
 COPPER_NOP = 0x1FE
 
 START_X = 0
@@ -1573,13 +1578,6 @@ _nmi:
 	rts
 	
 level3_interrupt:
-	.ifndef	RELEASE
-	move.l	(2,a7),interrupted_code_pc
-	.endif
-	* disable osd context switch
-	* we MUST NOT change d5 or change stack from an osd call from an interrupt
-	addq.b	#1,osd_entry_count
-    
 	movem.l d0-d7/a0-a6,-(a7)
 	lea		_custom,a5
 	move.w	(intreqr,a5),d0
@@ -1644,12 +1642,40 @@ level3_interrupt:
 	move.w	#0x20,(intreq,a5)	
 	jra	3f
 1:
-	* has to be copper: set sync
+	.ifndef	RELEASE
+	btst	#6,d0
+	jne		2f
+	BREAKPOINT	"unexpected level 3 interrupt"
+2:
+	.endif
+	* has to be blitter operation completed: handle next blit
+	* ack blitter int twice (040/pistorm bug)
+	move.w	#0x40,(intreq,a5)
+	move.w	#0x40,(intreq,a5)	
 
-	* we're going to ack copper & software interrupt now
+	
+	PROCESS_ONE_BLIT
+
+3:
+    movem.l (a7)+,d0-d7/a0-a6
+    rte
+
+
+level1_interrupt:
+ 	.ifndef	RELEASE
+	move.l	(2,a7),interrupted_code_pc
+	.endif
+	* disable osd context switch
+	* we MUST NOT change d5 or change stack from an osd call from an interrupt
+	addq.b	#1,osd_entry_count
+    movem.l d0-d7/a0-a6,-(a7)
+	lea		_custom,a5
+	move.w	(intreqr,a5),d0		| leave this, we need it for later on
+	* we're going to ack copper & software level 1 interrupt now
 	* do it twice (040/pistorm bug)
+	.rept	2
 	move.w	#0x14,(intreq,a5)
-	move.w	#0x14,(intreq,a5)
+	.endr
 
 	tst.b	pause_flag
 	jne	23f
@@ -1658,7 +1684,7 @@ level3_interrupt:
 	* declare that we're in interrupt mode so osd_disable_interrupts/osd_enable_interrupts
 	* is level 1 interrupt set? that would mean that mid-screen interrupt
 	* is the source of the interrupt
-	btst	#2,d0
+	btst	#4,d0
 	beq.b	2f
 	* mid-screen copper interrupt, must occur once every 5 times
 	* to simulate ~60 Hz on 50 Hz display
@@ -1673,8 +1699,7 @@ level3_interrupt:
 	jra		3f	| no need to update sprites we're in the middle of a frame
 2:
 
-	subq.w	#1,delay_timer
-	
+
 	jbsr	call_nmi
 	
 	
@@ -1764,7 +1789,7 @@ level3_interrupt:
 	
 	lea	_custom,a5
 	move.w	(intreqr,a5),d0
-	btst	#4,d0
+	btst	#2,d0
 	jeq		23f
 	* interrupt arrived during this interrupt: this is taking too long
 	* so skip the refresh
@@ -2845,6 +2870,7 @@ store_system:
 	move.w	dmaconr(a6),old_dmacon
 	lea		old_sysvectors,a0
 	move.l	system_vbr(pc),a1
+	move.l	(0x64,a1),(a0)+
 	move.l	(0x68,a1),(a0)+
 	move.l	(0x6c,a1),(a0)+
 	move.l	(0x70,a1),(a0)+
@@ -2861,6 +2887,7 @@ restore_system:
 	move.w	#0x4000,intena(a6)	| ints off
 	lea		old_sysvectors,a0
 	move.l	system_vbr(pc),a1
+	move.l	(a0)+,(0x64,a1)
 	move.l	(a0)+,(0x68,a1)
 	move.l	(a0)+,(0x6c,a1)
 	move.l	(a0)+,(0x70,a1)
@@ -3013,6 +3040,8 @@ platform_init:
 
 	* install keyboard and vblank/copper handler
 	move.l	system_vbr(pc),a1
+	pea		level1_interrupt(pc)
+	move.l	(a7)+,(0x64,a1)
 	pea		level2_interrupt(pc)
 	move.l	(a7)+,(0x68,a1)
 	pea		level3_interrupt(pc)
@@ -3109,11 +3138,7 @@ generate_row_table:
 	move.l	a2,a0		| next row
 	dbf		d0,0b
 	rts
-* change return address from vblank
-* D0: return address (0: no change)
-osd_set_irq_return_address:
-	move.l	d0,return_address
-	rts
+
 
 	
 	
@@ -3121,10 +3146,21 @@ osd_set_irq_return_address:
 * 60Hz VBLANK interrupt (also keyboard)
 * only called at bootup, not from interrupts (at least!!)
 osd_enable_interrupts:
-	move.w	#0xC038,_custom+intena
+	.if		OPT_BLIT_CHAIN_MODE==1
+	* enable blitter, vblank & software level 1
+	move.w	#0xC06C,_custom+intena
+	.else
+	* enable vblank & software level 1 only
+	move.w	#0xC02C,_custom+intena
+	.endif
 	rts
 osd_disable_interrupts:
-	move.w	#0x0030,_custom+intena
+	.if		OPT_BLIT_CHAIN_MODE==1
+	* leave keyboard
+	move.w	#0x0064,_custom+intena
+	.else
+	move.w	#0x0024,_custom+intena
+	.endif
 	rts
 	
 
@@ -5461,7 +5497,7 @@ temp_filename_buffer:
 mirror_table:
 	.include 	"mirror_table.68k"
 
-_end_of_ng_code:
+	DECL_BLITLISTS	BLITTER_LIST_SIZE
 		
   
 
@@ -5618,7 +5654,7 @@ fine_x_scroll_value:
 	* mid-line wait & extra interrupt
 	.word	0x8001,0xFFFE
 pal_intreq_block_game:
-	.word	 intreq,0x8014  | call copper interrupt in the middle of a frame, also flag so copper interrupt knows that we're going to call copper int
+	.word	 intreq,0x8014  | call level 1 interrupt in the middle of a frame, also flag so copper interrupt knows that we're going to call copper int
 	* here was second_rows (before I disabled it)
 	
 	* wait just before weapon displays (unless disabled in which case palette change happens in the middle
@@ -5660,7 +5696,7 @@ after_osd_lower_palette:
 	
 pal_wait:
 	*.word	xxxx
-	.word	 intreq,0x8010
+	.word	 intreq,0x8004
 
 
 

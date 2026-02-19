@@ -8,7 +8,7 @@
   => put cdplay, cdstop functions at start (offset 4,8) so game can call them, cd32slave is easy to code
 - bottom left life icon not erased by "credit" message
 
-- remove those "hhhhh" at start
+- remove those "hhhhh" at start fill_screen_with_h 
 - level 3 still tile issues (part 2, hard left after big ladder, even on emulation, try to reproduce as not systematic)
 - real hardware sometimes scrolling seems to reset. Increase delta x scroll to trigger full refresh: to test real hw
 - continue play: part of the map is black: not always???
