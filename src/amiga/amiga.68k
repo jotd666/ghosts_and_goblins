@@ -3,7 +3,7 @@
 *
 * (c) JOTD 2026
 *
-OPT_BLIT_CHAIN_MODE = 0		| enable blitter chaining
+OPT_BLIT_CHAIN_MODE = 1		| enable blitter chaining
 OPT_VBLIT_MIRROR_MODE = 1		| we need to mirror sprites on the fly, just before blitting them if needed
 OPT_VBLIT_SCROLL_MODE = 1		| we need to store scrolling values else BOBs can shake
 OPT_CD32_VERSION = 0
@@ -1722,14 +1722,58 @@ level1_interrupt:
 	eor.b	#1,flip_flop
 	jeq		23f
 0:
+	* wait for blits to complete (via soft flag that last blitter command
+	* sets when reaching the end of the list) and reset list pointers
+	NEW_BLITLIST
+	
+	* In sync blitter, the ball is drawn, then buffers are switched
+	* and current scroll makes up for ball moving in the opposite direction perfectly.
+	*
+	* In async blitter (OPT_BLIT_CHAIN_MODE==1), we use the scroll value stored in the blitter command list
+	
+	* show the newly drawn buffer THEN switch the buffers
+	* problem: frames and scroll values aren't in sync, this is visible when
+	* the ball crosses the screen, this is because we're now displaying what's been drawn
+	* at the previous frame. 
 
 	
+	.if		OPT_BLIT_CHAIN_MODE==1
 	jbsr	set_scroll_values
-	jbsr	really_update_sprites
+	jbsr	set_bobs_bitplanes
+	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
+	jbsr		switch_screen_buffers
+	.endif
+	.endif
 
-	* store current scroll values for next time, as the drawn buffer is not
-	* the displayed buffer
+	lea		_custom,a5
+	* start the chain reaction
+	tst.b	size_command_issued
+	jne		0f
+	* size command not issued: set blitter scrolling immediately
+	* no risks of bob shifting, there are no bobs on screen
+	*move.l	scroll_x_hi,blitter_scroll_x
+	*move.w	scroll_y,blitter_scroll_y
+	jra		1f
+0:
+	FORCE_PROCESS_BLITS
+1:
+	* fill the blitter command list while blitter interrupt 
+	* is processing the other blitter command list
+	* first fix the scrolling, so when it is set at the next frame, it is still coherent
+	* with the shifting that we put on BOBs to follow it (original game doesn't need that
+	* it has a separate layer for sprites, we just have crap dual playfield we cannot use here)
 
+	*WRITE_BLITTER_SCROLL_VALUES		scroll_x_hi,scroll_y FUCK
+	jbsr		really_update_sprites
+	* terminate the blitter command list
+	COMMIT_BLITLIST
+
+	.if		OPT_BLIT_CHAIN_MODE==0
+	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
+	jbsr		switch_screen_buffers
+	.endif
+	jbsr	set_bobs_bitplanes
+	.endif
 	
 	.ifndef	RELEASE
 	tst.b	osd_debug_active
@@ -2759,7 +2803,7 @@ start_process_1_plane:
 	beq.b	60f
 	move.l	d0,a4
 	add.w	d5,a4		| add Y offset
-	bra.b	61f
+	jra		61f
 60:
 	* source is 0: just apply mask (less bandwidth lost) and change bltcon
 	WRITE_BLITTER_REG_LONG	d6,bltcon0	| sets con0 and con1: C-A->D cookie cut, B fixed
