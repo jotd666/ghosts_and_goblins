@@ -69,6 +69,7 @@ level_music_index_00bd = $bd
 player_score_0068 = $68
 game_first_loop_done_007f = $7f
 nb_credits_0022 = $22
+continue_timer_000a = $a
 
 SND_STOP_00 = $00
 SND_UNKNOWN_FF = $FF 
@@ -2509,7 +2510,7 @@ player_dead_777c:
 785D: CC 02 25    LDD    #$0225
 7860: BD 69 09    JSR    $6909
 7863: C6 10       LDB    #$10
-7865: D7 0A       STB    $0A
+7865: D7 0A       STB    continue_timer_000a
 7867: 0C 08       INC    sub_sub_state_0008
 7869: 0F 0B       CLR    sub_sub_sub_state_000b
 786B: 39          RTS
@@ -2548,16 +2549,17 @@ player_dead_777c:
 78A6: D6 21       LDB    counter_8_bit_0021
 78A8: C5 3F       BITB   #$3F
 78AA: 26 20       BNE    $78CC
-78AC: 96 0A       LDA    $0A
+78AC: 96 0A       LDA    continue_timer_000a
 78AE: 8B 99       ADDA   #$99
 78B0: 19          DAA
-78B1: 97 0A       STA    $0A
+78B1: 97 0A       STA    continue_timer_000a
 78B3: 8E 21 EF    LDX    #$21EF
 78B6: 10 8E 00 0A LDY    #$000A
 78BA: C6 03       LDB    #$03
 78BC: BD 50 51    JSR    write_one_digit_to_screen_5051		; [bank_3]
-78BF: D6 0A       LDB    $0A
+78BF: D6 0A       LDB    continue_timer_000a
 78C1: 26 09       BNE    $78CC
+; continue timer ended
 78C3: C6 02       LDB    #$02
 78C5: D7 08       STB    sub_sub_state_0008
 78C7: 5F          CLRB
@@ -14225,7 +14227,7 @@ E810: 0C 08       INC    sub_sub_state_0008
 E812: E9 30       ADCB   -$10,Y
 E814: 0C 09       INC    $09
 E816: E9 34       ADCB   -$C,Y
-E818: 0C 0A       INC    $0A
+E818: 0C 0A       INC    continue_timer_000a
 E81A: E9 40       ADCB   $0,U
 E81C: 0C 0D       INC    $0D
 E81E: E9 48       ADCB   $8,U

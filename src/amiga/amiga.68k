@@ -4,7 +4,7 @@
 * (c) JOTD 2026
 *
 OPT_BLIT_CHAIN_MODE = 0
-OPT_CD32_VERSION = 1
+OPT_CD32_VERSION = 0
 
 	.ifne	OPT_CD32_VERSION
 boot:
@@ -270,6 +270,7 @@ osd_enter_\@:
 	.global osd_enable_interrupts
 	.global osd_disable_interrupts
 	.global osd_set_tile_palette
+	.global osd_no_continue_hook
 	.global osd_colors_cycled
 	.global osd_break		| for debug	
 	.global osd_blitz		| for debug
@@ -950,6 +951,13 @@ make_automatic_sound_channels:
 	addq	#1,d1
 	cmp.w	#0x3F,d1
 	jne		1b
+	rts
+
+* called when continue timer reaches 0: time to load context 1 else tiles will be trashed in the title
+* < A0: shadow ram palette
+osd_no_continue_hook:
+	clr.b	(current_level_0072,a6)		| doesn't matter for the game but it matters for the context
+	jbsr	osd_set_tile_palette
 	rts
 	
 osd_colors_cycled:

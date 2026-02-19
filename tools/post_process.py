@@ -439,7 +439,8 @@ for i,line in enumerate(lines):
         line = "\tGET_ADDRESS\ttiles_palette_in_ram_1632\n"+change_instruction("jbra\tosd_set_tile_palette",lines,i)
     elif address == 0xEE56:
         line = "\tGET_ADDRESS\ttiles_palette_in_ram_1632\n"+change_instruction("jbra\tosd_colors_cycled",lines,i)
-
+    elif address == 0x78CC:
+        line = "\tGET_ADDRESS\ttiles_palette_in_ram_1632\n"+change_instruction("jbra\tosd_no_continue_hook",lines,i)
     elif address in [0xf570]:
         line = "\ttst.b\tinvincible_flag\n\tjne\tl_f59a\n"+line
     elif address in [0xf13c]:
