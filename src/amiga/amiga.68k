@@ -69,7 +69,8 @@ GAME_MAX_SCROLL_X = 0x200
 GAME_MAX_SCROLL_Y = 0x200
 BG_TILE_WIDTH = 16
 
-BG_TILE_MAX_SIZE = 0x14000
+BG_TILE_FILE_MAX_SIZE = 0x14000
+SPRITE_FILE_MAX_SIZE = 0x1CC00
 	.if		OPT_CD32_VERSION==0
 BIGGEST_MUSIC_SIZE = 385000
 	.else
@@ -87,14 +88,14 @@ FG_TILE_COUNT = 0x400
 BG_TILE_NB_CLUTS_POW = 3
 BG_TILE_NB_CLUTS = 1<<BG_TILE_NB_CLUTS_POW
 BG_TILE_COUNT = 0x400
-NB_SPRITES = 0x400
+SPRITE_COUNT = 0x400
 
 SPRITE_NB_CLUTS_POW = 2
 SPRITE_NB_CLUTS = 1<<SPRITE_NB_CLUTS_POW
 
 HW_SPRITE_BUFFER_SIZE = (2*8*256+16*2)
 
-SPRITE_LOG_LENGTH = NB_SPRITES*SPRITE_NB_CLUTS
+SPRITE_LOG_LENGTH = SPRITE_COUNT*SPRITE_NB_CLUTS
 FG_TILE_LOG_LENGTH = FG_TILE_NB_CLUTS*FG_TILE_COUNT
 BG_TILE_LOG_LENGTH = BG_TILE_NB_CLUTS*BG_TILE_COUNT
 
@@ -1245,55 +1246,36 @@ load_context:
 	move.l	#bg_character_table_buffer,bg_character_table_buffer_ptr
 	jra		30f
 1:
-	lea	context_name_table,A0
+	lea	tile_context_name_table,A0
 	add.w	d0,d0	
 	add.w	d0,d0
 	move.l	(a0,d0.w),a0
 	move.w	#-1,saved_context   | cancel saved context
+	clr.l	context_sprite_table_ptr		| "free" sprites too
 	lea		bg_character_table_buffer,a1
 	move.l	a1,bg_character_table_buffer_ptr
-	move.l	#BG_TILE_MAX_SIZE,d0
+	move.l	#BG_TILE_FILE_MAX_SIZE,d0
 	jbsr	load_file
 	
+	* now load the specific sprites for that level
+	* there will be some repeats, but overall the memory footprint will be smaller
+	* thus allowing pre-computed symmetric bitmaps
+	cmp.w	#MAP_CONTEXT,d0
+	jeq		2f
+	move.w	current_context,d0
+	lea	sprite_context_name_table,A0
+	add.w	d0,d0	
+	add.w	d0,d0
+	move.l	(a0,d0.w),a0
+	lea		sprite_table_buffer,a1
+	move.l	a1,context_sprite_table_ptr
+	move.l	#SPRITE_FILE_MAX_SIZE,d0
+	jbsr	load_file
+	* todo: copy the first level of pointers in fastmem (256*4: 1kb)
+	jbsr	relocate_sprites_file
 	
 2:
-
-	
-	* now relocate file
-	move.l	bg_character_table_buffer_ptr,a0
-	lea		(TOTAL_NB_COLORS,a0),a0		| skip 32 color palette
-	move.l	a0,bg_tile_character_table				| set character table pointer
-	move.l	a0,d0
-	move.w	#0x3FF,d7
-0:
-	move.l	(a0)+,d1
-	jeq		10f
-	add.l	d0,d1
-	move.l 	d1,(-4,a0)
-	move.l	d1,a1
-
-	* relocate pointers on bitplane list in clut table
-	moveq	#BG_TILE_NB_CLUTS-1,d6
-1:
-	move.l	(a1)+,d2
-	jeq		5f
-	add.l	d0,d2
-	move.l	d2,(-4,a1)
-	move.l	d2,a2
-	* relocate pointers on bitplanes
-	moveq	#4,D5	| 5 bitplanes
-2:
-	move.l	(a2)+,d3
-	jeq		4f
-	add.l	d0,d3
-	move.l	d3,(-4,a2)
-4:
-	dbf		D5,2b
-5:
-	dbf		d6,1b
-10:
-	dbf		d7,0b
-
+	jbsr	relocate_tiles_file
 30:
 	* re-set pointer
 	move.l	bg_character_table_buffer_ptr,a0
@@ -1323,7 +1305,83 @@ load_context:
 	movem.l	(a7)+,d0-a6
 	rts
 	
+relocate_tiles_file:
+	* now relocate the tile file
+	move.l	bg_character_table_buffer_ptr,a0
+	lea		(TOTAL_NB_COLORS,a0),a0		| skip 32 color palette
+	move.l	a0,bg_tile_character_table				| set character table pointer
+	move.l	a0,d0
+	move.w	#BG_TILE_COUNT-1,d7
+0:
+	move.l	(a0)+,d1
+	jeq		10f
+	add.l	d0,d1
+	move.l 	d1,(-4,a0)
+	move.l	d1,a1
 
+	* relocate pointers on bitplane list in clut table
+	moveq	#BG_TILE_NB_CLUTS-1,d6
+1:
+	move.l	(a1)+,d2
+	jeq		5f
+	add.l	d0,d2
+	move.l	d2,(-4,a1)
+	move.l	d2,a2
+	* relocate pointers on bitplanes
+	moveq	#NB_BG_PLANES-1,D5	| 5 bitplanes
+2:
+	move.l	(a2)+,d3
+	jeq		4f
+	add.l	d0,d3
+	move.l	d3,(-4,a2)
+4:
+	dbf		D5,2b
+5:
+	dbf		d6,1b
+10:
+	dbf		d7,0b
+	rts
+	
+
+relocate_sprites_file:
+	* now relocate the tile file
+	move.l	context_sprite_table_ptr,a0
+	move.l	a0,d0
+	jne		0f
+	rts
+0:
+	move.w	#SPRITE_COUNT-1,d7  
+0:
+	move.l	(a0)+,d1
+	jeq		10f
+	add.l	d0,d1
+	move.l 	d1,(-4,a0)
+	move.l	d1,a1
+
+	* relocate pointers on bitplane list in clut table
+	moveq	#SPRITE_NB_CLUTS-1,d6
+1:
+	move.l	(a1)+,d2
+	jeq		5f
+	add.l	d0,d2
+	move.l	d2,(-4,a1)
+	move.l	d2,a2
+	* relocate pointers on bitplanes
+	addq	#8,a2		| skip dimensions (else boom!)
+	moveq	#NB_PLAYFIELD_PLANES-1+1,D5  | mask!!
+2:
+	move.l	(a2)+,d3
+	jeq		4f
+	add.l	d0,d3
+	move.l	d3,(-4,a2)
+4:
+	dbf		D5,2b
+5:
+	dbf		d6,1b
+10:
+	dbf		d7,0b
+	rts
+	
 force_all_screen_redraw:
 	lea		_custom,a5
 	REALLY_WAIT_BLIT
@@ -2169,7 +2227,7 @@ really_update_sprites:
 
     lea _custom,A5
 	move.l	bob_previous_drawed_sprites(pc),a6
-	lea		bob_table,a4
+	lea		shared_bob_table,a4
 	
 	moveq	#NB_TARGET_SPRITES-1,d7
 1:
@@ -2294,7 +2352,11 @@ update_one_bob:
 10:
 	add.w	d2,d2				| code times 4 now
 
-	move.l	(a4,d2.w),d4		| get pointer from bob table
+	move.l	(a4,d2.w),d4		| get pointer from shared bob table
+	jne		200f
+	* not in the shared bob table. Is it in the level specific bob table?
+	move.l	context_sprite_table_ptr,a3
+	move.l	(a3,d2.w),d4		| get pointer from specific bob table	
 	.ifdef	RELEASE
 	jeq		2f				| can theorically happen as sprite update is not atomic (it could be...)
 	.else
@@ -2312,7 +2374,7 @@ update_one_bob:
 	jra		2f
 100:
 	.endif
-	
+200:
 	* now select proper clut
 	move.l	d4,a0
 	moveq	#0,d2
@@ -5563,12 +5625,15 @@ osd_debug_active:
 
 	.section	.bsspublic
 
+
+context_sprite_table_ptr:
+	.long	0
 bg_tile_character_table:
 	.long 	0
 bg_character_table_buffer_ptr:
 	.long	0
 bg_character_table_buffer:
-	.skip	BG_TILE_MAX_SIZE
+	.skip	BG_TILE_FILE_MAX_SIZE
 	
 fg_tile_address_table:
 	.skip	0x400*2
@@ -5769,7 +5834,10 @@ fourth_rows:
 	.align	8
 	
 		.section .bsschip
-
+		
+sprite_table_buffer:
+	.skip	SPRITE_FILE_MAX_SIZE    | biggest contextual sprite file
+	
 module_buffer:
 	.skip	BIGGEST_MUSIC_SIZE		| biggest tune
 	

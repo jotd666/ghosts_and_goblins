@@ -16,6 +16,10 @@ subprocess.check_call(cmd_prefix+["RELEASE_BUILD=1"],cwd=progdir /"src")
 
 outdir = progdir / f"{gamename}_HD"
 
+dataout = outdir / "data"
+if dataout.exists():
+    shutil.rmtree(dataout)
+
 if os.path.exists(outdir):
     for x in outdir.glob("*"):
         x.unlink()
@@ -27,12 +31,9 @@ for file in ["readme.md",f"{gamename}_aga.slave"]:  #f"{gamename}.slave",
 assets = progdir /"assets"/"amiga"
 shutil.copy(assets/"GhostsNGoblins.info",outdir)
 
-dataout = outdir / "data"
-if dataout.exists():
-    shutil.rmtree(dataout)
 dataout.mkdir()
 
-for file in data.glob("level?"):
+for file in data.glob("level?_*"):
     shutil.copy(file,dataout)
 for file in data.glob("*.mod"):
     shutil.copy(file,dataout)

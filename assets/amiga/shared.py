@@ -143,11 +143,11 @@ def get_sprite_names():
     rval.update({i:"arthur_top_ladder" for i in atl})
     rval.update({i+4:"arthur_top_ladder_underwear" for i in atl})
 
-    rval.update({i:"arthur_losing_armor" for i in [0x130,0x131,0x138,0x139]})
+    rval.update({i:"arthur_losing_armor" for i in [0x130,0x131,0x138,0x139,0x13A]})
 
     rval[0x25B] = "arthur_spectre"
-    rval[0x275] = "arthur_passing_armor"
-    rval[0xE4] = "platform"
+    rval[0x275] = rval[0x27D] = "arthur_passing_armor"
+    rval[0xE4] = "eye_platform"
     rval[0x7F] = "coin_bonus"
     rval[0x26D] = rval[0x268] = rval[0x26A] = rval[0x26C] = "statue_bonus"
 
@@ -160,24 +160,44 @@ def get_sprite_names():
     rval[0x262] = "shoe_bonus"
     rval[0x257] = "star_bonus"
     rval[0x277] = "king_bonus"
+    rval[0x269] = "statue_bonus"
+    rval[0x26B] = "statue_bonus"
+    rval[0x261] = "ring_bonus"
     rval[0x27F] = "pot"
     rval[0xD7] = "key"
+    rval[0x57] = "torch"
+    rval[0x9F] = "boulder"
+    rval[0x170] = "stone_platform"
+    rval[0x40] = "boss_shot"
+    rval[0x9F] = "boulder"
+    rval[0x170] = "stone_platform"
     rval[0x263] = "ham_bonus"  # worth ??
     rval[0x264] = "trousers_bonus"  # worth 2000
     rval[0x265] = "crown_bonus"  # worth ??
-
+    rval[0x1D4] = rval[0x1DD] = "tomb_sorcerer"
+    rval[0x253] = rval[0x254] = rval[0x255] = "tomb_sorcerer"
+    rval.update({x:"arthur_skeleton" for x in range(0x140,0x14f)})
+    rval.update({x:"flying_goblin" for x in range(0x80,0x8f)})
+    rval.update({x:"flying_bag" for x in range(0x6A,0x7B)})
+    rval.update({x:"flying_bag" for x in [0x62,0x64,0x66,0x61]})
+    rval.update({x:"shield_warrior" for x in [0x60,0x68,0x70,0x71,0x72,0x73,0x74,0x75]})
+    rval.update({x:"thug" for x in range(0x1E0,0x1FF)})
+    rval.update({x:"arremer" for x in list(range(0x180,0x199))+list(range(0x1A0,0x1C0))+list(range(0x19A,0x19F))+[0x250,0x258]})
     rval.update({x:"princess" for x in [0x236,0x237,0x23e,0x23f]})
     rval.update({x:"princess" for x in [0x226,0x227,0x22e,0x22f]})
+    rval.update({x:"bridge_flame" for x in range(0xE7,0xF7)})
+    rval.update({x:"bridge_flame" for x in range(0x163,0x168)})
+    rval.update({x:"magic_trunk" for x in range(0x91,0x9f)})
     rval[0x1b6] = rval[0x1b7] = "plant_bullet"
     rval[0x54] = "spear"
     rval[0x132] = "armor"
     rval[0x134] = "blank"
     rval[0x132] = "armor"
     rval[0x13D] = "armor"
-    rval[0x178] = rval[0x135] = "tombstone"
+    rval[0x178] = rval[0x135] = "cave_tombstone"
     rval[0x90] = rval[0x98] = "earth"
     rval[0x23B] = rval[0x23C] = rval[0x23D] = "princess"
-    rval[0x233] = rval[0x234] = "princess"
+    rval[0x233] = rval[0x234] = rval[0x235] = "princess"
 
     #rval.update({i:"armored_arthur" for i in range()})
 
@@ -220,6 +240,7 @@ as opposed to Gyruss, most of the sprites don't
 
 
 alphanum_tile_codes = set(range(0,10)) | set(range(65-48,65+27-48))
+
 
 if __name__ == "__main__":
     raise Exception("no main!")

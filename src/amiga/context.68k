@@ -29,30 +29,55 @@ context_data:
 	.word	0x102  | context index
 	.word	-1
 
-context_name_table:
-	.long	level1_path
-	.long	level2_path
-	.long	level3_path
-	.long	level4_path
-	.long	level5_path
-	.long	level6_path
-	.long	level7_path
-	.long	map_path
+tile_context_name_table:
+	.long	level1_tiles_path
+	.long	level2_tiles_path
+	.long	level3_tiles_path
+	.long	level4_tiles_path
+	.long	level5_tiles_path
+	.long	level6_tiles_path
+	.long	level7_tiles_path
+	.long	map_tiles_path
 
-level1_path:
-	.asciz	"level1"
-level2_path:
-	.asciz	"level2"
-level3_path:
-	.asciz	"level3"
-level4_path:
-	.asciz	"level4"
-level5_path:
-	.asciz	"level5"
-level6_path:
-	.asciz	"level6"
-level7_path:
-	.asciz	"level7"
-map_path:
-	.asciz	"map"
+sprite_context_name_table:
+	.long	level1_sprites_path
+	.long	level2_sprites_path
+	.long	level3_sprites_path
+	.long	level4_sprites_path
+	.long	level5_sprites_path
+	.long	level6_sprites_path
+	.long	level7_sprites_path
+
+level1_tiles_path:
+	.asciz	"level1_tiles"
+level2_tiles_path:
+	.asciz	"level2_tiles"
+level3_tiles_path:
+	.asciz	"level3_tiles"
+level4_tiles_path:
+	.asciz	"level4_tiles"
+level5_tiles_path:
+	.asciz	"level5_tiles"
+level6_tiles_path:
+	.asciz	"level6_tiles"
+level7_tiles_path:
+	.asciz	"level7_tiles"
+map_tiles_path:
+	.asciz	"map_tiles"
+	
+level1_sprites_path:
+	.asciz	"level1_sprites"
+level2_sprites_path:
+	.asciz	"level2_sprites"
+level3_sprites_path:
+	.asciz	"level3_sprites"
+level4_sprites_path:
+	.asciz	"level4_sprites"
+level5_sprites_path:
+	.asciz	"level5_sprites"
+level6_sprites_path:
+	.asciz	"level6_sprites"
+level7_sprites_path:
+	.asciz	"level7_sprites"
+
 	.align	2
