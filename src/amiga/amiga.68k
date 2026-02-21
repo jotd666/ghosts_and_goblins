@@ -12,10 +12,18 @@ OPT_CD32_VERSION = 0
 boot:
 	bra.w	start	| don't optimize to bra.b or jra!!
 	* 2 functions that need to be at 4, 8
-cd32_track_play:
-	.long	0
-cd32_track_stop:
-	.long	0
+_cdplay:
+	dc.l	0	; cd32load slave writes the address of the play routine here
+_cdstop:
+	dc.l	0	; cd32load slave writes the address of the stop routine here
+_cdstatus:
+	dc.l	0	; cd32load slave writes the address of the status routine here
+				; 0: cd playing
+				; 1: cd stopped playing
+				; 2: cd not started playing
+				; 3: error
+_cdreplay:
+	dc.l	0	; slave cd32load writes the address of the play-if-play-ended routine here
 	.endif
 start:
 	move.l	a7,old_stack

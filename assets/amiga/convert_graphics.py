@@ -61,16 +61,35 @@ def ensure_empty(d):
     else:
         d.mkdir(parents=True)
 
+def is_pre_mirrored(prefix,context):
+    pc = sprites_per_level.get(prefix)
+    if not pc:
+        # not listed: pre-mirror to avoid issues
+        return True
+    pre_mirror = pc["pre_mirror"]
+    if pre_mirror is None:
+        # never pre-mirror
+        return False
+    if pre_mirror == True:
+        # always pre-mirror
+        return True
+    # pre-mirror only in some levels
+    return context in pre_mirror
+
 def is_in_level(prefix,context):
     pc = sprites_per_level.get(prefix)
-    if pc=="*":
-        pc = None   # "*" (levels 1-6): not the same as "all" but in the end the same
+    if not pc:
+        # not listed: in all levels & contextes
+        return True
+    levels = pc["levels"]
+    if not levels:
+        # also included in all levels
+        return True
     if context is None:
         # context none: global, pc not found or : include
-        return not pc
+        return not levels
     # included only if context defined and matches
-
-    return not pc or context in pc
+    return not levels or context in levels
 
 def dump_bob_layer(sprite_table,f,relative_root=None,context=None):
     if relative_root:

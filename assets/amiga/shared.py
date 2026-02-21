@@ -241,6 +241,19 @@ as opposed to Gyruss, most of the sprites don't
 
 alphanum_tile_codes = set(range(0,10)) | set(range(65-48,65+27-48))
 
+##import json
+##
+##with open("sprites_per_level.json","r") as f:
+##    spl = json.load(f)
+##sn = get_sprite_names()
+##snv = {k:{"pre_mirror":None,"levels":spl.get(k)} for k in set(sn.values())}
+##for k,v in snv.items():
+##    if v and v["levels"]=="*":
+##        v["levels"] = None
+##        v["on_last_level"] = False
+##
+##with open("sprites_per_level_all.json","w") as f:
+##    json.dump(snv,f,indent=2)
 
 if __name__ == "__main__":
     raise Exception("no main!")

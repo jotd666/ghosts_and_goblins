@@ -1,4 +1,4 @@
-- 50Hz to do with blitter chaining: risk of flickering because we can't store mirrored copies
+- 50Hz to do with blitter chaining: risk of flickering if we can't store mirrored copies
   => blit chaining seems to work, missing mirror commands, and also scroll
 - implement dip difficulty
 - load/save highscores
@@ -6,6 +6,7 @@
 - don't play a tune if same module / same pattern already playing (avoids to repeat music when there's a E8 trigger): does this happen?
 - CD32 version to test with release exe: works with 1E0000 base chip!!
   => need to record the tunes with several loops using service mode and 3F to stop sound: finish wav splitting
+     "finish your battle" small song to record
   => put cdplay, cdstop functions at start (offset 4,8) so game can call them, cd32slave is easy to code
 - bottom left life icon not erased by "credit" message
 

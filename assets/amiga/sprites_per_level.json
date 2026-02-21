@@ -1,47 +1,352 @@
 {
-  "boss": [7],
-  "bridge_flame": [4],
-  "tomb_sorcerer": [1,3],
-  "flying_bag": [1,3,5,6],
-  "arremer": [1,3,4,5,6],
-  "dragon": [3,4,6],
-  "plant": [1,2],
-  "key": "*",
-  "bag_bonus": "*",
-  "arthur_passing_armor": "*",
-  "eye_platform": [4,5],
-  "necklace_bonus": "*",
-  "ring_bonus": "*",
-  "big_devil": [1,5,6],
-  "star_bonus": "*",
-  "trousers_bonus": "*",
-  "tombstone": [1],
-  "cave_tombstone": [3],
-  "crow": [1,2],
-  "earth": [1,3],
-  "small_goblin": [2,4,5],
-  "earth_platform": [1],
-  "statue_bonus": "*",
-  "boulder": [3],
-  "shield_warrior": [1],
-  "ham_bonus": "*",
-  "thug": [2,5,6],
-  "skeleton": [5,6],
-  "frog": [1,3],
-  "stone_platform": [2],
-  "plant_bullet": [1,2],
-  "magic_trunk": [3],
-  "small_fire_bullet": [5],
-  "pot": "*",
-  "armor": "*",
-  "zombie": [1,3],
-  "arthur_top_ladder_underwear": "*",
-  "ice_platform": [2],
-  "giant": [1,2,6],
-  "flying_goblin": [2,3],
-  "king_bonus": "*",
-  "coin_bonus": "*",
-  "shoe_bonus": "*",
-  "boss_shot": [7],
-  "bat": [3]
+  "spear": {
+    "pre_mirror": true,
+    "levels": null
+  },
+  "arthur_spectre": {
+    "pre_mirror": null,
+    "levels": null
+  },
+  "shoe_bonus": {
+    "pre_mirror": null,
+    "levels": null,
+    "on_last_level": false
+  },
+  "crow": {
+    "pre_mirror": [2],
+    "levels": [
+      1,
+      2
+    ]
+  },
+  "flying_goblin": {
+    "pre_mirror": true,
+    "levels": [
+      2,
+      3
+    ]
+  },
+  "sword": {
+    "pre_mirror": true,
+    "levels": null
+  },
+  "crown_bonus": {
+    "pre_mirror": null,
+    "levels": null
+  },
+  "plant_bullet": {
+    "pre_mirror": true,
+    "levels": [
+      1,
+      2
+    ]
+  },
+  "lying_arthur": {
+    "pre_mirror": null,
+    "levels": null
+  },
+  "thug": {
+    "pre_mirror": true,
+    "levels": [
+      2,
+      5,
+      6
+    ]
+  },
+  "arthur_passing_armor": {
+    "pre_mirror": null,
+    "levels": null,
+    "on_last_level": false
+  },
+  "eye_platform": {
+    "pre_mirror": null,
+    "levels": [
+      4,
+      5
+    ]
+  },
+  "bag_bonus": {
+    "pre_mirror": null,
+    "levels": null,
+    "on_last_level": false
+  },
+  "small_fire_bullet": {
+    "pre_mirror": null,
+    "levels": [
+      5
+    ]
+  },
+  "frog": {
+    "pre_mirror": null,
+    "levels": [
+      1,
+      3
+    ]
+  },
+  "flying_bag": {
+    "pre_mirror": true,
+    "levels": [
+      1,
+      3,
+      5,
+      6
+    ]
+  },
+  "boss": {
+    "pre_mirror": null,
+    "levels": [
+      7
+    ]
+  },
+  "plant": {
+    "pre_mirror": null,
+    "levels": [
+      1,
+      2
+    ]
+  },
+  "ice_platform": {
+    "pre_mirror": null,
+    "levels": [
+      2
+    ]
+  },
+  "armor": {
+    "pre_mirror": null,
+    "levels": null,
+    "on_last_level": false
+  },
+  "shield_warrior": {
+    "pre_mirror": null,
+    "levels": [
+      1
+    ]
+  },
+  "skeleton": {
+    "pre_mirror": true,
+    "levels": [
+      5,
+      6
+    ]
+  },
+  "coin_bonus": {
+    "pre_mirror": null,
+    "levels": null,
+    "on_last_level": false
+  },
+  "necklace_bonus": {
+    "pre_mirror": null,
+    "levels": null,
+    "on_last_level": false
+  },
+  "score": {
+    "pre_mirror": null,
+    "levels": null
+  },
+  "stone_platform": {
+    "pre_mirror": null,
+    "levels": [
+      2
+    ]
+  },
+  "tombstone": {
+    "pre_mirror": null,
+    "levels": [
+      1
+    ]
+  },
+  "torch": {
+    "pre_mirror": true,
+    "levels": null
+  },
+  "arremer": {
+    "pre_mirror": [3,6],
+    "levels": [
+      1,
+      3,
+      4,
+      5,
+      6
+    ]
+  },
+  "small_goblin": {
+    "pre_mirror": null,
+    "levels": [
+      2,
+      4,
+      5
+    ]
+  },
+  "pot": {
+    "pre_mirror": null,
+    "levels": null,
+    "on_last_level": false
+  },
+  "blank": {
+    "pre_mirror": null,
+    "levels": null
+  },
+  "boulder": {
+    "pre_mirror": null,
+    "levels": [
+      3
+    ]
+  },
+  "statue_bonus": {
+    "pre_mirror": null,
+    "levels": null,
+    "on_last_level": false
+  },
+  "earth": {
+    "pre_mirror": null,
+    "levels": [
+      1,
+      3
+    ]
+  },
+  "tomb_sorcerer": {
+    "pre_mirror": null,
+    "levels": [
+      1,
+      3
+    ]
+  },
+  "arthur_top_ladder": {
+    "pre_mirror": null,
+    "levels": null
+  },
+  "boss_shot": {
+    "pre_mirror": null,
+    "levels": [
+      7
+    ]
+  },
+  "princess": {
+    "pre_mirror": null,
+    "levels": null
+  },
+  "cave_tombstone": {
+    "pre_mirror": null,
+    "levels": [
+      3
+    ]
+  },
+  "dragon": {
+    "pre_mirror": null,
+    "levels": [
+      3,
+      4,
+      6
+    ]
+  },
+  "star_bonus": {
+    "pre_mirror": null,
+    "levels": [1,3],
+    "on_last_level": false
+  },
+  "arthur_losing_armor": {
+    "pre_mirror": null,
+    "levels": null
+  },
+  "flame": {
+    "pre_mirror": null,
+    "levels": null
+  },
+  "armored_arthur": {
+    "pre_mirror": null,
+    "levels": null
+  },
+  "king_bonus": {
+    "pre_mirror": null,
+    "levels": null,
+    "on_last_level": false
+  },
+  "shield": {
+    "pre_mirror": true,
+    "levels": null
+  },
+  "ham_bonus": {
+    "pre_mirror": null,
+    "levels": null,
+    "on_last_level": false
+  },
+  "arthur_top_ladder_underwear": {
+    "pre_mirror": null,
+    "levels": null,
+    "on_last_level": false
+  },
+  "ring_bonus": {
+    "pre_mirror": null,
+    "levels": null,
+    "on_last_level": false
+  },
+  "big_devil": {
+    "pre_mirror": [6],
+    "levels": [
+      1,
+      5,
+      6
+    ]
+  },
+  "giant": {
+    "pre_mirror": [2,6],
+    "levels": [
+      1,
+      2,
+      6
+    ]
+  },
+  "bridge_flame": {
+    "pre_mirror": null,
+    "levels": [
+      4
+    ]
+  },
+  "underwear_arthur": {
+    "pre_mirror": null,
+    "levels": null
+  },
+  "axe": {
+    "pre_mirror": true,
+    "levels": null
+  },
+  "key": {
+    "pre_mirror": null,
+    "levels": null,
+    "on_last_level": false
+  },
+  "arthur_skeleton": {
+    "pre_mirror": null,
+    "levels": null
+  },
+  "trousers_bonus": {
+    "pre_mirror": null,
+    "levels": null,
+    "on_last_level": false
+  },
+  "magic_trunk": {
+    "pre_mirror": true,
+    "levels": [
+      3
+    ]
+  },
+  "bat": {
+    "pre_mirror": null,
+    "levels": [
+      3
+    ]
+  },
+  "zombie": {
+    "pre_mirror": [1,3],
+    "levels": [
+      1,
+      3
+    ]
+  },
+  "earth_platform": {
+    "pre_mirror": null,
+    "levels": [
+      1
+    ]
+  }
 }
