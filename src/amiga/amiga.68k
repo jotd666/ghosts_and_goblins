@@ -78,7 +78,7 @@ GAME_MAX_SCROLL_Y = 0x200
 BG_TILE_WIDTH = 16
 
 BG_TILE_FILE_MAX_SIZE = 0x14000
-SPRITE_FILE_MAX_SIZE = 0x1CC00
+SPRITE_FILE_MAX_SIZE = 0x1EB00
 	.if		OPT_CD32_VERSION==0
 BIGGEST_MUSIC_SIZE = 385000
 	.else
@@ -2494,10 +2494,18 @@ mirror_sprite_planes:
 	movem.l	d0-d2/a0,-(a7)
 	* bitplanes aren't pre-computed: check bitplanes current orientation and swap
 	* if required. This is slow but saves memory
+	.if		OPT_BLIT_CHAIN_MODE==0
 	lea		mirror_table,a1
-	moveq	#0,d2
-	moveq	#NB_PLAYFIELD_PLANES+1-1,d6   | mirror mask plane too
+	.endif
+	moveq	#NB_PLAYFIELD_PLANES+1-1,d6
 	lea		mirror_function_table(pc),a3
+	.ifndef	MC68020
+	move.w	d5,d0       | number of byte values (4: 16 bits + shifting)
+	add.w	d0,d0
+	move.l	(a3,d0.w),a3
+	.else
+	move.l	(a3,d5.w*2),a3		| compute mirror function once and for all
+	.endif
 0:
 	move.l	(a0)+,d1		| current plane data
 	jeq		1f				| no data: skip
@@ -2506,18 +2514,9 @@ mirror_sprite_planes:
 	jeq		1f
 	* not the proper orientation: change it
 	move.b	d3,(-2,a2)
-	move.w	d4,d1		| height
-	subq	#1,d1		| minus one for dbf
+	* perform or queue the mirroring
+	WRITE_BLITTER_VIRTUAL_MIRROR	d4,a3,a2
 
-	.ifndef	MC68020
-	lea		mirror_function_table(pc),a3
-	move.w	d5,d0       | number of byte values (4: 16 bits + shifting)
-	add.w	d0,d0
-	move.l	(a3,d0.w),a3
-	jsr		(a3)
-	.else
-	jsr		([a3,d5.w*2])
-	.endif
 	* next bitplane
 1:
 	dbf		d6,0b

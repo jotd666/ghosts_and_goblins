@@ -174,8 +174,10 @@ def dump_bob_layer(sprite_table,f,relative_root=None,context=None):
 
     for k,v in bob_plane_cache.items():
         if v in needed_bob_bitplanes:
-            f.write(f"\t.word\t0    | plane {v:02d} orientation\n")
-            f.write(f"bob_plane_{v:02d}:")
+            f.write(f"""
+\t.long\t0     | mirror plane pointer (set dynamically)
+\t.word\t0    | plane {v:02d} orientation
+bob_plane_{v:02d}:""")
             dump_asm_bytes(k,f)
 
 def load_tileset(image_name,palette_index,width,height,tileset_name,dumpdir,

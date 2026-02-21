@@ -227,6 +227,7 @@ def get_sprite_names():
 
     rval.update({i:"boss" for i in range(0x2C0,0x300)})
 
+    rval[0xa6] = "zombie"
     return rval
 
 def get_mirror_sprites():
