@@ -146,7 +146,9 @@ def dump_bob_layer(sprite_table,f,relative_root=None,context=None):
                                 break
                         else:
                             raise Exception(f"height not found for {name}!!")
+                        nonzero_written = False
                         for orientation,_ in plane_orientations:
+                            # loop for this, this sucks
                             if orientation == "standard":
                                 f.write("* orientation={}\n".format(orientation))
                                 active_planes = 0
@@ -155,11 +157,12 @@ def dump_bob_layer(sprite_table,f,relative_root=None,context=None):
                                 for j,bitplane_id in enumerate(bitplanes):
                                     if bitplane_id:
                                         active_planes |= 1<<j
-
-                                f.write(f"\t.word\t{height},{width},{offset},0x{active_planes:x}\n")
+                                bitplane_info = f"\t.word\t{height},{width},{offset},0x{active_planes:x}  | height,width,offset,active_planes\n"
+                                f.write(bitplane_info)
                                 for bitplane_id in bitplanes:
                                     f.write("\t.long\t")
                                     if bitplane_id:
+                                        nonzero_written = True
                                         bob_bitplane_ptr = f"bob_plane_{bitplane_id:02d}"
                                         needed_bob_bitplanes.add(bitplane_id)
                                         f.write(bob_bitplane_ptr)
@@ -169,13 +172,24 @@ def dump_bob_layer(sprite_table,f,relative_root=None,context=None):
                                         f.write("0")
                                     f.write("\n")
 
+                        if nonzero_written and is_pre_mirrored(prefix,context):
+                            # tell the game engine that it has to mirror the bitplanes
+                            # at start/file load and put them here
+                            # (except if tile has 0 data because it's blank)
+
+                            f.write("* mirrored bitplanes pointers (inc. mask) go here\n")
+                            for _ in bitplanes:
+                                f.write(f"\t.long\t-1\n")
+                        else:
+                            # tell the game engine that it has to mirror in-place
+                            f.write("\t.word\t-2    | bitplanes above will be mirrored in-place\n\n")
+
     if not relative_root:
         f.write("\t.section\t.datachip\n")
 
     for k,v in bob_plane_cache.items():
         if v in needed_bob_bitplanes:
             f.write(f"""
-\t.long\t0     | mirror plane pointer (set dynamically)
 \t.word\t0    | plane {v:02d} orientation
 bob_plane_{v:02d}:""")
             dump_asm_bytes(k,f)

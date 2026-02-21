@@ -67,7 +67,7 @@ CORKSCREW_NB_SCREENS = 20
 BORDERBLANK = 1
 START_HOST_SCROLL_X = (CORKSCREW_NB_SCREENS/2)*0x100
 
-
+MIRROR_BUFFER_SIZE = 0x20000
 
 PREVIOUS_SPRITE_SIZE = 8
 CURRENT_SPRITE_SIZE = 4
@@ -923,12 +923,45 @@ demo_game:
 	jeq		0f
 	jbsr	make_automatic_sound_channels
 0:
+	* create mirror parts for common sprites
+	* first initialize buffer address
+	move.l	#mirror_buffer,mirror_buffer_ptr
 
+	jbsr	mirror_common_sprites
 	moveq	#0,d0
 	jbsr	osd_set_bank
 	GET_MEMORY_START_AND_DP	
 	jmp		reset_6000								| pass control to the mpatrol core
 	
+
+mirror_common_sprites:
+	lea		shared_bob_table,a0
+	move.w	#0x3FF,d7
+0:
+	move.l	(a0)+,d0
+	jeq		100f
+	* sprite here, get clut table
+	move.l	d0,a1
+	move.w	#SPRITE_NB_CLUTS-1,d6
+1:
+	move.l	(a1)+,d1
+	jeq		2f
+	* clut exists
+	move.l	d1,a3
+	lea		((NB_PLAYFIELD_PLANES+1)*4+8,a3),a2
+	cmp.w	#-2,(a2)
+	jeq		2f
+	* we must generate mirrored data
+	jbsr	compute_mirror_bitplanes
+2:
+	dbf		d6,1b
+100:
+	dbf		d7,0b
+	* set top address as base for contextual mirror data
+	move.l	mirror_buffer_ptr,mirror_buffer_context_ptr
+	rts
+	
+
 copyright_message:
 	*.asciz	"ALL RIGHT RESEVED"
 	 .asciz	"AMIGA PORT : JOTD"
@@ -1233,6 +1266,9 @@ load_context:
 	jne	0b
 	.endif
 	
+	* clear mirror buffer (reset it just after the shared bob mirror data)
+	move.l	mirror_buffer_context_ptr,mirror_buffer_ptr
+
 	move.w	current_context,previous_context
 	move.w	d0,current_context
 	cmp.w	#MAP_CONTEXT,d0
@@ -1375,6 +1411,7 @@ relocate_sprites_file:
 	move.l	d2,(-4,a1)
 	move.l	d2,a2
 	* relocate pointers on bitplanes
+	move.l	a2,a3		| store bitplane data with headers for later
 	addq	#8,a2		| skip dimensions (else boom!)
 	moveq	#NB_PLAYFIELD_PLANES-1+1,D5  | mask!!
 2:
@@ -1384,10 +1421,91 @@ relocate_sprites_file:
 	move.l	d3,(-4,a2)
 4:
 	dbf		D5,2b
+	* finished processing bitplanes. Do we have to compute mirror bitplanes?
+	cmp.w	#-2,(a2)
+	jeq		5f
+	* yes, we need to fill the data
+	jbsr	compute_mirror_bitplanes
 5:
 	dbf		d6,1b
 10:
 	dbf		d7,0b
+	rts
+	
+
+* < A2: bitplane pointer list to fill
+* < A3: original bitplane pointers (with headers)
+	
+compute_mirror_bitplanes:
+	movem.l	d0-a6,-(a7)
+	* mirror exists: must first copy the bitplane data above
+	* a3 points on dimensions
+	* compute memory needed to clone the bitmap
+	move.l	mirror_buffer_ptr,a0
+	move.w	(a3)+,d4		| height
+	move.w	d4,d6 			| save height in d6
+	move.w	(a3)+,d5		| width in bytes + 2
+	addq	#4,a3			| skip rest to point on source bitplanes
+	subq	#2,d5			| adjust to real data width
+	mulu	d5,d4			| size of bitplane data
+	move.w	#NB_PLAYFIELD_PLANES-1+1,d3  | mask!!
+	mulu	d4,d3			| size of data to allocate
+
+	* first copy data so we can use in-place mirror routines (a bit wasteful but
+	* not a big issue as this happens at level start)
+	
+	move.w	#NB_PLAYFIELD_PLANES-1+1,d3  | mask!!
+100:
+	move.l	(a3)+,d1
+	jne		101f
+	* null source bitmap
+	clr.l	(a2)+
+	jra		2f		| next bitplane
+101:
+	move.l	d1,a1		| get bitplane data
+	move.l	a0,(a2)+		| store it
+	move.w	d4,d0
+	lsr.w	#1,d0
+	subq	#1,d0
+	* copy data
+1:
+	move.w	(a1)+,(a0)+
+	dbf		d0,1b
+	* check (too late) if the buffer overflowed
+	.ifndef	RELEASE
+	cmp.l	#mirror_buffer_end,a0
+	jcs		0f
+	BREAKPOINT	"mirror buffer too small"
+	illegal
+0:
+	.endif
+2:
+	dbf		d3,100b
+	move.l	a0,mirror_buffer_ptr	| update for next time
+	* reset pointer, start mirroring
+	lea		((-NB_PLAYFIELD_PLANES-1)*4,a2),a0
+	move.w	#NB_PLAYFIELD_PLANES-1+1,d3  | mask!!
+	lea		mirror_table,a1
+	lea		mirror_function_table,a3
+	addq	#2,d5		| make up
+	.ifndef	MC68020
+	move.w	d5,d0       | number of byte values (4: 16 bits + shifting)
+	add.w	d0,d0
+	move.l	(a3,d0.w),a3
+	.else
+	move.l	(a3,d5.w*2),a3		| compute mirror function once and for all
+	.endif
+0:
+	move.w	d6,d1		| height
+	subq	#1,d1		| minus one for dbf
+	move.l	(a0)+,d0	| bitplane data
+	jeq		1f
+	move.l	d0,a2
+	jsr		(a3)		| perform in-place mirror
+1:
+	dbf		d3,0b
+
+	movem.l	(a7)+,d0-a6
 	rts
 	
 force_all_screen_redraw:
@@ -2399,23 +2517,29 @@ update_one_bob:
 	jeq		2f		| invalid clut: can happen in transition phases
 	move.l	d4,a0
 
-	
-*	btst	#MIRROR_BIT,d3
-*	jeq		101f
-*	* pre-computed mirror bitplanes, can't afford that here
-*	add.w	#((NB_PLAYFIELD_PLANES+1)*4+8),a0
-
-	btst	#MIRROR_BIT,d3
-	sne		d3		| convert attribute to boolean 0/ff for mirror_sprite_planes
-
 	move.w	(a0)+,d4		| height
 	move.w	(a0)+,d5		| width
 	add.w	(a0)+,d1		| add offset to Y
 	* A0 points on the first bitplane of the bob
 	addq 	#2,a0
 
+* now we have to check if mirror must be performed, either by doing this in-place
+* or by selecting already mirrored data
+	lea		((NB_PLAYFIELD_PLANES+1)*4,a0),a1		| load mirrored data pointers
+	tst.w	(a1)
+	jmi		101f		| invalid pointers: we must do in-place
+	btst	#MIRROR_BIT,d3
+	jeq		102f
+	* to mirror, just change pointer list
+	move.l	a1,a0
+	* and skip mirroring bit
+	jra		103f
+101:
+	btst	#MIRROR_BIT,d3
+102:
+	sne		d3		| convert attribute to boolean 0/ff for mirror_sprite_planes
 	jbsr	mirror_sprite_planes
-	
+103:	
 	* BOBs must follow screen scroll
 	add.w	bobs_game_scroll_y,d1
 	add.w 	bobs_host_scroll_x,d0
@@ -5606,7 +5730,7 @@ floppy_file:
 temp_filename_buffer:
 	.skip	255
 	.align	2
-
+	
 mirror_table:
 	.include 	"mirror_table.68k"
 
@@ -5632,7 +5756,10 @@ osd_debug_active:
 
 	.section	.bsspublic
 
-
+mirror_buffer_ptr:
+	.long	0
+mirror_buffer_context_ptr:
+	.long	0
 context_sprite_table_ptr:
 	.long	0
 bg_tile_character_table:
@@ -5842,6 +5969,10 @@ fourth_rows:
 	
 		.section .bsschip
 		
+mirror_buffer:
+	.skip	MIRROR_BUFFER_SIZE
+mirror_buffer_end:
+
 sprite_table_buffer:
 	.skip	SPRITE_FILE_MAX_SIZE    | biggest contextual sprite file
 	
