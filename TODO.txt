@@ -2,9 +2,11 @@
 triplet arremer_1a3_03:
 * orientation=standard
 	.word	14,8,2,0x7f  | height,width,offset,active_planes
+plus missing white clut for some arremer frames
 - pre-mirror of trunk fails (91) in clut 1 probably because of 0 in planelist
+  maybe wrong also without symmetry: 0 in planelist doesn't seem to fare well with chained blits
 - scrolling to fix, wrong values, shaking
-- implement dip difficulty: DSW2 seems at 0 check read_dsw2 and dsw1!
+- implement dip difficulty: wrong 1 credit for 6 plays, difficulty level???
 - load/save highscores
 
 

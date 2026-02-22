@@ -1429,7 +1429,7 @@ relocate_sprites_file:
 	jne		0f
 	rts
 0:
-	move.w	#SPRITE_COUNT-1,d7  
+	moveq	#0,d7
 0:
 	move.l	(a0)+,d1
 	jeq		10f
@@ -1460,11 +1460,18 @@ relocate_sprites_file:
 	cmp.w	#-2,(a2)
 	jeq		5f
 	* yes, we need to fill the data
+*	cmp.w	#0x91,d7
+*	jne		55f
+*	BREAKPOINT	"trung"
+*55:
+
 	jbsr	compute_mirror_bitplanes
 5:
 	dbf		d6,1b
 10:
-	dbf		d7,0b
+	addq	#1,d7
+	cmp.w	#SPRITE_COUNT,d7  
+	jne		0b
 	rts
 	
 
@@ -1506,7 +1513,8 @@ compute_mirror_bitplanes:
 1:
 	move.w	(a1)+,(a0)+
 	dbf		d0,1b
-	* check (too late) if the buffer overflowed
+	* check (too late) if the buffer overflowed. It will overflow on restore buffer so no risk of crashing
+	* just detect it and stop
 	.ifndef	RELEASE
 	cmp.l	#mirror_buffer_end,a0
 	jcs		0f

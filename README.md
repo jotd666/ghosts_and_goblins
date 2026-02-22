@@ -6,6 +6,7 @@ Requires a 2-button joystick, or the keyboard, some fast memory or CD32 :)
 Features:
 
 - all 7 levels in 64 colors
+- exact arcade gameplay
 - awesome music
 - difficulty/lives settings
 - service mode :)
