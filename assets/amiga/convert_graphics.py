@@ -329,10 +329,6 @@ all_tile_cluts = False
 
 
 
-
-
-
-
 sprite_cluts = {}
 fg_tile_cluts = {}
 
@@ -355,6 +351,12 @@ for atc in alphanum_tile_codes:
 # now set cluts for all alphanum tiles
 for atc in alphanum_tile_codes:
     fg_tile_cluts[atc] = sorted(used_cluts)
+
+# add the white flavour of arremer for all arremer frames
+for k,v in sprite_cluts.items():
+    if sprite_names.get(k)=="arremer" and k!=0x198:
+        if 2 not in v:
+            v.append(2)
 
 plane_orientations = [("standard",lambda x:x),
 ("flip",ImageOps.flip),

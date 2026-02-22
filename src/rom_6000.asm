@@ -120,6 +120,7 @@ player_score_0068 = $68
 game_first_loop_done_007f = $7f
 nb_credits_0022 = $22
 continue_timer_000a = $a
+high_score_location_152c = $152c
 
 SND_STOP_00 = $00
 SND_UNKNOWN_FF = $FF 
@@ -301,7 +302,7 @@ end_of_memory_test_607d:
 60F8: A7 A0       STA    ,Y+
 60FA: 5A          DECB
 60FB: 26 F9       BNE    $60F6
-60FD: 8E 15 2C    LDX    #$152C
+60FD: 8E 15 2C    LDX    #high_score_location_152c
 6100: 10 8E 61 AA LDY    #$61AA
 6104: 32 7E       LEAS   -$2,S
 6106: 86 0A       LDA    #$0A
@@ -321,7 +322,7 @@ end_of_memory_test_607d:
 6122: 32 62       LEAS   $2,S
 6124: C6 0A       LDB    #$0A
 6126: 10 8E 15 18 LDY    #$1518
-612A: 8E 15 2C    LDX    #$152C
+612A: 8E 15 2C    LDX    #high_score_location_152c
 612D: AF A1       STX    ,Y++
 612F: 30 07       LEAX   $7,X
 6131: 5A          DECB
@@ -17334,8 +17335,8 @@ jump_table_beed:
 jump_table_6188:
 	dc.w	clear_screen_and_show_status_4800	; $6188
 	dc.w	$485C	; $618a
-	dc.w	$489B	; $618c from bank 3 
-	dc.w	$48BD	; $618e from bank 3 
+	dc.w	display_osd_text_489b	; $618c from bank 3 
+	dc.w	display_osd_text_48bd	; $618e from bank 3 
 	dc.w	$5022	; $6190 from bank 3 
 	dc.w	$511E	; $6192 from bank 3 
 	dc.w	change_background_62ab	; $6194

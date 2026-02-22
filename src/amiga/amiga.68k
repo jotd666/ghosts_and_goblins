@@ -78,14 +78,14 @@ GAME_MAX_SCROLL_Y = 0x200
 BG_TILE_WIDTH = 16
 
 BG_TILE_FILE_MAX_SIZE = 0x14000
-SPRITE_FILE_MAX_SIZE = 0x1EB00
+SPRITE_FILE_MAX_SIZE = 0x1F400
 	.if		OPT_CD32_VERSION==0
 BIGGEST_MUSIC_SIZE = 385000
 	.else
 BIGGEST_MUSIC_SIZE = 96000
 	.endif
 	
-SCORE_FILE_SIZE = 0x23		| wrong
+SCORE_FILE_SIZE = 70
 
 LOG_BUFFER_SIZE = 0x100000
 
@@ -1462,8 +1462,9 @@ relocate_sprites_file:
 	* yes, we need to fill the data
 *	cmp.w	#0x91,d7
 *	jne		55f
-*	BREAKPOINT	"trung"
+*	BREAKPOINT	"trunk"
 *55:
+
 
 	jbsr	compute_mirror_bitplanes
 5:
@@ -1490,6 +1491,7 @@ compute_mirror_bitplanes:
 	addq	#4,a3			| skip rest to point on source bitplanes
 	subq	#2,d5			| adjust to real data width
 	mulu	d5,d4			| size of bitplane data
+	addq	#2,d5		    | make up
 	move.w	#NB_PLAYFIELD_PLANES-1+1,d3  | mask!!
 	mulu	d4,d3			| size of data to allocate
 
@@ -1530,7 +1532,6 @@ compute_mirror_bitplanes:
 	move.w	#NB_PLAYFIELD_PLANES-1+1,d3  | mask!!
 	lea		mirror_table,a1
 	lea		mirror_function_table,a3
-	addq	#2,d5		| make up
 	.ifndef	MC68020
 	move.w	d5,d0       | number of byte values (4: 16 bits + shifting)
 	add.w	d0,d0
@@ -1970,7 +1971,6 @@ level1_interrupt:
 	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
 	jbsr		switch_screen_buffers
 	.endif
-	.endif
 
 	lea		_custom,a5
 	* start the chain reaction
@@ -1982,6 +1982,7 @@ level1_interrupt:
 	*move.w	scroll_y,blitter_scroll_y
 	jra		1f
 0:
+	.endif
 	FORCE_PROCESS_BLITS
 1:
 	* fill the blitter command list while blitter interrupt 
@@ -2654,7 +2655,7 @@ update_one_bob:
 * < A0: plane list
 * < D3: required orientation
 * < D4: height
-* < D5: width (bytes)
+* < D5: width (bytes) including 16 bit shift
 * trashes: only unused registers :) D6,A3
 
 mirror_sprite_planes:
@@ -2667,7 +2668,7 @@ mirror_sprite_planes:
 	moveq	#NB_PLAYFIELD_PLANES+1-1,d6
 	lea		mirror_function_table(pc),a3
 	.ifndef	MC68020
-	move.w	d5,d0       | number of byte values (4: 16 bits + shifting)
+	move.w	d5,d0       | number of byte values (ex: 4: 16 bits + shifting)
 	add.w	d0,d0
 	move.l	(a3,d0.w),a3
 	.else
@@ -2747,7 +2748,10 @@ mirror_32_bit_wide:
 
 
 mirror_48_bit_wide:
+	.ifdef	MC68020
 	moveq	#0,d0
+	moveq	#0,d2
+	.endif
 10:
 	.ifndef	MC68020
 	* we have to do that each time as we must add offsets as long (table is 128k long)
@@ -2784,7 +2788,10 @@ mirror_48_bit_wide:
 
 
 mirror_64_bit_wide:
+	.ifdef	MC68020
 	moveq	#0,d0
+	moveq	#0,d2
+	.endif
 10:
 	.ifndef	MC68020
 	moveq	#0,d0
@@ -4849,12 +4856,9 @@ read_args_string:
 read_args_string_end:
 	.align	2
 
-	.ifdef	HIGH_SCORES
-* < A0: buffer
+* < A0: highscore buffer
 osd_read_high_scores:
 	movem.l	d0-d7/a0-a6,-(a7)
-	GET_MEMORY_START_IN_A6
-	*lea		(high_score_table_0294,a6),a1
 	move.l	_resload,d0
 	beq.b	0f
 	move.l	d0,a2
@@ -4881,14 +4885,13 @@ osd_read_high_scores:
 	movem.l	(a7)+,d0-d7/a0-a6
 	rts
 	
+* < A0: highscore buffer
 osd_write_high_scores:
 	movem.l	d0-d7/a0-a6,-(a7)
 	.ifdef	RELEASE
 	tst.b	cheat_used		| don't save score if cheat on
 	bne.b	2f
 	.endif
-	GET_MEMORY_START_IN_A6
-	lea		(high_score_table_0294,a6),a0
 
 	move.l	_resload,d0
 	bne.b	1f
@@ -4961,7 +4964,6 @@ save_highscores:
 1:	
     rts
     
-	.endif
 	
 osd_music_stop:
 *	movem.l	d0/a0/a6,-(a7)

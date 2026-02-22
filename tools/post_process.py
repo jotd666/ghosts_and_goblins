@@ -103,6 +103,9 @@ for i,line in enumerate(lines):
 
     if address == 0x55CE:
         line = "\tILLEGAL\n"  # not reachable anyway, part of ROM/RAM check code
+    elif address == 0x5DBF:
+        line = "\tGET_ADDRESS\thigh_score_location_152c\njbsr\tosd_write_high_scores\n"+line
+
     if "review pshu instruction" in line or "review pulu instruction" in line or "review stack set from register" in line:
         line = remove_error(line)
 
@@ -159,8 +162,8 @@ with open(source_dir / f"{bankname}.68k","w") as fw:
     for gs in """clear_screen_and_show_status_4800
 l_5025
 l_485c
-l_489b
-l_48bd
+display_osd_text_489b
+display_osd_text_48bd
 l_5022
 l_5025
 write_one_digit_to_screen_5051
@@ -297,6 +300,9 @@ for i,line in enumerate(lines):
         line = "\tmove.b\tstart_level_flag,d0\n"+change_instruction("OP_W_ON_DP_ADDRESS    move,current_level_0072,d0",lines,i)
     elif address == 0x7183:
         line = "\ttst.b\tskip_intro_flag\n\tjne\tplay_intro_7187\n"+line
+    elif address == 0x6140:
+        # insert read highscore
+        line = "\tGET_ADDRESS\thigh_score_location_152c\njbsr\tosd_read_high_scores\n"+line
     ###################################################
     # 2 table of tables to rework almost completely
     # this mixes with table rework and is quite a mess but works

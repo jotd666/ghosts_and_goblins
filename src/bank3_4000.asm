@@ -1,5 +1,6 @@
 high_score_table_1518 = $1518
 time_left_00aa = $AA
+text_table_48dd = $48dd
 
 clear_screen_and_show_status_4800:
 4800: 8E 20 00    LDX    #$2000
@@ -17,7 +18,7 @@ clear_screen_and_show_status_4800:
 481D: 26 EA       BNE    $4809
 481F: 32 61       LEAS   $1,S
 4821: 5F          CLRB
-4822: BD 48 9B    JSR    $489B
+4822: BD 48 9B    JSR    display_osd_text_489b
 4825: 10 8E 00 D0 LDY    #$00D0
 4829: 8E 20 6C    LDX    #$206C
 482C: D6 F1       LDB    $F1
@@ -26,13 +27,13 @@ clear_screen_and_show_status_4800:
 4833: C4 01       ANDB   #$01
 4835: 27 11       BEQ    $4848
 4837: C6 02       LDB    #$02
-4839: BD 48 9B    JSR    $489B
+4839: BD 48 9B    JSR    display_osd_text_489b
 483C: 10 8E 04 48 LDY    #$0448
 4840: 8E 20 75    LDX    #$2075
 4843: D6 F1       LDB    $F1
 4845: BD 50 25    JSR    $5025
 4848: C6 01       LDB    #$01
-484A: BD 48 9B    JSR    $489B
+484A: BD 48 9B    JSR    display_osd_text_489b
 484D: 10 8E 00 68 LDY    #$0068
 4851: 8E 20 61    LDX    #$2061
 4854: D6 F1       LDB    $F1
@@ -70,12 +71,12 @@ l_485c:
 4895: 8C 23 FF    CMPX   #$23FF
 4898: 23 F5       BLS    $488F
 489A: 39          RTS
-l_489b:
+display_osd_text_489b:
 489B: 34 40       PSHS   U
 489D: 58          ASLB
 489E: 25 20       BCS    $48C0
 48A0: C4 7F       ANDB   #$7F
-48A2: 8E 48 DD    LDX    #$48DD
+48A2: 8E 48 DD    LDX    #text_table_48dd
 48A5: EE 85       LDU    B,X	; [bank_address]
 48A7: AE C1       LDX    ,U++	; [bank_address]
 48A9: A6 C0       LDA    ,U+	; [bank_address]
@@ -87,10 +88,10 @@ l_489b:
 48B7: E7 80       STB    ,X+		; [video_address]
 48B9: 20 F0       BRA    $48AB
 48BB: 35 C0       PULS   U,PC
-l_48bd:
+display_osd_text_48bd:
 48BD: 34 40       PSHS   U
 48BF: 58          ASLB
-48C0: 8E 48 DD    LDX    #$48DD
+48C0: 8E 48 DD    LDX    #text_table_48dd
 48C3: EE 85       LDU    B,X	; [bank_address]
 48C5: AE C1       LDX    ,U++	; [bank_address]
 48C7: 33 41       LEAU   $1,U
@@ -230,15 +231,16 @@ l_511e:
 5120: 26 13       BNE    $5135
 5122: 96 51       LDA    $51
 5124: 26 10       BNE    $5136
+; write "CREDIT"
 5126: C6 03       LDB    #$03
-5128: BD 48 9B    JSR    $489B
+5128: BD 48 9B    JSR    display_osd_text_489b
 512B: DC 22       LDD    $22
 512D: 8E 23 A1    LDX    #$23A1
 5130: 30 08       LEAX   $8,X
 5132: 7E 50 E1    JMP    $50E1
 5135: 39          RTS
 5136: C6 04       LDB    #$04
-5138: 7E 48 9B    JMP    $489B
+5138: 7E 48 9B    JMP    display_osd_text_489b
 l_513b:
 513B: C6 07       LDB    #$07
 513D: 8E 23 A0    LDX    #$23A0
@@ -349,7 +351,7 @@ write_weapon_frame_526d:
 5294: 39          RTS
 compute_and_display_time_52b9:
 52B9: C6 26       LDB    #$26
-52BB: BD 48 9B    JSR    $489B
+52BB: BD 48 9B    JSR    display_osd_text_489b
 52BE: 9E AA       LDX    time_left_00aa		; total time
 52C0: CC 00 3C    LDD    #$003C		; 60 seconds
 52C3: 36 10       PSHU   X			; U should be around $280
@@ -386,20 +388,20 @@ l_52fb:
 530A: BD 53 30    JSR    $5330
 530D: 35 C0       PULS   U,PC
 530F: C6 0D       LDB    #$0D
-5311: BD 48 9B    JSR    $489B
+5311: BD 48 9B    JSR    display_osd_text_489b
 5314: BE 53 41    LDX    $5341
 5317: 10 9E 55    LDY    $55
 531A: C6 03       LDB    #$03
 531C: 7E 50 25    JMP    $5025
 531F: C6 0E       LDB    #$0E
-5321: BD 48 9B    JSR    $489B
+5321: BD 48 9B    JSR    display_osd_text_489b
 5324: BE 53 43    LDX    $5343
 5327: DE 55       LDU    $55
 5329: 31 44       LEAY   $4,U
 532B: C6 03       LDB    #$03
 532D: 7E 50 25    JMP    $5025
 5330: C6 0F       LDB    #$0F
-5332: BD 48 9B    JSR    $489B
+5332: BD 48 9B    JSR    display_osd_text_489b
 5335: BE 53 45    LDX    $5345
 5338: DE 55       LDU    $55
 533A: 31 48       LEAY   $8,U
@@ -445,7 +447,7 @@ l_5347:
 copy_highscores_53a3:
 53A3: 34 40       PSHS   U
 53A5: C6 10       LDB    #$10
-53A7: BD 48 9B    JSR    $489B
+53A7: BD 48 9B    JSR    display_osd_text_489b
 53AA: 10 8E 15 18 LDY    #high_score_table_1518
 53AE: CE 20 CB    LDU    #$20CB
 53B1: 30 C4       LEAX   ,U
@@ -577,7 +579,7 @@ l_54ff:
 553F: 34 20       PSHS   Y
 5541: BD 48 00    JSR    $4800
 5544: C6 11       LDB    #$11
-5546: BD 48 9B    JSR    $489B
+5546: BD 48 9B    JSR    display_osd_text_489b
 5549: BD 55 A3    JSR    $55A3
 554C: 30 1F       LEAX   -$1,X
 554E: 26 FC       BNE    $554C
@@ -588,7 +590,7 @@ l_54ff:
 5557: F7 3D 00    STB    $3D00
 555A: BD 48 00    JSR    $4800
 555D: C6 12       LDB    #$12
-555F: BD 48 9B    JSR    $489B
+555F: BD 48 9B    JSR    display_osd_text_489b
 5562: 30 01       LEAX   $1,X
 5564: E6 E0       LDB    ,S+
 5566: 8D 23       BSR    $558B
@@ -601,7 +603,7 @@ l_54ff:
 5574: F7 3D 00    STB    $3D00
 5577: BD 48 00    JSR    $4800
 557A: C6 13       LDB    #$13
-557C: BD 48 9B    JSR    $489B
+557C: BD 48 9B    JSR    display_osd_text_489b
 557F: 30 01       LEAX   $1,X
 5581: E6 E0       LDB    ,S+
 5583: 8D 06       BSR    $558B
@@ -622,7 +624,7 @@ l_54ff:
 559F: A7 80       STA    ,X+			; [video_address]
 55A1: 35 84       PULS   B,PC
 55A3: C6 14       LDB    #$14
-55A5: BD 48 9B    JSR    $489B
+55A5: BD 48 9B    JSR    display_osd_text_489b
 55A8: CE 5F FA    LDU    #$5FFA
 55AB: 10 8E 60 00 LDY    #$6000
 55AF: 8E 20 00    LDX    #$2000
@@ -666,12 +668,12 @@ l_54ff:
 5609: 0A E4       DEC    $E4
 560B: 2A CC       BPL    $55D9
 560D: C6 15       LDB    #$15
-560F: BD 48 9B    JSR    $489B
+560F: BD 48 9B    JSR    display_osd_text_489b
 5612: 86 03       LDA    #$03
 5614: B7 3E 00    STA    $3E00
 5617: 39          RTS
 5618: C6 16       LDB    #$16
-561A: BD 48 9B    JSR    $489B
+561A: BD 48 9B    JSR    display_osd_text_489b
 561D: 20 FE       BRA    $561D
 561F: 4F          CLRA
 5620: 5F          CLRB
@@ -811,20 +813,20 @@ jump_table_56a0:
 5725: 27 15       BEQ    $573C
 5727: F7 05 00    STB    $0500
 572A: C6 28       LDB    #$28
-572C: BD 48 BD    JSR    $48BD
+572C: BD 48 BD    JSR    display_osd_text_48bd
 572F: C6 29       LDB    #$29
-5731: BD 48 BD    JSR    $48BD
+5731: BD 48 BD    JSR    display_osd_text_48bd
 5734: C6 2A       LDB    #$2A
-5736: BD 48 BD    JSR    $48BD
+5736: BD 48 BD    JSR    display_osd_text_48bd
 5739: BD 57 C6    JSR    $57C6
 573C: BD 57 86    JSR    $5786
 573F: 0D 52       TST    $52
 5741: 26 07       BNE    $574A
 5743: C6 1B       LDB    #$1B
-5745: BD 48 9B    JSR    $489B
+5745: BD 48 9B    JSR    display_osd_text_489b
 5748: 20 05       BRA    $574F
 574A: C6 1A       LDB    #$1A
-574C: BD 48 9B    JSR    $489B
+574C: BD 48 9B    JSR    display_osd_text_489b
 574F: 8E 20 EE    LDX    #$20EE
 5752: 96 50       LDA    $50
 5754: C6 04       LDB    #$04
@@ -847,15 +849,15 @@ jump_table_56a0:
 5776: 0D 53       TST    $53
 5778: 26 06       BNE    $5780
 577A: C6 1C       LDB    #$1C
-577C: BD 48 9B    JSR    $489B
+577C: BD 48 9B    JSR    display_osd_text_489b
 577F: 39          RTS
 5780: C6 1D       LDB    #$1D
-5782: BD 48 9B    JSR    $489B
+5782: BD 48 9B    JSR    display_osd_text_489b
 5785: 39          RTS
 5786: 0D 51       TST    $51
 5788: 26 36       BNE    $57C0
 578A: C6 18       LDB    #$18
-578C: BD 48 9B    JSR    $489B
+578C: BD 48 9B    JSR    display_osd_text_489b
 578F: 8E 20 48    LDX    #$2048
 5792: 10 8E 15 85 LDY    #$1585
 5796: A6 A4       LDA    ,Y
@@ -876,7 +878,7 @@ jump_table_56a0:
 57BD: A7 84       STA    ,X             ; [video_address]
 57BF: 39          RTS
 57C0: C6 19       LDB    #$19
-57C2: BD 48 9B    JSR    $489B
+57C2: BD 48 9B    JSR    display_osd_text_489b
 57C5: 39          RTS
 57C6: BD 57 D4    JSR    $57D4
 57C9: BD 57 E4    JSR    $57E4
@@ -885,20 +887,20 @@ jump_table_56a0:
 57D0: BD 57 F5    JSR    $57F5
 57D3: 39          RTS
 57D4: C6 28       LDB    #$28
-57D6: BD 48 9B    JSR    $489B
+57D6: BD 48 9B    JSR    display_osd_text_489b
 57D9: BE 58 06    LDX    $5806
 57DC: 10 9E 55    LDY    $55
 57DF: C6 01       LDB    #$01
 57E1: 7E 50 25    JMP    $5025
 57E4: C6 29       LDB    #$29
-57E6: BD 48 9B    JSR    $489B
+57E6: BD 48 9B    JSR    display_osd_text_489b
 57E9: BE 58 08    LDX    $5808
 57EC: DE 55       LDU    $55
 57EE: 31 44       LEAY   $4,U
 57F0: C6 01       LDB    #$01
 57F2: 7E 50 25    JMP    $5025
 57F5: C6 2A       LDB    #$2A
-57F7: BD 48 9B    JSR    $489B
+57F7: BD 48 9B    JSR    display_osd_text_489b
 57FA: BE 58 0A    LDX    $580A
 57FD: DE 55       LDU    $55
 57FF: 31 48       LEAY   $8,U
@@ -1622,6 +1624,7 @@ l_5bdd:
 5DB5: A6 26       LDA    $6,Y
 5DB7: 81 03       CMPA   #$03
 5DB9: 26 21       BNE    $5DDC
+; high score name entered
 5DBB: 86 04       LDA    #$04
 5DBD: 97 0B       STA    $0B
 5DBF: 39          RTS

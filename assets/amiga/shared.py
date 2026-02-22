@@ -174,20 +174,20 @@ def get_sprite_names():
     rval[0x263] = "ham_bonus"  # worth ??
     rval[0x264] = "trousers_bonus"  # worth 2000
     rval[0x265] = "crown_bonus"  # worth ??
-    rval[0x1D4] = rval[0x1DD] = "tomb_sorcerer"
-    rval[0x253] = rval[0x254] = rval[0x255] = "tomb_sorcerer"
     rval.update({x:"arthur_skeleton" for x in range(0x140,0x14f)})
     rval.update({x:"flying_goblin" for x in range(0x80,0x8f)})
     rval.update({x:"flying_bag" for x in range(0x6A,0x7B)})
     rval.update({x:"flying_bag" for x in [0x62,0x64,0x66,0x61]})
     rval.update({x:"shield_warrior" for x in [0x60,0x68,0x70,0x71,0x72,0x73,0x74,0x75]})
     rval.update({x:"thug" for x in range(0x1E0,0x1FF)})
-    rval.update({x:"arremer" for x in list(range(0x180,0x199))+list(range(0x1A0,0x1C0))+list(range(0x19A,0x19F))+[0x250,0x258]})
+    rval.update({x:"arremer" for x in list(range(0x180,0x199))+list(range(0x1A0,0x1C0))+list(range(0x19A,0x19F))+[0x250,0x251,0x252,0x258,0x259,0x25A]})
     rval.update({x:"princess" for x in [0x236,0x237,0x23e,0x23f]})
     rval.update({x:"princess" for x in [0x226,0x227,0x22e,0x22f]})
     rval.update({x:"bridge_flame" for x in range(0xE7,0xF7)})
     rval.update({x:"bridge_flame" for x in range(0x163,0x168)})
     rval.update({x:"magic_trunk" for x in range(0x91,0x9f)})
+    rval[0x1D4] = rval[0x1DD] = "tomb_sorcerer"
+    rval[0x18E] = rval[0x186] = rval[0x253] = rval[0x254] = rval[0x255] = "tomb_sorcerer"
     rval[0x1b6] = rval[0x1b7] = "plant_bullet"
     rval[0x54] = "spear"
     rval[0x132] = "armor"
@@ -208,8 +208,8 @@ def get_sprite_names():
     rval.update({i:"score" for i in range(0x3a,0x3e)})
     rval.update({i:"frog" for i in range(0x42,0x50)})
     rval.update({i:"dragon" for i in range(0x240,0x250)})
-    rval.update({i:"skeleton" for i in range(0xa0,0xa8)})
-    rval.update({i:"zombie" for i in range(0xa8,0xc0)})
+    rval.update({i:"skeleton" for i in range(0xa0,0xae)})
+    rval.update({i:"zombie" for i in range(0xae,0xc0)})
     rval.update({i:"bat" for i in range(0xe0,0xe4)})
     rval.update({i:"bat" for i in range(0xe8,0xec)})
     rval.update({i:"plant" for i in range(0xd0,0xd5)})
