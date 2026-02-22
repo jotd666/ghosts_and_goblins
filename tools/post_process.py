@@ -174,6 +174,7 @@ l_52fb
 copy_highscores_53a3
 add_to_score_53f4
 compute_and_display_time_52b9
+service_mode_5636
 l_58ce
 l_54e3
 l_5a8a

@@ -618,8 +618,8 @@ l_54ff:
 5595: 84 0F       ANDA   #$0F
 5597: 34 04       PSHS   B
 5599: C6 04       LDB    #$04
-559B: E7 89 04 00 STB    $0400,X
-559F: A7 80       STA    ,X+
+559B: E7 89 04 00 STB    $0400,X		; [unchecked_address]
+559F: A7 80       STA    ,X+			; [video_address]
 55A1: 35 84       PULS   B,PC
 55A3: C6 14       LDB    #$14
 55A5: BD 48 9B    JSR    $489B
@@ -687,6 +687,9 @@ l_54ff:
 5631: 9C E0       CMPX   $E0
 5633: 26 E3       BNE    $5618
 5635: 39          RTS
+
+; service mode!
+service_mode_5636:
 5636: D6 05       LDB    $05
 5638: 58          ASLB
 5639: 8E 56 3E    LDX    #jump_table_563e
@@ -825,8 +828,8 @@ jump_table_56a0:
 574F: 8E 20 EE    LDX    #$20EE
 5752: 96 50       LDA    $50
 5754: C6 04       LDB    #$04
-5756: E7 89 04 00 STB    $0400,X
-575A: A7 84       STA    ,X
+5756: E7 89 04 00 STB    $0400,X        ; [unchecked_address]
+575A: A7 84       STA    ,X				; [video_address]
 575C: 30 88 20    LEAX   $20,X
 575F: 96 41       LDA    $41
 5761: 84 60       ANDA   #$60
@@ -839,8 +842,8 @@ jump_table_56a0:
 576A: 22 02       BHI    $576E
 576C: 88 01       EORA   #$01
 576E: C6 04       LDB    #$04
-5770: E7 89 04 00 STB    $0400,X
-5774: A7 84       STA    ,X
+5770: E7 89 04 00 STB    $0400,X         ; [unchecked_address]
+5774: A7 84       STA    ,X              ; [video_address]
 5776: 0D 53       TST    $53
 5778: 26 06       BNE    $5780
 577A: C6 1C       LDB    #$1C
@@ -857,20 +860,20 @@ jump_table_56a0:
 5792: 10 8E 15 85 LDY    #$1585
 5796: A6 A4       LDA    ,Y
 5798: C6 05       LDB    #$05
-579A: E7 89 04 00 STB    $0400,X
-579E: A7 84       STA    ,X
+579A: E7 89 04 00 STB    $0400,X		; [unchecked_address]
+579E: A7 84       STA    ,X				; [video_address]
 57A0: 30 07       LEAX   $7,X
 57A2: A6 21       LDA    $1,Y
-57A4: E7 89 04 00 STB    $0400,X
-57A8: A7 84       STA    ,X
+57A4: E7 89 04 00 STB    $0400,X        ; [unchecked_address]
+57A8: A7 84       STA    ,X             ; [video_address]
 57AA: 30 88 19    LEAX   $19,X
 57AD: A6 28       LDA    $8,Y
-57AF: E7 89 04 00 STB    $0400,X
-57B3: A7 84       STA    ,X
+57AF: E7 89 04 00 STB    $0400,X        ; [unchecked_address]
+57B3: A7 84       STA    ,X             ; [video_address]
 57B5: 30 07       LEAX   $7,X
 57B7: A6 29       LDA    $9,Y
-57B9: E7 89 04 00 STB    $0400,X
-57BD: A7 84       STA    ,X
+57B9: E7 89 04 00 STB    $0400,X        ; [unchecked_address]
+57BD: A7 84       STA    ,X             ; [video_address]
 57BF: 39          RTS
 57C0: C6 19       LDB    #$19
 57C2: BD 48 9B    JSR    $489B
@@ -927,9 +930,9 @@ jump_table_56a0:
 5839: 5F          CLRB
 583A: 44          LSRA
 583B: 59          ROLB
-583C: E7 84       STB    ,X
+583C: E7 84       STB    ,X			; [unchecked_address]
 583E: C6 04       LDB    #$04
-5840: E7 89 04 00 STB    $0400,X
+5840: E7 89 04 00 STB    $0400,X	; [video_address]
 5844: 30 88 20    LEAX   $20,X
 5847: 39          RTS
 5848: 4F          CLRA

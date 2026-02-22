@@ -1,7 +1,12 @@
-- 50Hz to do with blitter chaining: risk of flickering if we can't store mirrored copies
-  => blit chaining seems to work, missing mirror commands, and also scroll
-- implement dip difficulty
+- arremer frames missing: pre-mirror of arremer doesn't work properly (level 3)
+triplet arremer_1a3_03:
+* orientation=standard
+	.word	14,8,2,0x7f  | height,width,offset,active_planes
+- pre-mirror of trunk fails (91) in clut 1 probably because of 0 in planelist
+- scrolling to fix, wrong values, shaking
+- implement dip difficulty: DSW2 seems at 0 check read_dsw2 and dsw1!
 - load/save highscores
+
 
 - don't play a tune if same module / same pattern already playing (avoids to repeat music when there's a E8 trigger): does this happen?
 - CD32 version to test with release exe: works with 1E0000 base chip!!
@@ -10,20 +15,20 @@
   => put cdplay, cdstop functions at start (offset 4,8) so game can call them, cd32slave is easy to code
 - bottom left life icon not erased by "credit" message
 
+- remove parasite tiles (in the end) because of levelskip some intro tiles are logged in levels 2+
 - remove those "hhhhh" at start fill_screen_with_h 
 - level 3 still tile issues (part 2, hard left after big ladder, even on emulation, try to reproduce as not systematic)
 - real hardware sometimes scrolling seems to reset. Increase delta x scroll to trigger full refresh: to test real hw
 - continue play: part of the map is black: not always???
 - try to apply patches to fix some original game bugs / difficulty level HP for monsters
 - scrolling and double buffering can it be improved? (also in other games!)
-- add foreground tiles (grass, bridge)
+- add foreground tiles (grass, bridge): tricky work, added blitting, and not really noticeable
 - demo resets scroll and makes column update buggy at times
 - level 2 see if we can use dynamic color change, see if separating ice towers from rest of game tiles (except house right after)
   allows a neat 32+32 colors. In that case, it's doable to use dynamic color change on some colors
 - diff with world version 3 see if the fixes are visible: difficult. 1 diff seen around DDFD, rom bank $4000 to check
 - 6ED0 called at the start of a level, maybe try to load context there first
 - force tile draw cheat screws up host_scroll and tile feed
-- remove parasite tiles (in the end) because of levelskip some intro tiles are logged in levels 2+
 - inprint the tombstones (level 1 & 3) in the background (for instance when drawing left & right tiles but also at start) to save
   cpu & reduce the shaking effect
 - change weapon trainer: call the routine to redraw weapon: not from interrupt!! if must be done, force to call "a new

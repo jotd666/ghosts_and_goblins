@@ -22,7 +22,57 @@
 ;	GFXDECODE_ENTRY( "chars",   0, charlayout,   0x80, 16 ) // colors 0x80-0xbf
 ;	GFXDECODE_ENTRY( "tiles",   0, tilelayout,   0x00,  8 ) // colors 0x00-0x3f
 ;	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0x40,  4 ) // colors 0x40-0x7f
-	
+
+;	PORT_START("DSW1")
+;	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:8,7,6,5")
+;	PORT_DIPSETTING( 0x02, DEF_STR( 4C_1C ) )
+;	PORT_DIPSETTING( 0x05, DEF_STR( 3C_1C ) )
+;	PORT_DIPSETTING( 0x08, DEF_STR( 2C_1C ) )
+;	PORT_DIPSETTING( 0x04, DEF_STR( 3C_2C ) )
+;	PORT_DIPSETTING( 0x01, DEF_STR( 4C_3C ) )
+;	PORT_DIPSETTING( 0x0f, DEF_STR( 1C_1C ) )
+;	PORT_DIPSETTING( 0x03, DEF_STR( 3C_4C ) )
+;	PORT_DIPSETTING( 0x07, DEF_STR( 2C_3C ) )
+;	PORT_DIPSETTING( 0x0e, DEF_STR( 1C_2C ) )
+;	PORT_DIPSETTING( 0x06, DEF_STR( 2C_5C ) )
+;	PORT_DIPSETTING( 0x0d, DEF_STR( 1C_3C ) )
+;	PORT_DIPSETTING( 0x0c, DEF_STR( 1C_4C ) )
+;	PORT_DIPSETTING( 0x0b, DEF_STR( 1C_5C ) )
+;	PORT_DIPSETTING( 0x0a, DEF_STR( 1C_6C ) )
+;	PORT_DIPSETTING( 0x09, DEF_STR( 1C_7C ) )
+;	PORT_DIPSETTING( 0x00, DEF_STR( Free_Play ) )
+;	PORT_DIPNAME( 0x10, 0x10, "Coinage affects" )       PORT_DIPLOCATION("SW1:4")
+;	PORT_DIPSETTING( 0x10, DEF_STR( Coin_A ) )
+;	PORT_DIPSETTING( 0x00, DEF_STR( Coin_B ) )
+;	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:3")
+;	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
+;	PORT_DIPSETTING(  0x00, DEF_STR( On ) )
+;	PORT_SERVICE_DIPLOC(  0x40, IP_ACTIVE_LOW, "SW1:2" )
+;	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:1")
+;	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
+;	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+;
+;	PORT_START("DSW2")
+;	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:8,7")
+;	PORT_DIPSETTING( 0x03, "3" )
+;	PORT_DIPSETTING( 0x02, "4" )
+;	PORT_DIPSETTING( 0x01, "5" )
+;	PORT_DIPSETTING( 0x00, "7" )
+;	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:6")
+;	PORT_DIPSETTING( 0x00, DEF_STR( Upright ) )
+;	PORT_DIPSETTING( 0x04, DEF_STR( Cocktail ) )
+;	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:5,4")
+;	PORT_DIPSETTING( 0x18, "20K 70K Every 70K" )
+;	PORT_DIPSETTING( 0x10, "30K 80K Every 80K" )
+;	PORT_DIPSETTING( 0x08, "20K and 80K Only" )
+;	PORT_DIPSETTING( 0x00, "30K and 80K Only" )
+;	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:3,2")
+;	PORT_DIPSETTING( 0x40, DEF_STR( Easy ) )
+;	PORT_DIPSETTING( 0x60, DEF_STR( Normal ) )
+;	PORT_DIPSETTING( 0x20, DEF_STR( Difficult ) )
+;	PORT_DIPSETTING( 0x00, DEF_STR( Very_Difficult ) )
+;	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:1" )        // Listed as "Unused"
+
 bankswitch_3e00 = $3e00
 bankswitch_copy_d9 = $d9
 weapon_type_0073 = $73
@@ -666,7 +716,7 @@ irq_65c4:
 65EF: 58          ASLB
 ; only 3 states: 1: game not in play, 2: game in play
 65F0: 8E 65 BC    LDX    #jump_table_65bc
-65F3: AD 95       JSR    [B,X]		; [indirect_jump] [nb_entries=3]
+65F3: AD 95       JSR    [B,X]		; [indirect_jump] [nb_entries=4]
 65F5: D6 D9       LDB    bankswitch_copy_d9
 65F7: F7 3E 00    STB    bankswitch_3e00
 65FA: 3B          RTI
@@ -16146,6 +16196,7 @@ jump_table_65bc:
 	dc.w	$684f	; $65bc
 	dc.w	game_not_playing_694d	; $65be
 	dc.w	game_in_play_70e3	; $65c0
+	dc.w	service_mode_5636
 jump_table_6611:
 	dc.w	update_tiles_palette_6619	; $6611
 	dc.w	update_sprites_palette_6693	; $6613

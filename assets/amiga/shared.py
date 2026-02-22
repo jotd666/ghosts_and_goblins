@@ -198,6 +198,7 @@ def get_sprite_names():
     rval[0x90] = rval[0x98] = "earth"
     rval[0x23B] = rval[0x23C] = rval[0x23D] = "princess"
     rval[0x233] = rval[0x234] = rval[0x235] = "princess"
+    rval[0x7C] = rval[0x7D] = rval[0x7E] = "dragon_shot"
 
     #rval.update({i:"armored_arthur" for i in range()})
 

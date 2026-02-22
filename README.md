@@ -1,7 +1,14 @@
 "# Ghosts'N'Goblins" 
-port of Ghosts'n'Goblins for Amiga
+port of Ghosts'n'Goblins for Amiga AGA
 
-Requires a 2-button joystick, or the keyboard
+Requires a 2-button joystick, or the keyboard, some fast memory or CD32 :)
+
+Features:
+
+- all 7 levels in 64 colors
+- awesome music
+- difficulty/lives settings
+- service mode :)
 
 Credits:
 

@@ -565,12 +565,7 @@ _user:
 
 
 0:
-1:
-*	move.b	difficulty_level+3,d0
-*	and.w	#3,d0
-*	lea		difficulty_table,a0
-*	move.b	(a0,d0.w),difficulty_dsw
-	
+1:	
 	
 	move.b	start_level+3,start_level_flag
 	
@@ -582,6 +577,8 @@ _user:
 	sne		skip_intro_flag
 	btst	#2,d1
 	sne		no_level_music_flag
+	btst	#3,d1
+	sne		service_mode_flag
 	.ifne	OPT_CD32_VERSION
 	* force the flag
 	st		no_level_music_flag
@@ -607,7 +604,33 @@ _user:
 	st		cheat_used
 
 0:
-		
+	* set dip switches
+	* (some settings are not modifiable)
+	moveq	#0,d0
+	bset	#5,d0		| "normal" setup in mame
+	tst.b	service_mode_flag
+	jeq		0f
+	bset	#6,d0
+0:
+	lea		lives_table,a0
+	move.b	start_lives+3,d1
+	and.w	#3,d1
+	move.b	(a0,d1.w),d1
+	or.b	d1,d0
+
+	not.b	d0
+	move.b	d0,dip_switches_1
+
+	move	#6,d0		| "normal" setup in mame (?? value->nb lives: 3->4, 4->5, 5->6, 7->7)
+	lea		difficulty_table,a0
+	move.b	difficulty_level+3,d1
+	and.w	#3,d1
+	move.b	(a0,d1.w),d1
+	lsl.b	#4,d1
+	or.b	d1,d0
+	not.b	d0
+	move.b	d0,dip_switches_2
+	
 	jsr	 _detect_controller_types
 
 	jra		demo_game
@@ -624,6 +647,18 @@ display_text:
 	jra		0b
 1:
 	rts
+
+lives_table:
+	.byte	4
+	.byte	5
+	.byte	6
+	.byte	7
+	
+difficulty_table:
+	.byte	2	| easy
+	.byte	0	| normal
+	.byte	4	| difficult
+	.byte	6	| very difficult
 	
 * < A1: address
 * < D0: number
@@ -4434,12 +4469,12 @@ decode_joypad_controls:
 
 osd_read_dsw1:
 	* actual dipswitches
-	move.b	#~0x20,d0	| what MAME returns by default
+	move.b	dip_switches_1,d0	| what MAME returns by default: demo sounds on. ~0x60: service mode
 	rts
 
 osd_read_dsw2:
 	* actual dipswitches
-	move.b	#~0x04,d0	| what MAME returns by default
+	move.b	dip_switches_2,d0	| what MAME returns by default
 	rts
 	
 osd_read_system:
@@ -5555,7 +5590,6 @@ chiprevbits:
 		.long	WHDLTAG_CUSTOM1_GET
 cheat_flags:
 		.long	0
-
 		.long	WHDLTAG_CUSTOM2_GET
 misc_options:
 		.long	0
@@ -5563,21 +5597,21 @@ misc_options:
 difficulty_level:
 		.long	0
 		.long	WHDLTAG_CUSTOM4_GET
+start_lives:
+		.long	0
+		.long	WHDLTAG_CUSTOM5_GET
 start_level:
 		.long	0
-
-		.long	WHDLTAG_CUSTOM5_GET
-		.long	0
 	.long	0
+	
 dip_switches_1:
-		.byte	0
-dip_switches_0:
-		.byte	0
-
+	.byte	0
 dip_switches_2:
 	.byte	0
 ntsc_flag:
 	.byte 	0
+service_mode_flag:
+	.byte	0
 no_level_music_flag:
 	.byte	0
 mid_screen_interrupt_count:

@@ -12,6 +12,13 @@
     "levels": null,
     "on_last_level": false
   },
+  "bat": {
+    "pre_mirror": [3],
+    "levels": [
+      3,
+      5
+    ]
+  },
   "crow": {
     "pre_mirror": [2],
     "levels": [
@@ -232,6 +239,14 @@
     ]
   },
   "dragon": {
+    "pre_mirror": null,
+    "levels": [
+      3,
+      4,
+      6
+    ]
+  },
+  "dragon_shot": {
     "pre_mirror": null,
     "levels": [
       3,

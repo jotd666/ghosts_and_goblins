@@ -8,7 +8,7 @@
 	IFD	CHIP_ONLY
 EXPMEM = 0
 	ELSE
-EXPMEM = $200000
+EXPMEM = $300000
 	ENDC
 CHIPSIZE = $1E0000
 
@@ -43,9 +43,11 @@ _config
 	dc.b	"C2:X:50 Hz update:0;"
 	dc.b	"C2:X:skip intro/map sequence:1;"
 	dc.b	"C2:X:no level music:2;"
+	dc.b	"C2:X:service mode:3;"
 
-	dc.b	"C4:L:start level:graveyard,town,cave,bridge,tower 1,tower 2,boss;"
-	dc.b	"C5:L:difficulty level:easy,normal,difficult,very difficult;"
+	dc.b	"C3:L:difficulty level:easy,normal,difficult,very difficult;"
+	dc.b	"C4:L:lives:3,5,6,7;"
+	dc.b	"C5:L:start level:graveyard,town,cave,bridge,tower 1,tower 2,boss;"
 	dc.b	0
 
 	IFD BARFLY
@@ -53,7 +55,7 @@ _config
 	ENDC
 
 DECL_VERSION:MACRO
-	dc.b	"1.0"
+	dc.b	"1.1"
 	IFD BARFLY
 		dc.b	" "
 		INCBIN	"T:date"
