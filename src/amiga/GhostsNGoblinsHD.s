@@ -5,10 +5,10 @@
 
 ;CHIP_ONLY
 
-	IFD	CHIP_ONLY
+	IFD	CD32_SLAVE
 EXPMEM = 0
 	ELSE
-EXPMEM = $300000
+EXPMEM = $200000
 	ENDC
 CHIPSIZE = $1E0000
 
@@ -46,7 +46,7 @@ _config
 	dc.b	"C2:X:service mode:3;"
 
 	dc.b	"C3:L:difficulty level:easy,normal,difficult,very difficult;"
-	dc.b	"C4:L:lives:3,5,6,7;"
+	dc.b	"C4:L:lives:3,4,5,7;"
 	dc.b	"C5:L:start level:graveyard,town,cave,bridge,tower 1,tower 2,boss;"
 	dc.b	0
 
@@ -67,7 +67,7 @@ DECL_VERSION:MACRO
 	ENDM
 _data   dc.b    "data",0
 _name	dc.b	"Ghosts'N'Goblins (arcade)"
-	IFD	CHIP_ONLY
+	IFD	CD32_SLAVE
 	dc.b	" (CD32)"
 	ENDC
 	dc.b	0
@@ -136,5 +136,8 @@ _resload:
 progstart
     dc.l    0
 exe
+	IFD	CD32_SLAVE
+	dc.b	"GhostsNGoblins_cd32",0
+	ELSE
 	dc.b	"GhostsNGoblins_aga",0
-	
+	ENDC

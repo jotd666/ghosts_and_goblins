@@ -11,7 +11,7 @@ cmd_prefix = ["make","-f",os.path.join(progdir,"makefile.am")]
 
 subprocess.check_call(cmd_prefix+["clean"],cwd=progdir /"src")
 
-subprocess.check_call(cmd_prefix+["RELEASE_BUILD=1"],cwd=progdir /"src")
+subprocess.check_call(cmd_prefix+["RELEASE_BUILD=1","all_cd32"],cwd=progdir /"src")
 # create archive
 
 outdir = progdir / f"{gamename}_HD"
@@ -23,12 +23,12 @@ if dataout.exists():
 if os.path.exists(outdir):
     for x in outdir.glob("*"):
         x.unlink()
-else:
-    outdir.mkdir()
-for file in ["readme.md",f"{gamename}_aga.slave"]:  #f"{gamename}.slave",
+outdir.mkdir(exist_ok=True)
+assets = progdir /"assets"/"amiga"
+
+for file in ["readme.md",f"{gamename}_AGA.slave"]:  #f"{gamename}.slave",
     shutil.copy(progdir / file,outdir)
 
-assets = progdir /"assets"/"amiga"
 shutil.copy(assets/"GhostsNGoblins.info",outdir)
 
 dataout.mkdir()
@@ -36,11 +36,45 @@ dataout.mkdir()
 for file in data.glob("level?_*"):
     shutil.copy(file,dataout)
 for file in data.glob("*.mod"):
-    shutil.copy(file,dataout)
+    if file.name != "GnG_Stage_CD32.mod":
+        shutil.copy(file,dataout)
 
 for ext in ["aga"]:
     exename = f"{gamename}_{ext}"
     shutil.copy(data/exename,dataout)
-    subprocess.run(["cranker_windows.exe","-f",data/exename,"-o",progdir/f"{exename}.rnc"],check=True)
+    #subprocess.run(["cranker_windows.exe","-f",data/exename,"-o",progdir/f"{exename}.rnc"],check=True)
 
-subprocess.run(cmd_prefix+["clean"],cwd=progdir/"src",check=True)
+
+outdir = progdir / f"{gamename}_CD32"
+
+dataout = outdir / "data"
+if dataout.exists():
+    shutil.rmtree(dataout)
+
+
+if os.path.exists(outdir):
+    for x in outdir.glob("*"):
+        x.unlink()
+
+outdir.mkdir(exist_ok=True)
+dataout.mkdir()
+
+for file in ["readme.md",f"{gamename}_CD32.slave"]:  #f"{gamename}.slave",
+    shutil.copy(progdir / file,outdir)
+
+shutil.copy(assets/"GhostsNGoblins.info",outdir)
+
+
+
+
+for file in data.glob("level?_*"):
+    shutil.copy(file,dataout)
+for file in data.glob("*.mod"):
+    if file.name == "GnG_Stage_CD32.mod" or not file.name.startswith("GnG_Stage"):
+        shutil.copy(file,dataout)
+
+for ext in ["cd32"]:
+    exename = f"{gamename}_{ext}"
+    shutil.copy(data/exename,dataout)
+
+#subprocess.run(cmd_prefix+["clean"],cwd=progdir/"src",check=True)

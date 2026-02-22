@@ -3,27 +3,27 @@
 *
 * (c) JOTD 2026
 *
-OPT_BLIT_CHAIN_MODE = 1		| enable blitter chaining
+OPT_BLIT_CHAIN_MODE = 0		| enable blitter chaining
 OPT_VBLIT_MIRROR_MODE = 1		| we need to mirror sprites on the fly, just before blitting them if needed
 OPT_VBLIT_SCROLL_MODE = 1		| we need to store scrolling values else BOBs can shake
-OPT_CD32_VERSION = 0
+
 
 	.ifne	OPT_CD32_VERSION
 boot:
 	bra.w	start	| don't optimize to bra.b or jra!!
 	* 2 functions that need to be at 4, 8
 _cdplay:
-	dc.l	0	; cd32load slave writes the address of the play routine here
+	.long	0	| cd32load slave writes the address of the play routine here
 _cdstop:
-	dc.l	0	; cd32load slave writes the address of the stop routine here
+	.long	0	| cd32load slave writes the address of the stop routine here
 _cdstatus:
-	dc.l	0	; cd32load slave writes the address of the status routine here
-				; 0: cd playing
-				; 1: cd stopped playing
-				; 2: cd not started playing
-				; 3: error
+	.long	0	| cd32load slave writes the address of the status routine here
+				| 0: cd playing
+				| 1: cd stopped playing
+				| 2: cd not started playing
+				| 3: error
 _cdreplay:
-	dc.l	0	; slave cd32load writes the address of the play-if-play-ended routine here
+	.long	0	| slave cd32load writes the address of the play-if-play-ended routine here
 	.endif
 start:
 	move.l	a7,old_stack
@@ -67,7 +67,7 @@ CORKSCREW_NB_SCREENS = 20
 BORDERBLANK = 1
 START_HOST_SCROLL_X = (CORKSCREW_NB_SCREENS/2)*0x100
 
-MIRROR_BUFFER_SIZE = 0x20000
+MIRROR_BUFFER_SIZE = 0x10000
 
 PREVIOUS_SPRITE_SIZE = 8
 CURRENT_SPRITE_SIZE = 4
@@ -78,7 +78,9 @@ GAME_MAX_SCROLL_Y = 0x200
 BG_TILE_WIDTH = 16
 
 BG_TILE_FILE_MAX_SIZE = 0x14000
-SPRITE_FILE_MAX_SIZE = 0x1F400
+*SPRITE_FILE_MAX_SIZE = 0x1F400
+SPRITE_FILE_MAX_SIZE = 0x1C800   | 8k smaller without the white arremers
+
 	.if		OPT_CD32_VERSION==0
 BIGGEST_MUSIC_SIZE = 385000
 	.else
@@ -606,22 +608,20 @@ _user:
 0:
 	* set dip switches
 	* (some settings are not modifiable)
-	moveq	#0,d0
-	bset	#5,d0		| "normal" setup in mame
+	move.b	#0x20,d0	| demo sounds on
 	tst.b	service_mode_flag
 	jeq		0f
 	bset	#6,d0
 0:
-	lea		lives_table,a0
-	move.b	start_lives+3,d1
-	and.w	#3,d1
-	move.b	(a0,d1.w),d1
-	or.b	d1,d0
-
 	not.b	d0
 	move.b	d0,dip_switches_1
 
-	move	#6,d0		| "normal" setup in mame (?? value->nb lives: 3->4, 4->5, 5->6, 7->7)
+	lea		lives_table,a0
+	move.b	start_lives+3,d1
+	and.w	#3,d1
+	move.b	(a0,d1.w),d0
+
+
 	lea		difficulty_table,a0
 	move.b	difficulty_level+3,d1
 	and.w	#3,d1
@@ -648,17 +648,6 @@ display_text:
 1:
 	rts
 
-lives_table:
-	.byte	4
-	.byte	5
-	.byte	6
-	.byte	7
-	
-difficulty_table:
-	.byte	2	| easy
-	.byte	0	| normal
-	.byte	4	| difficult
-	.byte	6	| very difficult
 	
 * < A1: address
 * < D0: number
@@ -1997,6 +1986,7 @@ level1_interrupt:
 	COMMIT_BLITLIST
 
 	.if		OPT_BLIT_CHAIN_MODE==0
+	jbsr	set_scroll_values
 	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
 	jbsr		switch_screen_buffers
 	.endif
@@ -2050,12 +2040,6 @@ level1_interrupt:
 	
 	
 0:
-	.endif
-
-	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
-	jbsr		switch_screen_buffers
-	.else
-	jbsr	set_bobs_bitplanes
 	.endif
 	
 	
@@ -2356,7 +2340,6 @@ really_update_sprites:
 	
 	move.l	bob_previous_drawed_sprites(pc),a4
 	lea		_custom,a5
-	
 
 
 	* clear previous positions
@@ -2364,7 +2347,7 @@ really_update_sprites:
 	move.l	playfield_drawed_screen_ptr(pc),a1
 	move.w	#NB_TARGET_SPRITES-1,d7
 	WAIT_BLIT
-	WRITE_BLITTER_REG_LONG	#-1,bltalwm		| needed for blit_background
+	WRITE_BLITTER_REG_WORD	#-1,bltalwm		| needed for blit_background
 1:
 	move.w	(a4),d0
 	bmi.b	11f		| x=0: inactive
@@ -3228,8 +3211,8 @@ platform_init:
 	lea		_custom,a5
 	move.w	#0x7FFF,dmacon(a5)
 	move.w	#0x7FFF,intena(a5)
-	* set blitter parameters once and for all
-	WRITE_BLITTER_REG_LONG	#-1,bltafwm
+	* set blitter parameters
+	move.l	#-1,bltafwm(a5)
 	
 	move.l	monitor,d0
 	cmp.l	#NTSC_MONITOR_ID,D0
@@ -5539,6 +5522,18 @@ normal_hiscorename:
 	.asciz	"gng.high"
 	
 
+lives_table:
+	.byte	4
+	.byte	5
+	.byte	6
+	.byte	7
+	
+difficulty_table:
+	.byte	2	| easy
+	.byte	0	| normal
+	.byte	4	| difficult
+	.byte	6	| very difficult
+	
 level_12_music:
 	.asciz	"GnG_Stage_1-2.mod"
 level_34_music:

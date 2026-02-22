@@ -352,11 +352,11 @@ for atc in alphanum_tile_codes:
 for atc in alphanum_tile_codes:
     fg_tile_cluts[atc] = sorted(used_cluts)
 
-# add the white flavour of arremer for all arremer frames
+# remove the white flavour of arremer for all arremer frames
 for k,v in sprite_cluts.items():
     if sprite_names.get(k)=="arremer" and k!=0x198:
-        if 2 not in v:
-            v.append(2)
+        if 2 in v:
+            v.remove(2)
 
 plane_orientations = [("standard",lambda x:x),
 ("flip",ImageOps.flip),
@@ -830,6 +830,10 @@ fg_tile_upper_table,next_id = read_tileset(fg_tile_upper_set_list,fg_tile_upper_
 fg_tile_lower_table,_ = read_tileset(fg_tile_lower_set_list,fg_tile_lower_palette,[True,False,False,False],cache=tile_plane_cache, is_bob=False, nb_cluts=FG_NB_CLUTS, mask_color=magenta, next_cache_id = next_id)
 sprite_table,_ = read_tileset(sprite_set_list,empty_32_cols+sprite_palette,[True,False,False,False],cache=bob_plane_cache, is_bob=True, mask_color=magenta, nb_cluts=SPRITE_NB_CLUTS)
 
+# remove white amerrers, waste of memory for very small benefit
+##for k,sprite in enumerate(sprite_table):
+##    if sprite_names.get(k)=="arremer" and k!=0x198:
+##        sprite[2]=sprite[3]
 
 
 with open(src_dir / "palette.68k","w") as f:

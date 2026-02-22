@@ -1,5 +1,6 @@
 PROGNAME = GhostsNGoblins
 MAIN_AGA = ..\data\$(PROGNAME)_aga
+MAIN_CD32 = ..\data\$(PROGNAME)_cd32
 MAIN_OCS = ..\data\$(PROGNAME)_ocs
 AMIGA_SHELL = ..\$(PROGNAME)
 
@@ -13,11 +14,12 @@ ASM_BASE = $(GCC_BIN)/m68k-amigaos-as -c --defsym __amiga__=1
 ASM_000 = $(ASM_BASE) -m68000 --defsym OCS_VERSION=1 $(OPT_RELEASE) 
 ASM_020 = $(ASM_BASE) -m68020 --defsym MC68020=1 $(OPT_RELEASE) 
 ASM = $(ASM_000)
-MAIN_OBJ = amiga.o
+
 HW_TESTER_AGA = ..\HWTester.slave
 CDLOADER = ..\$(PROGNAME).cdslave
 WHDLOADER_AGA = ..\$(PROGNAME)_AGA.slave
 WHDLOADER_AGA_CHIP = ..\$(PROGNAME)_AGA_chip.slave
+WHDLOADER_CD32 = ..\$(PROGNAME)_CD32.slave
 WHDLOADER_OCS = ..\$(PROGNAME)_OCS.slave
 WHDLOADER_OCS_CHIP = ..\$(PROGNAME)_OCS_chip.slave
 ASSETS = ..\assets\amiga
@@ -37,17 +39,19 @@ WHDASM = vasmm68k_mot -DDATETIME -I$(HDBASE)/amiga39_JFF_OS/include -I$(WHDBASE)
 MEM_OBJS = rom.o ram.o bank0.o bank1.o bank2.o bank3.o bank4.o
 HWT_OBJS = hw_tester.o sounds.o ram.o  graphics_aga.o vbr.o ReadJoyPad.o ptplayer.o 
 AGA_OBJS = amiga_aga.o sounds.o main_code_6000_020.o bank3_code_4000_020.o $(MEM_OBJS) graphics_aga.o vbr.o ReadJoyPad.o ptplayer.o rn_floppy_loader.o
-OCS_OBJS = amiga_ocs.o sounds.o $(PROGNAME)_000.o ram.o graphics_ocs.o rom.o vbr.o ReadJoyPad.o ptplayer.o 
+CD32_OBJS = amiga_cd32.o sounds.o main_code_6000_020.o bank3_code_4000_020.o $(MEM_OBJS) graphics_aga.o vbr.o ReadJoyPad.o ptplayer.o
 
 #../data/hw_tester
-all:  $(HW_TESTER_AGA) $(CDLOADER) $(MAIN_AGA) $(WHDLOADER_AGA) $(WHDLOADER_AGA_CHIP) $(AMIGASRC)/graphics_aga.68k $(AMIGASRC)/sounds.68k
- 
+all:  $(HW_TESTER_AGA) $(CDLOADER) $(MAIN_AGA)  $(WHDLOADER_AGA) $(WHDLOADER_AGA_CHIP) $(AMIGASRC)/graphics_aga.68k $(AMIGASRC)/sounds.68k
+
+all_cd32: all $(MAIN_CD32) $(WHDLOADER_CD32)
+
 $(AMIGA_SHELL): shell.o
 	$(GCC_BIN)/m68k-amigaos-ld $(OPT_RELEASE_LINK) -o $(AMIGA_SHELL) shell.o
 
 # don't clean shell program, update_floppy will need it
 clean:
-	del $(AGA_OBJS) $(OCS_OBJS) "$(MAIN_AGA)" "$(MAIN_OCS)"
+	del $(AGA_OBJS) $(CD32_OBJS) $(OCS_OBJS) "$(MAIN_AGA)" "$(MAIN_OCS)"
 	
 shell.o: $(AMIGASRC)/shell.68k
 	$(ASM_000) -I$(AMIGASRC) -I$(AMIGASRC)/mit_includes $(AMIGASRC)/shell.68k -o shell.o
@@ -63,11 +67,14 @@ $(AMIGASRC)/sounds.68k: $(ASSETS)/convert_sounds.py
 $(MAIN_AGA): $(AGA_OBJS)
 	$(GCC_BIN)/m68k-amigaos-ld $(OPT_RELEASE_LINK) -o $(MAIN_AGA) $(AGA_OBJS)
 	
+$(MAIN_CD32): $(CD32_OBJS)
+	$(GCC_BIN)/m68k-amigaos-ld $(OPT_RELEASE_LINK) -o $(MAIN_CD32) $(AGA_OBJS)
+	
 ../data/hw_tester: $(HWT_OBJS)
 	$(GCC_BIN)/m68k-amigaos-ld $(OPT_RELEASE_LINK) -o ../data/hw_tester  $(HWT_OBJS)
 	
-$(MAIN_OCS): $(OCS_OBJS)
-	$(GCC_BIN)/m68k-amigaos-ld $(OPT_RELEASE_LINK) -o $(MAIN_OCS) $(OCS_OBJS)
+#$(MAIN_OCS): $(OCS_OBJS)
+#	$(GCC_BIN)/m68k-amigaos-ld $(OPT_RELEASE_LINK) -o $(MAIN_OCS) $(OCS_OBJS)
 
 ram.o: ram.68k options.inc
 	$(ASM) ram.68k -o ram.o
@@ -94,7 +101,9 @@ $(PROGNAME)_000.o: $(PROGNAME).68k options.inc include.inc sounds.inc data.inc
 hw_tester.o: $(AMIGASRC)/hw_tester.68k options.inc include.inc data.inc $(AMIGASRC)/ReadJoyPad.i $(AMIGASRC)/palette.68k $(AMIGASRC)/graphics_aga.68k $(AMIGASRC)/sound_entries.68k  $(AMIGASRC)/scroll_table_64.68k
 	$(ASM_020) -I$(AMIGASRC) -I$(AMIGASRC)/mit_includes $(AMIGASRC)/hw_tester.68k -o hw_tester.o
 amiga_aga.o: $(AMIGASRC)/amiga.68k $(AMIGASRC)/context.68k options.inc include.inc data.inc $(AMIGASRC)/ReadJoyPad.i $(AMIGASRC)/palette.68k $(AMIGASRC)/graphics_aga.68k $(AMIGASRC)/sound_entries.68k  $(AMIGASRC)/scroll_table_64.68k
-	$(ASM_020) -I$(AMIGASRC) -I$(AMIGASRC)/mit_includes $(AMIGASRC)/amiga.68k -o amiga_aga.o
+	$(ASM_020) --defsym OPT_CD32_VERSION=0 -I$(AMIGASRC) -I$(AMIGASRC)/mit_includes $(AMIGASRC)/amiga.68k -o amiga_aga.o
+amiga_cd32.o: $(AMIGASRC)/amiga.68k $(AMIGASRC)/context.68k options.inc include.inc data.inc $(AMIGASRC)/ReadJoyPad.i $(AMIGASRC)/palette.68k $(AMIGASRC)/graphics_aga.68k $(AMIGASRC)/sound_entries.68k  $(AMIGASRC)/scroll_table_64.68k
+	$(ASM_020) --defsym OPT_CD32_VERSION=1 -I$(AMIGASRC) -I$(AMIGASRC)/mit_includes $(AMIGASRC)/amiga.68k -o amiga_aga.o
 amiga_ocs.o: $(AMIGASRC)/amiga.68k options.inc include.inc data.inc $(AMIGASRC)/ReadJoyPad.i $(AMIGASRC)/ocs/palette.68k $(AMIGASRC)/sound_entries.68k $(AMIGASRC)/scroll_table_16.68k
 	$(ASM_000) -I$(AMIGASRC)/ocs -I$(AMIGASRC) -I$(AMIGASRC)/mit_includes $(AMIGASRC)/amiga.68k -o amiga_ocs.o
 amiga_shared.o: $(AMIGASRC)/amiga_shared.68k options.inc  data.inc $(AMIGASRC)/sound_entries.68k $(AMIGASRC)/ReadJoyPad.i
@@ -129,6 +138,10 @@ $(HW_TESTER_AGA) : $(AMIGASRC)/HWTesterHD.s
 $(WHDLOADER_AGA_CHIP) : $(AMIGASRC)/$(PROGNAME)HD.s
 	wdate.py> datetime
 	$(WHDASM) -DCHIP_ONLY -o $(WHDLOADER_AGA_CHIP) $(AMIGASRC)/$(PROGNAME)HD.s
+
+$(WHDLOADER_CD32) : $(AMIGASRC)/$(PROGNAME)HD.s
+	wdate.py> datetime
+	$(WHDASM) -DCD32_SLAVE -o $(WHDLOADER_CD32) $(AMIGASRC)/$(PROGNAME)HD.s
 
 $(WHDLOADER_OCS) : $(AMIGASRC)/ocs/$(PROGNAME)HD.s
 	wdate.py> datetime

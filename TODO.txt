@@ -1,8 +1,8 @@
 - pre-mirror of trunk fails (91) in clut 1 probably because of 0 in planelist (?? sounds ok)
 - scrolling to fix, wrong values, shaking
-- implement dip difficulty: wrong 1 credit for 6 plays, difficulty level???
 - load/save highscores: to test
-- to save memory (CD32 version?): don't include white arremers, shorten sprite files
+- to save memory (CD32 version?): don't include white arremers, shorten sprite files, lower quality sound samples
+- freeze & optimize 68k code
 
 - don't play a tune if same module / same pattern already playing (avoids to repeat music when there's a E8 trigger): does this happen?
 - CD32 version to test with release exe: works with 1E0000 base chip!!
