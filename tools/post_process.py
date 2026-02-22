@@ -104,8 +104,10 @@ for i,line in enumerate(lines):
     if address == 0x55CE:
         line = "\tILLEGAL\n"  # not reachable anyway, part of ROM/RAM check code
     elif address == 0x5DBF:
-        line = "\tGET_ADDRESS\thigh_score_location_152c\njbsr\tosd_write_high_scores\n"+line
-
+        line = "jbsr\tosd_write_high_scores\n"+line
+    elif address == 0x512B and "GET_DP_ADDRESS" in line:
+        # clear life tile
+        line = "\tGET_UNCHECKED_ADDRESS\t0x23A0\n\tmove.b\t#0x20,(a0)\n\tclr.b\t(0x400,a0)\n\tVIDEO_BYTE_DIRTY  | clear bottom left corner\n"+line
     if "review pshu instruction" in line or "review pulu instruction" in line or "review stack set from register" in line:
         line = remove_error(line)
 
@@ -302,7 +304,7 @@ for i,line in enumerate(lines):
         line = "\ttst.b\tskip_intro_flag\n\tjne\tplay_intro_7187\n"+line
     elif address == 0x6140:
         # insert read highscore
-        line = "\tGET_ADDRESS\thigh_score_location_152c\njbsr\tosd_read_high_scores\n"+line
+        line = "\tjbsr\tosd_read_high_scores\n"+line
     ###################################################
     # 2 table of tables to rework almost completely
     # this mixes with table rework and is quite a mess but works

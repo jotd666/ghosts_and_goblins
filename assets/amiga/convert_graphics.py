@@ -353,10 +353,13 @@ for atc in alphanum_tile_codes:
     fg_tile_cluts[atc] = sorted(used_cluts)
 
 # remove the white flavour of arremer for all arremer frames
+# or add them
 for k,v in sprite_cluts.items():
     if sprite_names.get(k)=="arremer" and k!=0x198:
-        if 2 in v:
-            v.remove(2)
+##        if 2 in v:
+##            v.remove(2)
+        if 2 not in v:
+            v.append(2)
 
 plane_orientations = [("standard",lambda x:x),
 ("flip",ImageOps.flip),

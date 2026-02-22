@@ -1,6 +1,8 @@
+; pointers for order, then score & names
 high_score_table_1518 = $1518
 time_left_00aa = $AA
 text_table_48dd = $48dd
+high_score_00d0 = $d0
 
 clear_screen_and_show_status_4800:
 4800: 8E 20 00    LDX    #$2000
@@ -516,7 +518,7 @@ add_to_score_53f4:
 5429: 10 93 D2    CMPD   $D2
 542C: 25 14       BCS    $5442
 542E: DC 68       LDD    $68
-5430: DD D0       STD    $D0
+5430: DD D0       STD    high_score_00d0
 5432: DC 6A       LDD    $6A
 5434: DD D2       STD    $D2
 5436: D6 F1       LDB    $F1
@@ -1251,6 +1253,7 @@ jump_table_5a96:
 5AAC: ED 2E       STD    $E,Y
 5AAE: 0C 08       INC    $08
 5AB0: 39          RTS
+
 5AB1: 8E 15 18    LDX    #high_score_table_1518
 5AB4: BD 5A E3    JSR    $5AE3
 5AB7: 25 12       BCS    $5ACB
@@ -1543,7 +1546,7 @@ l_5bdd:
 5D0C: 25 23       BCS    $5D31
 5D0E: EE 23       LDU    $3,Y
 5D10: 86 0B       LDA    #$0B
-5D12: A7 C9 04 00 STA    $0400,U
+5D12: A7 C9 04 00 STA    $0400,U	; [video_address]
 5D16: CE 21 C4    LDU    #$21C4
 5D19: 11 A3 23    CMPU   $3,Y
 5D1C: 23 0A       BLS    $5D28
@@ -1628,6 +1631,7 @@ l_5bdd:
 5DBB: 86 04       LDA    #$04
 5DBD: 97 0B       STA    $0B
 5DBF: 39          RTS
+
 5DC0: E6 26       LDB    $6,Y
 5DC2: 5D          TSTB
 5DC3: 27 17       BEQ    $5DDC

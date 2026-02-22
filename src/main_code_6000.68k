@@ -321,8 +321,8 @@ l_612d:
 	MAKE_D                                 	| [...]
 	GET_DP_ADDRESS	0xd2                    	| [$613e: std    $d2]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
-	GET_ADDRESS	high_score_location_152c
-jbsr	osd_read_high_scores
+	GET_ADDRESS	high_score_table_1518
+	jbsr	osd_read_high_scores
 	jbsr	read_dip_switches_622c            	| [$6140: jsr    read_dip_switches_622c]
 	jbsr	l_6239                            	| [$6143: jsr    $6239]
 	jbsr	l_6274                            	| [$6146: jsr    $6274]

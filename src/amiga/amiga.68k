@@ -67,7 +67,7 @@ CORKSCREW_NB_SCREENS = 20
 BORDERBLANK = 1
 START_HOST_SCROLL_X = (CORKSCREW_NB_SCREENS/2)*0x100
 
-MIRROR_BUFFER_SIZE = 0x10000
+MIRROR_BUFFER_SIZE = 0x15000
 
 PREVIOUS_SPRITE_SIZE = 8
 CURRENT_SPRITE_SIZE = 4
@@ -78,8 +78,8 @@ GAME_MAX_SCROLL_Y = 0x200
 BG_TILE_WIDTH = 16
 
 BG_TILE_FILE_MAX_SIZE = 0x14000
-*SPRITE_FILE_MAX_SIZE = 0x1F400
-SPRITE_FILE_MAX_SIZE = 0x1C800   | 8k smaller without the white arremers
+SPRITE_FILE_MAX_SIZE = 0x1F400
+*SPRITE_FILE_MAX_SIZE = 0x1C800   | 8k smaller without the white arremers
 
 	.if		OPT_CD32_VERSION==0
 BIGGEST_MUSIC_SIZE = 385000
@@ -87,7 +87,7 @@ BIGGEST_MUSIC_SIZE = 385000
 BIGGEST_MUSIC_SIZE = 96000
 	.endif
 	
-SCORE_FILE_SIZE = 70
+SCORE_FILE_SIZE = 90
 
 LOG_BUFFER_SIZE = 0x100000
 
@@ -1981,12 +1981,14 @@ level1_interrupt:
 	* it has a separate layer for sprites, we just have crap dual playfield we cannot use here)
 
 	*WRITE_BLITTER_SCROLL_VALUES		scroll_x_hi,scroll_y FUCK
-	jbsr		really_update_sprites
+	*jbsr		really_update_sprites
 	* terminate the blitter command list
 	COMMIT_BLITLIST
 
 	.if		OPT_BLIT_CHAIN_MODE==0
 	jbsr	set_scroll_values
+	jbsr		really_update_sprites
+
 	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
 	jbsr		switch_screen_buffers
 	.endif
@@ -4842,9 +4844,12 @@ read_args_string_end:
 * < A0: highscore buffer
 osd_read_high_scores:
 	movem.l	d0-d7/a0-a6,-(a7)
+	GET_MEMORY_START_IN_A6
+	lea	(high_score_table_1518,a6),a0
 	move.l	_resload,d0
 	beq.b	0f
 	move.l	d0,a2
+	move.l	a0,a1
 	bsr		get_hiscore_name
 	move.l	a1,-(a7)
  	jsr		resload_GetFileSize(a2)		
@@ -4865,6 +4870,12 @@ osd_read_high_scores:
 	move.b	(a1)+,(a0)+
 	dbf		d0,0b
 1:
+	lea	(high_score_table_1518,a6),a0
+	move.w	(a0),d0		| offset for highest score
+	lea		(a6,d0.w),a0
+	* also update copy (for top screen display)
+	lea	(high_score_00d0,a6),a1
+	move.l	(a0),(a1)
 	movem.l	(a7)+,d0-d7/a0-a6
 	rts
 	
@@ -4875,7 +4886,9 @@ osd_write_high_scores:
 	tst.b	cheat_used		| don't save score if cheat on
 	bne.b	2f
 	.endif
-
+	GET_MEMORY_START_IN_A6
+	lea	(high_score_table_1518,a6),a0
+	
 	move.l	_resload,d0
 	bne.b	1f
 	* DOS

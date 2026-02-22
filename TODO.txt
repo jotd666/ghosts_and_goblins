@@ -1,25 +1,25 @@
-- pre-mirror of trunk fails (91) in clut 1 probably because of 0 in planelist (?? sounds ok)
-- scrolling to fix, wrong values, shaking
-- load/save highscores: to test
+- pre-mirror of trunk fails (91) in clut 1 probably because of 0 in planelist (but ok on non-blit chain): re-test!!!
+- blit chain: scrolling to fix, wrong values, shaking
+- blue? flashes at times?
+- level 2: sprites missing when killing both bosses?
 - to save memory (CD32 version?): don't include white arremers, shorten sprite files, lower quality sound samples
+  => arremer table index=>is_arremer to fix clut to red else it will become invisible!
   no pre-mirroring: mirror_planes sets -2 systematically to force in-place, and no blitter chain
-- freeze & optimize 68k code
+- freeze & optimize 68k code, turn jmp => jra, jsr => jbsr
 
 - don't play a tune if same module / same pattern already playing (avoids to repeat music when there's a E8 trigger): does this happen?
 - CD32 version to test with release exe: works with 1E0000 base chip!!
   => need to record the tunes with several loops using service mode and 3F to stop sound: finish wav splitting
      "finish your battle" small song to record
   => put cdplay, cdstop functions at start (offset 4,8) so game can call them, cd32slave is easy to code
-- bottom left life icon not erased by "credit" message: original bug: erase it at 512B
 
-- non-chained blitter not working anymore
+
 - remove parasite tiles (in the end) because of levelskip some intro tiles are logged in levels 2+
 - remove those "hhhhh" at start fill_screen_with_h 
 - level 3 still tile issues (part 2, hard left after big ladder, even on emulation, try to reproduce as not systematic)
 - real hardware sometimes scrolling seems to reset. Increase delta x scroll to trigger full refresh: to test real hw
 - continue play: part of the map is black: not always???
 - try to apply patches to fix some original game bugs / difficulty level HP for monsters
-- scrolling and double buffering can it be improved? (also in other games!)
 - add foreground tiles (grass, bridge): tricky work, added blitting, and not really noticeable
 - demo resets scroll and makes column update buggy at times
 - level 2 see if we can use dynamic color change, see if separating ice towers from rest of game tiles (except house right after)

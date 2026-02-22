@@ -27,9 +27,11 @@
 
 	.include "include.inc"
 
+* pointers for order, then score & names
 high_score_table_1518 = 0x1518
 time_left_00aa = 0xAA
 text_table_48dd = 0x48dd
+high_score_00d0 = 0xd0
 
 clear_screen_and_show_status_4800:
 l_4800:
@@ -420,6 +422,10 @@ l_511e:
 * write "CREDIT"
 	move.b	#0x03,d1                        	| [$5126: ldb    #$03]
 	jbsr	display_osd_text_489b             	| [$5128: jsr    display_osd_text_489b]
+	GET_UNCHECKED_ADDRESS	0x23A0
+	move.b	#0x20,(a0)
+	clr.b	(0x400,a0)
+	VIDEO_BYTE_DIRTY  | clear bottom left corner
 	GET_DP_ADDRESS	0x22                    	| [$512b: ldd    $22]
 	LOAD_D                                 	| [$512b: ldd    $22]
 	move.w	#0x23a1,d2                      	| [$512d: ldx    #$23a1]
@@ -900,7 +906,7 @@ add_to_score_53f4:
 l_542e:
 	GET_DP_ADDRESS	0x68                    	| [$542e: ldd    $68]
 	LOAD_D                                 	| [$542e: ldd    $68]
-	GET_DP_ADDRESS	0xd0                    	| [$5430: std    $d0]
+	GET_DP_ADDRESS	high_score_00d0         	| [$5430: std    high_score_00d0]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	GET_DP_ADDRESS	0x6a                    	| [$5432: ldd    $6a]
 	LOAD_D                                 	| [$5432: ldd    $6a]
@@ -2005,6 +2011,7 @@ l_5a9c:
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	OP_W_ON_DP_ADDRESS	addq,0x08,#1         | [$5aae: inc    $08]
 	rts                                    	| [$5ab0: rts]
+
 l_5ab1:
 	move.w	#high_score_table_1518,d2       	| [$5ab1: ldx    #high_score_table_1518]
 	jbsr	l_5ae3                            	| [$5ab4: jsr    $5ae3]
@@ -2493,8 +2500,9 @@ l_5d06:
 	GET_REG_ADDRESS	0x3,d3                 	| [$5d0e: ldu    $3,y]
 	MOVE_W_TO_REG	a0,d4                         	| [...]
 	move.b	#0x0b,d0                        	| [$5d10: lda    #$0b]
-	GET_REG_ADDRESS	0x0400,d4              	| [$5d12: sta    $0400,u]
+	GET_REG_UNCHECKED_ADDRESS	0x0400,d4              	| [$5d12: sta    $0400,u] [video_address]
 	move.b	d0,(a0)                         	| [...]
+	VIDEO_BYTE_DIRTY | [...]
 	move.w	#0x21c4,d4                      	| [$5d16: ldu    #$21c4]
 	GET_REG_ADDRESS	0x3,d3                 	| [$5d19: cmpu   $3,y]
 	CMP_W_TO_REG	a0,d4                          	| [...]
@@ -2650,9 +2658,10 @@ l_5d99:
 l_5dbb:
 	move.b	#0x04,d0                        	| [$5dbb: lda    #$04]
 	OP_W_ON_DP_ADDRESS	move,0x0b,d0         | [$5dbd: sta    $0b]
-	GET_ADDRESS	high_score_location_152c
+	GET_ADDRESS	high_score_table_1518
 jbsr	osd_write_high_scores
 	rts                                    	| [$5dbf: rts]
+
 l_5dc0:
 	GET_REG_ADDRESS	0x6,d3                 	| [$5dc0: ldb    $6,y]
 	move.b	(a0),d1                         	| [...]

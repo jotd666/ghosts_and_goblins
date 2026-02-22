@@ -330,6 +330,11 @@
     "levels": null,
     "on_last_level": false
   },
+  "sparkle": {
+    "pre_mirror": null,
+    "levels": null,
+    "on_last_level": true
+  },
   "arthur_skeleton": {
     "pre_mirror": null,
     "levels": null
@@ -346,9 +351,10 @@
     ]
   },
   "bat": {
-    "pre_mirror": null,
+    "pre_mirror": [3],
     "levels": [
-      3
+      3,
+	  5
     ]
   },
   "zombie": {

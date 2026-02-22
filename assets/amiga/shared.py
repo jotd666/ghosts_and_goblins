@@ -228,6 +228,7 @@ def get_sprite_names():
 
     rval.update({i:"boss" for i in range(0x2C0,0x300)})
 
+    rval[0x96] = rval[0x97] = rval[0x9E] = "sparkle"
     rval[0xa6] = "zombie"
     return rval
 
