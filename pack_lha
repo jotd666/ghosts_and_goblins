@@ -1,0 +1,12 @@
+.key nope
+
+set game GhostsNGoblins
+set arc ${game}_WHD.lha
+if exists ${arc}
+    echo deleting ${arc}...
+    delete ${arc}
+endif
+
+; also archive with lha
+lha a -r $arc ${game}
+

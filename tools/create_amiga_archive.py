@@ -1,5 +1,27 @@
 import subprocess,os,glob,shutil,pathlib
 
+pack_data = True
+
+def packcopy(sourcefile,dest):
+# -= RNC ProPackED v1.8 [by Lab 313] (01/26/2021) =-
+    if dest.is_dir():
+        destfile = dest / sourcefile.name
+    else:
+        destfile = dest
+    with open(sourcefile,"rb") as f:
+        header = f.read(3).decode(errors="ignore")
+    if header=="RNC" or not pack_data:
+        # already packed/do not pack
+        print(f"Copying {destfile}...")
+        shutil.copy(sourcefile,destfile)
+    else:
+        cmd = ["propack","p",str(sourcefile),str(destfile)]
+        print(f"Packing {destfile}...")
+        p = subprocess.run(cmd,check=False,stdout=subprocess.DEVNULL)
+        if p.returncode:
+            print(f"failed packing {destfile}")
+            shutil.copy(sourcefile,destfile)
+
 progdir = pathlib.Path(__file__).parent.parent.absolute()
 data = progdir / "data"
 
@@ -14,7 +36,7 @@ subprocess.check_call(cmd_prefix+["clean"],cwd=progdir /"src")
 subprocess.check_call(cmd_prefix+["RELEASE_BUILD=1","all_cd32"],cwd=progdir /"src")
 # create archive
 
-outdir = progdir / f"{gamename}_HD"
+outdir = progdir / f"{gamename}"
 
 dataout = outdir / "data"
 if dataout.exists():
@@ -34,14 +56,14 @@ shutil.copy(assets/"GhostsNGoblins.info",outdir)
 dataout.mkdir()
 
 for file in data.glob("level?_*"):
-    shutil.copy(file,dataout)
+    packcopy(file,dataout)
 for file in data.glob("*.mod"):
     if file.name != "GnG_Stage_CD32.mod":
-        shutil.copy(file,dataout)
+        packcopy(file,dataout)
 
 for ext in ["aga"]:
     exename = f"{gamename}_{ext}"
-    shutil.copy(data/exename,dataout)
+    packcopy(data/exename,dataout)
     #subprocess.run(["cranker_windows.exe","-f",data/exename,"-o",progdir/f"{exename}.rnc"],check=True)
 
 
