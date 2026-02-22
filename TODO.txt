@@ -2,6 +2,7 @@
 - scrolling to fix, wrong values, shaking
 - load/save highscores: to test
 - to save memory (CD32 version?): don't include white arremers, shorten sprite files, lower quality sound samples
+  no pre-mirroring: mirror_planes sets -2 systematically to force in-place, and no blitter chain
 - freeze & optimize 68k code
 
 - don't play a tune if same module / same pattern already playing (avoids to repeat music when there's a E8 trigger): does this happen?
