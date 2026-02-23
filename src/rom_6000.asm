@@ -2561,7 +2561,7 @@ player_dead_777c:
 785D: CC 02 25    LDD    #$0225
 7860: BD 69 09    JSR    $6909
 7863: C6 10       LDB    #$10
-7865: D7 0A       STB    continue_timer_000a
+7865: D7 0A       STB    continue_timer_000a		; continue? 10 seconds to choose
 7867: 0C 08       INC    sub_sub_state_0008
 7869: 0F 0B       CLR    sub_sub_sub_state_000b
 786B: 39          RTS
@@ -2570,13 +2570,16 @@ player_dead_777c:
 786F: D6 51       LDB    $51
 7871: 26 04       BNE    $7877
 7873: 9E 22       LDX    nb_credits_0022
-7875: 27 08       BEQ    $787F
+7875: 27 08       BEQ    $787F			; not enough credits to continue
 7877: D6 42       LDB    $42
 7879: C5 03       BITB   #$03
-787B: 27 02       BEQ    $787F
+787B: 27 02       BEQ    $787F			; "start" not pressed
+; player successfully enabled continue feature
 787D: 35 81       PULS   CC,PC
+
 787F: 4F          CLRA
 7880: 35 84       PULS   B,PC	; pops stack, do not restore CC
+
 7882: D6 46       LDB    $46
 7884: DA 48       ORB    $48
 7886: C5 30       BITB   #$30
@@ -2593,10 +2596,12 @@ player_dead_777c:
 789C: D7 0B       STB    sub_sub_sub_state_000b
 789E: D7 0E       STB    $0E
 78A0: 39          RTS
+
 78A1: 8D DF       BSR    $7882
-78A3: 8D 01       BSR    $78A6
+78A3: 8D 01       BSR    continue_timer_tick_78a6
 78A5: 39          RTS
 
+continue_timer_tick_78a6:
 78A6: D6 21       LDB    counter_8_bit_0021
 78A8: C5 3F       BITB   #$3F
 78AA: 26 20       BNE    $78CC
@@ -2610,7 +2615,7 @@ player_dead_777c:
 78BC: BD 50 51    JSR    write_one_digit_to_screen_5051		; [bank_3]
 78BF: D6 0A       LDB    continue_timer_000a
 78C1: 26 09       BNE    $78CC
-; continue timer ended
+; continue timer ended with the player choosing not to continue
 78C3: C6 02       LDB    #$02
 78C5: D7 08       STB    sub_sub_state_0008
 78C7: 5F          CLRB

@@ -283,6 +283,8 @@ for i,line in enumerate(lines):
     elif address == 0x6174:
          line = remove_instruction(lines,i)
          line = change_instruction("add.w\td6,d6",lines,i)
+    elif address == 0x6ED0:
+        line = "\tjbsr\tosd_black_colors\n"+line
     elif address == 0x617d:
         # direct jump
          line = change_instruction("move.l\t(a2,d6.w),a2",lines,i) + "\tjsr\t(a2)\n"
@@ -448,8 +450,8 @@ for i,line in enumerate(lines):
         line = "\tGET_ADDRESS\ttiles_palette_in_ram_1632\n"+change_instruction("jbra\tosd_set_tile_palette",lines,i)
     elif address == 0xEE56:
         line = "\tGET_ADDRESS\ttiles_palette_in_ram_1632\n"+change_instruction("jbra\tosd_colors_cycled",lines,i)
-    elif address == 0x78CC:
-        line = "\tGET_ADDRESS\ttiles_palette_in_ram_1632\n"+change_instruction("jbra\tosd_no_continue_hook",lines,i)
+    elif address == 0x78C3:
+        line = "\tGET_ADDRESS\ttiles_palette_in_ram_1632\n\tjbsr\tosd_no_continue_hook\n"+line
     elif address in [0xf570]:
         line = "\ttst.b\tinvincible_flag\n\tjne\tl_f59a\n"+line
     elif address in [0xf13c]:
@@ -458,7 +460,10 @@ for i,line in enumerate(lines):
         line = "\ttst.b\tinfinite_lives_flag\n\tjne\tl_77bb\n"+line
     elif address == 0x9bae:
         line = "\ttst.b\tinfinite_lives_flag\n\tjne\tl_9bb6\n"+line
-
+    elif address in {0x7875,0x787b}:
+        # allow to continue even with 0 credits
+        # allow to continue only with "fire" pressed
+        line = remove_instruction(lines,i)
     elif address in {0x661D,0x6697,0x671c,0x6716}:
         # no need to update palette hardware registers, it takes time for nothing
         line = change_instruction("rts",lines,i)

@@ -1,21 +1,17 @@
-- First is the continue function in the game after dying. You need to press up and fire to continue in the game
+- confirmed First is the continue function in the game after dying. You need to press up and fire to continue in the game
   this replicates the arcades method of continuing, which incidentally might be worth changing to just fire
-- When you do continue it sends you back to about half way through the first stage, this happens no matter which stage you happen to die on.
-  I tested in this in v0.8, and it didn't do this, it actually continued on the correct stage so it's not a user error.
-  The other problem after continuing is the music for the level loses focus and doesn't play until you make the next level.
-  This happen in v.08 also, but the music didn't remedy itself on that version.
 
-- the high score screen only partially works some of the time. 
+- after continuing, the map context should be loaded!!
+
+- confirmed (level 5): the high score screen only partially works some of the time. 
   Occasionally while on this screen you will see all of the characters and other times it will only show one or two rows.
   It still functions and you can continue on, but it treats any of the characters not shown on screen as blanks,
   when attempting to type in an abbreviated name.
 
 - Another issue I found is at level 6, the 2 unicorns seem to easily go left and never return (specially the one on the left). There may be a bug behind this.
 
-- pre-mirror of trunk fails (91) in clut 1 probably because of 0 in planelist (but ok on non-blit chain): re-test!!!
+- pre-mirror of trunk fails (91) in clut 1 probably because of 0 in planelist (ok on non-blit chain, blit chain specifics)
 - blit chain: scrolling to fix, wrong values, shaking
-- blue? flashes at times?
-- level 2: sprites missing when killing both bosses?
 - to save memory (CD32 version?): don't include white arremers, shorten sprite files, lower quality sound samples
   => arremer table index=>is_arremer to fix clut to red else it will become invisible!
   no pre-mirroring: mirror_planes sets -2 systematically to force in-place, and no blitter chain
@@ -26,7 +22,7 @@
   => need to record the tunes with several loops using service mode and 3F to stop sound: finish wav splitting
      "finish your battle" small song to record
   => put cdplay, cdstop functions at start (offset 4,8) so game can call them, cd32slave is easy to code
-- 6ED0 called at the start of a level, maybe would help if palette was all dark here
+
 
 
 - remove parasite tiles (in the end) because of levelskip some intro tiles are logged in levels 2+

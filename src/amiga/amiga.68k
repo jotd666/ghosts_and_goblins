@@ -284,6 +284,7 @@ osd_enter_\@:
 	.global		cheat_used
 * osd layer		
 	.global osd_enable_interrupts
+	.global osd_black_colors
 	.global osd_disable_interrupts
 	.global osd_set_tile_palette
 	.global osd_no_continue_hook
@@ -1024,9 +1025,22 @@ make_automatic_sound_channels:
 	jne		1b
 	rts
 
+osd_black_colors:
+	lea		sprite_palette,a0
+	move.l	color_copper_pointers,a1	| tile entries 0-32
+	move.w	#TOTAL_NB_COLORS/2-1,d0
+1:
+	addq.w	#2,a1
+	clr.w	(a1)+
+	dbf		d0,1b
+2:
+	rts
+
+	
 * called when continue timer reaches 0: time to load context 1 else tiles will be trashed in the title
 * < A0: shadow ram palette
 osd_no_continue_hook:
+	* wrong no_continue_hook also called on continue!!
 	clr.b	(current_level_0072,a6)		| doesn't matter for the game but it matters for the context
 	jbsr	osd_set_tile_palette
 	rts

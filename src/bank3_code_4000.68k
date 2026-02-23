@@ -2658,7 +2658,6 @@ l_5d99:
 l_5dbb:
 	move.b	#0x04,d0                        	| [$5dbb: lda    #$04]
 	OP_W_ON_DP_ADDRESS	move,0x0b,d0         | [$5dbd: sta    $0b]
-	GET_ADDRESS	high_score_table_1518
 jbsr	osd_write_high_scores
 	rts                                    	| [$5dbf: rts]
 

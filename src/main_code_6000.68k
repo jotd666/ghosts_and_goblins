@@ -321,7 +321,6 @@ l_612d:
 	MAKE_D                                 	| [...]
 	GET_DP_ADDRESS	0xd2                    	| [$613e: std    $d2]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
-	GET_ADDRESS	high_score_table_1518
 	jbsr	osd_read_high_scores
 	jbsr	read_dip_switches_622c            	| [$6140: jsr    read_dip_switches_622c]
 	jbsr	l_6239                            	| [$6143: jsr    $6239]
@@ -2806,6 +2805,7 @@ l_6ea2:
 
 * start of a level, get current level
 l_6ed0:
+	jbsr	osd_black_colors
 	OP_R_ON_DP_ADDRESS	move,current_level_0072,d1| [$6ed0: ldb    current_level_0072]
 	move.w	#0x6ec9,d2                      	| [$6ed2: ldx    #$6ec9]
 	moveq	#0,d6                            	| [...]
@@ -4107,7 +4107,7 @@ l_785d:
 	move.w	#0x0225,d1                      	| [$785d: ldd    #$0225]
 	jbsr	l_6909                            	| [$7860: jsr    $6909]
 	move.b	#0x10,d1                        	| [$7863: ldb    #$10]
-	OP_W_ON_DP_ADDRESS	move,continue_timer_000a,d1| [$7865: stb    continue_timer_000a]
+	OP_W_ON_DP_ADDRESS	move,continue_timer_000a,d1| [$7865: stb    continue_timer_000a] continue? 10 seconds to choose
 	OP_W_ON_DP_ADDRESS	addq,sub_sub_state_0008,#1| [$7867: inc    sub_sub_state_0008]
 	OP_1_ON_DP_ADDRESS	clr,sub_sub_sub_state_000b| [$7869: clr    sub_sub_sub_state_000b]
 	rts                                    	| [$786b: rts]
@@ -4118,17 +4118,20 @@ l_786c:
 	jne	l_7877                             	| [$7871: bne    $7877]
 	GET_DP_ADDRESS	nb_credits_0022         	| [$7873: ldx    nb_credits_0022]
 	MOVE_W_TO_REG	a0,d2                         	| [...]
-	jeq	l_787f                             	| [$7875: beq    $787f]
+	 |  [$7875: beq    $787f] not enough credits to continue
 l_7877:
 	OP_R_ON_DP_ADDRESS	move,0x42,d1         | [$7877: ldb    $42]
 	BIT	#0x03,d1                           	| [$7879: bitb   #$03]
-	jeq	l_787f                             	| [$787b: beq    $787f]
+	 |  [$787b: beq    $787f] "start" not pressed
+* player successfully enabled continue feature
 	POP_SR                                 	| [$787d: puls   cc,pc]
 	rts                                    	| [...]
+
 l_787f:
 	moveq	#0,d0                            	| [$787f: clra]
 	addq	#2,sp |  [$7880: puls   b,pc] pops stack, do not restore CC
 	rts                                    	| [...]
+
 l_7882:
 	OP_R_ON_DP_ADDRESS	move,0x46,d1         | [$7882: ldb    $46]
 	GET_DP_ADDRESS	0x48                    	| [$7884: orb    $48]
@@ -4150,12 +4153,13 @@ l_7882:
 	OP_W_ON_DP_ADDRESS	move,0x0e,d1         | [$789e: stb    $0e]
 l_78a0:
 	rts                                    	| [$78a0: rts]
+
 l_78a1:
 	jbsr	l_7882                            	| [$78a1: bsr    $7882]
-	jbsr	l_78a6                            	| [$78a3: bsr    $78a6]
+	jbsr	continue_timer_tick_78a6          	| [$78a3: bsr    continue_timer_tick_78a6]
 	rts                                    	| [$78a5: rts]
 
-l_78a6:
+continue_timer_tick_78a6:
 	OP_R_ON_DP_ADDRESS	move,counter_8_bit_0021,d1| [$78a6: ldb    counter_8_bit_0021]
 	BIT	#0x3f,d1                           	| [$78a8: bitb   #$3f]
 	jne	l_78cc                             	| [$78aa: bne    $78cc]
@@ -4170,15 +4174,16 @@ l_78a6:
 	jbsr	write_one_digit_to_screen_5051    	| [$78bc: jsr    write_one_digit_to_screen_5051] [bank_3]
 	OP_R_ON_DP_ADDRESS	move,continue_timer_000a,d1| [$78bf: ldb    continue_timer_000a]
 	jne	l_78cc                             	| [$78c1: bne    $78cc]
-* continue timer ended
+* continue timer ended with the player choosing not to continue
+	GET_ADDRESS	tiles_palette_in_ram_1632
+	jbsr	osd_no_continue_hook
 	move.b	#0x02,d1                        	| [$78c3: ldb    #$02]
 	OP_W_ON_DP_ADDRESS	move,sub_sub_state_0008,d1| [$78c5: stb    sub_sub_state_0008]
 	moveq	#0,d1                            	| [$78c7: clrb]
 	OP_W_ON_DP_ADDRESS	move,sub_sub_sub_state_000b,d1| [$78c8: stb    sub_sub_sub_state_000b]
 	OP_W_ON_DP_ADDRESS	move,0x0e,d1         | [$78ca: stb    $0e]
 l_78cc:
-	GET_ADDRESS	tiles_palette_in_ram_1632
-	jbra	osd_no_continue_hook |  [$78cc: rts]
+	rts                                    	| [$78cc: rts]
 
 l_78cd:
 	OP_R_ON_DP_ADDRESS	move,sub_sub_sub_state_000b,d1| [$78cd: ldb    sub_sub_sub_state_000b]
