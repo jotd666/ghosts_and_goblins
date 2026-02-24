@@ -1,7 +1,4 @@
-- confirmed First is the continue function in the game after dying. You need to press up and fire to continue in the game
-  this replicates the arcades method of continuing, which incidentally might be worth changing to just fire
-
-- after continuing, the map context should be loaded!!
+- after continuing, the map context should be loaded!! sometimes ok sometimes not
 
 - confirmed (level 5): the high score screen only partially works some of the time. 
   Occasionally while on this screen you will see all of the characters and other times it will only show one or two rows.
@@ -10,8 +7,6 @@
 
 - Another issue I found is at level 6, the 2 unicorns seem to easily go left and never return (specially the one on the left). There may be a bug behind this.
 
-- pre-mirror of trunk fails (91) in clut 1 probably because of 0 in planelist (ok on non-blit chain, blit chain specifics)
-- blit chain: scrolling to fix, wrong values, shaking
 - to save memory (CD32 version?): don't include white arremers, shorten sprite files, lower quality sound samples
   => arremer table index=>is_arremer to fix clut to red else it will become invisible!
   no pre-mirroring: mirror_planes sets -2 systematically to force in-place, and no blitter chain
@@ -24,7 +19,8 @@
   => put cdplay, cdstop functions at start (offset 4,8) so game can call them, cd32slave is easy to code
 
 
-
+- pre-mirror of trunk fails (91) in clut 1 probably because of 0 in planelist (ok on non-blit chain, blit chain specifics)
+- blit chain: scrolling to fix, wrong values, shaking
 - remove parasite tiles (in the end) because of levelskip some intro tiles are logged in levels 2+
 - remove those "hhhhh" at start fill_screen_with_h 
 - level 3 still tile issues (part 2, hard left after big ladder, even on emulation, try to reproduce as not systematic)

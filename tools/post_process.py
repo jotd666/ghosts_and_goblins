@@ -1,6 +1,8 @@
 import re,pathlib
 from shared import *
 
+import find_possible_optims
+
 bankname = "bank3_code_4000"
 gamename = "main_code_6000"
 # post-conversion automatic patches, allowing not to change the asm file by hand
@@ -159,6 +161,8 @@ for i,line in enumerate(lines):
 
     lines[i] = line
 
+lines = find_possible_optims.optimize(lines)
+
 with open(source_dir / f"{bankname}.68k","w") as fw:
     # game_specific: fill global symbols
     for gs in """clear_screen_and_show_status_4800
@@ -283,8 +287,8 @@ for i,line in enumerate(lines):
     elif address == 0x6174:
          line = remove_instruction(lines,i)
          line = change_instruction("add.w\td6,d6",lines,i)
-    elif address == 0x6ED0:
-        line = "\tjbsr\tosd_black_colors\n"+line
+##    elif address == 0x6ED0:
+##        line = "\tjbsr\tosd_black_colors\n"+line
     elif address == 0x617d:
         # direct jump
          line = change_instruction("move.l\t(a2,d6.w),a2",lines,i) + "\tjsr\t(a2)\n"
@@ -512,6 +516,8 @@ for i,line in enumerate(lines):
 
 with open(source_dir / "data.inc","w") as fw:
     fw.writelines(equates)
+
+lines = find_possible_optims.optimize(lines)
 
 with open(source_dir / f"{gamename}.68k","w") as fw:
     # game_specific: fill global symbols

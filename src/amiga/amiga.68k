@@ -111,8 +111,7 @@ BG_TILE_LOG_LENGTH = BG_TILE_NB_CLUTS*BG_TILE_COUNT
 
 SPRITE_X_CORRECTION = 0
 SPRITE_Y_CORRECTION = -BG_TILE_WIDTH
-HW_SPRITE_X_CORRECTION = 0
-HW_SPRITE_Y_CORRECTION = 0
+
 
 
 * start displaying earlier in ntsc mode, allowing
@@ -446,108 +445,7 @@ _user:
 	lea		debug_copperlist,a0
 	move.l	a0,cop1lc(a5)
 	
-	lea		hw_sprite_ram_buffer,a0
-	jbsr	align_for_fmode
-	moveq	#7,d0
-	lea		hw_sprite_pointers,a1
-0:
-	move.l	a0,(a1)+
-	add.w	#HW_SPRITE_BUFFER_SIZE,a0
-	dbf		d0,0b
-	
-	lea		bobs_screen_buffer_1,a0
-	addq	#2,a0	| leave 16 bits hidden for left side clipping
-	jbsr	align_for_fmode
-	move.l	a0,playfield_screen_data_1
-	move.l	a0,playfield_drawed_screen_ptr
-	move.l	a0,playfield_displayed_screen_ptr
-	
-	st		music_track_start_number
 
-	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
-	lea		bobs_screen_buffer_2,a0
-	addq	#2,a0	| leave 16 bits hidden for left side clipping
-	jbsr	align_for_fmode
-	move.l	a0,playfield_screen_data_2
-	move.l	a0,playfield_displayed_screen_ptr
-	.endif
-		
-	* init color table handling the bank switch issue
-	lea		copperlist_colors,a0
-	lea		color_copper_pointers,a1
-	moveq	#(TOTAL_NB_COLORS/32),d0		| nb banks for all colors + sprite color bank
-0:
-	.ifne	OPT_AGA_MODE
-	addq.w	#4,a0		| skip set bank
-	.endif
-	move.w	#31,d1		| 32 colors per bank
-1:
-	move.l	a0,(a1)+
-	addq.w	#4,a0
-	dbf		d1,1b
-	dbf		d0,0b
-	
-	
-	
-	* put static sprite entries, we'll write into
-	* that sprite area
-	lea		game_sprites,a2
-	lea		hw_sprite_pointers,a1
-1:
-	move.l	(a1)+,d0
-	move.w	d0,(6,a2)
-	swap	d0
-	move.w	d0,(2,a2)
-	*swap	d0
-	addq	#8,a2
-	cmp.l	#game_sprites_end,a2
-	bcs		1b
-2:
-	* compute control words for each sprite pair
-	lea		hw_sprite_pointers,a0
-	lea		HW_SpriteYTable_256,a1
-	moveq	#3,d7
-	moveq	#0x3F,d2	| sprite X start
-0:
-	move.w	d2,d0
-	move.w	#0x14,d1
-	jbsr	store_sprite_pos
-	add.w	#64,d2		| advance X
-	
-	* store control word
-	.rept	2
-	move.l	(a0)+,a2
-	move.w	d0,(8,a2)
-	swap 	d0
-	move.w	d0,(a2)
-	swap	d0
-	bset	#7,d0		| attach bit
-	addq	#8,a2
-	.endr
-	
-	dbf	d7,0b
-
-	
-	* load attached sprites palette
-	lea		fg_tile_upper_palette,a0
-	move.l	color_copper_pointers+TOTAL_NB_COLORS*4,a1	| entries 64-80
-	move.w	#16,d0
-	jbsr	load_palette
-		
-	* load palette for bottom tiles (in-game), skipping first color (transparent, for sprites)
-	lea		fg_tile_lower_palette+2,a0
-	lea		osd_lower_palette,a1
-	move.w	#15,d0
-	jbsr	load_palette
-	
-	lea		sprite_palette,a0
-	move.l	color_copper_pointers+TOTAL_NB_COLORS/2*4,a1	| entries 32-64
-	move.w	#TOTAL_NB_COLORS/2,d0
-	jbsr	load_palette
-	
-	
-	jbsr		set_bobs_bitplanes
-	
 
 	move.l	cheat_flags,d0
 	jeq		1f
@@ -3236,6 +3134,10 @@ platform_init:
 	st.b	ntsc_flag
 	* disable extra mid-screen interrupt, as it would be too fast (NTSC)
 	move.w	#COPPER_NOP,pal_intreq_block_game
+	* also change screen start position, make it higher
+	move.w	#0x01+(0xC<<8),screen_start
+	sub.b	#8,weapon_palette_wait_value
+	
 	*move.w	#0x0401,pal_wait			| else intreq never happens
 0:
 	.if		NB_PLAYFIELD_PLANES==8
@@ -3281,6 +3183,7 @@ platform_init:
     move.w d0,bpl1mod(a5)
     move.w d0,bpl2mod(a5)
 
+	.ifdef	NEED_ROWS
 	lea		rows_table,a1
 	* generate a contiguous pointer table for copperlist row entries
 	* we cannot have a contiguous copperlist because we need to insert
@@ -3297,6 +3200,7 @@ platform_init:
 	lea		fourth_rows,a0
 	move.w	#NB_FOURTH_ROWS,d0
 	jbsr	generate_row_table
+	.endif
 	
 	* install jump for palette switch
 	move.l	#after_osd_lower_palette,d0
@@ -3304,6 +3208,113 @@ platform_init:
 	move.w	d0,(6,a0)
 	swap	d0
 	move.w	d0,(2,a0)
+	
+	lea		hw_sprite_ram_buffer,a0
+	jbsr	align_for_fmode
+	moveq	#7,d0
+	lea		hw_sprite_pointers,a1
+0:
+	move.l	a0,(a1)+
+	add.w	#HW_SPRITE_BUFFER_SIZE,a0
+	dbf		d0,0b
+	
+	lea		bobs_screen_buffer_1,a0
+	addq	#2,a0	| leave 16 bits hidden for left side clipping
+	jbsr	align_for_fmode
+	move.l	a0,playfield_screen_data_1
+	move.l	a0,playfield_drawed_screen_ptr
+	move.l	a0,playfield_displayed_screen_ptr
+	
+	st		music_track_start_number
+
+	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
+	lea		bobs_screen_buffer_2,a0
+	addq	#2,a0	| leave 16 bits hidden for left side clipping
+	jbsr	align_for_fmode
+	move.l	a0,playfield_screen_data_2
+	move.l	a0,playfield_displayed_screen_ptr
+	.endif
+		
+	* init color table handling the bank switch issue
+	lea		copperlist_colors,a0
+	lea		color_copper_pointers,a1
+	moveq	#(TOTAL_NB_COLORS/32),d0		| nb banks for all colors + sprite color bank
+0:
+	.ifne	OPT_AGA_MODE
+	addq.w	#4,a0		| skip set bank
+	.endif
+	move.w	#31,d1		| 32 colors per bank
+1:
+	move.l	a0,(a1)+
+	addq.w	#4,a0
+	dbf		d1,1b
+	dbf		d0,0b
+	
+	
+	
+	* put static sprite entries, we'll write into
+	* that sprite area
+	lea		game_sprites,a2
+	lea		hw_sprite_pointers,a1
+1:
+	move.l	(a1)+,d0
+	move.w	d0,(6,a2)
+	swap	d0
+	move.w	d0,(2,a2)
+	*swap	d0
+	addq	#8,a2
+	cmp.l	#game_sprites_end,a2
+	bcs		1b
+2:
+	* compute control words for each sprite pair
+	lea		hw_sprite_pointers,a0
+	lea		HW_SpriteYTable_256,a1
+	moveq	#3,d7
+	moveq	#0x3F,d2	| sprite X start
+0:
+	move.w	d2,d0
+	move.w	#0x14,d1
+	tst.b	ntsc_flag
+	jeq		1f
+	sub.w	#12,d1		| sprites slightly higher
+1:
+	jbsr	store_sprite_pos
+	add.w	#64,d2		| advance X
+	
+	* store control word
+	.rept	2
+	move.l	(a0)+,a2
+	move.w	d0,(8,a2)
+	swap 	d0
+	move.w	d0,(a2)
+	swap	d0
+	bset	#7,d0		| attach bit
+	addq	#8,a2
+	.endr
+	
+	dbf	d7,0b
+
+	
+	* load attached sprites palette
+	lea		fg_tile_upper_palette,a0
+	move.l	color_copper_pointers+TOTAL_NB_COLORS*4,a1	| entries 64-80
+	move.w	#16,d0
+	jbsr	load_palette
+		
+	* load palette for bottom tiles (in-game), skipping first color (transparent, for sprites)
+	lea		fg_tile_lower_palette+2,a0
+	lea		osd_lower_palette,a1
+	move.w	#15,d0
+	jbsr	load_palette
+	
+	lea		sprite_palette,a0
+	move.l	color_copper_pointers+TOTAL_NB_COLORS/2*4,a1	| entries 32-64
+	move.w	#TOTAL_NB_COLORS/2,d0
+	jbsr	load_palette
+	
+	
+	jbsr		set_bobs_bitplanes
+	
 	
 	lea		_custom,a5
 	lea		game_copperlist,a0
@@ -3410,6 +3421,7 @@ wrap_bitplanes:
 * < A1: part of the pointers list
 * < D0: number of rows to fill
 
+	.ifdef	NEED_ROWS
 generate_row_table:
 	* generate row table, set jumps
 	move.w	#(first_rows_end-first_rows)/NB_FIRST_ROWS,d7	| block size
@@ -3424,7 +3436,7 @@ generate_row_table:
 	move.l	a2,a0		| next row
 	dbf		d0,0b
 	rts
-
+	.endif
 
 	
 	
@@ -3571,7 +3583,7 @@ osd_video_byte_dirty:
 	jra		0f
 1:
 	* shield is not here: palette change at the bottom
-	move.w	#0xF001,weapon_palette_wait
+	move.w	weapon_palette_wait_value,weapon_palette_wait
 0:
 
 	jbsr	update_fg_tile
@@ -5486,6 +5498,8 @@ interesting_colors_level_4:
 	.word	0x0A03
 	.word	-1
 
+weapon_palette_wait_value:
+	.word	0xF001		| pal
 looped_sound_enabled:
 	.long	0
 
@@ -5950,9 +5964,8 @@ copperlist_colors:
 	.endr
 	.endif
 
-	.set	y_pos,0x20
-	.word	0x01+(y_pos<<8),0xFFFE
-	.set	y_pos,y_pos+1
+screen_start:
+	.word	0x01+(0x20<<8),0xFFFE
 bobs_bitplanes:
 	DECL_BITPLANES	0,NB_PLAYFIELD_PLANES
 
@@ -5997,7 +6010,6 @@ after_osd_lower_palette:
     .word  0xFFDF,0xFFFE       | PAL wait
 	.endif
 	* extra wait for PAL (NTSC can't afford this)
-	.set	y_pos,0
 	* here was fourth_rows (before I disabled it)
 
 
@@ -6011,6 +6023,11 @@ pal_wait:
 
      .long    -2					
 	.ascii	"ENDCPLST"
+	
+	
+	.ifdef	NEED_ROWS
+	* moved out of the copperlist, we don't need this on this game
+	* I decided screw copper split
 first_rows:
 	.rept	NB_FIRST_ROWS
 	DECL_ROW
@@ -6025,10 +6042,13 @@ third_rows:
 	.rept	NB_THIRD_ROWS
 	DECL_ROW
 	.endr
+	.set	y_pos,0
 fourth_rows:
 	.rept	NB_FOURTH_ROWS
 	DECL_ROW
 	.endr
+	.endif
+	
 	* aligning on 8 bytes so .align will work
 	* in the next datachip sections
 	.align	8
