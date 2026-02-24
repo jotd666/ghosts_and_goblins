@@ -2189,7 +2189,7 @@ l_5b81:
 	MAKE_D                                 	| [...]
 	GET_REG_ADDRESS	0xe,d3                 	| [$5b81: std    $e,y]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
-	jbsr	l_5c3a                            	| [$5b83: jsr    $5c3a]
+	jbsr	display_high_score_entry_5c3a     	| [$5b83: jsr    display_high_score_entry_5c3a]
 	move.w	#0x0d48,d2                      	| [$5b86: ldx    #$0d48]
 	GET_DP_ADDRESS	0x09                    	| [$5b89: stx    $09]
 	MOVE_W_FROM_REG	d2,a0                         	| [...]
@@ -2314,7 +2314,8 @@ l_5c1b:
 	GET_REG_ADDRESS	0x2,d3                 	| [$5c37: sta    $2,y]
 	move.b	d0,(a0)                         	| [...]
 	rts                                    	| [$5c39: rts]
-l_5c3a:
+
+display_high_score_entry_5c3a:
 	move.w	#0x5c7f,d2                      	| [$5c3a: ldx    #$5c7f]
 	GET_REG_BANK_ADDRESS	0,d2                   	| [$5c3d: ldu    ,x++] [bank_address]
 	addq.w	#2,d2                           	| [...]
@@ -2323,7 +2324,8 @@ l_5c3a:
 	GET_REG_ADDRESS	0,d5 |  [$5c41: pshs   b] do it 13 times
 	subq.w	#1,d5
 	move.b	d1,-(a0)   | [...]
-	move.b	#0x41,d1                        	| [$5c43: ldb    #$41]
+* layout the alphabet for highscore
+	move.b	#0x41,d1                        	| [$5c43: ldb    #$41] 'A'
 l_5c45:
 	move.b	#0x0b,d0                        	| [$5c45: lda    #$0b]
 	GET_REG_UNCHECKED_ADDRESS	0x0400,d4              	| [$5c47: sta    $0400,u] [unchecked_address]
@@ -2332,9 +2334,9 @@ l_5c45:
 	addq.w	#2,d4                           	| [...]
 	move.b	d1,(a0)                         	| [...]
 	VIDEO_BYTE_DIRTY | [...]
-	cmp.b	#0x5a,d1                         	| [$5c4d: cmpb   #$5a]
+	cmp.b	#0x5a,d1                         	| [$5c4d: cmpb   #$5a] 'Z'
 	jne	l_5c53                             	| [$5c4f: bne    $5c53]
-	move.b	#0x60,d1                        	| [$5c51: ldb    #$60]
+	move.b	#0x60,d1                        	| [$5c51: ldb    #$60] lowercase
 l_5c53:
 	cmp.b	#0x7a,d1                         	| [$5c53: cmpb   #$7a]
 	jeq	l_5c65                             	| [$5c55: beq    $5c65]

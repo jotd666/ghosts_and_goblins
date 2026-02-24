@@ -1366,7 +1366,7 @@ jump_table_5b6b:
 5B7C: 27 03       BEQ    $5B81
 5B7E: CC 01 27    LDD    #$0127
 5B81: ED 2E       STD    $E,Y
-5B83: BD 5C 3A    JSR    $5C3A
+5B83: BD 5C 3A    JSR    display_high_score_entry_5c3a
 5B86: 8E 0D 48    LDX    #$0D48
 5B89: 9F 09       STX    $09
 5B8B: 6F 26       CLR    $6,Y
@@ -1449,17 +1449,20 @@ l_5bdd:
 5C35: 86 09       LDA    #$09
 5C37: A7 22       STA    $2,Y
 5C39: 39          RTS
+
+display_high_score_entry_5c3a:
 5C3A: 8E 5C 7F    LDX    #$5C7F
 5C3D: EE 81       LDU    ,X++		; [bank_address]
 5C3F: C6 0D       LDB    #$0D
 5C41: 34 04       PSHS   B			; do it 13 times
-5C43: C6 41       LDB    #$41
+; layout the alphabet for highscore
+5C43: C6 41       LDB    #$41		; 'A'
 5C45: 86 0B       LDA    #$0B
 5C47: A7 C9 04 00 STA    $0400,U	; [unchecked_address]
 5C4B: E7 C1       STB    ,U++  		; [video_address]
-5C4D: C1 5A       CMPB   #$5A
+5C4D: C1 5A       CMPB   #$5A		; 'Z'
 5C4F: 26 02       BNE    $5C53
-5C51: C6 60       LDB    #$60
+5C51: C6 60       LDB    #$60		; lowercase
 5C53: C1 7A       CMPB   #$7A
 5C55: 27 0E       BEQ    $5C65
 5C57: 5C          INCB

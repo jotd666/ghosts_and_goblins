@@ -86,7 +86,7 @@ for file in ["readme.md",f"{gamename}_CD32.slave"]:  #f"{gamename}.slave",
 
 shutil.copy(assets/"GhostsNGoblins.info",outdir)
 
-
+shutil.copy(assets/"GhostsNGoblins_drw.info",outdir.parent / "GhostsNGoblins.info")
 
 
 for file in data.glob("level?_*"):

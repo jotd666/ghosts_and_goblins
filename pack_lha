@@ -8,5 +8,5 @@ if exists ${arc}
 endif
 
 ; also archive with lha
-lha a -r $arc ${game}
+lha a -r $arc ${game} ${game}.info
 

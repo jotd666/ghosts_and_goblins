@@ -1,11 +1,12 @@
-- after continuing, the map context should be loaded!! sometimes ok sometimes not
-
-- confirmed (level 5): the high score screen only partially works some of the time. 
+- after continuing, the map context should be loaded!! sometimes ok sometimes not (release mode level 5??)
+- confirmed (level 5): the high score screen only partially works some of the time. (release mode!)
   Occasionally while on this screen you will see all of the characters and other times it will only show one or two rows.
   It still functions and you can continue on, but it treats any of the characters not shown on screen as blanks,
-  when attempting to type in an abbreviated name.
+  when attempting to type in an abbreviated name. plus if entering name sometimes crashes stream fault at 204541F6:
+  reverse alphabet print on screen. debug at 5c3a
+  
 
-- Another issue I found is at level 6, the 2 unicorns seem to easily go left and never return (specially the one on the left). There may be a bug behind this.
+- At level 6, the 2 unicorns seem to easily go left and never return (specially the one on the left). not in the arcade!
 
 - to save memory (CD32 version?): don't include white arremers, shorten sprite files, lower quality sound samples
   => arremer table index=>is_arremer to fix clut to red else it will become invisible!
@@ -23,9 +24,8 @@
 - blit chain: scrolling to fix, wrong values, shaking
 - remove parasite tiles (in the end) because of levelskip some intro tiles are logged in levels 2+
 - remove those "hhhhh" at start fill_screen_with_h 
-- level 3 still tile issues (part 2, hard left after big ladder, even on emulation, try to reproduce as not systematic)
+- level 3 still tile issues (part 2, hard left after big ladder, even on emulation, try to reproduce as not systematic, maybe release only)
 - real hardware sometimes scrolling seems to reset. Increase delta x scroll to trigger full refresh: to test real hw
-- continue play: part of the map is black: not always???
 - try to apply patches to fix some original game bugs / difficulty level HP for monsters
 - add foreground tiles (grass, bridge): tricky work, added blitting, and not really noticeable
 - demo resets scroll and makes column update buggy at times

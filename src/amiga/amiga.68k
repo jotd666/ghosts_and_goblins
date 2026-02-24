@@ -255,6 +255,8 @@ BIT_FIRE_2 = 5
 	* specially when the irq is called. Except that if the irq interrupts
 	* an osd call, we need to restore the value of D5 on osd enter, not
 	* the value within osd
+	* OSD routines possibly using D5 or calling whdload / external libs MUST wrap their calls
+	* with OSD_ENTER/OSD_EXIT.
 	
 	.macro	OSD_ENTER
 	tst.b	osd_entry_count
@@ -938,7 +940,6 @@ osd_black_colors:
 * called when continue timer reaches 0: time to load context 1 else tiles will be trashed in the title
 * < A0: shadow ram palette
 osd_no_continue_hook:
-	* wrong no_continue_hook also called on continue!!
 	clr.b	(current_level_0072,a6)		| doesn't matter for the game but it matters for the context
 	jbsr	osd_set_tile_palette
 	rts
@@ -4105,6 +4106,7 @@ compute_fg_tile_xy:
 * < D1: tile attribute
 
 update_fg_tile:
+	move.b	#0,0x110
 	* if < 0x40 bail out as not visible
 	cmp.w	#0x40,d7
 	jcc		0f
@@ -4737,6 +4739,11 @@ handle_keyboard:
     bsr	toggle_pause
 0:
 
+	* last life, time=0, direct game over
+	cmp.b	#69,d0	| F8 key: set time at 0
+	bne.b	0f
+	jbsr	lose_all_lives
+0:
 
 
 	* cheat keys are always active in dev mode
@@ -4798,12 +4805,6 @@ handle_keyboard:
 	cmp.b	#0x56,d0	| F7 key: debug params
 	bne.b	0f
 	eor.b		#1,osd_debug_active
-0:
-	* last life, if killed, direct game over
-	cmp.b	#0x57,d0	| F8 key: set time at 0
-	bne.b	0f
-	jbsr	lose_all_lives
-
 0:
 	cmp.b	#0x58,d0	| F9 key crashes game (restarts whdload)
 	bne.b	0f
@@ -4869,6 +4870,7 @@ read_args_string_end:
 
 * < A0: highscore buffer
 osd_read_high_scores:
+	OSD_ENTER
 	movem.l	d0-d7/a0-a6,-(a7)
 	GET_MEMORY_START_IN_A6
 	lea	(high_score_table_1518,a6),a0
@@ -4903,10 +4905,12 @@ osd_read_high_scores:
 	lea	(high_score_00d0,a6),a1
 	move.l	(a0),(a1)
 	movem.l	(a7)+,d0-d7/a0-a6
+	OSD_EXIT
 	rts
 	
 * < A0: highscore buffer
 osd_write_high_scores:
+	OSD_ENTER
 	movem.l	d0-d7/a0-a6,-(a7)
 	.ifdef	RELEASE
 	tst.b	cheat_used		| don't save score if cheat on
@@ -4936,6 +4940,7 @@ osd_write_high_scores:
 2:
 
 	movem.l	(a7)+,d0-d7/a0-a6
+	OSD_EXIT
 	rts
 
 	
@@ -5009,7 +5014,7 @@ force_sound_stop:
 	clr.l	looped_sound_enabled
 
     jsr		_mt_end
-0:
+
 	movem.l	(a7)+,d0-d1/a0/a6
 	OSD_EXIT
 	rts
@@ -5017,7 +5022,6 @@ force_sound_stop:
 * < D0.B sound index
 osd_sound_start:
 	OSD_ENTER
-
 	movem.l	d0/d1/d2/a0/a1/a6,-(a7)
 	lea		_custom,a6
 	
