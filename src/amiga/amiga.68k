@@ -4106,7 +4106,6 @@ compute_fg_tile_xy:
 * < D1: tile attribute
 
 update_fg_tile:
-	move.b	#0,0x110
 	* if < 0x40 bail out as not visible
 	cmp.w	#0x40,d7
 	jcc		0f

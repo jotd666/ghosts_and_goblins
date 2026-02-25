@@ -4327,7 +4327,7 @@ l_798d:
 	move.b	#SND_FLYING_GOBLIN_0B,d1        	| [$798d: ldb    #SND_FLYING_GOBLIN_0B]
 	jmp	queue_sound_forced_with_ff_7958    	| [$798f: jmp    queue_sound_forced_with_ff_7958]
 
-l_7992:
+play_giant_stomp_sound_7992:
 	move.b	#SND_GIANT_STOMPS_0C,d1         	| [$7992: ldb    #SND_GIANT_STOMPS_0C]
 	jmp	queue_sound_forced_with_ff_7958    	| [$7994: jmp    queue_sound_forced_with_ff_7958]
 
@@ -4370,8 +4370,8 @@ l_79c4:
 	move.b	#SND_UNKNOWN_19,d1              	| [$79c4: ldb    #SND_UNKNOWN_19]
 	jmp	queue_sound_7915                   	| [$79c6: jmp    queue_sound_7915]
 
-l_79c9:
-	move.b	#SND_UNKNOWN_1A,d1              	| [$79c9: ldb    #SND_UNKNOWN_1A]
+play_enemy_hit_sound_79c9:
+	move.b	#SND_ENEMY_HIT_1A,d1            	| [$79c9: ldb    #SND_ENEMY_HIT_1A]
 	jmp	queue_sound_forced_with_ff_7958    	| [$79cb: jmp    queue_sound_forced_with_ff_7958]
 
 l_79ce:
@@ -12453,10 +12453,10 @@ l_a41c:
 * < X: enemy structure (ex: $C80)
 
 apply_xy_speeds_to_enemy_a427:
-	GET_REG_ADDRESS	-0x4,d2                	| [$a427: ldu    -$4,x]
+	GET_REG_ADDRESS	-0x4,d2                	| [$a427: ldu    -$4,x] get speed table
 	MOVE_W_TO_REG	a0,d4                         	| [...]
 l_a429:
-	GET_REG_ADDRESS	-0x2,d2                	| [$a429: ldb    -$2,x]
+	GET_REG_ADDRESS	-0x2,d2                	| [$a429: ldb    -$2,x] get speed index (ex: giants: 1 or 2)
 	move.b	(a0),d1                         	| [...]
                                          | [$a42b: aslb]
 	asl.b	#2,d1                            	| [$a42c: aslb]
@@ -16237,7 +16237,7 @@ l_b91a:
 	move.b	d1,(a0)                         	| [...]
 	GET_REG_ADDRESS	-0xe,d2                	| [$b92a: inc    -$e,x]
 	addq.b	#1,(a0)                         	| [...]
-	jmp	l_79c9                             	| [$b92c: jmp    $79c9]
+	jmp	play_enemy_hit_sound_79c9          	| [$b92c: jmp    play_enemy_hit_sound_79c9]
 l_b92f:
 	GET_REG_ADDRESS	0x2,d2                 	| [$b92f: ldb    $2,x]
 	move.b	(a0),d1                         	| [...]
@@ -19070,25 +19070,27 @@ l_c6f0:
 	jbsr	l_c75d                            	| [$c6f0: jsr    $c75d]
 	GET_REG_ADDRESS	-0x2,d2                	| [$c6f3: ldb    -$2,x]
 	move.b	(a0),d1                         	| [...]
-	jeq	l_c706                             	| [$c6f5: beq    $c706]
+	jeq	l_c706                             	| [$c6f5: beq    $c706] giant not moving anymore: change direction
 	OP_R_ON_DP_ADDRESS	move,counter_8_bit_0021,d1| [$c6f7: ldb    counter_8_bit_0021]
 	addq.b	#1,d1                           	| [$c6f9: incb]
 	and.b	#0x1f,d1                         	| [$c6fa: andb   #$1f]
 	jne	l_c701                             	| [$c6fc: bne    $c701]
-	jbsr	l_7992                            	| [$c6fe: jsr    $7992]
+* randomly play stomp sound
+	jbsr	play_giant_stomp_sound_7992       	| [$c6fe: jsr    play_giant_stomp_sound_7992]
 l_c701:
 	jbsr	apply_xy_speeds_to_enemy_a427     	| [$c701: jsr    apply_xy_speeds_to_enemy_a427]
 	jra	l_c716                             	| [$c704: bra    $c716]
+
 l_c706:
 	GET_REG_ADDRESS	0x13,d2                	| [$c706: ldb    $13,x]
 	move.b	(a0),d1                         	| [...]
-	GET_REG_ADDRESS	-0x2,d2                	| [$c709: stb    -$2,x]
+	GET_REG_ADDRESS	-0x2,d2                	| [$c709: stb    -$2,x] set giant direction
 	move.b	d1,(a0)                         	| [...]
 	GET_REG_ADDRESS	0x1e,d2                	| [$c70b: ldu    $1e,x]
 	MOVE_W_TO_REG	a0,d4                         	| [...]
 	jbsr	l_906b                            	| [$c70e: jsr    $906b]
 	moveq	#0,d0                            	| [$c711: clra]
-	GET_REG_ADDRESS	-0x2,d2                	| [$c712: sta    -$2,x]
+	GET_REG_ADDRESS	-0x2,d2                	| [$c712: sta    -$2,x] set giant direction to "no direction" (will pick another one later)
 	move.b	d0,(a0)                         	| [...]
 	GET_REG_ADDRESS	0x2,d2                 	| [$c714: sta    $2,x]
 	move.b	d0,(a0)                         	| [...]
@@ -19158,7 +19160,7 @@ l_c75d:
 	GET_REG_ADDRESS	task_pointer_0012,d2   	| [$c75d: lda    task_pointer_0012,x]
 	move.b	(a0),d0                         	| [...]
 	cmp.b	#0x02,d0                         	| [$c760: cmpa   #$02]
-	jeq	l_c77b                             	| [$c762: beq    $c77b]
+	jeq	handle_giants_c77b                 	| [$c762: beq    handle_giants_c77b]
 	OP_R_ON_DP_ADDRESS	move,current_level_0072,d0| [$c764: lda    current_level_0072]
 	cmp.b	#0x01,d0                         	| [$c766: cmpa   #$01]
 	jeq	l_c793                             	| [$c768: beq    $c793]
@@ -19183,379 +19185,572 @@ l_c776:
 	GET_REG_ADDRESS	0x7,d2                 	| [$c778: stb    $7,x]
 	move.b	d1,(a0)                         	| [...]
 	rts                                    	| [$c77a: rts]
-l_c77b:
+
+handle_giants_c77b:
+	LOG_REGS	c77b   | added by add_reg_log.py
+	ENABLE_LOG_REGS   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0xa,d2                	| [$c77b: ldd    -$a,x]
+	ENABLE_LOG_REGS   | added by add_reg_log.py
 	LOAD_D                                 	| [$c77b: ldd    -$a,x]
+	LOG_REGS	c77d   | added by add_reg_log.py
 	cmp.w	#0x1d98,d1                       	| [$c77d: cmpd   #$1d98]
+	LOG_REGS	c781   | added by add_reg_log.py
 	jhi	l_c788                             	| [$c781: bhi    $c788]
+	LOG_REGS	c783   | added by add_reg_log.py
 	move.b	#0x01,d0                        	| [$c783: ldd    #$0140]
 	move.w	#0x0140,d1                      	| [$c783: ldd    #$0140]
+	LOG_REGS	c786   | added by add_reg_log.py
 	jra	l_c776                             	| [$c786: bra    $c776]
 l_c788:
 	MAKE_D
+	LOG_REGS	c788   | added by add_reg_log.py
 	cmp.w	#0x1e48,d1                       	| [$c788: cmpd   #$1e48]
+	LOG_REGS	c78c   | added by add_reg_log.py
 	jcs	l_c7a0                             	| [$c78c: bcs    $c7a0]
+	LOG_REGS	c78e   | added by add_reg_log.py
 	move.b	#0x02,d0                        	| [$c78e: ldd    #$0240]
 	move.w	#0x0240,d1                      	| [$c78e: ldd    #$0240]
+	LOG_REGS	c791   | added by add_reg_log.py
 	jra	l_c776                             	| [$c791: bra    $c776]
 l_c793:
+	LOG_REGS	c793   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0xa,d2                	| [$c793: ldd    -$a,x]
 	LOAD_D                                 	| [$c793: ldd    -$a,x]
+	LOG_REGS	c795   | added by add_reg_log.py
 	cmp.w	#0x1a18,d1                       	| [$c795: cmpd   #$1a18]
+	LOG_REGS	c799   | added by add_reg_log.py
 	jhi	l_c7a0                             	| [$c799: bhi    $c7a0]
+	LOG_REGS	c79b   | added by add_reg_log.py
 	move.b	#0x01,d0                        	| [$c79b: ldd    #$0140]
 	move.w	#0x0140,d1                      	| [$c79b: ldd    #$0140]
+	LOG_REGS	c79e   | added by add_reg_log.py
 	jra	l_c776                             	| [$c79e: bra    $c776]
 l_c7a0:
+	LOG_REGS	c7a0   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x7,d2                 	| [$c7a0: ldb    $7,x]
 	move.b	(a0),d1                         	| [...]
+	LOG_REGS	c7a2   | added by add_reg_log.py
 	jne	l_c7b6                             	| [$c7a2: bne    $c7b6]
+	LOG_REGS	c7a4   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x8,d2                 	| [$c7a4: ldu    $8,x]
 	MOVE_W_TO_REG	a0,d4                         	| [...]
+	LOG_REGS	c7a6   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$c7a6: ldd    ,u++]
 	addq.w	#2,d4                           	| [...]
 	LOAD_D                                 	| [$c7a6: ldd    ,u++]
+	LOG_REGS	c7a8   | added by add_reg_log.py
 	tst.b	d0                               	| [$c7a8: tsta]
+	LOG_REGS	c7a9   | added by add_reg_log.py
 	jpl	l_c7af                             	| [$c7a9: bpl    $c7af]
+	LOG_REGS	c7ab   | added by add_reg_log.py
 	and.b	#0x7f,d0                         	| [$c7ab: anda   #$7f]
+	LOG_REGS	c7ad   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$c7ad: ldu    ,u]
 	MOVE_W_TO_REG	a0,d4                         	| [...]
 l_c7af:
+	LOG_REGS	c7af   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x8,d2                 	| [$c7af: stu    $8,x]
 	MOVE_W_FROM_REG	d4,a0                         	| [...]
-	GET_REG_ADDRESS	-0x2,d2                	| [$c7b1: sta    -$2,x]
+	LOG_REGS	c7b1   | added by add_reg_log.py
+	GET_REG_ADDRESS	-0x2,d2                	| [$c7b1: sta    -$2,x] change giant direction
 	move.b	d0,(a0)                         	| [...]
+	LOG_REGS	c7b3   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x7,d2                 	| [$c7b3: stb    $7,x]
 	move.b	d1,(a0)                         	| [...]
+	LOG_REGS	c7b5   | added by add_reg_log.py
 	rts                                    	| [$c7b5: rts]
 l_c7b6:
+	LOG_REGS	c7b6   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x7,d2                 	| [$c7b6: dec    $7,x]
 	subq.b	#1,(a0)                         	| [...]
+	LOG_REGS	c7b8   | added by add_reg_log.py
 	rts                                    	| [$c7b8: rts]
 
 l_c7c5:
+	LOG_REGS	c7c5   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0xb,d2                	| [$c7c5: ldb    -$b,x]
 	move.b	(a0),d1                         	| [...]
+	LOG_REGS	c7c7   | added by add_reg_log.py
 	asl.b	#1,d1                            	| [$c7c7: aslb]
 	.ifndef	RELEASE
+	LOG_REGS	c7c8   | added by add_reg_log.py
 	move.w	#0xc7cd,d4             	| [$c7c8: ldu    #0xc7cd]
 	.endif
 	lea	jump_table_c7cd,a4             	| [$c7c8: ldu    #jump_table_c7cd]
+	LOG_REGS	c7cb   | added by add_reg_log.py
 	JMP_B_INDEXED	a4,8  | [$c7cb: jmp    [b,u]] [indirect_jump] [nb_entries=8]
 
 
 l_c7dd:
+	LOG_REGS	c7dd   | added by add_reg_log.py
 	move.b	#0x00,d0                        	| [$c7dd: ldd    #$0006]
 	move.w	#0x0006,d1                      	| [$c7dd: ldd    #$0006]
 	MAKE_D                                 	| [...]
+	LOG_REGS	c7e0   | added by add_reg_log.py
 	GET_REG_ADDRESS	0xc,d2                 	| [$c7e0: std    $c,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
+	LOG_REGS	c7e2   | added by add_reg_log.py
 	moveq	#0,d1                            	| [$c7e2: clrb]
 	MAKE_D                                 	| [...]
+	LOG_REGS	c7e3   | added by add_reg_log.py
 	GET_REG_ADDRESS	0xe,d2                 	| [$c7e3: std    $e,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
+	LOG_REGS	c7e5   | added by add_reg_log.py
 	move.w	#0x4e1f,d4                      	| [$c7e5: ldu    #$4e1f]
+	LOG_REGS	c7e8   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x1b,d2                	| [$c7e8: ldb    $1b,x]
 	move.b	(a0),d1                         	| [...]
+	LOG_REGS	c7eb   | added by add_reg_log.py
 	jeq	l_c7f0                             	| [$c7eb: beq    $c7f0]
+	LOG_REGS	c7ed   | added by add_reg_log.py
 	move.w	#0x4ea1,d4                      	| [$c7ed: ldu    #$4ea1]
 l_c7f0:
+	LOG_REGS	c7f0   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x1e,d2                	| [$c7f0: stu    $1e,x]
 	MOVE_W_FROM_REG	d4,a0                         	| [...]
+	LOG_REGS	c7f3   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x13,d2                	| [$c7f3: ldb    $13,x]
 	move.b	(a0),d1                         	| [...]
+	LOG_REGS	c7f6   | added by add_reg_log.py
 	asl.b	#1,d1                            	| [$c7f6: aslb]
 	moveq	#0,d6                            	| [...]
 	move.b	d1,d6                           	| [...] as byte
 	DO_EXTB	d6                             	| [...] with sign extension
+	LOG_REGS	c7f7   | added by add_reg_log.py
 	GET_REG_BANK_ADDRESS_FROM_REG	d6,d4         	| [$c7f7: ldu    b,u] [bank_address]
 	MOVE_W_TO_REG	a0,d4                         	| [...]
+	LOG_REGS	c7f9   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d2                   	| [$c7f9: stu    ,x]
 	MOVE_W_FROM_REG	d4,a0                         	| [...]
+	LOG_REGS	c7fb   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x3,d2                 	| [$c7fb: stu    $3,x]
 	MOVE_W_FROM_REG	d4,a0                         	| [...]
+	LOG_REGS	c7fd   | added by add_reg_log.py
 	GET_REG_ADDRESS	task_pointer_0012,d2   	| [$c7fd: ldb    task_pointer_0012,x]
 	move.b	(a0),d1                         	| [...]
+	LOG_REGS	c800   | added by add_reg_log.py
 	jeq	l_c818                             	| [$c800: beq    $c818]
+	LOG_REGS	c802   | added by add_reg_log.py
 	cmp.b	#0x02,d1                         	| [$c802: cmpb   #$02]
+	LOG_REGS	c804   | added by add_reg_log.py
 	jeq	l_c82f                             	| [$c804: beq    $c82f]
 	| [$c806: clr    task_pointer_0012,x]
 	clr.b	(a0)                         	| [...]
+	LOG_REGS	c809   | added by add_reg_log.py
 	move.b	#0x10,d1                        	| [$c809: ldb    #$10]
+	LOG_REGS	c80b   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x13,d2                	| [$c80b: lda    $13,x]
 	move.b	(a0),d0                         	| [...]
+	LOG_REGS	c80e   | added by add_reg_log.py
 	subq.b	#1,d0                           	| [$c80e: deca]
+	LOG_REGS	c80f   | added by add_reg_log.py
 	jne	l_c813                             	| [$c80f: bne    $c813]
+	LOG_REGS	c811   | added by add_reg_log.py
 	move.b	#0x0f,d1                        	| [$c811: ldb    #$0f]
 l_c813:
+	LOG_REGS	c813   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x13,d2                	| [$c813: stb    $13,x]
 	move.b	d1,(a0)                         	| [...]
+	LOG_REGS	c816   | added by add_reg_log.py
 	jra	l_c845                             	| [$c816: bra    $c845]
 l_c818:
+	LOG_REGS	c818   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x15,d2                	| [$c818: ldb    $15,x]
 	move.b	(a0),d1                         	| [...]
+	LOG_REGS	c81b   | added by add_reg_log.py
 	jeq	l_c82f                             	| [$c81b: beq    $c82f]
 	| [$c81d: clr    $15,x]
 	clr.b	(a0)                         	| [...]
+	LOG_REGS	c820   | added by add_reg_log.py
 	move.b	#0x05,d1                        	| [$c820: ldb    #$05]
+	LOG_REGS	c822   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x13,d2                	| [$c822: lda    $13,x]
 	move.b	(a0),d0                         	| [...]
+	LOG_REGS	c825   | added by add_reg_log.py
 	subq.b	#1,d0                           	| [$c825: deca]
+	LOG_REGS	c826   | added by add_reg_log.py
 	jne	l_c82a                             	| [$c826: bne    $c82a]
+	LOG_REGS	c828   | added by add_reg_log.py
 	move.b	#0x06,d1                        	| [$c828: ldb    #$06]
 l_c82a:
+	LOG_REGS	c82a   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x13,d2                	| [$c82a: stb    $13,x]
 	move.b	d1,(a0)                         	| [...]
+	LOG_REGS	c82d   | added by add_reg_log.py
 	jra	l_c845                             	| [$c82d: bra    $c845]
 l_c82f:
+	LOG_REGS	c82f   | added by add_reg_log.py
 	move.w	#0xc89e,d4                      	| [$c82f: ldu    #$c89e]
+	LOG_REGS	c832   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x13,d2                	| [$c832: ldb    $13,x]
 	move.b	(a0),d1                         	| [...]
+	LOG_REGS	c835   | added by add_reg_log.py
 	subq.b	#1,d1                           	| [$c835: decb]
+	LOG_REGS	c836   | added by add_reg_log.py
 	jne	l_c83b                             	| [$c836: bne    $c83b]
+	LOG_REGS	c838   | added by add_reg_log.py
 	move.w	#0xc8a2,d4                      	| [$c838: ldu    #$c8a2]
 l_c83b:
+	LOG_REGS	c83b   | added by add_reg_log.py
 	jbsr	l_68f9                            	| [$c83b: jsr    $68f9]
+	LOG_REGS	c83e   | added by add_reg_log.py
 	and.b	#0x03,d1                         	| [$c83e: andb   #$03]
 	moveq	#0,d6                            	| [...]
 	move.b	d1,d6                           	| [...] as byte
 	DO_EXTB	d6                             	| [...] with sign extension
+	LOG_REGS	c840   | added by add_reg_log.py
 	GET_REG_ADDRESS_FROM_REG	d6,d4         	| [$c840: ldb    b,u]
 	move.b	(a0),d1                         	| [...]
+	LOG_REGS	c842   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x13,d2                	| [$c842: stb    $13,x]
 	move.b	d1,(a0)                         	| [...]
 l_c845:
+	LOG_REGS	c845   | added by add_reg_log.py
 	OP_R_ON_DP_ADDRESS	move,current_level_0072,d0| [$c845: lda    current_level_0072]
+	LOG_REGS	c847   | added by add_reg_log.py
 	cmp.b	#0x05,d0                         	| [$c847: cmpa   #$05]
+	LOG_REGS	c849   | added by add_reg_log.py
 	jeq	l_c864                             	| [$c849: beq    $c864]
+	LOG_REGS	c84b   | added by add_reg_log.py
 	cmp.b	#0x01,d0                         	| [$c84b: cmpa   #$01]
+	LOG_REGS	c84d   | added by add_reg_log.py
 	jne	l_c886                             	| [$c84d: bne    $c886]
+	LOG_REGS	c84f   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0xa,d2                	| [$c84f: ldd    -$a,x]
 	LOAD_D                                 	| [$c84f: ldd    -$a,x]
+	LOG_REGS	c851   | added by add_reg_log.py
 	cmp.w	#0x1a60,d1                       	| [$c851: cmpd   #$1a60]
+	LOG_REGS	c855   | added by add_reg_log.py
 	jhi	l_c886                             	| [$c855: bhi    $c886]
+	LOG_REGS	c857   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x13,d2                	| [$c857: lda    $13,x]
 	move.b	(a0),d0                         	| [...]
+	LOG_REGS	c85a   | added by add_reg_log.py
 	BIT	#0x01,d0                           	| [$c85a: bita   #$01]
+	LOG_REGS	c85c   | added by add_reg_log.py
 	jne	l_c886                             	| [$c85c: bne    $c886]
 l_c85e:
+	LOG_REGS	c85e   | added by add_reg_log.py
 	move.b	#0x02,d0                        	| [$c85e: ldd    #$0205]
 	move.w	#0x0205,d1                      	| [$c85e: ldd    #$0205]
 	MAKE_D                                 	| [...]
+	LOG_REGS	c861   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0xc,d2                	| [$c861: std    -$c,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
+	LOG_REGS	c863   | added by add_reg_log.py
 	rts                                    	| [$c863: rts]
 l_c864:
+	LOG_REGS	c864   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0xa,d2                	| [$c864: ldd    -$a,x]
 	LOAD_D                                 	| [$c864: ldd    -$a,x]
+	LOG_REGS	c866   | added by add_reg_log.py
 	cmp.w	#0x1da8,d1                       	| [$c866: cmpd   #$1da8]
+	LOG_REGS	c86a   | added by add_reg_log.py
 	jhi	l_c875                             	| [$c86a: bhi    $c875]
+	LOG_REGS	c86c   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x13,d2                	| [$c86c: lda    $13,x]
 	move.b	(a0),d0                         	| [...]
+	LOG_REGS	c86f   | added by add_reg_log.py
 	BIT	#0x01,d0                           	| [$c86f: bita   #$01]
+	LOG_REGS	c871   | added by add_reg_log.py
 	jne	l_c886                             	| [$c871: bne    $c886]
+	LOG_REGS	c873   | added by add_reg_log.py
 	jra	l_c85e                             	| [$c873: bra    $c85e]
 l_c875:
 	MAKE_D
+	LOG_REGS	c875   | added by add_reg_log.py
 	cmp.w	#0x1e38,d1                       	| [$c875: cmpd   #$1e38]
+	LOG_REGS	c879   | added by add_reg_log.py
 	jcs	l_c886                             	| [$c879: bcs    $c886]
+	LOG_REGS	c87b   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x13,d2                	| [$c87b: lda    $13,x]
 	move.b	(a0),d0                         	| [...]
+	LOG_REGS	c87e   | added by add_reg_log.py
 	jeq	l_c85e                             	| [$c87e: beq    $c85e]
+	LOG_REGS	c880   | added by add_reg_log.py
 	BIT	#0x01,d0                           	| [$c880: bita   #$01]
+	LOG_REGS	c882   | added by add_reg_log.py
 	jeq	l_c886                             	| [$c882: beq    $c886]
+	LOG_REGS	c884   | added by add_reg_log.py
 	jra	l_c85e                             	| [$c884: bra    $c85e]
 l_c886:
+	LOG_REGS	c886   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0xb,d2                	| [$c886: inc    -$b,x]
 	addq.b	#1,(a0)                         	| [...]
+	LOG_REGS	c888   | added by add_reg_log.py
 	rts                                    	| [$c888: rts]
 l_c889:
+	LOG_REGS	c889   | added by add_reg_log.py
 	jbsr	l_c940                            	| [$c889: jsr    $c940]
+	LOG_REGS	c88c   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x10,d2                	| [$c88c: clr    $10,x]
 	clr.b	(a0)                         	| [...]
+	LOG_REGS	c88f   | added by add_reg_log.py
 	jbsr	l_c8a6                            	| [$c88f: bsr    $c8a6]
+	LOG_REGS	c891   | added by add_reg_log.py
 	GET_REG_ADDRESS	0xd,d2                 	| [$c891: ldd    $d,x]
 	LOAD_D                                 	| [$c891: ldd    $d,x]
+	LOG_REGS	c893   | added by add_reg_log.py
 	cmp.w	#0x0100,d1                       	| [$c893: cmpd   #$0100]
+	LOG_REGS	c897   | added by add_reg_log.py
 	jhi	l_9074                             	| [$c897: lbhi   $9074]
+	LOG_REGS	c89b   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0xb,d2                	| [$c89b: inc    -$b,x]
 	addq.b	#1,(a0)                         	| [...]
+	LOG_REGS	c89d   | added by add_reg_log.py
 	rts                                    	| [$c89d: rts]
+	LOG_REGS	c89e   | added by add_reg_log.py
 	GET_DP_ADDRESS	global_state_0002       	| [$c89e: neg    global_state_0002]
 	neg.b	(a0)                             	| [...]
+	LOG_REGS	c8a0   | added by add_reg_log.py
 	GET_DP_ADDRESS	0x00                    	| [$c8a0: lsr    $00]
 	move.b	(a0),d6	| [$c8a0: lsr    $00]
 	lsr.b	#1,d6                          	| [$c8a0: lsr    $00]
 	move.b	d6,(a0)	| [$c8a0: lsr    $00]
+	LOG_REGS	c8a2   | added by add_reg_log.py
 	GET_DP_ADDRESS	0x00                    	| [$c8a2: neg    $00]
 	neg.b	(a0)                             	| [...]
+	LOG_REGS	c8a4   | added by add_reg_log.py
 	GET_DP_ADDRESS	0x03                    	| [$c8a4: neg    $03]
 	neg.b	(a0)                             	| [...]
 l_c8a6:
+	LOG_REGS	c8a6   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0x6,d2                	| [$c8a6: ldd    -$6,x]
 	LOAD_D                                 	| [$c8a6: ldd    -$6,x]
+	LOG_REGS	c8a8   | added by add_reg_log.py
 	GET_REG_ADDRESS	0xd,d2                 	| [$c8a8: addd   $d,x]
 	ADD_W_TO_REG	a0,d1                          	| [...]
 	PUSH_SR                                	| [...]
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	MAKE_D                                 	| [...]
+	LOG_REGS	c8aa   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0x6,d2                	| [$c8aa: std    -$6,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
+	LOG_REGS	c8ac   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0x7,d2                	| [$c8ac: ldb    -$7,x]
 	move.b	(a0),d1                         	| [...]
+	LOG_REGS	c8ae   | added by add_reg_log.py
 	GET_REG_ADDRESS	0xc,d2                 	| [$c8ae: adcb   $c,x]
 	move.b	(a0),d6	| [...]
 	addx.b	d6,d1                         	| [...]
+	LOG_REGS	c8b0   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0x7,d2                	| [$c8b0: stb    -$7,x]
 	move.b	d1,(a0)                         	| [...]
+	LOG_REGS	c8b2   | added by add_reg_log.py
 	move.w	#0xc7b9,d4                      	| [$c8b2: ldu    #$c7b9]
+	LOG_REGS	c8b5   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x10,d2                	| [$c8b5: ldb    $10,x]
 	move.b	(a0),d1                         	| [...]
+	LOG_REGS	c8b8   | added by add_reg_log.py
 	asl.b	#1,d1                            	| [$c8b8: aslb]
 	moveq	#0,d6                            	| [...]
 	move.b	d1,d6                           	| [...] as byte
 	DO_EXTB	d6                             	| [...] with sign extension
+	LOG_REGS	c8b9   | added by add_reg_log.py
 	GET_REG_ADDRESS_FROM_REG	d6,d4         	| [$c8b9: ldu    b,u]
 	MOVE_W_TO_REG	a0,d4                         	| [...]
+	LOG_REGS	c8bb   | added by add_reg_log.py
 	GET_REG_ADDRESS	0xe,d2                 	| [$c8bb: ldd    $e,x]
 	LOAD_D                                 	| [$c8bb: ldd    $e,x]
+	LOG_REGS	c8bd   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$c8bd: subd   ,u]
 	SUB_W_TO_REG	a0,d1                          	| [...]
 	PUSH_SR                                	| [...]
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	MAKE_D                                 	| [...]
+	LOG_REGS	c8bf   | added by add_reg_log.py
 	GET_REG_ADDRESS	0xe,d2                 	| [$c8bf: std    $e,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
+	LOG_REGS	c8c1   | added by add_reg_log.py
 	GET_REG_ADDRESS	0xc,d2                 	| [$c8c1: ldd    $c,x]
 	LOAD_D                                 	| [$c8c1: ldd    $c,x]
+	LOG_REGS	c8c3   | added by add_reg_log.py
 	move.b	#0x00,d6	| [$c8c3: sbcb   #$00]
 	subx.b	d6,d1                        	| [$c8c3: sbcb   #$00]
+	LOG_REGS	c8c5   | added by add_reg_log.py
 	move.b	#0x00,d6	| [$c8c5: sbca   #$00]
 	subx.b	d6,d0                        	| [$c8c5: sbca   #$00]
 	MAKE_D                                 	| [...]
 	| [$c8c7: std    $c,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
+	LOG_REGS	c8c9   | added by add_reg_log.py
 	rts                                    	| [$c8c9: rts]
 
 l_c8ec:
+	LOG_REGS	c8ec   | added by add_reg_log.py
 	jbsr	l_c940                            	| [$c8ec: bsr    $c940]
+	LOG_REGS	c8ee   | added by add_reg_log.py
 	move.b	#0x01,d1                        	| [$c8ee: ldb    #$01]
+	LOG_REGS	c8f0   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x10,d2                	| [$c8f0: stb    $10,x]
 	move.b	d1,(a0)                         	| [...]
+	LOG_REGS	c8f3   | added by add_reg_log.py
 	jbsr	l_c8a6                            	| [$c8f3: bsr    $c8a6]
+	LOG_REGS	c8f5   | added by add_reg_log.py
 	GET_REG_ADDRESS	0xd,d2                 	| [$c8f5: ldd    $d,x]
 	LOAD_D                                 	| [$c8f5: ldd    $d,x]
+	LOG_REGS	c8f7   | added by add_reg_log.py
 	cmp.w	#0x0019,d1                       	| [$c8f7: cmpd   #$0019]
+	LOG_REGS	c8fb   | added by add_reg_log.py
 	jhi	l_9074                             	| [$c8fb: lbhi   $9074]
+	LOG_REGS	c8ff   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0xb,d2                	| [$c8ff: inc    -$b,x]
 	addq.b	#1,(a0)                         	| [...]
+	LOG_REGS	c901   | added by add_reg_log.py
 	rts                                    	| [$c901: rts]
 l_c902:
+	LOG_REGS	c902   | added by add_reg_log.py
 	jbsr	l_c940                            	| [$c902: bsr    $c940]
+	LOG_REGS	c904   | added by add_reg_log.py
 	move.b	#0x01,d1                        	| [$c904: ldb    #$01]
+	LOG_REGS	c906   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x10,d2                	| [$c906: stb    $10,x]
 	move.b	d1,(a0)                         	| [...]
+	LOG_REGS	c909   | added by add_reg_log.py
 	jbsr	l_c90e                            	| [$c909: bsr    $c90e]
+	LOG_REGS	c90b   | added by add_reg_log.py
 	jmp	l_9074                             	| [$c90b: jmp    $9074]
 l_c90e:
+	LOG_REGS	c90e   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0x6,d2                	| [$c90e: ldd    -$6,x]
 	LOAD_D                                 	| [$c90e: ldd    -$6,x]
+	LOG_REGS	c910   | added by add_reg_log.py
 	GET_REG_ADDRESS	0xd,d2                 	| [$c910: subd   $d,x]
 	SUB_W_TO_REG	a0,d1                          	| [...]
 	PUSH_SR                                	| [...]
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	MAKE_D                                 	| [...]
+	LOG_REGS	c912   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0x6,d2                	| [$c912: std    -$6,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
+	LOG_REGS	c914   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0x7,d2                	| [$c914: ldb    -$7,x]
 	move.b	(a0),d1                         	| [...]
+	LOG_REGS	c916   | added by add_reg_log.py
 	GET_REG_ADDRESS	0xc,d2                 	| [$c916: sbcb   $c,x]
 	move.b	(a0),d6	| [...]
 	subx.b	d6,d1                         	| [...]
+	LOG_REGS	c918   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0x7,d2                	| [$c918: stb    -$7,x]
 	move.b	d1,(a0)                         	| [...]
+	LOG_REGS	c91a   | added by add_reg_log.py
 	move.w	#0xc7b9,d4                      	| [$c91a: ldu    #$c7b9]
+	LOG_REGS	c91d   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x10,d2                	| [$c91d: ldb    $10,x]
 	move.b	(a0),d1                         	| [...]
+	LOG_REGS	c920   | added by add_reg_log.py
 	asl.b	#1,d1                            	| [$c920: aslb]
 	moveq	#0,d6                            	| [...]
 	move.b	d1,d6                           	| [...] as byte
 	DO_EXTB	d6                             	| [...] with sign extension
+	LOG_REGS	c921   | added by add_reg_log.py
 	GET_REG_ADDRESS_FROM_REG	d6,d4         	| [$c921: ldu    b,u]
 	MOVE_W_TO_REG	a0,d4                         	| [...]
+	LOG_REGS	c923   | added by add_reg_log.py
 	GET_REG_ADDRESS	0xc,d2                 	| [$c923: ldd    $c,x]
 	LOAD_D                                 	| [$c923: ldd    $c,x]
+	LOG_REGS	c925   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x2,d4                 	| [$c925: cmpd   $2,u]
 	CMP_W_TO_REG	a0,d1                          	| [...]
+	LOG_REGS	c928   | added by add_reg_log.py
 	jhi	l_c938                             	| [$c928: bhi    $c938]
+	LOG_REGS	c92a   | added by add_reg_log.py
 	GET_REG_ADDRESS	0xe,d2                 	| [$c92a: ldd    $e,x]
 	LOAD_D                                 	| [$c92a: ldd    $e,x]
+	LOG_REGS	c92c   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$c92c: addd   ,u]
 	ADD_W_TO_REG	a0,d1                          	| [...]
 	PUSH_SR                                	| [...]
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	MAKE_D                                 	| [...]
+	LOG_REGS	c92e   | added by add_reg_log.py
 	GET_REG_ADDRESS	0xe,d2                 	| [$c92e: std    $e,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
+	LOG_REGS	c930   | added by add_reg_log.py
 	GET_REG_ADDRESS	0xc,d2                 	| [$c930: ldd    $c,x]
 	LOAD_D                                 	| [$c930: ldd    $c,x]
+	LOG_REGS	c932   | added by add_reg_log.py
 	move.b	#0x00,d6	| [$c932: adcb   #$00]
 	addx.b	d6,d1                        	| [$c932: adcb   #$00]
+	LOG_REGS	c934   | added by add_reg_log.py
 	move.b	#0x00,d6	| [$c934: adca   #$00]
 	addx.b	d6,d0                        	| [$c934: adca   #$00]
 	MAKE_D                                 	| [...]
 	| [$c936: std    $c,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 l_c938:
+	LOG_REGS	c938   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x10,d2                	| [$c938: ldb    $10,x]
 	move.b	(a0),d1                         	| [...]
+	LOG_REGS	c93b   | added by add_reg_log.py
 	jeq	l_c93f                             	| [$c93b: beq    $c93f]
+	LOG_REGS	c93d   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0xb,d2                	| [$c93d: inc    -$b,x]
 	addq.b	#1,(a0)                         	| [...]
 l_c93f:
+	LOG_REGS	c93f   | added by add_reg_log.py
 	rts                                    	| [$c93f: rts]
 l_c940:
+	LOG_REGS	c940   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x13,d2                	| [$c940: ldb    $13,x]
 	move.b	(a0),d1                         	| [...]
+	LOG_REGS	c943   | added by add_reg_log.py
 	asl.b	#1,d1                            	| [$c943: aslb]
+	LOG_REGS	c944   | added by add_reg_log.py
 	move.w	#0xc8ca,d4                      	| [$c944: ldu    #$c8ca]
 	moveq	#0,d6                            	| [...]
 	move.b	d1,d6                           	| [...] as byte
 	DO_EXTB	d6                             	| [...] with sign extension
+	LOG_REGS	c947   | added by add_reg_log.py
 	add.w	d6,d4                            	| [$c947: leau   b,u]
+	LOG_REGS	c949   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0x9,d2                	| [$c949: ldd    -$9,x]
 	LOAD_D                                 	| [$c949: ldd    -$9,x]
+	LOG_REGS	c94b   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$c94b: addd   ,u]
 	ADD_W_TO_REG	a0,d1                          	| [...]
 	PUSH_SR                                	| [...]
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	MAKE_D                                 	| [...]
+	LOG_REGS	c94d   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0x9,d2                	| [$c94d: std    -$9,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
+	LOG_REGS	c94f   | added by add_reg_log.py
 	GET_REG_ADDRESS	0,d4                   	| [$c94f: ldb    ,u]
 	move.b	(a0),d1                         	| [...]
+	LOG_REGS	c951   | added by add_reg_log.py
 	SEX                                    	| [$c951: sex]
+	LOG_REGS	c952   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0xa,d2                	| [$c952: adca   -$a,x]
 	move.b	(a0),d6	| [...]
 	addx.b	d6,d0                         	| [...]
 	| [$c954: sta    -$a,x]
 	move.b	d0,(a0)                         	| [...]
+	LOG_REGS	c956   | added by add_reg_log.py
 	rts                                    	| [$c956: rts]
 l_c957:
+	LOG_REGS	c957   | added by add_reg_log.py
 	jbsr	l_c940                            	| [$c957: bsr    $c940]
+	LOG_REGS	c959   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x10,d2                	| [$c959: clr    $10,x]
 	clr.b	(a0)                         	| [...]
+	LOG_REGS	c95c   | added by add_reg_log.py
 	jbsr	l_c90e                            	| [$c95c: bsr    $c90e]
+	LOG_REGS	c95e   | added by add_reg_log.py
 	jbsr	l_9074                            	| [$c95e: jsr    $9074]
+	LOG_REGS	c961   | added by add_reg_log.py
 	jbsr	l_8ca7                            	| [$c961: jsr    $8ca7]
+	LOG_REGS	c964   | added by add_reg_log.py
 	jcc	l_c96d                             	| [$c964: bcc    $c96d]
+	LOG_REGS	c966   | added by add_reg_log.py
 	moveq	#0,d0                            	| [$c966: clra]
 	MAKE_D                                 	| [...]
+	LOG_REGS	c967   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0x7,d2                	| [$c967: addd   -$7,x]
 	ADD_W_TO_REG	a0,d1                          	| [...]
 	PUSH_SR                                	| [...]
@@ -19564,46 +19759,69 @@ l_c957:
 	MAKE_D                                 	| [...]
 	| [$c969: std    -$7,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
+	LOG_REGS	c96b   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0xb,d2                	| [$c96b: inc    -$b,x]
 	addq.b	#1,(a0)                         	| [...]
 l_c96d:
+	LOG_REGS	c96d   | added by add_reg_log.py
 	rts                                    	| [$c96d: rts]
 l_c96e:
-	jbsr	l_7992                            	| [$c96e: jsr    $7992]
+	LOG_REGS	c96e   | added by add_reg_log.py
+	jbsr	play_giant_stomp_sound_7992       	| [$c96e: jsr    play_giant_stomp_sound_7992]
+	LOG_REGS	c971   | added by add_reg_log.py
 	move.b	#0x01,d1                        	| [$c971: ldb    #$01]
+	LOG_REGS	c973   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0x2,d2                	| [$c973: stb    -$2,x]
 	move.b	d1,(a0)                         	| [...]
+	LOG_REGS	c975   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x13,d2                	| [$c975: stb    $13,x]
 	move.b	d1,(a0)                         	| [...]
+	LOG_REGS	c978   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0xa,d2                	| [$c978: ldd    -$a,x]
 	LOAD_D                                 	| [$c978: ldd    -$a,x]
+	LOG_REGS	c97a   | added by add_reg_log.py
 	GET_DP_ADDRESS	0xa0                    	| [$c97a: cmpd   $a0]
 	CMP_W_TO_REG	a0,d1                          	| [...]
+	LOG_REGS	c97d   | added by add_reg_log.py
 	jlt	l_c986                             	| [$c97d: blt    $c986]
+	LOG_REGS	c97f   | added by add_reg_log.py
 	move.b	#0x02,d1                        	| [$c97f: ldb    #$02]
+	LOG_REGS	c981   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0x2,d2                	| [$c981: stb    -$2,x]
 	move.b	d1,(a0)                         	| [...]
+	LOG_REGS	c983   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x13,d2                	| [$c983: stb    $13,x]
 	move.b	d1,(a0)                         	| [...]
 l_c986:
+	LOG_REGS	c986   | added by add_reg_log.py
 	move.w	#0x4dbd,d4                      	| [$c986: ldu    #$4dbd]
+	LOG_REGS	c989   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x1b,d2                	| [$c989: ldb    $1b,x]
 	move.b	(a0),d1                         	| [...]
+	LOG_REGS	c98c   | added by add_reg_log.py
 	jeq	l_c9a0                             	| [$c98c: beq    $c9a0]
+	LOG_REGS	c98e   | added by add_reg_log.py
 	move.w	#0x4ec1,d4                      	| [$c98e: ldu    #$4ec1]
+	LOG_REGS	c991   | added by add_reg_log.py
 	jbsr	l_906b                            	| [$c991: jsr    $906b]
+	LOG_REGS	c994   | added by add_reg_log.py
 	move.b	#0x19,d0                        	| [$c994: ldd    #$1900]
 	move.w	#0x1900,d1                      	| [$c994: ldd    #$1900]
 	MAKE_D                                 	| [...]
+	LOG_REGS	c997   | added by add_reg_log.py
 	GET_REG_ADDRESS	0x1a,d2                	| [$c997: std    $1a,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
+	LOG_REGS	c99a   | added by add_reg_log.py
 	move.b	#0x05,d0                        	| [$c99a: ldd    #$0500]
 	move.w	#0x0500,d1                      	| [$c99a: ldd    #$0500]
 	MAKE_D                                 	| [...]
+	LOG_REGS	c99d   | added by add_reg_log.py
 	GET_REG_ADDRESS	-0xc,d2                	| [$c99d: std    -$c,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
+	LOG_REGS	c99f   | added by add_reg_log.py
 	rts                                    	| [$c99f: rts]
 l_c9a0:
+	LOG_REGS	c9a0   | added by add_reg_log.py
 	move.w	#0x4dbd,d4                      	| [$c9a0: ldu    #$4dbd]
 	jbsr	l_906b                            	| [$c9a3: jsr    $906b]
 	GET_REG_ADDRESS	0x1e,d2                	| [$c9a6: stu    $1e,x]
@@ -19766,7 +19984,7 @@ l_ca58:
 	addq.b	#1,d1                           	| [$ca5a: incb]
 	and.b	#0x0f,d1                         	| [$ca5b: andb   #$0f]
 	jne	l_ca62                             	| [$ca5d: bne    $ca62]
-	jbsr	l_7992                            	| [$ca5f: jsr    $7992]
+	jbsr	play_giant_stomp_sound_7992       	| [$ca5f: jsr    play_giant_stomp_sound_7992]
 l_ca62:
 	jbsr	apply_xy_speeds_to_enemy_a427     	| [$ca62: jsr    apply_xy_speeds_to_enemy_a427]
 	jbsr	l_9074                            	| [$ca65: jsr    $9074]
@@ -19813,7 +20031,7 @@ l_ca8c:
 	addq.b	#1,d1                           	| [$ca96: incb]
 	and.b	#0x1f,d1                         	| [$ca97: andb   #$1f]
 	jne	l_ca9e                             	| [$ca99: bne    $ca9e]
-	jbsr	l_7992                            	| [$ca9b: jsr    $7992]
+	jbsr	play_giant_stomp_sound_7992       	| [$ca9b: jsr    play_giant_stomp_sound_7992]
 l_ca9e:
 	jbsr	l_cb3a                            	| [$ca9e: jsr    $cb3a]
 	jmp	l_c5e9                             	| [$caa1: jmp    $c5e9]
@@ -20981,7 +21199,7 @@ l_cfd6:
 	move.b	#0x06,d0                        	| [$cfd6: lda    #$06]
 	GET_REG_ADDRESS	0x13,d2                	| [$cfd8: sta    $13,x]
 	move.b	d0,(a0)                         	| [...]
-	jbsr	l_79c9                            	| [$cfdb: jsr    $79c9]
+	jbsr	play_enemy_hit_sound_79c9         	| [$cfdb: jsr    play_enemy_hit_sound_79c9]
 	GET_REG_ADDRESS	-0xb,d2                	| [$cfde: inc    -$b,x]
 	addq.b	#1,(a0)                         	| [...]
 l_cfe0:
@@ -21068,7 +21286,7 @@ l_d034:
 	addq.b	#1,d1                           	| [$d036: incb]
 	and.b	#0x1f,d1                         	| [$d037: andb   #$1f]
 	jne	l_d03e                             	| [$d039: bne    $d03e]
-	jbsr	l_7992                            	| [$d03b: jsr    $7992]
+	jbsr	play_giant_stomp_sound_7992       	| [$d03b: jsr    play_giant_stomp_sound_7992]
 l_d03e:
 	OP_R_ON_DP_ADDRESS	move,counter_8_bit_0021,d1| [$d03e: ldb    counter_8_bit_0021]
 	addq.b	#1,d1                           	| [$d040: incb]
@@ -21339,7 +21557,7 @@ l_d188:
 	addq.b	#1,d1                           	| [$d18a: incb]
 	and.b	#0x0f,d1                         	| [$d18b: andb   #$0f]
 	jne	l_d192                             	| [$d18d: bne    $d192]
-	jbsr	l_7992                            	| [$d18f: jsr    $7992]
+	jbsr	play_giant_stomp_sound_7992       	| [$d18f: jsr    play_giant_stomp_sound_7992]
 l_d192:
 	jbsr	l_9074                            	| [$d192: jsr    $9074]
 	jbsr	l_9074                            	| [$d195: jsr    $9074]
@@ -23476,7 +23694,7 @@ l_db42:
 	OP_R_ON_DP_ADDRESS	add,0xe0,d1          | [$db44: addb   $e0]
 	and.b	#0x1f,d1                         	| [$db46: andb   #$1f]
 	jne	l_db4d                             	| [$db48: bne    $db4d]
-	jbsr	l_7992                            	| [$db4a: jsr    $7992]
+	jbsr	play_giant_stomp_sound_7992       	| [$db4a: jsr    play_giant_stomp_sound_7992]
 l_db4d:
 	jbsr	apply_xy_speeds_to_enemy_a427     	| [$db4d: jsr    apply_xy_speeds_to_enemy_a427]
 	GET_REG_ADDRESS	-0xa,d2                	| [$db50: ldd    -$a,x]
@@ -23979,7 +24197,7 @@ l_ddc0:
 	jne	l_ddcb                             	| [$ddc4: bne    $ddcb]
 	| [$ddc6: clr    -$e,x]
 	clr.b	(a0)                         	| [...]
-	jbsr	l_79c9                            	| [$ddc8: jsr    $79c9]
+	jbsr	play_enemy_hit_sound_79c9         	| [$ddc8: jsr    play_enemy_hit_sound_79c9]
 l_ddcb:
 	move.w	#0x0540,d3                      	| [$ddcb: ldy    #$0540]
 	move.b	#0x04,d1                        	| [$ddcf: ldb    #$04]

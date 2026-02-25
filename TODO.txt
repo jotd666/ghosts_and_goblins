@@ -7,6 +7,8 @@
   
 
 - At level 6, the 2 unicorns seem to easily go left and never return (specially the one on the left). not in the arcade!
+  check when the unicorn code is activated, then activate a trace, with 21 timer set to a fixed value, compare to amiga
+  C77B only called for 1 enemy in CB0, never for D10. Trace C4EA see if the same, then narrow down
 
 - to save memory (CD32 version?): don't include white arremers, shorten sprite files, lower quality sound samples
   => arremer table index=>is_arremer to fix clut to red else it will become invisible!

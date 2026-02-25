@@ -145,7 +145,7 @@ SND_UNKNOWN_14 = $14
 SND_ZOMBIE_RISING_17 = $17
 SND_UNKNOWN_18 = $18
 SND_UNKNOWN_19 = $19
-SND_UNKNOWN_1A = $1A
+SND_ENEMY_HIT_1A = $1A
 SND_UNKNOWN_1B = $1B
 SND_UNKNOWN_1C = $1C
 SND_UNKNOWN_00 = $00
@@ -2728,6 +2728,7 @@ queue_sound_forced_with_ff_7958:
 798D: C6 0B       LDB    #SND_FLYING_GOBLIN_0B
 798F: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
 
+play_giant_stomp_sound_7992:
 7992: C6 0C       LDB    #SND_GIANT_STOMPS_0C
 7994: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
 
@@ -2761,7 +2762,8 @@ queue_sound_forced_with_ff_7958:
 79C4: C6 19       LDB    #SND_UNKNOWN_19
 79C6: 7E 79 15    JMP    queue_sound_7915
 
-79C9: C6 1A       LDB    #SND_UNKNOWN_1A
+play_enemy_hit_sound_79c9:
+79C9: C6 1A       LDB    #SND_ENEMY_HIT_1A
 79CB: 7E 79 58    JMP    queue_sound_forced_with_ff_7958
 
 79CE: C6 1B       LDB    #SND_UNKNOWN_1B
@@ -7141,8 +7143,8 @@ A424: 7E 8E 0C    JMP    $8E0C
 * < X: enemy structure (ex: $C80)
 
 apply_xy_speeds_to_enemy_a427:
-A427: EE 1C       LDU    -$4,X
-A429: E6 1E       LDB    -$2,X
+A427: EE 1C       LDU    -$4,X		; get speed table
+A429: E6 1E       LDB    -$2,X		; get speed index (ex: giants: 1 or 2)
 A42B: 58          ASLB
 A42C: 58          ASLB
 A42D: 33 C5       LEAU   B,U
@@ -9082,7 +9084,7 @@ B924: ED 03       STD    $3,X
 B926: C6 05       LDB    #$05
 B928: E7 02       STB    $2,X
 B92A: 6C 12       INC    -$E,X
-B92C: 7E 79 C9    JMP    $79C9
+B92C: 7E 79 C9    JMP    play_enemy_hit_sound_79c9
 B92F: E6 02       LDB    $2,X
 B931: 26 02       BNE    $B935
 B933: 6F 12       CLR    -$E,X
@@ -10352,6 +10354,8 @@ C4E2: 5F          CLRB
 C4E3: ED 10       STD    -$10,X
 C4E5: ED 13       STD    -$D,X
 C4E7: 7E 8E 0C    JMP    $8E0C
+
+; as I know of, called on unicorn giant enemies only (not for flying bags)
 C4EA: EC 13       LDD    -$D,X
 C4EC: 48          ASLA
 C4ED: CE C4 F2    LDU    #jump_table_c4f2
@@ -10412,6 +10416,7 @@ C56D: CC 01 00    LDD    #$0100
 C570: ED 13       STD    -$D,X
 C572: E7 15       STB    -$B,X
 C574: 39          RTS
+
 C575: 58          ASLB
 C576: CE C5 7B    LDU    #jump_table_c57b
 C579: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=6]
@@ -10442,6 +10447,7 @@ C5B5: 0C B5       INC    $B5
 C5B7: CC 01 00    LDD    #$0100
 C5BA: ED 14       STD    -$C,X
 C5BC: 39          RTS
+
 C5BD: EC 16       LDD    -$A,X
 C5BF: 93 9C       SUBD   $9C
 C5C1: C3 01 00    ADDD   #$0100
@@ -10532,7 +10538,7 @@ C6D7: E6 C5       LDB    B,U
 C6D9: E7 06       STB    $6,X
 C6DB: 6F 0A       CLR    $A,X
 C6DD: 6F 0B       CLR    $B,X
-C6DF: E6 88 12    LDB    task_pointer_0012,X
+C6DF: E6 88 12    LDB    $12,X
 C6E2: 27 0A       BEQ    $C6EE
 C6E4: C1 02       CMPB   #$02
 C6E6: 27 06       BEQ    $C6EE
@@ -10542,20 +10548,22 @@ C6ED: 39          RTS
 C6EE: 6C 15       INC    -$B,X
 C6F0: BD C7 5D    JSR    $C75D
 C6F3: E6 1E       LDB    -$2,X
-C6F5: 27 0F       BEQ    $C706
+C6F5: 27 0F       BEQ    $C706		; giant not moving anymore: change direction
 C6F7: D6 21       LDB    counter_8_bit_0021
 C6F9: 5C          INCB
 C6FA: C4 1F       ANDB   #$1F
 C6FC: 26 03       BNE    $C701
-C6FE: BD 79 92    JSR    $7992
+; randomly play stomp sound
+C6FE: BD 79 92    JSR    play_giant_stomp_sound_7992
 C701: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 C704: 20 10       BRA    $C716
+
 C706: E6 88 13    LDB    $13,X
-C709: E7 1E       STB    -$2,X
+C709: E7 1E       STB    -$2,X		 ; set giant direction
 C70B: EE 88 1E    LDU    $1E,X
 C70E: BD 90 6B    JSR    $906B
 C711: 4F          CLRA
-C712: A7 1E       STA    -$2,X
+C712: A7 1E       STA    -$2,X		; set giant direction to "no direction" (will pick another one later)
 C714: A7 02       STA    $2,X
 C716: BD 90 74    JSR    $9074
 C719: 8D 39       BSR    $C754
@@ -10589,9 +10597,10 @@ C756: 26 04       BNE    $C75C
 C758: C6 01       LDB    #$01
 C75A: E7 0A       STB    $A,X
 C75C: 39          RTS
-C75D: A6 88 12    LDA    task_pointer_0012,X
+
+C75D: A6 88 12    LDA    $12,X
 C760: 81 02       CMPA   #$02
-C762: 27 17       BEQ    $C77B
+C762: 27 17       BEQ    handle_giants_c77b
 C764: 96 72       LDA    current_level_0072
 C766: 81 01       CMPA   #$01
 C768: 27 29       BEQ    $C793
@@ -10603,6 +10612,8 @@ C773: CC 02 40    LDD    #$0240
 C776: A7 1E       STA    -$2,X
 C778: E7 07       STB    $7,X
 C77A: 39          RTS
+
+handle_giants_c77b:
 C77B: EC 16       LDD    -$A,X
 C77D: 10 83 1D 98 CMPD   #$1D98
 C781: 22 05       BHI    $C788
@@ -10626,7 +10637,7 @@ C7A9: 2A 04       BPL    $C7AF
 C7AB: 84 7F       ANDA   #$7F
 C7AD: EE C4       LDU    ,U
 C7AF: EF 08       STU    $8,X
-C7B1: A7 1E       STA    -$2,X
+C7B1: A7 1E       STA    -$2,X		; change giant direction
 C7B3: E7 07       STB    $7,X
 C7B5: 39          RTS
 C7B6: 6A 07       DEC    $7,X
@@ -10804,7 +10815,7 @@ C967: E3 19       ADDD   -$7,X
 C969: ED 19       STD    -$7,X
 C96B: 6C 15       INC    -$B,X
 C96D: 39          RTS
-C96E: BD 79 92    JSR    $7992
+C96E: BD 79 92    JSR    play_giant_stomp_sound_7992
 C971: C6 01       LDB    #$01
 C973: E7 1E       STB    -$2,X
 C975: E7 88 13    STB    $13,X
@@ -10908,7 +10919,7 @@ CA58: D6 21       LDB    counter_8_bit_0021
 CA5A: 5C          INCB
 CA5B: C4 0F       ANDB   #$0F
 CA5D: 26 03       BNE    $CA62
-CA5F: BD 79 92    JSR    $7992
+CA5F: BD 79 92    JSR    play_giant_stomp_sound_7992
 CA62: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 CA65: BD 90 74    JSR    $9074
 CA68: BD 90 74    JSR    $9074
@@ -10935,7 +10946,7 @@ CA94: D6 21       LDB    counter_8_bit_0021
 CA96: 5C          INCB
 CA97: C4 1F       ANDB   #$1F
 CA99: 26 03       BNE    $CA9E
-CA9B: BD 79 92    JSR    $7992
+CA9B: BD 79 92    JSR    play_giant_stomp_sound_7992
 CA9E: BD CB 3A    JSR    $CB3A
 CAA1: 7E C5 E9    JMP    $C5E9
 
@@ -11509,7 +11520,7 @@ CFD0: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=2]
 
 CFD6: 86 06       LDA    #$06
 CFD8: A7 88 13    STA    $13,X
-CFDB: BD 79 C9    JSR    $79C9
+CFDB: BD 79 C9    JSR    play_enemy_hit_sound_79c9
 CFDE: 6C 15       INC    -$B,X
 CFE0: 6A 88 13    DEC    $13,X
 CFE3: 10 26 C0 8D LBNE   $9074
@@ -11551,7 +11562,7 @@ D034: D6 21       LDB    counter_8_bit_0021
 D036: 5C          INCB
 D037: C4 1F       ANDB   #$1F
 D039: 26 03       BNE    $D03E
-D03B: BD 79 92    JSR    $7992
+D03B: BD 79 92    JSR    play_giant_stomp_sound_7992
 D03E: D6 21       LDB    counter_8_bit_0021
 D040: 5C          INCB
 D041: C4 0F       ANDB   #$0F
@@ -11700,7 +11711,7 @@ D188: D6 21       LDB    counter_8_bit_0021
 D18A: 5C          INCB
 D18B: C4 0F       ANDB   #$0F
 D18D: 26 03       BNE    $D192
-D18F: BD 79 92    JSR    $7992
+D18F: BD 79 92    JSR    play_giant_stomp_sound_7992
 D192: BD 90 74    JSR    $9074
 D195: BD 90 74    JSR    $9074
 D198: BD 90 74    JSR    $9074
@@ -12796,7 +12807,7 @@ DB42: D6 21       LDB    counter_8_bit_0021
 DB44: DB E0       ADDB   $E0
 DB46: C4 1F       ANDB   #$1F
 DB48: 26 03       BNE    $DB4D
-DB4A: BD 79 92    JSR    $7992
+DB4A: BD 79 92    JSR    play_giant_stomp_sound_7992
 DB4D: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 DB50: EC 16       LDD    -$A,X
 DB52: 10 A3 0B    CMPD   $B,X
@@ -13069,7 +13080,7 @@ DDC0: A6 12       LDA    -$E,X
 DDC2: 81 01       CMPA   #$01
 DDC4: 26 05       BNE    $DDCB
 DDC6: 6F 12       CLR    -$E,X
-DDC8: BD 79 C9    JSR    $79C9
+DDC8: BD 79 C9    JSR    play_enemy_hit_sound_79c9
 DDCB: 10 8E 05 40 LDY    #$0540
 DDCF: C6 04       LDB    #$04
 DDD1: D7 E1       STB    $E1
