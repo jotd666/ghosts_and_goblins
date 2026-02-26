@@ -126,6 +126,21 @@ for i,line in enumerate(lines):
     elif address == 0x523E:
         # hook on weapon palette change (maybe not useful on 256 color-capable platforms but on amiga we need that)
         line = "\tjbsr\tosd_weapon_palette_change\n" + line
+    # fix race condition between interrupt displaying highscore alphabet and
+    # the previous clear screen loop (not running in interrupt): block the interrupts in clear screen
+    elif address == 0x4861:
+        line += "\tjbsr\tosd_disable_interrupts\n"
+    elif address == 0x487A:
+        line += "\tjbsr\tosd_enable_interrupts    | end fix OSD clear/score entry race condition\n"
+    # end of race condition fix
+    # fix another potential race condition after "continue"
+    # (no map after continue sometimes)
+    elif address == 0x54e3:
+        line += "\tjbsr\tosd_disable_interrupts\n"
+    elif address == 0x54fd:
+        line += "\tjbsr\tosd_enable_interrupts   | end fix (possible) race condition\n"
+    # end of race condition fix
+
     elif address == 0x5025:
         # remove movem because afterwards the registers are restored individually
         # plus it's slightly faster, but it was indeed equivalent
@@ -167,7 +182,7 @@ with open(source_dir / f"{bankname}.68k","w") as fw:
     # game_specific: fill global symbols
     for gs in """clear_screen_and_show_status_4800
 l_5025
-l_485c
+clear_osd_screen_rows_485c
 display_osd_text_489b
 display_osd_text_48bd
 l_5022
@@ -185,7 +200,7 @@ add_to_score_53f4
 compute_and_display_time_52b9
 service_mode_5636
 l_58ce
-l_54e3
+clear_tiles_54e3
 l_5a8a
 l_5b3a
 l_5910
@@ -287,8 +302,8 @@ for i,line in enumerate(lines):
     elif address == 0x6174:
          line = remove_instruction(lines,i)
          line = change_instruction("add.w\td6,d6",lines,i)
-##    elif address == 0x6ED0:
-##        line = "\tjbsr\tosd_black_colors\n"+line
+    elif address == 0x6C77:
+        line = "\tjbsr\tosd_black_colors\n"+line
     elif address == 0x617d:
         # direct jump
          line = change_instruction("move.l\t(a2,d6.w),a2",lines,i) + "\tjsr\t(a2)\n"

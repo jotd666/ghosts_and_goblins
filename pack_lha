@@ -1,5 +1,4 @@
 .key nope
-
 set game GhostsNGoblins
 set arc ${game}_WHD.lha
 if exists ${arc}

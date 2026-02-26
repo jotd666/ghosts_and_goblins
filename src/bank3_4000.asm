@@ -42,7 +42,7 @@ clear_screen_and_show_status_4800:
 4856: BD 50 25    JSR    $5025
 4859: 0F F0       CLR    $F0
 485B: 39          RTS
-l_485c:
+clear_osd_screen_rows_485c:
 485C: 5D          TSTB
 485D: 2B 1E       BMI    $487D
 485F: D7 FD       STB    $FD
@@ -534,7 +534,7 @@ add_to_score_53f4:
 5452: BD 50 25    JSR    $5025
 5455: 35 C0       PULS   U,PC
 
-l_54e3:
+clear_tiles_54e3:
 54E3: 34 40       PSHS   U                                         
 54E5: 8E 28 00    LDX    #$2800
 54E8: 33 89 04 00 LEAU   $0400,X
@@ -1456,6 +1456,7 @@ display_high_score_entry_5c3a:
 5C3F: C6 0D       LDB    #$0D
 5C41: 34 04       PSHS   B			; do it 13 times
 ; layout the alphabet for highscore
+; 4 rows of 13 letters
 5C43: C6 41       LDB    #$41		; 'A'
 5C45: 86 0B       LDA    #$0B
 5C47: A7 C9 04 00 STA    $0400,U	; [unchecked_address]
@@ -1464,15 +1465,16 @@ display_high_score_entry_5c3a:
 5C4F: 26 02       BNE    $5C53
 5C51: C6 60       LDB    #$60		; lowercase
 5C53: C1 7A       CMPB   #$7A
-5C55: 27 0E       BEQ    $5C65
+5C55: 27 0E       BEQ    $5C65		; last letter: out
 5C57: 5C          INCB
 5C58: 6A E4       DEC    ,S
 5C5A: 26 E9       BNE    $5C45
 5C5C: 86 0D       LDA    #$0D
-5C5E: A7 E4       STA    ,S
+5C5E: A7 E4       STA    ,S		; reload column count
 5C60: 33 C8 26    LEAU   $26,U
 5C63: 20 E0       BRA    $5C45
 5C65: 33 C8 26    LEAU   $26,U
+; last row with signs, space and end
 5C68: C6 0D       LDB    #$0D
 5C6A: E7 E4       STB    ,S
 5C6C: E6 80       LDB    ,X+		; [bank_address]

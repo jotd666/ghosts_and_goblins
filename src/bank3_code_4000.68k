@@ -1,6 +1,6 @@
 	.global	clear_screen_and_show_status_4800
 	.global	l_5025
-	.global	l_485c
+	.global	clear_osd_screen_rows_485c
 	.global	display_osd_text_489b
 	.global	display_osd_text_48bd
 	.global	l_5022
@@ -18,7 +18,7 @@
 	.global	compute_and_display_time_52b9
 	.global	service_mode_5636
 	.global	l_58ce
-	.global	l_54e3
+	.global	clear_tiles_54e3
 	.global	l_5a8a
 	.global	l_5b3a
 	.global	l_5910
@@ -81,11 +81,12 @@ l_4848:
 	jbsr	l_5025                            	| [$4856: jsr    $5025]
 	OP_1_ON_DP_ADDRESS	clr,0xf0             | [$4859: clr    $f0]
 	rts                                    	| [$485b: rts]
-l_485c:
+clear_osd_screen_rows_485c:
 	tst.b	d1                               	| [$485c: tstb]
 	jmi	l_487d                             	| [$485d: bmi    $487d]
 	OP_W_ON_DP_ADDRESS	move,0xfd,d1         | [$485f: stb    $fd]
 	move.w	#0x2080,d2                      	| [$4861: ldx    #$2080]
+	jbsr	osd_disable_interrupts
 l_4864:
 	move.b	#0x20,d1                        	| [$4864: ldb    #$20]
 	OP_W_ON_DP_ADDRESS	move,0xfc,d1         | [$4866: stb    $fc]
@@ -103,6 +104,7 @@ l_486c:
 	OP_W_ON_DP_ADDRESS	subq,0xfd,#1         | [$4876: dec    $fd]
 	jne	l_4864                             	| [$4878: bne    $4864]
 	OP_1_ON_DP_ADDRESS	clr,0xf0             | [$487a: clr    $f0]
+	jbsr	osd_enable_interrupts    | end fix OSD clear/score entry race condition
 	rts                                    	| [$487c: rts]
 l_487d:
 	and.b	#0x7f,d1                         	| [$487d: andb   #$7f]
@@ -928,8 +930,9 @@ l_5452:
 	movem.l	(sp)+,d4                       	| [$5455: puls   u,pc]
 	rts                                    	| [...]
 
-l_54e3:
+clear_tiles_54e3:
 	move.l	d4,-(sp)                        	| [$54e3: pshs   u]
+	jbsr	osd_disable_interrupts
 	move.w	#0x2800,d2                      	| [$54e5: ldx    #$2800]
 	move.w	d2,d4                           	| [$54e8: leau   $0400,x]
 	add.w	#0x0400,d4                       	| [$54e8: leau   $0400,x]
@@ -948,6 +951,7 @@ l_54f3:
 	jne	l_54f3                             	| [$54f9: bne    $54f3]
 	OP_1_ON_DP_ADDRESS	clr,0xf0             | [$54fb: clr    $f0]
 	movem.l	(sp)+,d4                       	| [$54fd: puls   u,pc]
+	jbsr	osd_enable_interrupts   | end fix (possible) race condition
 	rts                                    	| [...]
 
 l_54ff:
@@ -2325,6 +2329,7 @@ display_high_score_entry_5c3a:
 	subq.w	#1,d5
 	move.b	d1,-(a0)   | [...]
 * layout the alphabet for highscore
+* 4 rows of 13 letters
 	move.b	#0x41,d1                        	| [$5c43: ldb    #$41] 'A'
 l_5c45:
 	move.b	#0x0b,d0                        	| [$5c45: lda    #$0b]
@@ -2339,18 +2344,19 @@ l_5c45:
 	move.b	#0x60,d1                        	| [$5c51: ldb    #$60] lowercase
 l_5c53:
 	cmp.b	#0x7a,d1                         	| [$5c53: cmpb   #$7a]
-	jeq	l_5c65                             	| [$5c55: beq    $5c65]
+	jeq	l_5c65                             	| [$5c55: beq    $5c65] last letter: out
 	addq.b	#1,d1                           	| [$5c57: incb]
 	GET_REG_ADDRESS	0,d5                   	| [$5c58: dec    ,s]
 	subq.b	#1,(a0)                         	| [...]
 	jne	l_5c45                             	| [$5c5a: bne    $5c45]
 	move.b	#0x0d,d0                        	| [$5c5c: lda    #$0d]
-	| [$5c5e: sta    ,s]
+	| [$5c5e: sta    ,s] reload column count
 	move.b	d0,(a0)                         	| [...]
 	add.w	#0x26,d4                         	| [$5c60: leau   $26,u]
 	jra	l_5c45                             	| [$5c63: bra    $5c45]
 l_5c65:
 	add.w	#0x26,d4                         	| [$5c65: leau   $26,u]
+* last row with signs, space and end
 	move.b	#0x0d,d1                        	| [$5c68: ldb    #$0d]
 	GET_REG_ADDRESS	0,d5                   	| [$5c6a: stb    ,s]
 	move.b	d1,(a0)                         	| [...]

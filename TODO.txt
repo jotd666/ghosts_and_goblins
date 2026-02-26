@@ -1,11 +1,6 @@
-- after continuing, the map context should be loaded!! sometimes ok sometimes not (release mode level 5??)
-- confirmed (level 5): the high score screen only partially works some of the time. (release mode!)
-  Occasionally while on this screen you will see all of the characters and other times it will only show one or two rows.
-  It still functions and you can continue on, but it treats any of the characters not shown on screen as blanks,
-  when attempting to type in an abbreviated name. plus if entering name sometimes crashes stream fault at 204541F6:
-  reverse alphabet print on screen. debug at 5c3a
-  
-
+- after continuing, the map context should be loaded!! sometimes ok sometimes not (release mode level 5??). Maybe another clear screen
+  race condition? maybe fixed now
+- 50Hz flashy at times, limit framerate?
 - At level 6, the 2 unicorns seem to easily go left and never return (specially the one on the left). not in the arcade!
   check when the unicorn code is activated, then activate a trace, with 21 timer set to a fixed value, compare to amiga
   C77B only called for 1 enemy in CB0, never for D10. Trace C4EA see if the same, then narrow down
@@ -13,7 +8,7 @@
 - to save memory (CD32 version?): don't include white arremers, shorten sprite files, lower quality sound samples
   => arremer table index=>is_arremer to fix clut to red else it will become invisible!
   no pre-mirroring: mirror_planes sets -2 systematically to force in-place, and no blitter chain
-- freeze & optimize 68k code, turn jmp => jra, jsr => jbsr
+- freeze & optimize 68k code, turn jmp => jra, jsr => jbsr: in post_process
 
 - don't play a tune if same module / same pattern already playing (avoids to repeat music when there's a E8 trigger): does this happen?
 - CD32 version to test with release exe: works with 1E0000 base chip!!

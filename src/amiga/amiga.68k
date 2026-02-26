@@ -3534,8 +3534,6 @@ osd_video_word_dirty:
 osd_video_byte_dirty:
 	OSD_ENTER
 	movem.l	d0-d7/a0-a2/a5,-(a7)
-	lea		_custom,a5
-	REALLY_WAIT_BLIT
 	move.b	(a0),d0
 	move.l	a0,d7		| save address
 	sub.l	a6,d7
@@ -3906,6 +3904,12 @@ update_bg_tile:
 	.else
 	move.l	(a0,d1.w*4),a0
 	.endif
+	
+	* we wait just in case a blitter operation is in progress
+	* it rarely conflicts, as only animated tiles are the windows at level 2
+	* from where the flying small pests arrive
+	*lea		_custom,a5
+	*REALLY_WAIT_BLIT
 	tst.b 	d6
 	jeq		0f
 	movem.l	d0-D3/a0-a6,-(a7)

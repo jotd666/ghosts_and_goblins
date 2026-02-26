@@ -17350,7 +17350,7 @@ jump_table_beed:
 
 jump_table_6188:
 	dc.w	clear_screen_and_show_status_4800	; $6188
-	dc.w	$485C	; $618a
+	dc.w	clear_osd_screen_rows_485c	; $618a
 	dc.w	display_osd_text_489b	; $618c from bank 3 
 	dc.w	display_osd_text_48bd	; $618e from bank 3 
 	dc.w	$5022	; $6190 from bank 3 
@@ -17363,7 +17363,7 @@ jump_table_6188:
 	dc.w	copy_highscores_53a3	; $619e
 	dc.w	add_to_score_53f4	; $61a0
 	dc.w	compute_and_display_time_52b9	; $61a2
-	dc.w	$54E3	; $61a4
+	dc.w	clear_tiles_54e3	; $61a4
 	dc.w	$5910	; $61a6
 	dc.w	$5180	; $61a8
 	dc.w	$5975	; $61aa
