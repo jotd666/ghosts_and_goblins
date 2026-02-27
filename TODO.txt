@@ -1,6 +1,7 @@
 - after continuing, the map context should be loaded!! sometimes ok sometimes not (release mode level 5??). Maybe another clear screen
   race condition? maybe fixed now
 - 50Hz flashy at times, limit framerate?
+- different score table for each difficulty / lives?
 - At level 6, the 2 unicorns seem to easily go left and never return (specially the one on the left). not in the arcade!
   check when the unicorn code is activated, then activate a trace, with 21 timer set to a fixed value, compare to amiga
   C77B only called for 1 enemy in CB0, never for D10. Trace C4EA see if the same, then narrow down
@@ -24,7 +25,7 @@
 - level 3 still tile issues (part 2, hard left after big ladder, even on emulation, try to reproduce as not systematic, maybe release only)
 - real hardware sometimes scrolling seems to reset. Increase delta x scroll to trigger full refresh: to test real hw
 - try to apply patches to fix some original game bugs / difficulty level HP for monsters
-- add foreground tiles (grass, bridge): tricky work, added blitting, and not really noticeable
+- add foreground tiles (grass, bridge, level 6 pillars): tricky work, added blitting, and not really noticeable
 - demo resets scroll and makes column update buggy at times
 - level 2 see if we can use dynamic color change, see if separating ice towers from rest of game tiles (except house right after)
   allows a neat 32+32 colors. In that case, it's doable to use dynamic color change on some colors
@@ -52,6 +53,11 @@ replace division:
 
 bpset FED8,,{temp0=A;A /= B; B = A % B;PC=FEEF;g}
 bpset FEF0,,{temp0=w@U; temp1=temp0/D; w@U=temp1; D = temp0%D; PC=$feef; g}
+
+fix random (warning: also random with timer @ 21)
+
+bpset 68f9,,{B=0;PC=6908;g}
+
 
 log sounds: bpset 7942,,{print B;g}
 skip sounds: bpset 7942,B == $17,{PC=$792F;g}

@@ -81,6 +81,8 @@ armour_flag_00ac = $ac
 nb_lives_0060 = $60
 time_00aa = $aa
 stack_save_00e2 = $e2
+copy_of_player_x_00a0 = $a0
+copy_of_player_y_00a2 = $a2
 system_3000 = $3000
 p1_3001 = $3001
 p2_3002 = $3002
@@ -1093,6 +1095,7 @@ fill_screen_with_h_6883:
 68F5: 26 F6       BNE    $68ED
 68F7: 35 C4       PULS   B,U,PC
 
+random_68f9:
 68F9: D6 6F       LDB    $6F
 68FB: D8 6E       EORB   $6E
 68FD: 53          COMB
@@ -1103,6 +1106,7 @@ fill_screen_with_h_6883:
 6904: D6 6F       LDB    $6F
 6906: D7 70       STB    $70
 6908: 39          RTS
+
 6909: 10 9E 10    LDY    $10
 690C: ED A1       STD    ,Y++
 690E: 10 8C 01 3F CMPY   #$013F
@@ -5275,9 +5279,9 @@ compute_screen_address_8dd2:
 8FE0: 5F          CLRB
 8FE1: ED 33       STD    -$D,Y
 8FE3: 39          RTS
-8FE4: DC A0       LDD    $A0
+8FE4: DC A0       LDD    copy_of_player_x_00a0
 8FE6: DD E2       STD    stack_save_00e2
-8FE8: DC A2       LDD    $A2
+8FE8: DC A2       LDD    copy_of_player_y_00a2
 8FEA: DD E4       STD    $E4
 8FEC: 0F E1       CLR    $E1
 8FEE: DC E2       LDD    stack_save_00e2
@@ -5362,9 +5366,9 @@ compute_screen_address_8dd2:
 90AE: 8D 0B       BSR    $90BB
 90B0: 8D E8       BSR    $909A
 90B2: EC 16       LDD    -$A,X
-90B4: DD A0       STD    $A0
+90B4: DD A0       STD    copy_of_player_x_00a0
 90B6: EC 19       LDD    -$7,X
-90B8: DD A2       STD    $A2
+90B8: DD A2       STD    copy_of_player_y_00a2
 90BA: 39          RTS
 90BB: E6 10       LDB    -$10,X
 90BD: 27 FB       BEQ    $90BA
@@ -6775,7 +6779,7 @@ A116: E7 1F       STB    -$1,X
 A118: C6 01       LDB    #$01
 A11A: E7 1E       STB    -$2,X
 A11C: EC 16       LDD    -$A,X
-A11E: 10 93 A0    CMPD   $A0
+A11E: 10 93 A0    CMPD   copy_of_player_x_00a0
 A121: 2D 04       BLT    $A127
 A123: C6 09       LDB    #$09
 A125: E7 1E       STB    -$2,X
@@ -6888,7 +6892,7 @@ A209: DB E0       ADDB   $E0
 A20B: C4 0F       ANDB   #$0F
 A20D: 26 26       BNE    $A235
 A20F: EC 16       LDD    -$A,X
-A211: 93 A0       SUBD   $A0
+A211: 93 A0       SUBD   copy_of_player_x_00a0
 A213: 2A 05       BPL    $A21A
 A215: 43          COMA
 A216: 53          COMB
@@ -6930,7 +6934,7 @@ A25D: 33 48       LEAU   $8,U
 A25F: EF 0E       STU    $E,X
 A261: 6C 15       INC    -$B,X
 A263: 39          RTS
-A264: DC A2       LDD    $A2
+A264: DC A2       LDD    copy_of_player_y_00a2
 A266: C3 00 20    ADDD   #$0020
 A269: 10 A3 19    CMPD   -$7,X
 A26C: 22 26       BHI    $A294
@@ -7005,7 +7009,7 @@ A2F8: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=4]
 
 A302: CE 45 C8    LDU    #$45C8
 A305: EC 16       LDD    -$A,X
-A307: 10 93 A0    CMPD   $A0
+A307: 10 93 A0    CMPD   copy_of_player_x_00a0
 A30A: 23 03       BLS    $A30F
 A30C: CE 45 D2    LDU    #$45D2
 A30F: EF 84       STU    ,X
@@ -7025,7 +7029,7 @@ A32C: 6A 09       DEC    $9,X
 A32E: 10 26 ED 42 LBNE   $9074
 A332: CE 47 D8    LDU    #$47D8
 A335: EC 16       LDD    -$A,X
-A337: 10 93 A0    CMPD   $A0
+A337: 10 93 A0    CMPD   copy_of_player_x_00a0
 A33A: 23 03       BLS    $A33F
 A33C: CE 47 E6    LDU    #$47E6
 A33F: EF 84       STU    ,X
@@ -7065,12 +7069,12 @@ A383: 5C          INCB
 A384: C4 0F       ANDB   #$0F
 A386: 26 27       BNE    $A3AF
 A388: EC 16       LDD    -$A,X
-A38A: 93 A0       SUBD   $A0
+A38A: 93 A0       SUBD   copy_of_player_x_00a0
 A38C: C3 00 10    ADDD   #$0010
 A38F: 10 83 00 20 CMPD   #$0020
 A393: 23 1A       BLS    $A3AF
 A395: EC 19       LDD    -$7,X
-A397: 10 93 A2    CMPD   $A2
+A397: 10 93 A2    CMPD   copy_of_player_y_00a2
 A39A: 23 13       BLS    $A3AF
 A39C: 86 06       LDA    #$06
 A39E: 90 A7       SUBA   $A7
@@ -7190,7 +7194,7 @@ A477: E7 0D       STB    $D,X
 A479: C6 01       LDB    #$01
 A47B: E7 1E       STB    -$2,X
 A47D: EC 16       LDD    -$A,X
-A47F: 10 93 A0    CMPD   $A0
+A47F: 10 93 A0    CMPD   copy_of_player_x_00a0
 A482: 2D 04       BLT    $A488
 A484: C6 00       LDB    #$00
 A486: E7 1E       STB    -$2,X
@@ -7210,7 +7214,7 @@ A4A2: CE 48 34    LDU    #$4834
 A4A5: A6 12       LDA    -$E,X
 A4A7: 81 04       CMPA   #$04
 A4A9: 26 0A       BNE    $A4B5
-A4AB: DC A2       LDD    $A2
+A4AB: DC A2       LDD    copy_of_player_y_00a2
 A4AD: C3 00 10    ADDD   #$0010
 A4B0: ED 06       STD    $6,X
 A4B2: CE 48 38    LDU    #$4838
@@ -7257,11 +7261,11 @@ A526: E6 1E       LDB    -$2,X
 A528: 5A          DECB
 A529: 27 09       BEQ    $A534
 A52B: EC 16       LDD    -$A,X
-A52D: 10 93 A0    CMPD   $A0
+A52D: 10 93 A0    CMPD   copy_of_player_x_00a0
 A530: 22 0B       BHI    $A53D
 A532: 20 07       BRA    $A53B
 A534: EC 16       LDD    -$A,X
-A536: 10 93 A0    CMPD   $A0
+A536: 10 93 A0    CMPD   copy_of_player_x_00a0
 A539: 25 02       BCS    $A53D
 A53B: 6C 15       INC    -$B,X
 A53D: 39          RTS
@@ -7312,7 +7316,7 @@ A592: EC 06       LDD    $6,X
 A594: 93 E4       SUBD   $E4
 A596: ED 19       STD    -$7,X
 A598: 39          RTS
-A599: BD 68 F9    JSR    $68F9
+A599: BD 68 F9    JSR    random_68F9
 A59C: DB E0       ADDB   $E0
 A59E: 6C 15       INC    -$B,X
 A5A0: 54          LSRB
@@ -7395,7 +7399,7 @@ A667: 26 05       BNE    $A66E
 A669: CC 01 00    LDD    #$0100
 A66C: ED 14       STD    -$C,X
 A66E: 39          RTS
-A66F: BD 68 F9    JSR    $68F9
+A66F: BD 68 F9    JSR    random_68F9
 A672: EE 88 1C    LDU    $1C,X
 A675: C4 07       ANDB   #$07
 A677: E6 C5       LDB    B,U		; [bank_address]
@@ -7417,7 +7421,7 @@ A693: 58          ASLB
 A694: CE A6 99    LDU    #jump_table_a699
 A697: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
 
-A6AD: BD 68 F9    JSR    $68F9
+A6AD: BD 68 F9    JSR    random_68F9
 A6B0: C4 0F       ANDB   #$0F
 A6B2: CE A6 9D    LDU    #$A69D
 A6B5: A6 C5       LDA    B,U
@@ -7502,7 +7506,7 @@ A76D: 27 05       BEQ    $A774
 A76F: BD A6 6F    JSR    $A66F
 A772: 6C 15       INC    -$B,X
 A774: 39          RTS
-A775: BD 68 F9    JSR    $68F9
+A775: BD 68 F9    JSR    random_68F9
 A778: C4 07       ANDB   #$07
 A77A: CE A7 D6    LDU    #$A7D6
 A77D: E6 C5       LDB    B,U
@@ -7517,7 +7521,7 @@ A78E: 48          ASLA
 A78F: EE C6       LDU    A,U
 A791: EC C5       LDD    B,U	; [bank_address]
 A793: BD A8 68    JSR    $A868
-A796: BD 68 F9    JSR    $68F9
+A796: BD 68 F9    JSR    random_68F9
 A799: C4 07       ANDB   #$07
 A79B: CE A7 CE    LDU    #$A7CE
 A79E: E6 C5       LDB    B,U
@@ -7649,7 +7653,7 @@ A8CB: BD A9 61    JSR    $A961
 A8CE: 10 8E AA 19 LDY    #$AA19
 A8D2: 6F 1E       CLR    -$2,X
 A8D4: EC 16       LDD    -$A,X
-A8D6: 10 93 A0    CMPD   $A0
+A8D6: 10 93 A0    CMPD   copy_of_player_x_00a0
 A8D9: 2F 08       BLE    $A8E3
 A8DB: 10 8E AA 2D LDY    #$AA2D
 A8DF: C6 01       LDB    #$01
@@ -7682,7 +7686,7 @@ A91E: BD A9 61    JSR    $A961
 A921: 10 8E A9 BF LDY    #$A9BF
 A925: 6F 1E       CLR    -$2,X
 A927: EC 16       LDD    -$A,X
-A929: 10 93 A0    CMPD   $A0
+A929: 10 93 A0    CMPD   copy_of_player_x_00a0
 A92C: 2F 08       BLE    $A936
 A92E: 10 8E A9 D3 LDY    #$A9D3
 A932: C6 01       LDB    #$01
@@ -7694,11 +7698,11 @@ A93E: CC AA 8B    LDD    #$AA8B
 A941: ED 88 19    STD    $19,X
 A944: 6F 88 1B    CLR    $1B,X
 A947: CE AD 43    LDU    #$AD43
-A94A: BD 68 F9    JSR    $68F9
+A94A: BD 68 F9    JSR    random_68F9
 A94D: C4 0F       ANDB   #$0F
 A94F: A6 C5       LDA    B,U
 A951: A7 0F       STA    $F,X
-A953: BD 68 F9    JSR    $68F9
+A953: BD 68 F9    JSR    random_68F9
 A956: C4 1F       ANDB   #$1F
 A958: CB 40       ADDB   #$40
 A95A: E7 0E       STB    $E,X
@@ -7715,7 +7719,7 @@ A96F: 86 04       LDA    #$04
 A971: A7 88 15    STA    $15,X
 A974: 86 02       LDA    #$02
 A976: A7 0B       STA    $B,X
-A978: DC A2       LDD    $A2
+A978: DC A2       LDD    copy_of_player_y_00a2
 A97A: ED 88 13    STD    $13,X
 A97D: CC 01 00    LDD    #$0100
 A980: ED 13       STD    -$D,X
@@ -7733,7 +7737,7 @@ A998: 26 14       BNE    $A9AE
 A99A: EC 16       LDD    -$A,X
 A99C: 10 83 11 ED CMPD   #$11ED
 A9A0: 25 0C       BCS    $A9AE
-A9A2: 10 93 A0    CMPD   $A0
+A9A2: 10 93 A0    CMPD   copy_of_player_x_00a0
 A9A5: 24 07       BCC    $A9AE
 A9A7: 6F 0B       CLR    $B,X
 A9A9: CC 03 00    LDD    #$0300
@@ -7804,7 +7808,7 @@ ABE2: 27 23       BEQ    $AC07
 ABE4: BD AD 28    JSR    $AD28
 ABE7: CE AB 0B    LDU    #$AB0B
 ABEA: EF 1C       STU    -$4,X
-ABEC: DC A2       LDD    $A2
+ABEC: DC A2       LDD    copy_of_player_y_00a2
 ABEE: ED 88 13    STD    $13,X
 ABF1: 17 01 5F    LBSR   $AD53
 ABF4: CC A9 E7    LDD    #$A9E7
@@ -7831,7 +7835,7 @@ AC1F: E6 0B       LDB    $B,X
 AC21: 58          ASLB
 AC22: 7E AB BC    JMP    $ABBC
 AC25: BD AD 1E    JSR    $AD1E
-AC28: DC A2       LDD    $A2
+AC28: DC A2       LDD    copy_of_player_y_00a2
 AC2A: ED 88 13    STD    $13,X
 AC2D: 17 01 23    LBSR   $AD53
 AC30: 6C 15       INC    -$B,X
@@ -7944,7 +7948,7 @@ AD17: A7 1E       STA    -$2,X
 AD19: A6 08       LDA    $8,X
 AD1B: A7 07       STA    $7,X
 AD1D: 39          RTS
-AD1E: BD 68 F9    JSR    $68F9
+AD1E: BD 68 F9    JSR    random_68F9
 AD21: C4 1F       ANDB   #$1F
 AD23: CB 50       ADDB   #$50
 AD25: E7 06       STB    $6,X
@@ -7956,7 +7960,7 @@ AD2C: 54          LSRB
 AD2D: 54          LSRB
 AD2E: CE AD 3F    LDU    #$AD3F
 AD31: A6 C5       LDA    B,U
-AD33: BD 68 F9    JSR    $68F9
+AD33: BD 68 F9    JSR    random_68F9
 AD36: C4 2F       ANDB   #$2F
 AD38: D7 E1       STB    $E1
 AD3A: 9B E1       ADDA   $E1
@@ -7986,7 +7990,7 @@ AD75: 86 05       LDA    #$05
 AD77: A7 07       STA    $7,X
 AD79: A7 08       STA    $8,X
 AD7B: CE AD DB    LDU    #$ADDB
-AD7E: DC A0       LDD    $A0
+AD7E: DC A0       LDD    copy_of_player_x_00a0
 AD80: 10 A3 16    CMPD   -$A,X
 AD83: 25 03       BCS    $AD88
 AD85: CE AD D8    LDU    #$ADD8
@@ -8009,14 +8013,14 @@ ADA7: ED 03       STD    $3,X
 ADA9: 6F 02       CLR    $2,X
 ADAB: 39          RTS
 
-ADDE: DC A0       LDD    $A0
+ADDE: DC A0       LDD    copy_of_player_x_00a0
 ADE0: 83 00 1E    SUBD   #$001E
 ADE3: 10 A3 16    CMPD   -$A,X
 ADE6: 22 15       BHI    $ADFD
 ADE8: C3 00 3C    ADDD   #$003C
 ADEB: 10 A3 16    CMPD   -$A,X
 ADEE: 25 0D       BCS    $ADFD
-ADF0: DC A2       LDD    $A2
+ADF0: DC A2       LDD    copy_of_player_y_00a2
 ADF2: 10 A3 19    CMPD   -$7,X
 ADF5: 22 06       BHI    $ADFD
 ADF7: 86 0A       LDA    #$0A
@@ -8035,28 +8039,28 @@ AE0E: 6D 0D       TST    $D,X
 AE10: 27 44       BEQ    $AE56
 AE12: D6 A7       LDB    $A7
 AE14: 27 40       BEQ    $AE56
-AE16: DC A2       LDD    $A2
+AE16: DC A2       LDD    copy_of_player_y_00a2
 AE18: C3 00 10    ADDD   #$0010
 AE1B: 10 A3 19    CMPD   -$7,X
 AE1E: 25 1A       BCS    $AE3A
 AE20: 83 00 10    SUBD   #$0010
 AE23: 10 A3 19    CMPD   -$7,X
 AE26: 22 12       BHI    $AE3A
-AE28: DC A0       LDD    $A0
+AE28: DC A0       LDD    copy_of_player_x_00a0
 AE2A: 83 00 32    SUBD   #$0032
 AE2D: 10 A3 16    CMPD   -$A,X
 AE30: 22 25       BHI    $AE57
 AE32: C3 00 64    ADDD   #$0064
 AE35: 10 A3 16    CMPD   -$A,X
 AE38: 25 1D       BCS    $AE57
-AE3A: DC A0       LDD    $A0
+AE3A: DC A0       LDD    copy_of_player_x_00a0
 AE3C: 83 00 05    SUBD   #$0005
 AE3F: 10 A3 16    CMPD   -$A,X
 AE42: 22 12       BHI    $AE56
 AE44: C3 00 0A    ADDD   #$000A
 AE47: 10 A3 16    CMPD   -$A,X
 AE4A: 25 0A       BCS    $AE56
-AE4C: DC A2       LDD    $A2
+AE4C: DC A2       LDD    copy_of_player_y_00a2
 AE4E: C3 00 3C    ADDD   #$003C
 AE51: 10 A3 19    CMPD   -$7,X
 AE54: 25 13       BCS    $AE69
@@ -8064,7 +8068,7 @@ AE56: 39          RTS
 AE57: BD 8E 2E    JSR    $8E2E
 AE5A: 86 01       LDA    #$01
 AE5C: A7 3E       STA    -$2,Y
-AE5E: DC A0       LDD    $A0
+AE5E: DC A0       LDD    copy_of_player_x_00a0
 AE60: 10 A3 16    CMPD   -$A,X
 AE63: 25 02       BCS    $AE67
 AE65: 6F 3E       CLR    -$2,Y
@@ -8244,7 +8248,7 @@ B095: ED 07       STD    $7,X
 B097: 6F 09       CLR    $9,X
 B099: C6 81       LDB    #$81
 B09B: E7 10       STB    -$10,X
-B09D: BD 68 F9    JSR    $68F9
+B09D: BD 68 F9    JSR    random_68F9
 B0A0: 4F          CLRA
 B0A1: C4 01       ANDB   #$01
 B0A3: 26 03       BNE    $B0A8
@@ -8273,7 +8277,7 @@ B0D0: BD 90 74    JSR    $9074
 B0D3: E6 10       LDB    -$10,X
 B0D5: 2A 0B       BPL    $B0E2
 B0D7: EC 16       LDD    -$A,X
-B0D9: 10 93 A0    CMPD   $A0
+B0D9: 10 93 A0    CMPD   copy_of_player_x_00a0
 B0DC: 24 04       BCC    $B0E2
 B0DE: C6 01       LDB    #$01
 B0E0: E7 10       STB    -$10,X
@@ -8424,7 +8428,7 @@ B21F: 6C 14       INC    -$C,X
 B221: 39          RTS
 B222: 6F 1E       CLR    -$2,X
 B224: EC 16       LDD    -$A,X
-B226: 10 93 A0    CMPD   $A0
+B226: 10 93 A0    CMPD   copy_of_player_x_00a0
 B229: 2D 04       BLT    $B22F
 B22B: C6 01       LDB    #$01
 B22D: E7 1E       STB    -$2,X
@@ -8471,7 +8475,7 @@ B2C6: C6 00       LDB    #$00
 B2C8: E7 1F       STB    -$1,X
 B2CA: CE B2 8D    LDU    #$B28D
 B2CD: BD 90 6B    JSR    $906B
-B2D0: BD 68 F9    JSR    $68F9
+B2D0: BD 68 F9    JSR    random_68F9
 B2D3: CE B2 BF    LDU    #$B2BF
 B2D6: C4 03       ANDB   #$03
 B2D8: E6 C5       LDB    B,U
@@ -8509,7 +8513,7 @@ B31B: 39          RTS
 
 B34C: CE B3 20    LDU    #$B320
 B34F: BD 90 6B    JSR    $906B
-B352: BD 68 F9    JSR    $68F9
+B352: BD 68 F9    JSR    random_68F9
 B355: CE B3 48    LDU    #$B348
 B358: C4 03       ANDB   #$03
 B35A: E6 C5       LDB    B,U
@@ -8536,7 +8540,7 @@ B38D: 4F          CLRA
 B38E: 5F          CLRB
 B38F: ED 09       STD    $9,X
 B391: E7 08       STB    $8,X
-B393: BD 68 F9    JSR    $68F9
+B393: BD 68 F9    JSR    random_68F9
 B396: CE B3 7B    LDU    #$B37B
 B399: C4 01       ANDB   #$01
 B39B: E6 C5       LDB    B,U
@@ -8668,7 +8672,7 @@ B4D1: BD B2 22    JSR    $B222
 B4D4: A6 1E       LDA    -$2,X
 B4D6: A7 0F       STA    $F,X
 B4D8: 6F 1E       CLR    -$2,X
-B4DA: DC A0       LDD    $A0
+B4DA: DC A0       LDD    copy_of_player_x_00a0
 B4DC: 83 00 0A    SUBD   #$000A
 B4DF: 10 A3 16    CMPD   -$A,X
 B4E2: 22 0C       BHI    $B4F0
@@ -8679,7 +8683,7 @@ B4EC: 86 02       LDA    #$02
 B4EE: A7 0F       STA    $F,X
 B4F0: C6 01       LDB    #$01
 B4F2: E7 88 14    STB    $14,X
-B4F5: DC A0       LDD    $A0
+B4F5: DC A0       LDD    copy_of_player_x_00a0
 B4F7: 83 00 40    SUBD   #$0040
 B4FA: 10 A3 16    CMPD   -$A,X
 B4FD: 22 0B       BHI    $B50A
@@ -8817,12 +8821,12 @@ B69D: CC 00 10    LDD    #$0010
 B6A0: ED 88 1E    STD    $1E,X
 B6A3: 6C 15       INC    -$B,X
 B6A5: EC 19       LDD    -$7,X
-B6A7: 93 A2       SUBD   $A2
+B6A7: 93 A2       SUBD   copy_of_player_y_00a2
 B6A9: C3 00 30    ADDD   #$0030
 B6AC: 10 83 00 60 CMPD   #$0060
 B6B0: 22 0D       BHI    $B6BF
 B6B2: EC 16       LDD    -$A,X
-B6B4: 93 A0       SUBD   $A0
+B6B4: 93 A0       SUBD   copy_of_player_x_00a0
 B6B6: C3 00 60    ADDD   #$0060
 B6B9: 10 83 00 C0 CMPD   #$00C0
 B6BD: 23 06       BLS    $B6C5
@@ -8882,7 +8886,7 @@ B73B: C6 03       LDB    #$03
 B73D: E7 1F       STB    -$1,X
 B73F: 6F 1E       CLR    -$2,X
 B741: EC 16       LDD    -$A,X
-B743: 10 93 A0    CMPD   $A0
+B743: 10 93 A0    CMPD   copy_of_player_x_00a0
 B746: 2D 02       BLT    $B74A
 B748: 6C 1E       INC    -$2,X
 B74A: D6 21       LDB    counter_8_bit_0021
@@ -8980,7 +8984,7 @@ B823: ED 1C       STD    -$4,X
 B825: C6 03       LDB    #$03
 B827: E7 1F       STB    -$1,X
 B829: 6F 1E       CLR    -$2,X
-B82B: DC A0       LDD    $A0
+B82B: DC A0       LDD    copy_of_player_x_00a0
 B82D: 10 A3 16    CMPD   -$A,X
 B830: 22 02       BHI    $B834
 B832: 6C 1E       INC    -$2,X
@@ -9020,7 +9024,7 @@ B879: ED 14       STD    -$C,X
 B87B: 6F 0C       CLR    $C,X
 B87D: 39          RTS
 B87E: EC 16       LDD    -$A,X
-B880: 93 A0       SUBD   $A0
+B880: 93 A0       SUBD   copy_of_player_x_00a0
 B882: 97 E4       STA    $E4
 B884: E3 C4       ADDD   ,U
 B886: 10 A3 42    CMPD   $2,U
@@ -9031,7 +9035,7 @@ B891: D7 E1       STB    $E1
 B893: E6 31       LDB    -$F,Y
 B895: 27 26       BEQ    $B8BD
 B897: EC 36       LDD    -$A,Y
-B899: 93 A0       SUBD   $A0
+B899: 93 A0       SUBD   copy_of_player_x_00a0
 B89B: 97 E5       STA    $E5
 B89D: C3 00 08    ADDD   #$0008
 B8A0: 10 83 00 10 CMPD   #$0010
@@ -9148,7 +9152,7 @@ B9C4: 33 C5       LEAU   B,U
 B9C6: 39          RTS
 B9C7: 8D ED       BSR    $B9B6
 B9C9: 6F 0E       CLR    $E,X
-B9CB: DC A0       LDD    $A0
+B9CB: DC A0       LDD    copy_of_player_x_00a0
 B9CD: A3 16       SUBD   -$A,X
 B9CF: 2A 07       BPL    $B9D8
 B9D1: 43          COMA
@@ -9187,7 +9191,7 @@ BA12: 39          RTS
 
 BA35: 6F 1E       CLR    -$2,X
 BA37: EC 16       LDD    -$A,X
-BA39: 10 93 A0    CMPD   $A0
+BA39: 10 93 A0    CMPD   copy_of_player_x_00a0
 BA3C: 23 02       BLS    $BA40
 BA3E: 6C 1E       INC    -$2,X
 BA40: CE BA 21    LDU    #$BA21
@@ -9217,14 +9221,14 @@ BA75: BD B7 AA    JSR    $B7AA
 BA78: E6 0A       LDB    $A,X
 BA7A: 27 11       BEQ    $BA8D
 BA7C: EC 16       LDD    -$A,X
-BA7E: 10 93 A0    CMPD   $A0
+BA7E: 10 93 A0    CMPD   copy_of_player_x_00a0
 BA81: 22 1D       BHI    $BAA0
 BA83: 6C 15       INC    -$B,X
 BA85: 6F 1E       CLR    -$2,X
 BA87: CE 4B 49    LDU    #$4B49
 BA8A: 7E B7 CA    JMP    $B7CA
 BA8D: EC 16       LDD    -$A,X
-BA8F: 10 93 A0    CMPD   $A0
+BA8F: 10 93 A0    CMPD   copy_of_player_x_00a0
 BA92: 23 0C       BLS    $BAA0
 BA94: 6C 15       INC    -$B,X
 BA96: C6 01       LDB    #$01
@@ -9234,7 +9238,7 @@ BA9D: 7E B7 CA    JMP    $B7CA
 BAA0: 39          RTS
 BAA1: BD B7 AA    JSR    $B7AA
 BAA4: EC 16       LDD    -$A,X
-BAA6: 93 A0       SUBD   $A0
+BAA6: 93 A0       SUBD   copy_of_player_x_00a0
 BAA8: C3 00 50    ADDD   #$0050
 BAAB: 10 83 00 A0 CMPD   #$00A0
 BAAF: 23 06       BLS    $BAB7
@@ -9353,7 +9357,7 @@ BBAD: BD B9 36    JSR    $B936
 BBB0: 7E B8 6F    JMP    $B86F
 
 BBB7: 6F 0F       CLR    $F,X
-BBB9: DC A0       LDD    $A0
+BBB9: DC A0       LDD    copy_of_player_x_00a0
 BBBB: A3 16       SUBD   -$A,X
 BBBD: C3 00 50    ADDD   #$0050
 BBC0: 10 83 00 A0 CMPD   #$00A0
@@ -9389,7 +9393,7 @@ BC01: 39          RTS
 
 
 BC0E: 6F 1E    CLR    -$2,X
-BC10: DC A0    LDD    $A0
+BC10: DC A0    LDD    copy_of_player_x_00a0
 BC12: 10 A3 16 CMPD   -$A,X
 BC15: 22 02       BHI    $BC19
 BC17: 6C 1E       INC    -$2,X
@@ -9539,7 +9543,7 @@ BD53: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=6]
 BD61: E6 1E       LDB    -$2,X
 BD63: E7 0A       STB    $A,X
 BD65: EC 19       LDD    -$7,X
-BD67: 93 A2       SUBD   $A2
+BD67: 93 A2       SUBD   copy_of_player_y_00a2
 BD69: 2B 09       BMI    $BD74
 BD6B: C3 00 10    ADDD   #$0010
 BD6E: 10 83 00 20 CMPD   #$0020
@@ -9555,7 +9559,7 @@ BD81: C6 03       LDB    #$03
 BD83: E7 15       STB    -$B,X
 BD85: 39          RTS
 BD86: BD B7 AA    JSR    $B7AA
-BD89: DC A0       LDD    $A0
+BD89: DC A0       LDD    copy_of_player_x_00a0
 BD8B: A3 16       SUBD   -$A,X
 BD8D: C3 00 10    ADDD   #$0010
 BD90: 10 83 00 20 CMPD   #$0020
@@ -9563,7 +9567,7 @@ BD94: 24 02       BCC    $BD98
 BD96: 6C 15       INC    -$B,X
 BD98: 39          RTS
 BD99: BD B7 AA    JSR    $B7AA
-BD9C: DC A0       LDD    $A0
+BD9C: DC A0       LDD    copy_of_player_x_00a0
 BD9E: A3 16       SUBD   -$A,X
 BDA0: C3 00 40    ADDD   #$0040
 BDA3: 10 83 00 80 CMPD   #$0080
@@ -9578,7 +9582,7 @@ BDB3: 39          RTS
 BDB4: C6 01       LDB    #$01
 BDB6: E7 1E       STB    -$2,X
 BDB8: EC 16       LDD    -$A,X
-BDBA: 93 A0       SUBD   $A0
+BDBA: 93 A0       SUBD   copy_of_player_x_00a0
 BDBC: 2A 07       BPL    $BDC5
 BDBE: 6F 1E       CLR    -$2,X
 BDC0: 43          COMA
@@ -9588,15 +9592,15 @@ BDC5: 10 83 00 80 CMPD   #$0080
 BDC9: 10 24 00 B3 LBCC   $BE80
 BDCD: E7 88 15    STB    $15,X
 BDD0: EC 19       LDD    -$7,X
-BDD2: 93 A2       SUBD   $A2
+BDD2: 93 A2       SUBD   copy_of_player_y_00a2
 BDD4: 2A 05       BPL    $BDDB
 BDD6: 43          COMA
 BDD7: 53          COMB
 BDD8: C3 00 01    ADDD   #$0001
 BDDB: E7 88 14    STB    $14,X
-BDDE: DC A0       LDD    $A0
+BDDE: DC A0       LDD    copy_of_player_x_00a0
 BDE0: ED 88 10    STD    $10,X
-BDE3: DC A2       LDD    $A2
+BDE3: DC A2       LDD    copy_of_player_y_00a2
 BDE5: ED 88 12    STD    task_pointer_0012,X
 BDE8: 6F 08       CLR    $8,X
 BDEA: 6C 15       INC    -$B,X
@@ -9726,7 +9730,7 @@ BEF6: C6 04       LDB    #$04
 BEF8: E7 1F       STB    -$1,X
 BEFA: 6F 1E       CLR    -$2,X
 BEFC: EC 16       LDD    -$A,X
-BEFE: 10 93 A0    CMPD   $A0
+BEFE: 10 93 A0    CMPD   copy_of_player_x_00a0
 BF01: 2D 04       BLT    $BF07
 BF03: C6 01       LDB    #$01
 BF05: E7 1E       STB    -$2,X
@@ -9782,7 +9786,7 @@ BF7A: E7 88 1A    STB    $1A,X
 BF7D: 6F 88 1D    CLR    $1D,X
 BF80: 6F 0F       CLR    $F,X
 BF82: 4F          CLRA
-BF83: DE A0       LDU    $A0
+BF83: DE A0       LDU    copy_of_player_x_00a0
 BF85: 11 A3 16    CMPU   -$A,X
 BF88: 25 02       BCS    $BF8C
 BF8A: 86 01       LDA    #$01
@@ -9816,7 +9820,7 @@ BFCA: 96 21       LDA    counter_8_bit_0021
 BFCC: 84 7F       ANDA   #$7F
 BFCE: 81 7F       CMPA   #$7F
 BFD0: 26 07       BNE    $BFD9
-BFD2: BD 68 F9    JSR    $68F9
+BFD2: BD 68 F9    JSR    random_68F9
 BFD5: C4 03       ANDB   #$03
 BFD7: E7 0F       STB    $F,X
 BFD9: E6 0F       LDB    $F,X
@@ -9828,7 +9832,7 @@ BFE6: FF 90 00    STU    $9000
 BFE9: 70 FF 90    NEG    $FF90
 BFEC: 4F          CLRA
 BFED: EE 16       LDU    -$A,X
-BFEF: 11 93 A0    CMPU   $A0
+BFEF: 11 93 A0    CMPU   copy_of_player_x_00a0
 BFF2: 25 02       BCS    $BFF6
 BFF4: 86 01       LDA    #$01
 BFF6: A1 1E       CMPA   -$2,X
@@ -9878,7 +9882,7 @@ C05D: 86 05       LDA    #$05
 C05F: A7 88 12    STA    task_pointer_0012,X
 C062: 39          RTS
 C063: CE C0 6E    LDU    #$C06E
-C066: BD 68 F9    JSR    $68F9
+C066: BD 68 F9    JSR    random_68F9
 C069: C4 03       ANDB   #$03
 C06B: E6 C5       LDB    B,U
 C06D: 39          RTS
@@ -9933,13 +9937,13 @@ C0C9: 7E 8F 62    JMP    $8F62
 C0D4: CC 00 01    LDD    #$0001
 C0D7: ED 14       STD    -$C,X
 C0D9: 39          RTS
-C0DA: DC A0       LDD    $A0
+C0DA: DC A0       LDD    copy_of_player_x_00a0
 C0DC: ED 0C       STD    $C,X
 C0DE: BD 8F E4    JSR    $8FE4
 C0E1: C4 07       ANDB   #$07
 C0E3: 27 10       BEQ    $C0F5
 C0E5: EC 19       LDD    -$7,X
-C0E7: 93 A2       SUBD   $A2
+C0E7: 93 A2       SUBD   copy_of_player_y_00a2
 C0E9: 2A 0F       BPL    $C0FA
 C0EB: BD 8F E4    JSR    $8FE4
 C0EE: E7 1E       STB    -$2,X
@@ -9949,7 +9953,7 @@ C0F4: 39          RTS
 C0F5: 86 01       LDA    #$01
 C0F7: A7 88 1D    STA    $1D,X
 C0FA: EC 16       LDD    -$A,X
-C0FC: 93 A0       SUBD   $A0
+C0FC: 93 A0       SUBD   copy_of_player_x_00a0
 C0FE: 2A 05       BPL    $C105
 C100: 43          COMA
 C101: 53          COMB
@@ -9975,13 +9979,13 @@ C12F: A7 88 15    STA    $15,X
 C132: C6 00       LDB    #$00
 C134: E7 1E       STB    -$2,X
 C136: EC 16       LDD    -$A,X
-C138: 10 93 A0    CMPD   $A0
+C138: 10 93 A0    CMPD   copy_of_player_x_00a0
 C13B: 24 04       BCC    $C141
 C13D: C6 01       LDB    #$01
 C13F: E7 1E       STB    -$2,X
 C141: CE 4C CD    LDU    #$4CCD
 C144: BD 90 6B    JSR    $906B
-C147: BD 68 F9    JSR    $68F9
+C147: BD 68 F9    JSR    random_68F9
 C14A: C4 03       ANDB   #$03
 C14C: 58          ASLB
 C14D: CE C1 8B    LDU    #$C18B
@@ -9989,7 +9993,7 @@ C150: B6 05 1F    LDA    $051F
 C153: 27 03       BEQ    $C158
 C155: CE C1 93    LDU    #$C193
 C158: 33 C5       LEAU   B,U
-C15A: DC A2       LDD    $A2
+C15A: DC A2       LDD    copy_of_player_y_00a2
 C15C: E3 C4       ADDD   ,U
 C15E: A3 19       SUBD   -$7,X
 C160: 2A 05       BPL    $C167
@@ -10151,7 +10155,7 @@ C303: 39          RTS
 C310: 6D 0E       TST    $E,X
 C312: 26 20       BNE    $C334
 C314: EC 16       LDD    -$A,X
-C316: 93 A0       SUBD   $A0
+C316: 93 A0       SUBD   copy_of_player_x_00a0
 C318: C3 00 30    ADDD   #$0030
 C31B: 10 83 00 60 CMPD   #$0060
 C31F: 24 13       BCC    $C334
@@ -10167,7 +10171,7 @@ C336: 27 1B       BEQ    $C353
 C338: 6A 88 17    DEC    $17,X
 C33B: 27 12       BEQ    $C34F
 C33D: CE C3 54    LDU    #$C354
-C340: DC A0       LDD    $A0
+C340: DC A0       LDD    copy_of_player_x_00a0
 C342: A3 16       SUBD   -$A,X
 C344: 2A 04       BPL    $C34A
 C346: C6 01       LDB    #$01
@@ -10227,7 +10231,7 @@ C3C6: ED 13       STD    -$D,X
 C3C8: 39          RTS
 C3C9: C6 01       LDB    #$01
 C3CB: E7 1E       STB    -$2,X
-C3CD: DC A0       LDD    $A0
+C3CD: DC A0       LDD    copy_of_player_x_00a0
 C3CF: 10 A3 16    CMPD   -$A,X
 C3D2: 25 02       BCS    $C3D6
 C3D4: 6F 1E       CLR    -$2,X
@@ -10327,6 +10331,7 @@ C4A8: ED 30       STD    -$10,Y
 C4AA: C6 00       LDB    #$00
 C4AC: E7 25       STB    $5,Y
 C4AE: 39          RTS
+
 C4AF: 58          ASLB
 C4B0: CE C4 B5    LDU    #jump_table_c4b5
 C4B3: 6E D5       JMP    [B,U]        ; [indirect_jump] [nb_entries=3]
@@ -10379,7 +10384,7 @@ C51B: E7 1F       STB    -$1,X
 C51D: C6 01       LDB    #$01
 C51F: E7 1E       STB    -$2,X
 C521: EC 16       LDD    -$A,X
-C523: 10 93 A0    CMPD   $A0
+C523: 10 93 A0    CMPD   copy_of_player_x_00a0
 C526: 2D 04       BLT    $C52C
 C528: C6 02       LDB    #$02
 C52A: E7 1E       STB    -$2,X
@@ -10405,11 +10410,12 @@ C555: E7 88 16    STB    $16,X
 C558: CE 4D 65    LDU    #$4D65
 C55B: D6 21       LDB    counter_8_bit_0021
 C55D: DB E0       ADDB   $E0
-C55F: C4 03       ANDB   #$03
+C55F: C4 03       ANDB   #$03	; random
 C561: E6 C5       LDB    B,U	; [bank_address]
 C563: E7 88 11    STB    $11,X
 C566: 6C 14       INC    -$C,X
 C568: 39          RTS
+
 C569: A6 11       LDA    -$F,X
 C56B: 27 07       BEQ    $C574
 C56D: CC 01 00    LDD    #$0100
@@ -10433,7 +10439,7 @@ C599: E3 19       ADDD   -$7,X
 C59B: ED 19       STD    -$7,X
 C59D: 6C 15       INC    -$B,X
 C59F: 39          RTS
-C5A0: DC A2       LDD    $A2
+C5A0: DC A2       LDD    copy_of_player_y_00a2
 C5A2: C3 00 40    ADDD   #$0040
 C5A5: A3 19       SUBD   -$7,X
 C5A7: 2B 13       BMI    $C5BC
@@ -10464,7 +10470,7 @@ C5DC: E7 15       STB    -$B,X
 C5DE: E6 15       LDB    -$B,X
 C5E0: 58          ASLB
 C5E1: CE C6 42    LDU    #jump_table_c642		; 2 entries
-C5E4: AD D5       JSR    [B,U]		; [indirect_jump] [nb_entries=6]
+C5E4: AD D5       JSR    [B,U]		; [indirect_jump] [nb_entries=2]
 C5E6: BD CB 3A    JSR    $CB3A
 C5E9: E6 88 1B    LDB    $1B,X
 C5EC: 26 32       BNE    $C620
@@ -10505,11 +10511,12 @@ C63C: CC 05 00    LDD    #$0500
 C63F: ED 14       STD    -$C,X
 C641: 39          RTS
 
+handle_giant_c696:
 C696: D6 21       LDB    counter_8_bit_0021                                        
 C698: DB E0       ADDB   $E0                                        
 C69A: 5C          INCB                                              
-C69B: C4 03       ANDB   #$03
-C69D: CE C6 46    LDU    #$C646
+C69B: C4 03       ANDB   #$03		; random stuff
+C69D: CE C6 46    LDU    #$C646		; data table
 C6A0: 58          ASLB
 C6A1: EE C5       LDU    B,U
 C6A3: EF 08       STU    $8,X
@@ -10517,11 +10524,12 @@ C6A5: 6F 07       CLR    $7,X
 C6A7: BD C7 5D    JSR    $C75D
 C6AA: CC C6 82    LDD    #$C682
 C6AD: ED 1C       STD    -$4,X
+; tries to lock on player X coordinate when giant is very close to the player
 C6AF: C6 01       LDB    #$01
 C6B1: E7 88 13    STB    $13,X
-C6B4: EC 16       LDD    -$A,X
-C6B6: 10 93 A0    CMPD   $A0
-C6B9: 2D 05       BLT    $C6C0
+C6B4: EC 16       LDD    -$A,X		; X of giant
+C6B6: 10 93 A0    CMPD   copy_of_player_x_00a0
+C6B9: 2D 05       BLT    $C6C0			; branches if giant X < player X
 C6BB: C6 02       LDB    #$02
 C6BD: E7 88 13    STB    $13,X
 C6C0: E6 88 13    LDB    $13,X
@@ -10531,7 +10539,7 @@ C6C7: EE C5       LDU    B,U		; [bank_address]
 C6C9: EF 84       STU    ,X
 C6CB: EF 03       STU    $3,X
 C6CD: 6F 02       CLR    $2,X
-C6CF: BD 68 F9    JSR    $68F9
+C6CF: BD 68 F9    JSR    random_68F9
 C6D2: C4 07       ANDB   #$07
 C6D4: CE C6 8E    LDU    #$C68E
 C6D7: E6 C5       LDB    B,U
@@ -10546,6 +10554,7 @@ C6E8: CC 02 00    LDD    #$0200
 C6EB: ED 14       STD    -$C,X
 C6ED: 39          RTS
 C6EE: 6C 15       INC    -$B,X
+handle_giant_movements_c6f0:
 C6F0: BD C7 5D    JSR    $C75D
 C6F3: E6 1E       LDB    -$2,X
 C6F5: 27 0F       BEQ    $C706		; giant not moving anymore: change direction
@@ -10573,9 +10582,9 @@ C71F: 26 1F       BNE    $C740
 C721: C6 02       LDB    #$02
 C723: E7 0B       STB    $B,X
 C725: EC 16       LDD    -$A,X
-C727: 10 93 A0    CMPD   $A0
+C727: 10 93 A0    CMPD   copy_of_player_x_00a0
 C72A: 22 15       BHI    $C741
-C72C: DC A0       LDD    $A0
+C72C: DC A0       LDD    copy_of_player_x_00a0
 C72E: A3 16       SUBD   -$A,X
 C730: 10 83 00 20 CMPD   #$0020
 C734: 23 0A       BLS    $C740
@@ -10584,7 +10593,7 @@ C738: 10 83 00 78 CMPD   #$0078
 C73C: 24 02       BCC    $C740
 C73E: 6A 0B       DEC    $B,X
 C740: 39          RTS
-C741: 93 A0       SUBD   $A0
+C741: 93 A0       SUBD   copy_of_player_x_00a0
 C743: 10 83 00 78 CMPD   #$0078
 C747: 24 F7       BCC    $C740
 C749: 6A 0B       DEC    $B,X
@@ -10600,7 +10609,7 @@ C75C: 39          RTS
 
 C75D: A6 88 12    LDA    $12,X
 C760: 81 02       CMPA   #$02
-C762: 27 17       BEQ    handle_giants_c77b
+C762: 27 17       BEQ    handle_giant_behaviour_c77b
 C764: 96 72       LDA    current_level_0072
 C766: 81 01       CMPA   #$01
 C768: 27 29       BEQ    $C793
@@ -10613,7 +10622,7 @@ C776: A7 1E       STA    -$2,X
 C778: E7 07       STB    $7,X
 C77A: 39          RTS
 
-handle_giants_c77b:
+handle_giant_behaviour_c77b:
 C77B: EC 16       LDD    -$A,X
 C77D: 10 83 1D 98 CMPD   #$1D98
 C781: 22 05       BHI    $C788
@@ -10689,7 +10698,7 @@ C832: E6 88 13    LDB    $13,X
 C835: 5A          DECB
 C836: 26 03       BNE    $C83B
 C838: CE C8 A2    LDU    #$C8A2
-C83B: BD 68 F9    JSR    $68F9
+C83B: BD 68 F9    JSR    random_68F9
 C83E: C4 03       ANDB   #$03
 C840: E6 C5       LDB    B,U
 C842: E7 88 13    STB    $13,X
@@ -10820,7 +10829,7 @@ C971: C6 01       LDB    #$01
 C973: E7 1E       STB    -$2,X
 C975: E7 88 13    STB    $13,X
 C978: EC 16       LDD    -$A,X
-C97A: 10 93 A0    CMPD   $A0
+C97A: 10 93 A0    CMPD   copy_of_player_x_00a0
 C97D: 2D 07       BLT    $C986
 C97F: C6 02       LDB    #$02
 C981: E7 1E       STB    -$2,X
@@ -10872,9 +10881,9 @@ C9EB: E6 88 13    LDB    $13,X
 C9EE: 5A          DECB
 C9EF: 27 06       BEQ    $C9F7
 C9F1: EC 16       LDD    -$A,X
-C9F3: 93 A0       SUBD   $A0
+C9F3: 93 A0       SUBD   copy_of_player_x_00a0
 C9F5: 20 04       BRA    $C9FB
-C9F7: DC A0       LDD    $A0
+C9F7: DC A0       LDD    copy_of_player_x_00a0
 C9F9: A3 16       SUBD   -$A,X
 C9FB: C4 70       ANDB   #$70
 C9FD: 54          LSRB
@@ -10899,17 +10908,17 @@ CA1C: 58          ASLB
 CA1D: CE CA 22    LDU    #jump_table_ca22
 CA20: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
-CA32: DC A0       LDD    $A0                                         
+CA32: DC A0       LDD    copy_of_player_x_00a0                                         
 CA34: C3 00 10    ADDD   #$0010                                       10
 CA37: ED 88 1C    STD    $1C,X
 CA3A: C6 01       LDB    #$01
 CA3C: E7 1E       STB    -$2,X
 CA3E: EC 16       LDD    -$A,X
-CA40: 10 93 A0    CMPD   $A0
+CA40: 10 93 A0    CMPD   copy_of_player_x_00a0
 CA43: 23 0C       BLS    $CA51
 CA45: C6 02       LDB    #$02
 CA47: E7 1E       STB    -$2,X
-CA49: DC A0       LDD    $A0
+CA49: DC A0       LDD    copy_of_player_x_00a0
 CA4B: 83 00 10    SUBD   #$0010
 CA4E: ED 88 1C    STD    $1C,X
 CA51: CC CA 26    LDD    #$CA26
@@ -10956,7 +10965,7 @@ CAAE: 6F 0B       CLR    $B,X
 CAB0: C6 01       LDB    #$01
 CAB2: E7 88 13    STB    $13,X
 CAB5: EC 16       LDD    -$A,X
-CAB7: 10 93 A0    CMPD   $A0
+CAB7: 10 93 A0    CMPD   copy_of_player_x_00a0
 CABA: 2D 05       BLT    $CAC1
 CABC: C6 02       LDB    #$02
 CABE: E7 88 13    STB    $13,X
@@ -10964,7 +10973,7 @@ CAC1: E6 88 13    LDB    $13,X
 CAC4: C6 02       LDB    #$02
 CAC6: E7 15       STB    -$B,X
 CAC8: EC 16       LDD    -$A,X
-CACA: 10 93 A0    CMPD   $A0
+CACA: 10 93 A0    CMPD   copy_of_player_x_00a0
 CACD: 22 21       BHI    $CAF0
 CACF: E6 1E       LDB    -$2,X
 CAD1: 5A          DECB
@@ -10974,7 +10983,7 @@ CAD6: 39          RTS
 CAD7: E6 88 12    LDB    task_pointer_0012,X
 CADA: C1 02       CMPB   #$02
 CADC: 27 11       BEQ    $CAEF
-CADE: BD 68 F9    JSR    $68F9
+CADE: BD 68 F9    JSR    random_68F9
 CAE1: C4 01       ANDB   #$01
 CAE3: 26 0A       BNE    $CAEF
 CAE5: C6 01       LDB    #$01
@@ -10990,7 +10999,7 @@ CAF7: 39          RTS
 CAF8: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 CAFB: BD 90 74    JSR    $9074
 CAFE: EC 16       LDD    -$A,X
-CB00: 93 A0       SUBD   $A0
+CB00: 93 A0       SUBD   copy_of_player_x_00a0
 CB02: C3 00 70    ADDD   #$0070
 CB05: 10 83 00 E0 CMPD   #$00E0
 CB09: 22 05       BHI    $CB10
@@ -11000,7 +11009,7 @@ CB10: 39          RTS
 CB11: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 CB14: BD 90 74    JSR    $9074
 CB17: EC 16       LDD    -$A,X
-CB19: 93 A0       SUBD   $A0
+CB19: 93 A0       SUBD   copy_of_player_x_00a0
 CB1B: C3 00 60    ADDD   #$0060
 CB1E: 10 83 00 C0 CMPD   #$00C0
 CB22: 25 05       BCS    $CB29
@@ -11043,7 +11052,7 @@ CB72: 39          RTS
 CB73: A6 88 12    LDA    task_pointer_0012,X
 CB76: 81 02       CMPA   #$02
 CB78: 27 07       BEQ    $CB81
-CB7A: BD 68 F9    JSR    $68F9
+CB7A: BD 68 F9    JSR    random_68F9
 CB7D: C4 01       ANDB   #$01
 CB7F: 26 06       BNE    $CB87
 CB81: CC 03 00    LDD    #$0300
@@ -11158,12 +11167,12 @@ CC6F: 39          RTS
 CC70: E6 11       LDB    -$F,X
 CC72: 27 21       BEQ    $CC95
 CC74: EC 16       LDD    -$A,X
-CC76: 93 A0       SUBD   $A0
+CC76: 93 A0       SUBD   copy_of_player_x_00a0
 CC78: C3 00 20    ADDD   #$0020
 CC7B: 10 83 00 40 CMPD   #$0040
 CC7F: 22 14       BHI    $CC95
 CC81: EC 19       LDD    -$7,X
-CC83: 93 A2       SUBD   $A2
+CC83: 93 A2       SUBD   copy_of_player_y_00a2
 CC85: C3 00 20    ADDD   #$0020
 CC88: 10 83 00 40 CMPD   #$0040
 CC8C: 22 07       BHI    $CC95
@@ -11300,13 +11309,13 @@ CDD5: CC 02 00    LDD    #$0200
 CDD8: ED 14       STD    -$C,X
 CDDA: 39          RTS
 CDDB: EC 16       LDD    -$A,X
-CDDD: 93 A0       SUBD   $A0
+CDDD: 93 A0       SUBD   copy_of_player_x_00a0
 CDDF: C3 00 40    ADDD   #$0040
 CDE2: 10 83 00 80 CMPD   #$0080
 CDE6: 25 0D       BCS    $CDF5
 CDE8: C6 03       LDB    #$03
 CDEA: EE 16       LDU    -$A,X
-CDEC: 11 93 A0    CMPU   $A0
+CDEC: 11 93 A0    CMPU   copy_of_player_x_00a0
 CDEF: 22 02       BHI    $CDF3
 CDF1: C6 01       LDB    #$01
 CDF3: E7 1E       STB    -$2,X
@@ -11538,7 +11547,7 @@ CFFC: CE 4F 26    LDU    #$4F26
 CFFF: BD 90 6B    JSR    $906B                                       
 D002: 6C 15       INC    -$B,X
 D004: 39          RTS
-D005: DC A2       LDD    $A2
+D005: DC A2       LDD    copy_of_player_y_00a2
 D007: A3 19       SUBD   -$7,X
 D009: C3 00 0A    ADDD   #$000A
 D00C: 2B 0C       BMI    $D01A
@@ -11548,12 +11557,12 @@ D014: CC 01 00    LDD    #$0100
 D017: ED 14       STD    -$C,X
 D019: 39          RTS
 D01A: EC 16       LDD    -$A,X
-D01C: 93 A0       SUBD   $A0
+D01C: 93 A0       SUBD   copy_of_player_x_00a0
 D01E: C3 00 0A    ADDD   #$000A
 D021: 10 83 00 14 CMPD   #$0014
 D025: 22 0D       BHI    $D034
 D027: EC 19       LDD    -$7,X
-D029: 10 93 A2    CMPD   $A2
+D029: 10 93 A2    CMPD   copy_of_player_y_00a2
 D02C: 2D 06       BLT    $D034
 D02E: CC 02 00    LDD    #$0200
 D031: ED 14       STD    -$C,X
@@ -11588,7 +11597,7 @@ D06C: EE C4       LDU    ,U		; [bank_address]
 D06E: E6 C0       LDB    ,U+	; [bank_address]
 D070: EF 0A       STU    $A,X
 D072: E7 09       STB    $9,X
-D074: BD 68 F9    JSR    $68F9
+D074: BD 68 F9    JSR    random_68F9
 D077: C4 01       ANDB   #$01
 D079: 26 0C       BNE    $D087
 D07B: CE 4F 8A    LDU    #$4F8A
@@ -11604,7 +11613,7 @@ D091: 6C 15       INC    -$B,X
 D093: 39          RTS
 D094: 6A 0D       DEC    $D,X
 D096: 10 26 BF DA LBNE   $9074
-D09A: BD 68 F9    JSR    $68F9
+D09A: BD 68 F9    JSR    random_68F9
 D09D: C4 01       ANDB   #$01
 D09F: E7 1E       STB    -$2,X
 D0A1: 6F 15       CLR    -$B,X
@@ -11639,7 +11648,7 @@ D0E2: BD D0 A4    JSR    $D0A4
 D0E5: C6 00       LDB    #$00
 D0E7: E7 1E       STB    -$2,X
 D0E9: EC 16       LDD    -$A,X
-D0EB: 10 93 A0    CMPD   $A0
+D0EB: 10 93 A0    CMPD   copy_of_player_x_00a0
 D0EE: 2D 04       BLT    $D0F4
 D0F0: C6 01       LDB    #$01
 D0F2: E7 1E       STB    -$2,X
@@ -11647,7 +11656,7 @@ D0F4: CE 4F 26    LDU    #$4F26
 D0F7: BD 90 6B    JSR    $906B
 D0FA: 6C 15       INC    -$B,X
 D0FC: 39          RTS
-D0FD: DC A2       LDD    $A2
+D0FD: DC A2       LDD    copy_of_player_y_00a2
 D0FF: A3 19       SUBD   -$7,X
 D101: C3 00 0A    ADDD   #$000A
 D104: 2B 35       BMI    $D13B
@@ -11657,14 +11666,14 @@ D10C: A6 0F       LDA    $F,X
 D10E: 26 28       BNE    $D138
 D110: E6 1E       LDB    -$2,X
 D112: 27 10       BEQ    $D124
-D114: DC A0       LDD    $A0
+D114: DC A0       LDD    copy_of_player_x_00a0
 D116: 83 00 28    SUBD   #$0028
 D119: 10 A3 16    CMPD   -$A,X
 D11C: 25 1A       BCS    $D138
 D11E: C6 00       LDB    #$00
 D120: E7 1E       STB    -$2,X
 D122: 20 0E       BRA    $D132
-D124: DC A0       LDD    $A0
+D124: DC A0       LDD    copy_of_player_x_00a0
 D126: C3 00 28    ADDD   #$0028
 D129: 10 A3 16    CMPD   -$A,X
 D12C: 22 0A       BHI    $D138
@@ -11682,7 +11691,7 @@ D144: BD D0 A4    JSR    $D0A4
 D147: A6 0F       LDA    $F,X
 D149: 27 2E       BEQ    $D179
 D14B: EC 16       LDD    -$A,X
-D14D: 10 93 A0    CMPD   $A0
+D14D: 10 93 A0    CMPD   copy_of_player_x_00a0
 D150: 22 10       BHI    $D162
 D152: A6 88 14    LDA    $14,X
 D155: 27 31       BEQ    $D188
@@ -11752,7 +11761,7 @@ D1DB: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=4]
 D1E5: C6 00       LDB    #$00
 D1E7: E7 1E       STB    -$2,X
 D1E9: EC 16       LDD    -$A,X
-D1EB: 10 93 A0    CMPD   $A0
+D1EB: 10 93 A0    CMPD   copy_of_player_x_00a0
 D1EE: 2D 04       BLT    $D1F4
 D1F0: C6 01       LDB    #$01
 D1F2: E7 1E       STB    -$2,X
@@ -11796,7 +11805,7 @@ D23E: ED 30       STD    -$10,Y
 D240: C6 03       LDB    #$03
 D242: E7 25       STB    $5,Y
 D244: 39          RTS
-D245: DC A2       LDD    $A2
+D245: DC A2       LDD    copy_of_player_y_00a2
 D247: A3 19       SUBD   -$7,X
 D249: C3 00 0A    ADDD   #$000A
 D24C: 2B 0C       BMI    $D25A
@@ -11806,12 +11815,12 @@ D254: CC 01 00    LDD    #$0100
 D257: ED 14       STD    -$C,X
 D259: 39          RTS
 D25A: EC 16       LDD    -$A,X
-D25C: 93 A0       SUBD   $A0
+D25C: 93 A0       SUBD   copy_of_player_x_00a0
 D25E: C3 00 0A    ADDD   #$000A
 D261: 10 83 00 14 CMPD   #$0014
 D265: 22 14       BHI    $D27B
 D267: EC 19       LDD    -$7,X
-D269: 10 93 A2    CMPD   $A2
+D269: 10 93 A2    CMPD   copy_of_player_y_00a2
 D26C: 2D 0D       BLT    $D27B
 D26E: 86 1E       LDA    #$1E
 D270: A7 0E       STA    $E,X
@@ -11917,7 +11926,7 @@ D35B: 6C 15       INC    -$B,X
 D35D: 39          RTS
 D35E: 6F 1E       CLR    -$2,X
 D360: EC 16       LDD    -$A,X
-D362: 10 93 A0    CMPD   $A0
+D362: 10 93 A0    CMPD   copy_of_player_x_00a0
 D365: 2D 04       BLT    $D36B
 D367: C6 01       LDB    #$01
 D369: E7 1E       STB    -$2,X
@@ -11984,7 +11993,7 @@ D3EF: C6 03       LDB    #$03
 D3F1: E7 1F       STB    -$1,X
 D3F3: 6F 1E       CLR    -$2,X
 D3F5: EC 16       LDD    -$A,X
-D3F7: 10 93 A0    CMPD   $A0
+D3F7: 10 93 A0    CMPD   copy_of_player_x_00a0
 D3FA: 2D 04       BLT    $D400
 D3FC: C6 01       LDB    #$01
 D3FE: E7 1E       STB    -$2,X
@@ -12030,12 +12039,12 @@ D456: 39          RTS
 D457: E6 1E       LDB    -$2,X
 D459: 27 0A       BEQ    $D465
 D45B: EC 16       LDD    -$A,X
-D45D: 10 93 A0    CMPD   $A0
+D45D: 10 93 A0    CMPD   copy_of_player_x_00a0
 D460: 22 0C       BHI    $D46E
 D462: 6C 15       INC    -$B,X
 D464: 39          RTS
 D465: EC 16       LDD    -$A,X
-D467: 10 93 A0    CMPD   $A0
+D467: 10 93 A0    CMPD   copy_of_player_x_00a0
 D46A: 23 02       BLS    $D46E
 D46C: 6C 15       INC    -$B,X
 D46E: 39          RTS
@@ -12135,7 +12144,7 @@ D544: E7 1E       STB    -$2,X
 D546: E7 88 14    STB    $14,X
 D549: E7 0D       STB    $D,X
 D54B: EC 16       LDD    -$A,X
-D54D: 10 93 A0    CMPD   $A0
+D54D: 10 93 A0    CMPD   copy_of_player_x_00a0
 D550: 2D 09       BLT    $D55B
 D552: C6 08       LDB    #$08
 D554: E7 1E       STB    -$2,X
@@ -12258,7 +12267,7 @@ D648: E7 15       STB    -$B,X
 D64A: 39          RTS
 D64B: 6F 1E       CLR    -$2,X
 D64D: EC 16       LDD    -$A,X
-D64F: 10 93 A0    CMPD   $A0
+D64F: 10 93 A0    CMPD   copy_of_player_x_00a0
 D652: 2D 04       BLT    $D658
 D654: C6 08       LDB    #$08
 D656: E7 1E       STB    -$2,X
@@ -12287,7 +12296,7 @@ D687: 39          RTS
 
 D690: 6F 1E       CLR    -$2,X
 D692: EC 16       LDD    -$A,X
-D694: 10 93 A0    CMPD   $A0
+D694: 10 93 A0    CMPD   copy_of_player_x_00a0
 D697: 2D 04       BLT    $D69D
 D699: C6 08       LDB    #$08
 D69B: E7 1E       STB    -$2,X
@@ -12411,7 +12420,7 @@ D7B9: E6 11       LDB    -$F,X
 D7BB: 27 02       BEQ    $D7BF
 D7BD: 6C 15       INC    -$B,X
 D7BF: 39          RTS
-D7C0: DC A2       LDD    $A2
+D7C0: DC A2       LDD    copy_of_player_y_00a2
 D7C2: C3 00 20    ADDD   #$0020
 D7C5: A3 19       SUBD   -$7,X
 D7C7: 2B 24       BMI    $D7ED
@@ -12446,7 +12455,7 @@ D800: C6 0A       LDB    #$0A
 D802: E7 02       STB    $2,X
 D804: BD 79 EC    JSR    $79EC
 D807: BD 90 74    JSR    $9074
-D80A: BD 68 F9    JSR    $68F9
+D80A: BD 68 F9    JSR    random_68F9
 D80D: D7 EB       STB    $EB
 D80F: 8D 07       BSR    $D818
 D811: BD D9 81    JSR    $D981
@@ -12464,7 +12473,7 @@ D828: 22 3A       BHI    $D864
 D82A: E6 88 14    LDB    $14,X
 D82D: 27 2C       BEQ    $D85B
 D82F: EC 16       LDD    -$A,X
-D831: 93 A0       SUBD   $A0
+D831: 93 A0       SUBD   copy_of_player_x_00a0
 D833: 83 00 18    SUBD   #$0018
 D836: 2B 2C       BMI    $D864
 D838: BD 8F E4    JSR    $8FE4
@@ -12482,12 +12491,12 @@ D852: 86 12       LDA    #$12
 D854: D6 E3       LDB    $E3
 D856: EE 08       LDU    $8,X
 D858: 7E D8 CC    JMP    $D8CC
-D85B: DC A0       LDD    $A0
+D85B: DC A0       LDD    copy_of_player_x_00a0
 D85D: A3 16       SUBD   -$A,X
 D85F: 83 00 18    SUBD   #$0018
 D862: 2A D4       BPL    $D838
 D864: EC 16       LDD    -$A,X
-D866: 10 93 A0    CMPD   $A0
+D866: 10 93 A0    CMPD   copy_of_player_x_00a0
 D869: 22 07       BHI    $D872
 D86B: E6 88 14    LDB    $14,X
 D86E: 26 07       BNE    $D877
@@ -12499,7 +12508,7 @@ D879: C3 01 00    ADDD   #$0100
 D87C: 10 A3 16    CMPD   -$A,X
 D87F: 23 0D       BLS    $D88E
 D881: EC 16       LDD    -$A,X
-D883: 93 A0       SUBD   $A0
+D883: 93 A0       SUBD   copy_of_player_x_00a0
 D885: C3 00 5E    ADDD   #$005E
 D888: 10 83 00 BC CMPD   #$00BC
 D88C: 25 5A       BCS    $D8E8
@@ -12549,7 +12558,7 @@ D8EA: C1 05       CMPB   #$05
 D8EC: 27 1C       BEQ    $D90A
 D8EE: CE D9 47    LDU    #$D947
 D8F1: EC 19       LDD    -$7,X
-D8F3: 93 A2       SUBD   $A2
+D8F3: 93 A2       SUBD   copy_of_player_y_00a2
 D8F5: 2B 09       BMI    $D900
 D8F7: 10 83 00 A0 CMPD   #$00A0
 D8FB: 25 C5       BCS    $D8C2
@@ -12560,24 +12569,24 @@ D904: EC C5       LDD    B,U
 D906: EE 08       LDU    $8,X
 D908: 20 C2       BRA    $D8CC
 D90A: EC 88 19    LDD    $19,X
-D90D: 93 A2       SUBD   $A2
+D90D: 93 A2       SUBD   copy_of_player_y_00a2
 D90F: C3 01 00    ADDD   #$0100
 D912: 10 83 02 00 CMPD   #$0200
 D916: 22 1C       BHI    $D934
 D918: EC 19       LDD    -$7,X
-D91A: 93 A2       SUBD   $A2
+D91A: 93 A2       SUBD   copy_of_player_y_00a2
 D91C: C3 00 5E    ADDD   #$005E
 D91F: 10 83 00 BC CMPD   #$00BC
 D923: 25 9D       BCS    $D8C2
 D925: CE D9 47    LDU    #$D947
 D928: EC 19       LDD    -$7,X
-D92A: 10 93 A2    CMPD   $A2
+D92A: 10 93 A2    CMPD   copy_of_player_y_00a2
 D92D: 25 03       BCS    $D932
 D92F: CE D9 43    LDU    #$D943
 D932: 20 CC       BRA    $D900
 D934: CE D9 47    LDU    #$D947
 D937: EC 19       LDD    -$7,X
-D939: 10 93 A2    CMPD   $A2
+D939: 10 93 A2    CMPD   copy_of_player_y_00a2
 D93C: 22 03       BHI    $D941
 D93E: CE D9 43    LDU    #$D943
 D941: 20 BD       BRA    $D900
@@ -12609,7 +12618,7 @@ D980: 39          RTS
 D981: E6 88 15    LDB    $15,X
 D984: 26 63       BNE    $D9E9
 D986: EC 19       LDD    -$7,X
-D988: 93 A2       SUBD   $A2
+D988: 93 A2       SUBD   copy_of_player_y_00a2
 D98A: C3 00 48    ADDD   #$0048
 D98D: 10 83 00 90 CMPD   #$0090
 D991: 22 ED       BHI    $D980
@@ -12827,10 +12836,10 @@ DB6E: 58          ASLB
 DB6F: CE DB 74    LDU    #jump_table_db74
 DB72: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=3]
 
-DB7A: BD 68 F9    JSR    $68F9
+DB7A: BD 68 F9    JSR    random_68F9
 DB7D: C4 03       ANDB   #$03
 DB7F: 1F 98       TFR    B,A
-DB81: BD 68 F9    JSR    $68F9
+DB81: BD 68 F9    JSR    random_68F9
 DB84: ED 06       STD    $6,X
 DB86: 6F 88 19    CLR    $19,X
 DB89: BD DC DE    JSR    $DCDE
@@ -12850,7 +12859,7 @@ DBAB: E6 88 1A    LDB    $1A,X
 DBAE: 54          LSRB
 DBAF: A6 C5       LDA    B,U
 DBB1: 97 E1       STA    $E1
-DBB3: BD 68 F9    JSR    $68F9
+DBB3: BD 68 F9    JSR    random_68F9
 DBB6: C4 2F       ANDB   #$2F
 DBB8: DB E1       ADDB   $E1
 DBBA: E7 08       STB    $8,X
@@ -12869,7 +12878,7 @@ DBD7: 88 01       EORA   #$01
 DBD9: A7 1E       STA    -$2,X
 DBDB: 6F 14       CLR    -$C,X
 DBDD: 39          RTS
-DBDE: BD 68 F9    JSR    $68F9
+DBDE: BD 68 F9    JSR    random_68F9
 DBE1: C4 0F       ANDB   #$0F
 DBE3: CE DB F2    LDU    #$DBF2
 DBE6: E6 C5       LDB    B,U
@@ -12895,16 +12904,16 @@ DC25: 26 08       BNE    $DC2F
 DC27: CE 54 02    LDU    #$5402
 DC2A: E6 88 1A    LDB    $1A,X
 DC2D: EE C5       LDU    B,U		; [bank_address]
-DC2F: BD 68 F9    JSR    $68F9
+DC2F: BD 68 F9    JSR    random_68F9
 DC32: C4 07       ANDB   #$07
 DC34: E6 C5       LDB    B,U		; [bank_address]
 DC36: E7 09       STB    $9,X
 DC38: 39          RTS
-DC39: BD 68 F9    JSR    $68F9
+DC39: BD 68 F9    JSR    random_68F9
 DC3C: C4 01       ANDB   #$01
 DC3E: 5C          INCB
 DC3F: E7 0E       STB    $E,X
-DC41: BD 68 F9    JSR    $68F9
+DC41: BD 68 F9    JSR    random_68F9
 DC44: ED 0F       STD    $F,X
 DC46: 39          RTS
 DC47: 6D 0D       TST    $D,X
@@ -12918,7 +12927,7 @@ DC57: A7 0D       STA    $D,X
 DC59: BD DC DE    JSR    $DCDE
 DC5C: 4F          CLRA
 DC5D: 5F          CLRB
-DC5E: BD 68 F9    JSR    $68F9
+DC5E: BD 68 F9    JSR    random_68F9
 DC61: C4 7F       ANDB   #$7F
 DC63: C3 00 40    ADDD   #$0040
 DC66: ED 88 10    STD    $10,X
@@ -12933,7 +12942,7 @@ DC78: 10 AE 88 10 LDY    $10,X
 DC7C: 31 3F       LEAY   -$1,Y
 DC7E: 10 AF 88 10 STY    $10,X
 DC82: 27 0C       BEQ    $DC90
-DC84: BD 68 F9    JSR    $68F9
+DC84: BD 68 F9    JSR    random_68F9
 DC87: C4 01       ANDB   #$01
 DC89: E7 88 12    STB    task_pointer_0012,X
 DC8C: BD DC 9F    JSR    $DC9F
@@ -12951,7 +12960,7 @@ DCA6: BD DC 20    JSR    $DC20
 DCA9: 39          RTS
 DCAA: 6F 88 17    CLR    $17,X
 DCAD: EC 16       LDD    -$A,X
-DCAF: 93 A0       SUBD   $A0
+DCAF: 93 A0       SUBD   copy_of_player_x_00a0
 DCB1: C3 00 50    ADDD   #$0050
 DCB4: 10 83 00 A0 CMPD   #$00A0
 DCB8: 25 05       BCS    $DCBF
@@ -12960,7 +12969,7 @@ DCBC: A7 88 17    STA    $17,X
 DCBF: 39          RTS
 DCC0: 0F E1       CLR    $E1
 DCC2: EC 16       LDD    -$A,X
-DCC4: 10 93 A0    CMPD   $A0
+DCC4: 10 93 A0    CMPD   copy_of_player_x_00a0
 DCC7: 25 02       BCS    $DCCB
 DCC9: 0C E1       INC    $E1
 DCCB: A6 88 18    LDA    $18,X
@@ -12988,7 +12997,7 @@ DCF9: 39          RTS
 DCFA: 86 01       LDA    #$01
 DCFC: A7 88 12    STA    task_pointer_0012,X
 DCFF: 96 20       LDA    counter_16_bit_0020
-DD01: BD 68 F9    JSR    $68F9
+DD01: BD 68 F9    JSR    random_68F9
 DD04: C4 03       ANDB   #$03
 DD06: 26 03       BNE    $DD0B
 DD08: 6F 88 12    CLR    task_pointer_0012,X
@@ -13206,7 +13215,7 @@ DECD: E7 1F       STB    -$1,X
 DECF: C6 00       LDB    #$00
 DED1: E7 1E       STB    -$2,X
 DED3: EC 16       LDD    -$A,X
-DED5: 10 93 A0    CMPD   $A0
+DED5: 10 93 A0    CMPD   copy_of_player_x_00a0
 DED8: 2D 04       BLT    $DEDE
 DEDA: C6 01       LDB    #$01
 DEDC: E7 1E       STB    -$2,X
@@ -13243,7 +13252,7 @@ DF17: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 DF1D: C6 00       LDB    #$00
 DF1F: E7 1E       STB    -$2,X
 DF21: EC 16       LDD    -$A,X
-DF23: 10 93 A0    CMPD   $A0
+DF23: 10 93 A0    CMPD   copy_of_player_x_00a0
 DF26: 2D 04       BLT    $DF2C
 DF28: C6 01       LDB    #$01
 DF2A: E7 1E       STB    -$2,X
@@ -13333,7 +13342,7 @@ DFE4: E7 1F       STB    -$1,X
 DFE6: C6 01       LDB    #$01
 DFE8: E7 1E       STB    -$2,X
 DFEA: EC 16       LDD    -$A,X
-DFEC: 10 93 A0    CMPD   $A0
+DFEC: 10 93 A0    CMPD   copy_of_player_x_00a0
 DFEF: 2D 04       BLT    $DFF5
 DFF1: C6 03       LDB    #$03
 DFF3: E7 1E       STB    -$2,X
@@ -13385,7 +13394,7 @@ E05A: E7 10       STB    -$10,X
 E05C: C6 01       LDB    #$01
 E05E: E7 1E       STB    -$2,X
 E060: EC 16       LDD    -$A,X
-E062: 10 93 A0    CMPD   $A0
+E062: 10 93 A0    CMPD   copy_of_player_x_00a0
 E065: 2D 04       BLT    $E06B
 E067: C6 03       LDB    #$03
 E069: E7 1E       STB    -$2,X
@@ -13393,7 +13402,7 @@ E06B: CE 55 D1    LDU    #$55D1
 E06E: BD 90 6B    JSR    $906B
 E071: 6F 0C       CLR    $C,X
 E073: EC 19       LDD    -$7,X
-E075: 93 A2       SUBD   $A2
+E075: 93 A2       SUBD   copy_of_player_y_00a2
 E077: C3 00 30    ADDD   #$0030
 E07A: 10 83 00 60 CMPD   #$0060
 E07E: 22 02       BHI    $E082
@@ -13517,7 +13526,7 @@ E198: ED 39       STD    -$7,Y
 E19A: C6 00       LDB    #$00
 E19C: E7 3E       STB    -$2,Y
 E19E: EC 16       LDD    -$A,X
-E1A0: 10 93 A0    CMPD   $A0
+E1A0: 10 93 A0    CMPD   copy_of_player_x_00a0
 E1A3: 2D 04       BLT    $E1A9
 E1A5: C6 01       LDB    #$01
 E1A7: E7 3E       STB    -$2,Y
@@ -13539,7 +13548,7 @@ E1C3: ED 39       STD    -$7,Y
 E1C5: C6 00       LDB    #$00
 E1C7: E7 3E       STB    -$2,Y
 E1C9: EC 16       LDD    -$A,X
-E1CB: 10 93 A0    CMPD   $A0
+E1CB: 10 93 A0    CMPD   copy_of_player_x_00a0
 E1CE: 2D 04       BLT    $E1D4
 E1D0: C6 01       LDB    #$01
 E1D2: E7 3E       STB    -$2,Y
@@ -13760,7 +13769,7 @@ E3AA: 58          ASLB
 E3AB: CE E3 B0    LDU    #jump_table_e3b0
 E3AE: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
-E3B4: DC A0       LDD    $A0
+E3B4: DC A0       LDD    copy_of_player_x_00a0
 E3B6: 10 83 17 80 CMPD   #$1780
 E3BA: 25 02       BCS    $E3BE
 E3BC: 6C 15       INC    -$B,X
@@ -13772,12 +13781,12 @@ E3C5: 24 32       BCC    $E3F9
 E3C7: E6 11       LDB    -$F,X
 E3C9: 27 2E       BEQ    $E3F9
 E3CB: EC 16       LDD    -$A,X
-E3CD: 93 A0       SUBD   $A0
+E3CD: 93 A0       SUBD   copy_of_player_x_00a0
 E3CF: C3 00 0C    ADDD   #$000C
 E3D2: 10 83 00 18 CMPD   #$0018
 E3D6: 22 21       BHI    $E3F9
 E3D8: EC 19       LDD    -$7,X
-E3DA: 93 A2       SUBD   $A2
+E3DA: 93 A2       SUBD   copy_of_player_y_00a2
 E3DC: C3 00 08    ADDD   #$0008
 E3DF: 10 83 00 10 CMPD   #$0010
 E3E3: 22 14       BHI    $E3F9
@@ -13944,7 +13953,7 @@ E522: E6 53       LDB    -$D,U
 E524: C1 02       CMPB   #$02
 E526: 26 11       BNE    $E539
 E528: EC 16       LDD    -$A,X
-E52A: 93 A0       SUBD   $A0
+E52A: 93 A0       SUBD   copy_of_player_x_00a0
 E52C: C3 00 14    ADDD   #$0014
 E52F: 10 83 00 28 CMPD   #$0028
 E533: 22 7E       BHI    $E5B3
@@ -13952,12 +13961,12 @@ E535: 7E E5 8C    JMP    $E58C
 E538: 39          RTS
 E539: 6F 0F       CLR    $F,X
 E53B: EC 19       LDD    -$7,X
-E53D: 93 A2       SUBD   $A2
+E53D: 93 A2       SUBD   copy_of_player_y_00a2
 E53F: C3 00 10    ADDD   #$0010
 E542: 10 83 00 20 CMPD   #$0020
 E546: 22 43       BHI    $E58B
 E548: EC 16       LDD    -$A,X
-E54A: 93 A0       SUBD   $A0
+E54A: 93 A0       SUBD   copy_of_player_x_00a0
 E54C: C3 00 20    ADDD   #$0020
 E54F: 10 83 00 40 CMPD   #$0040
 E553: 22 36       BHI    $E58B
@@ -13986,14 +13995,14 @@ E587: E3 0D       ADDD   $D,X
 E589: ED 56       STD    -$A,U
 E58B: 39          RTS
 E58C: EC 16       LDD    -$A,X
-E58E: 93 A0       SUBD   $A0
+E58E: 93 A0       SUBD   copy_of_player_x_00a0
 E590: C3 00 18    ADDD   #$0018
 E593: 10 83 00 30 CMPD   #$0030
 E597: 22 19       BHI    $E5B2
 E599: EC 19       LDD    -$7,X
-E59B: 10 93 A2    CMPD   $A2
+E59B: 10 93 A2    CMPD   copy_of_player_y_00a2
 E59E: 25 12       BCS    $E5B2
-E5A0: 93 A2       SUBD   $A2
+E5A0: 93 A2       SUBD   copy_of_player_y_00a2
 E5A2: 10 83 00 14 CMPD   #$0014
 E5A6: 22 0A       BHI    $E5B2
 E5A8: CE 05 10    LDU    #$0510
@@ -14002,7 +14011,7 @@ E5AE: E3 59       ADDD   -$7,U
 E5B0: ED 59       STD    -$7,U
 E5B2: 39          RTS
 E5B3: EC 16       LDD    -$A,X
-E5B5: 93 A0       SUBD   $A0
+E5B5: 93 A0       SUBD   copy_of_player_x_00a0
 E5B7: 2A 07       BPL    $E5C0
 E5B9: E6 5E       LDB    -$2,U
 E5BB: C1 02       CMPB   #$02
@@ -14015,12 +14024,12 @@ E5C6: 39          RTS
 E5C7: A6 0F       LDA    $F,X
 E5C9: 26 22       BNE    $E5ED
 E5CB: EC 19       LDD    -$7,X
-E5CD: 93 A2       SUBD   $A2
+E5CD: 93 A2       SUBD   copy_of_player_y_00a2
 E5CF: C3 00 10    ADDD   #$0010
 E5D2: 10 83 00 20 CMPD   #$0020
 E5D6: 22 15       BHI    $E5ED
 E5D8: EC 16       LDD    -$A,X
-E5DA: 93 A0       SUBD   $A0
+E5DA: 93 A0       SUBD   copy_of_player_x_00a0
 E5DC: C3 00 20    ADDD   #$0020
 E5DF: 10 83 00 40 CMPD   #$0040
 E5E3: 22 08       BHI    $E5ED
@@ -14211,12 +14220,12 @@ E76A: F6 05 00    LDB    $0500
 E76D: 54          LSRB
 E76E: 24 2D       BCC    $E79D
 E770: EC 16       LDD    -$A,X
-E772: 93 A0       SUBD   $A0
+E772: 93 A0       SUBD   copy_of_player_x_00a0
 E774: C3 00 08    ADDD   #$0008
 E777: 10 83 00 10 CMPD   #$0010
 E77B: 22 20       BHI    $E79D
 E77D: EC 19       LDD    -$7,X
-E77F: 93 A2       SUBD   $A2
+E77F: 93 A2       SUBD   copy_of_player_y_00a2
 E781: C3 00 08    ADDD   #$0008
 E784: 10 83 00 10 CMPD   #$0010
 E788: 22 13       BHI    $E79D
@@ -14338,7 +14347,7 @@ E867: C6 03       LDB    #$03
 E869: E7 1F       STB    -$1,X
 E86B: CE 5A 9A    LDU    #$5A9A
 E86E: EC 16       LDD    -$A,X
-E870: 10 93 A0    CMPD   $A0
+E870: 10 93 A0    CMPD   copy_of_player_x_00a0
 E873: 23 03       BLS    $E878
 E875: CE 5A C0    LDU    #$5AC0
 E878: EF 84       STU    ,X
@@ -14798,7 +14807,7 @@ ECB9: 20 02       BRA    $ECBD
 ECBB: A3 C1       SUBD   ,U++		; [bank_address]
 ECBD: ED 36       STD    -$A,Y
 ECBF: 33 42       LEAU   $2,U
-ECC1: DC A2       LDD    $A2
+ECC1: DC A2       LDD    copy_of_player_y_00a2
 ECC3: ED 39       STD    -$7,Y
 ECC5: E6 C0       LDB    ,U+		; [bank_address]
 ECC7: A6 C0       LDA    ,U+		; [bank_address]
@@ -15390,7 +15399,7 @@ F718: 0A E0       DEC    $E0
 F71A: 26 8E       BNE    $F6AA
 F71C: 39          RTS
 
-F762: DC A2       LDD    $A2
+F762: DC A2       LDD    copy_of_player_y_00a2
 F764: 93 9E       SUBD   $9E
 F766: 10 83 00 20 CMPD   #$0020
 F76A: 22 1B       BHI    $F787
@@ -16003,7 +16012,7 @@ FCC9: 7E FC B9    JMP    $FCB9
 FCCC: 6F 11       CLR    -$F,X
 FCCE: 0F E2       CLR    stack_save_00e2
 FCD0: EC 19       LDD    -$7,X
-FCD2: 93 A2       SUBD   $A2
+FCD2: 93 A2       SUBD   copy_of_player_y_00a2
 FCD4: 2A 07       BPL    $FCDD
 FCD6: 97 E2       STA    stack_save_00e2
 FCD8: 43          COMA
@@ -16012,7 +16021,7 @@ FCDA: C3 00 01    ADDD   #$0001
 FCDD: DD E4       STD    $E4
 FCDF: 0F E3       CLR    $E3
 FCE1: EC 16       LDD    -$A,X
-FCE3: 93 A0       SUBD   $A0
+FCE3: 93 A0       SUBD   copy_of_player_x_00a0
 FCE5: 2A 07       BPL    $FCEE
 FCE7: 97 E3       STA    $E3
 FCE9: 43          COMA
@@ -16785,12 +16794,8 @@ jump_table_c58f:
 	dc.w	$c593	; $c58f
 	dc.w	$c5a0	; $c591
 jump_table_c642:
-	dc.w	$c696	; $c642
-	dc.w	$c6f0	; $c644
-	dc.w	$ffff	; $c646
-	dc.w	$ffff	; $c648
-	dc.w	$ffff	; $c64a
-	dc.w	$ffff	; $c64c
+	dc.w	handle_giant_c696	; $c642
+	dc.w	handle_giant_movements_c6f0	; $c644
 jump_table_c7cd:
 	dc.w	$c7dd	; $c7cd
 	dc.w	$c889	; $c7cf

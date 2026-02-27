@@ -191,13 +191,24 @@ okay\@:
 	.macro    JXX_A_INDEXED    inst,reg,nb_cases
 	and.w    #0xFF,d0  | mask 8 bits
 	CHECK_MAX    d0,\nb_cases
+	.ifdef	RELEASE
 	\inst    ([\reg,d0.W*2])
+	.else
+	move.l	 (\reg,d0.W*2),\reg  | efficiently destroys address register (debug)
+	\inst    (\reg)
+	.endif
+	
 	.endm
 
 	.macro    JXX_B_INDEXED    inst,reg,nb_cases
 	and.w    #0xFF,d1  | mask 8 bits
 	CHECK_MAX    d1,\nb_cases
+	.ifdef	RELEASE
 	\inst    ([\reg,d1.W*2])
+	.else
+	move.l	 (\reg,d1.W*2),\reg  | efficiently destroys address register (debug)
+	\inst    (\reg)
+	.endif
 	.endm
 
 	.macro DO_EXTB	reg
