@@ -8629,7 +8629,7 @@ B451: BD 79 AB    JSR    $79AB
 B454: 6C 15       INC    -$B,X
 B456: 39          RTS
 
-* < Y: window address
+; < Y: window address
 update_opening_window_tiles_b457:
 B457: 6D 88 15    TST    $15,X
 B45A: 26 2A       BNE    $B486
@@ -10508,7 +10508,7 @@ C634: C6 19       LDB    #$19
 C636: E7 88 1A    STB    $1A,X
 C639: 6F 88 1B    CLR    $1B,X
 C63C: CC 05 00    LDD    #$0500
-C63F: ED 14       STD    -$C,X
+C63F: ED 14       STD    -$C,X		; unicorn about to shoot
 C641: 39          RTS
 
 handle_giant_c696:
@@ -10618,7 +10618,7 @@ C76C: C3 00 E0    ADDD   #$00E0
 C76F: A3 16       SUBD   -$A,X
 C771: 2A 2D       BPL    $C7A0
 C773: CC 02 40    LDD    #$0240
-C776: A7 1E       STA    -$2,X
+C776: A7 1E       STA    -$2,X		; unicorn direction to the left	
 C778: E7 07       STB    $7,X
 C77A: 39          RTS
 
@@ -10947,7 +10947,7 @@ CA84: 22 05       BHI    $CA8B
 CA86: CC 01 00    LDD    #$0100
 CA89: ED 14       STD    -$C,X
 CA8B: 39          RTS
-CA8C: E6 15       LDB    -$B,X
+CA8C: E6 15       LDB    -$B,X		; unicorn substate for current state (0-2)
 CA8E: 58          ASLB
 CA8F: CE CA A4    LDU    #jump_table_caa4
 CA92: AD D5       JSR    [B,U]	; [indirect_jump] [nb_entries=3]
@@ -10996,6 +10996,7 @@ CAF2: 5A          DECB
 CAF3: 27 E2       BEQ    $CAD7
 CAF5: 6A 15       DEC    -$B,X
 CAF7: 39          RTS
+
 CAF8: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 CAFB: BD 90 74    JSR    $9074
 CAFE: EC 16       LDD    -$A,X
@@ -11004,8 +11005,9 @@ CB02: C3 00 70    ADDD   #$0070
 CB05: 10 83 00 E0 CMPD   #$00E0
 CB09: 22 05       BHI    $CB10
 CB0B: CC 01 01    LDD    #$0101
-CB0E: ED 14       STD    -$C,X
+CB0E: ED 14       STD    -$C,X		; unicorn going forward slowly
 CB10: 39          RTS
+
 CB11: BD A4 27    JSR    apply_xy_speeds_to_enemy_a427
 CB14: BD 90 74    JSR    $9074
 CB17: EC 16       LDD    -$A,X
@@ -11020,9 +11022,10 @@ CB2C: C3 00 E0    ADDD   #$00E0
 CB2F: A3 16       SUBD   -$A,X
 CB31: 2A 06       BPL    $CB39
 CB33: CC 01 01    LDD    #$0101
-CB36: ED 14       STD    -$C,X
+CB36: ED 14       STD    -$C,X		; unicorn going forward slowly
 CB38: 39          RTS
 CB39: 39          RTS
+
 CB3A: E6 0A       LDB    $A,X
 CB3C: 26 35       BNE    $CB73
 CB3E: E6 88 1B    LDB    $1B,X
@@ -11047,7 +11050,7 @@ CB67: 26 09       BNE    $CB72
 CB69: E6 0B       LDB    $B,X
 CB6B: 27 05       BEQ    $CB72
 CB6D: CC 04 00    LDD    #$0400
-CB70: ED 14       STD    -$C,X
+CB70: ED 14       STD    -$C,X		; unicorn going back slowly
 CB72: 39          RTS
 CB73: A6 88 12    LDA    task_pointer_0012,X
 CB76: 81 02       CMPA   #$02
@@ -11056,7 +11059,7 @@ CB7A: BD 68 F9    JSR    random_68F9
 CB7D: C4 01       ANDB   #$01
 CB7F: 26 06       BNE    $CB87
 CB81: CC 03 00    LDD    #$0300
-CB84: ED 14       STD    -$C,X
+CB84: ED 14       STD    -$C,X		; unicorn dashing in the current direction
 CB86: 39          RTS
 CB87: CC 02 07    LDD    #$0207
 CB8A: ED 14       STD    -$C,X
@@ -11106,9 +11109,9 @@ CBE6: EF 03       STU    $3,X
 CBE8: A6 0A       LDA    $A,X
 CBEA: 26 06       BNE    $CBF2
 CBEC: CC 01 01    LDD    #$0101
-CBEF: ED 14       STD    -$C,X
+CBEF: ED 14       STD    -$C,X		; unicorn moving forward slowly
 CBF1: 39          RTS
-CBF2: CC 03 00    LDD    #$0300
+CBF2: CC 03 00    LDD    #$0300		; unicorn dashing
 CBF5: ED 14       STD    -$C,X
 CBF7: 39          RTS
 CBF8: 58          ASLB

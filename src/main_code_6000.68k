@@ -6346,7 +6346,7 @@ l_8354:
 	GET_REG_ADDRESS	0,d5 |  [$8376: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$8378: lda    $8,x]
+	| [$8378: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$837a: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$837c: ora    ,s+]
@@ -6869,7 +6869,7 @@ l_8599:
 	GET_REG_ADDRESS	0,d5 |  [$85b9: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$85bb: lda    $8,x]
+	| [$85bb: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$85bd: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$85bf: ora    ,s+]
@@ -7292,7 +7292,7 @@ l_8783:
 	GET_REG_ADDRESS	0,d5 |  [$87a0: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$87a2: lda    $8,x]
+	| [$87a2: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$87a4: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$87a6: ora    ,s+]
@@ -7329,7 +7329,7 @@ l_8783:
 	GET_REG_ADDRESS	0,d5 |  [$87c8: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$87ca: lda    $8,x]
+	| [$87ca: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$87cc: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$87ce: ora    ,s+]
@@ -7366,7 +7366,7 @@ l_8783:
 	GET_REG_ADDRESS	0,d5 |  [$87f0: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$87f2: lda    $8,x]
+	| [$87f2: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$87f4: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$87f6: ora    ,s+]
@@ -7440,7 +7440,7 @@ l_8827:
 	GET_REG_ADDRESS	0,d5 |  [$883c: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$883e: lda    $8,x]
+	| [$883e: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8840: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$8842: ora    ,s+]
@@ -7477,7 +7477,7 @@ l_8827:
 	GET_REG_ADDRESS	0,d5 |  [$8864: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$8866: lda    $8,x]
+	| [$8866: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8868: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$886a: ora    ,s+]
@@ -7514,7 +7514,7 @@ l_8827:
 	GET_REG_ADDRESS	0,d5 |  [$888c: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$888e: lda    $8,x]
+	| [$888e: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8890: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$8892: ora    ,s+]
@@ -7556,7 +7556,7 @@ l_88a0:
 	GET_REG_ADDRESS	0,d5 |  [$88bd: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$88bf: lda    $8,x]
+	| [$88bf: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$88c1: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$88c3: ora    ,s+]
@@ -7589,7 +7589,7 @@ l_88a0:
 	GET_REG_ADDRESS	0,d5 |  [$88dc: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$88de: lda    $8,x]
+	| [$88de: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$88e0: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$88e2: ora    ,s+]
@@ -7625,7 +7625,7 @@ l_88a0:
 	GET_REG_ADDRESS	0,d5 |  [$8905: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$8907: lda    $8,x]
+	| [$8907: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8909: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$890b: ora    ,s+]
@@ -7658,7 +7658,7 @@ l_88a0:
 	GET_REG_ADDRESS	0,d5 |  [$8924: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$8926: lda    $8,x]
+	| [$8926: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8928: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$892a: ora    ,s+]
@@ -7694,7 +7694,7 @@ l_88a0:
 	GET_REG_ADDRESS	0,d5 |  [$894b: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$894d: lda    $8,x]
+	| [$894d: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$894f: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$8951: ora    ,s+]
@@ -7727,7 +7727,7 @@ l_88a0:
 	GET_REG_ADDRESS	0,d5 |  [$896a: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$896c: lda    $8,x]
+	| [$896c: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$896e: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$8970: ora    ,s+]
@@ -7872,7 +7872,7 @@ l_89e9:
 	GET_REG_ADDRESS	0,d5 |  [$89fe: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$8a00: lda    $8,x]
+	| [$8a00: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8a02: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$8a04: ora    ,s+]
@@ -7905,7 +7905,7 @@ l_89e9:
 	GET_REG_ADDRESS	0,d5 |  [$8a1d: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$8a1f: lda    $8,x]
+	| [$8a1f: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8a21: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$8a23: ora    ,s+]
@@ -7941,7 +7941,7 @@ l_89e9:
 	GET_REG_ADDRESS	0,d5 |  [$8a45: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$8a47: lda    $8,x]
+	| [$8a47: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8a49: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$8a4b: ora    ,s+]
@@ -7974,7 +7974,7 @@ l_89e9:
 	GET_REG_ADDRESS	0,d5 |  [$8a64: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$8a66: lda    $8,x]
+	| [$8a66: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8a68: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$8a6a: ora    ,s+]
@@ -8010,7 +8010,7 @@ l_89e9:
 	GET_REG_ADDRESS	0,d5 |  [$8a8c: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$8a8e: lda    $8,x]
+	| [$8a8e: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8a90: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$8a92: ora    ,s+]
@@ -8043,7 +8043,7 @@ l_89e9:
 	GET_REG_ADDRESS	0,d5 |  [$8aab: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0x8,d2                 	| [$8aad: lda    $8,x]
+	| [$8aad: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8aaf: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$8ab1: ora    ,s+]
@@ -8203,7 +8203,7 @@ l_8b45:
 	GET_REG_ADDRESS	0,d5 |  [$8b67: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	-0x2,d2                	| [$8b69: lda    -$2,x]
+	| [$8b69: lda    -$2,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8b6b: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$8b6d: ora    ,s+]
@@ -8251,7 +8251,7 @@ l_8b71:
 	GET_REG_ADDRESS	0,d5 |  [$8b98: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0xa,d2                 	| [$8b9a: lda    $a,x]
+	| [$8b9a: lda    $a,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8b9c: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$8b9e: ora    ,s+]
@@ -8347,7 +8347,7 @@ l_8bf6:
 	GET_REG_ADDRESS	0,d5 |  [$8c16: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	-0x2,d2                	| [$8c18: lda    -$2,x]
+	| [$8c18: lda    -$2,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8c1a: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$8c1c: ora    ,s+]
@@ -8396,7 +8396,7 @@ l_8c20:
 	GET_REG_ADDRESS	0,d5 |  [$8c49: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
-	GET_REG_ADDRESS	0xa,d2                 	| [$8c4b: lda    $a,x]
+	| [$8c4b: lda    $a,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8c4d: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$8c4f: ora    ,s+]
@@ -8614,7 +8614,7 @@ l_8d1a:
 	tst.b	(a0)                             	| [...]
 	jeq	l_8d47                             	| [$8d3f: beq    $8d47]
 	OP_R_ON_DP_ADDRESS	move,0xe8,d1         | [$8d41: ldb    $e8]
-	GET_REG_BANK_ADDRESS	0,d3                   	| [$8d43: subb   ,y] [bank_address]
+	| [$8d43: subb   ,y] [bank_address]
 	sub.b	(a0),d1                          	| [...]
 	jcc	l_8d49                             	| [$8d45: bcc    $8d49]
 l_8d47:
@@ -16430,7 +16430,7 @@ l_b9fc:
 	lea	jump_table_ba13,a4             	| [$b9ff: ldu    #jump_table_ba13]
 	JSR_B_INDEXED	a4,7  | [$ba02: jsr    [b,u]] [indirect_jump] [nb_entries=7]
 
-	GET_REG_ADDRESS	-0xb,d2                	| [$ba04: ldb    -$b,x]
+	| [$ba04: ldb    -$b,x]
 	move.b	(a0),d1                         	| [...]
 	sub.b	#0x02,d1                         	| [$ba06: subb   #$02]
 	cmp.b	#0x01,d1                         	| [$ba08: cmpb   #$01]
@@ -16927,7 +16927,7 @@ l_bc76:
 	lea	jump_table_bc8d,a4             	| [$bc79: ldu    #jump_table_bc8d]
 	JSR_B_INDEXED	a4,6  | [$bc7c: jsr    [b,u]] [indirect_jump] [nb_entries=6]
 
-	GET_REG_ADDRESS	-0xb,d2                	| [$bc7e: ldb    -$b,x]
+	| [$bc7e: ldb    -$b,x]
 	move.b	(a0),d1                         	| [...]
 	sub.b	#0x02,d1                         	| [$bc80: subb   #$02]
 	cmp.b	#0x01,d1                         	| [$bc82: cmpb   #$01]
@@ -18626,6 +18626,7 @@ l_c48b:
 	move.b	d1,(a0)                         	| [...]
 l_c4ae:
 	rts                                    	| [$c4ae: rts]
+
 l_c4af:
 	asl.b	#1,d1                            	| [$c4af: aslb]
 	.ifndef	RELEASE
@@ -18776,7 +18777,7 @@ l_c52c:
 	move.w	#0x4d65,d4                      	| [$c558: ldu    #$4d65]
 	OP_R_ON_DP_ADDRESS	move,counter_8_bit_0021,d1| [$c55b: ldb    counter_8_bit_0021]
 	OP_R_ON_DP_ADDRESS	add,0xe0,d1          | [$c55d: addb   $e0]
-	and.b	#0x03,d1                         	| [$c55f: andb   #$03]
+	and.b	#0x03,d1                         	| [$c55f: andb   #$03] random
 	moveq	#0,d6                            	| [...]
 	move.b	d1,d6                           	| [...] as byte
 	DO_EXTB	d6                             	| [...] with sign extension
@@ -18787,6 +18788,7 @@ l_c52c:
 	GET_REG_ADDRESS	-0xc,d2                	| [$c566: inc    -$c,x]
 	addq.b	#1,(a0)                         	| [...]
 	rts                                    	| [$c568: rts]
+
 l_c569:
 	GET_REG_ADDRESS	-0xf,d2                	| [$c569: lda    -$f,x]
 	move.b	(a0),d0                         	| [...]
@@ -18989,7 +18991,7 @@ l_c620:
 	move.b	#0x05,d0                        	| [$c63c: ldd    #$0500]
 	move.w	#0x0500,d1                      	| [$c63c: ldd    #$0500]
 	MAKE_D                                 	| [...]
-	GET_REG_ADDRESS	-0xc,d2                	| [$c63f: std    -$c,x]
+	GET_REG_ADDRESS	-0xc,d2                	| [$c63f: std    -$c,x] unicorn about to shoot
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 l_c641:
 	rts                                    	| [$c641: rts]
@@ -19016,15 +19018,15 @@ handle_giant_c696:
 	MAKE_D                                 	| [...]
 	GET_REG_ADDRESS	-0x4,d2                	| [$c6ad: std    -$4,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
+* tries to lock on player X coordinate when giant is very close to the player
 	move.b	#0x01,d1                        	| [$c6af: ldb    #$01]
 	GET_REG_ADDRESS	0x13,d2                	| [$c6b1: stb    $13,x]
 	move.b	d1,(a0)                         	| [...]
-	move.b	#0x1,0x111
 	GET_REG_ADDRESS	-0xa,d2                	| [$c6b4: ldd    -$a,x] X of giant
 	LOAD_D                                 	| [$c6b4: ldd    -$a,x] X of giant
 	GET_DP_ADDRESS	copy_of_player_x_00a0   	| [$c6b6: cmpd   copy_of_player_x_00a0]
 	CMP_W_TO_REG	a0,d1                          	| [...]
-	jlt	l_c6c0                             	| [$c6b9: blt    $c6c0]
+	jlt	l_c6c0                             	| [$c6b9: blt    $c6c0] branches if giant X < player X
 	move.b	#0x02,d1                        	| [$c6bb: ldb    #$02]
 	GET_REG_ADDRESS	0x13,d2                	| [$c6bd: stb    $13,x]
 	move.b	d1,(a0)                         	| [...]
@@ -19188,7 +19190,7 @@ l_c75d:
 	move.b	#0x02,d0                        	| [$c773: ldd    #$0240]
 	move.w	#0x0240,d1                      	| [$c773: ldd    #$0240]
 l_c776:
-	GET_REG_ADDRESS	-0x2,d2                	| [$c776: sta    -$2,x]
+	GET_REG_ADDRESS	-0x2,d2                	| [$c776: sta    -$2,x] unicorn direction to the left
 	move.b	d0,(a0)                         	| [...]
 	GET_REG_ADDRESS	0x7,d2                 	| [$c778: stb    $7,x]
 	move.b	d1,(a0)                         	| [...]
@@ -19811,7 +19813,7 @@ l_ca7e:
 l_ca8b:
 	rts                                    	| [$ca8b: rts]
 l_ca8c:
-	GET_REG_ADDRESS	-0xb,d2                	| [$ca8c: ldb    -$b,x]
+	GET_REG_ADDRESS	-0xb,d2                	| [$ca8c: ldb    -$b,x] unicorn substate for current state (0-2)
 	move.b	(a0),d1                         	| [...]
 	asl.b	#1,d1                            	| [$ca8e: aslb]
 	.ifndef	RELEASE
@@ -19891,6 +19893,7 @@ l_caf0:
 	GET_REG_ADDRESS	-0xb,d2                	| [$caf5: dec    -$b,x]
 	subq.b	#1,(a0)                         	| [...]
 	rts                                    	| [$caf7: rts]
+
 l_caf8:
 	jbsr	apply_xy_speeds_to_enemy_a427     	| [$caf8: jsr    apply_xy_speeds_to_enemy_a427]
 	jbsr	l_9074                            	| [$cafb: jsr    $9074]
@@ -19912,10 +19915,11 @@ l_caf8:
 	move.b	#0x01,d0                        	| [$cb0b: ldd    #$0101]
 	move.w	#0x0101,d1                      	| [$cb0b: ldd    #$0101]
 	MAKE_D                                 	| [...]
-	GET_REG_ADDRESS	-0xc,d2                	| [$cb0e: std    -$c,x]
+	GET_REG_ADDRESS	-0xc,d2                	| [$cb0e: std    -$c,x] unicorn going forward slowly
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 l_cb10:
 	rts                                    	| [$cb10: rts]
+
 l_cb11:
 	jbsr	apply_xy_speeds_to_enemy_a427     	| [$cb11: jsr    apply_xy_speeds_to_enemy_a427]
 	jbsr	l_9074                            	| [$cb14: jsr    $9074]
@@ -19956,11 +19960,12 @@ l_cb29:
 	move.b	#0x01,d0                        	| [$cb33: ldd    #$0101]
 	move.w	#0x0101,d1                      	| [$cb33: ldd    #$0101]
 	MAKE_D                                 	| [...]
-	GET_REG_ADDRESS	-0xc,d2                	| [$cb36: std    -$c,x]
+	GET_REG_ADDRESS	-0xc,d2                	| [$cb36: std    -$c,x] unicorn going forward slowly
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	rts                                    	| [$cb38: rts]
 l_cb39:
 	rts                                    	| [$cb39: rts]
+
 l_cb3a:
 	GET_REG_ADDRESS	0xa,d2                 	| [$cb3a: ldb    $a,x]
 	move.b	(a0),d1                         	| [...]
@@ -19992,7 +19997,7 @@ l_cb69:
 	move.b	#0x04,d0                        	| [$cb6d: ldd    #$0400]
 	move.w	#0x0400,d1                      	| [$cb6d: ldd    #$0400]
 	MAKE_D                                 	| [...]
-	GET_REG_ADDRESS	-0xc,d2                	| [$cb70: std    -$c,x]
+	GET_REG_ADDRESS	-0xc,d2                	| [$cb70: std    -$c,x] unicorn going back slowly
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 l_cb72:
 	rts                                    	| [$cb72: rts]
@@ -20008,7 +20013,7 @@ l_cb81:
 	move.b	#0x03,d0                        	| [$cb81: ldd    #$0300]
 	move.w	#0x0300,d1                      	| [$cb81: ldd    #$0300]
 	MAKE_D                                 	| [...]
-	GET_REG_ADDRESS	-0xc,d2                	| [$cb84: std    -$c,x]
+	GET_REG_ADDRESS	-0xc,d2                	| [$cb84: std    -$c,x] unicorn dashing in the current direction
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	rts                                    	| [$cb86: rts]
 l_cb87:
@@ -20107,13 +20112,13 @@ l_cbaf:
 	move.b	#0x01,d0                        	| [$cbec: ldd    #$0101]
 	move.w	#0x0101,d1                      	| [$cbec: ldd    #$0101]
 	MAKE_D                                 	| [...]
-	GET_REG_ADDRESS	-0xc,d2                	| [$cbef: std    -$c,x]
+	GET_REG_ADDRESS	-0xc,d2                	| [$cbef: std    -$c,x] unicorn moving forward slowly
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 l_cbf1:
 	rts                                    	| [$cbf1: rts]
 l_cbf2:
-	move.b	#0x03,d0                        	| [$cbf2: ldd    #$0300]
-	move.w	#0x0300,d1                      	| [$cbf2: ldd    #$0300]
+	move.b	#0x03,d0                        	| [$cbf2: ldd    #$0300] unicorn dashing
+	move.w	#0x0300,d1                      	| [$cbf2: ldd    #$0300] unicorn dashing
 	MAKE_D                                 	| [...]
 	GET_REG_ADDRESS	-0xc,d2                	| [$cbf5: std    -$c,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
@@ -22735,8 +22740,7 @@ l_d7c0:
 	POP_SR                                 	| [...]
 	jmi	l_d7ed                             	| [$d7c7: bmi    $d7ed]
 	cmp.b	#0x05,d1                         	| [$d7c9: cmpb   #$05] [useless]
-	GET_DP_ADDRESS	counter_8_bit_0021      	| [$d7cb: ldb    counter_8_bit_0021]
-	move.b	(a0),d1                         	| [...]
+	OP_R_ON_DP_ADDRESS	move,counter_8_bit_0021,d1| [$d7cb: ldb    counter_8_bit_0021]
 	addq.b	#1,d1                           	| [$d7cd: incb]
 	and.b	#0x0f,d1                         	| [$d7ce: andb   #$0f]
 	jne	l_d7ed                             	| [$d7d0: bne    $d7ed]
@@ -26815,7 +26819,7 @@ l_e9eb:
 l_e9ec:
 	GET_REG_BANK_ADDRESS	0,d4                   	| [$e9ec: ldb    ,u] [bank_address]
 	move.b	(a0),d1                         	| [...]
-	GET_REG_BANK_ADDRESS	0,d4                   	| [$e9ee: lda    ,u+] [bank_address]
+	| [$e9ee: lda    ,u+] [bank_address]
 	addq.w	#1,d4                           	| [...]
 	move.b	(a0),d0                         	| [...]
                                          | [$e9f0: lsra]

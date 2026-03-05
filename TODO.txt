@@ -5,7 +5,8 @@
 - At level 6, the 2 unicorns seem to easily go left and never return (specially the one on the left). not in the arcade!
   check when the unicorn code is activated, then activate a trace, with 21 timer set to a fixed value, compare to amiga
   C77B only called for 1 enemy in CB0, never for D10. Trace C4EA see if the same, then narrow down
-
+  debug values in CAF8/CB11 sub player X maybe don't work
+  
 - to save memory (CD32 version?): don't include white arremers, shorten sprite files, lower quality sound samples
   => arremer table index=>is_arremer to fix clut to red else it will become invisible!
   no pre-mirroring: mirror_planes sets -2 systematically to force in-place, and no blitter chain
@@ -57,6 +58,10 @@ bpset FEF0,,{temp0=w@U; temp1=temp0/D; w@U=temp1; D = temp0%D; PC=$feef; g}
 fix random (warning: also random with timer @ 21)
 
 bpset 68f9,,{B=0;PC=6908;g}
+
+log a value to screen:
+
+wpset D04,1,W,,{b@20B0=wpdata;g}
 
 
 log sounds: bpset 7942,,{print B;g}

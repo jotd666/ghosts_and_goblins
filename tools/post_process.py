@@ -1,7 +1,7 @@
 import re,pathlib
 from shared import *
 
-import find_possible_optims
+
 
 bankname = "bank3_code_4000"
 gamename = "main_code_6000"
@@ -103,6 +103,10 @@ for i,line in enumerate(lines):
     # game_specific
     line = process_jump_table(line)
 
+    if "addx mix" in line:
+        # errors have been fixed
+        line = ""
+
     if address == 0x55CE:
         line = "\tILLEGAL\n"  # not reachable anyway, part of ROM/RAM check code
     elif address == 0x5DBF:
@@ -176,7 +180,6 @@ for i,line in enumerate(lines):
 
     lines[i] = line
 
-lines = find_possible_optims.optimize(lines)
 
 with open(source_dir / f"{bankname}.68k","w") as fw:
     # game_specific: fill global symbols
@@ -532,7 +535,6 @@ for i,line in enumerate(lines):
 with open(source_dir / "data.inc","w") as fw:
     fw.writelines(equates)
 
-lines = find_possible_optims.optimize(lines)
 
 with open(source_dir / f"{gamename}.68k","w") as fw:
     # game_specific: fill global symbols
