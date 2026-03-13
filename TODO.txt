@@ -1,11 +1,16 @@
 - after continuing, the map context should be loaded!! sometimes ok sometimes not (release mode level 5??). Maybe another clear screen
   race condition? maybe fixed now
+- After entering a highscore and being too fast on the continues screen with pressing fire to continue, the game switches to the map (as expected), but it's playing the wrong music: it's repeating the last part from the highscore screen instead of the "map music" and you'll start the level without any music at all. Once you finish the level (or in my case more likely: die), all goes back to normal.
+- another curious thing about the time (playing normally this one), when the two minutes counter ends, a :32 is displayed when you are dying, until the next life begins 
 - 50Hz flashy at times, limit framerate?
 - different score table for each difficulty / lives?
+- alternate control scheme up for jump, 2nd button for ladder up? if I could RE the game more I could even
+  reinstate the infamous up for jump or ladder.
 - At level 6, the 2 unicorns seem to easily go left and never return (specially the one on the left). not in the arcade!
   check when the unicorn code is activated, then activate a trace, with 21 timer set to a fixed value, compare to amiga
   C77B only called for 1 enemy in CB0, never for D10. Trace C4EA see if the same, then narrow down
-  debug values in CAF8/CB11 sub player X maybe don't work
+  debug values in CAF8/CB11 sub player X maybe don't work. check for behaviour diff according to level. Level 2: ok
+  level 6: no (current_level_0072)
   
 - to save memory (CD32 version?): don't include white arremers, shorten sprite files, lower quality sound samples
   => arremer table index=>is_arremer to fix clut to red else it will become invisible!

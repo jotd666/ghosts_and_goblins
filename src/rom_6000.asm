@@ -531,7 +531,7 @@ change_background_62ab:
 6336: 33 C8 50    LEAU   $50,U
 6339: 6A 61       DEC    $1,S
 633B: 26 EF       BNE    $632C
-633D: 35 86       PULS   D,PC
+633D: 35 86       PULS   D,PC		; pop stack & return
 
 write_4_bg_tiles_633f:
 ; set bank 0
@@ -779,7 +779,7 @@ change_ram_palette_6656:
 6677: 37 16       PULU   D,X		; [bank_address]
 6679: ED A1       STD    ,Y++
 667B: AF A1       STX    ,Y++
-667D: 35 16       PULS   D,X
+667D: 35 16       PULS   D,X		; read values and advance
 667F: ED A8 40    STD    $40,Y
 6682: AF A8 42    STX    $42,Y
 6685: 37 16       PULU   D,X		; [bank_address]
@@ -800,16 +800,16 @@ update_sprites_palette_6693:
 66A0: 10 8E 38 40 LDY    #$3840		; palette registers R & G colors
 66A4: C6 08       LDB    #$08		; 64 colors (8*8)
 66A6: D7 E0       STB    $E0
-66A8: 35 16       PULS   D,X
+66A8: 35 16       PULS   D,X		; read values and advance
 66AA: ED A9 01 00 STD    $0100,Y		; write to R/G
 66AE: AF A9 01 02 STX    $0102,Y
-66B2: 37 16       PULU   D,X
+66B2: 37 16       PULU   D,X		; read values and advance
 66B4: ED A1       STD    ,Y++		; write to R/G
 66B6: AF A1       STX    ,Y++
-66B8: 35 16       PULS   D,X
+66B8: 35 16       PULS   D,X		; read values and advance
 66BA: ED A9 01 00 STD    $0100,Y	; write to B
 66BE: AF A9 01 02 STX    $0102,Y
-66C2: 37 16       PULU   D,X
+66C2: 37 16       PULU   D,X		; read values and advance
 66C4: ED A1       STD    ,Y++
 66C6: AF A1       STX    ,Y++
 66C8: 0A E0       DEC    $E0
@@ -831,13 +831,13 @@ update_sprites_palette_6693:
 66E9: 32 C8 10    LEAS   $10,U
 66EC: C6 02       LDB    #$02
 66EE: D7 E0       STB    $E0
-66F0: 35 16       PULS   D,X
+66F0: 35 16       PULS   D,X		; read values and advance
 66F2: ED A8 40    STD    $40,Y
 66F5: AF A8 42    STX    $42,Y
 66F8: 37 16       PULU   D,X		; [bank_address]
 66FA: ED A1       STD    ,Y++
 66FC: AF A1       STX    ,Y++
-66FE: 35 16       PULS   D,X
+66FE: 35 16       PULS   D,X		; read values and advance
 6700: ED A8 40    STD    $40,Y
 6703: AF A8 42    STX    $42,Y
 6706: 37 16       PULU   D,X		; [bank_address]
@@ -859,7 +859,7 @@ update_osd_palette_671c:
 6726: 32 C8 40    LEAS   $40,U
 6729: C6 08       LDB    #$08
 672B: D7 E0       STB    $E0
-672D: 35 16       PULS   D,X
+672D: 35 16       PULS   D,X		; read values and advance
 672F: ED A9 01 00 STD    $0100,Y
 6733: AF A9 01 02 STX    $0102,Y
 6737: 37 16       PULU   D,X
@@ -993,9 +993,9 @@ update_osd_palette_671c:
 682D: 39          RTS
 682E: 8D 09       BSR    $6839
 6830: 6F 05       CLR    $5,X
-6832: 34 10       PSHS   X
+6832: 34 10       PSHS   X			; save X
 6834: BD 79 50    JSR    play_credit_sound_7950
-6837: 35 90       PULS   X,PC		; X saved at 6832
+6837: 35 90       PULS   X,PC		; restore X saved at 6832
 6839: 6C 84       INC    ,X
 683B: 6C 01       INC    $1,X
 683D: A6 01       LDA    $1,X
@@ -1183,6 +1183,7 @@ game_not_playing_694d:
 699E: C6 02       LDB    #$02
 69A0: D7 02       STB    global_state_0002
 69A2: 39          RTS
+
 69A3: 1A 01       ORCC   #$01
 69A5: 34 01       PSHS   CC
 69A7: 0D 51       TST    $51
@@ -1196,11 +1197,13 @@ game_not_playing_694d:
 69B7: C6 FE       LDB    #$FE
 69B9: 86 01       LDA    #$01
 69BB: 35 81       PULS   CC,PC
+
 69BD: C5 01       BITB   #$01
 69BF: 27 06       BEQ    $69C7
 69C1: C6 FF       LDB    #$FF
 69C3: 86 00       LDA    #$00
 69C5: 35 81       PULS   CC,PC
+
 69C7: 1C FE       ANDCC  #$FE
 69C9: 35 84       PULS   B,PC	; just pop the stack, no CC restore, B was not saved
 
@@ -3683,7 +3686,7 @@ devil_takes_girl_7d80:
 81DA: C6 00       LDB    #$00
 81DC: D7 2A       STB    $2A
 81DE: BD 86 77    JSR    $8677
-81E1: 35 10       PULS   X
+81E1: 35 10       PULS   X		; restore X
 81E3: 7E 83 54    JMP    $8354
 
 81E6: 39          RTS
@@ -3865,7 +3868,7 @@ devil_takes_girl_7d80:
 834C: ED A1       STD    ,Y++
 834E: 0A E2       DEC    stack_save_00e2
 8350: 26 DC       BNE    $832E
-8352: 35 90       PULS   X,PC
+8352: 35 90       PULS   X,PC		; restore X saved at 8328
 
 8354: E6 03       LDB    $3,X
 8356: 5C          INCB
@@ -4345,7 +4348,7 @@ update_tile_column_86b1:
 8738: C6 00       LDB    #$00
 873A: D7 2B       STB    $2B
 873C: BD 8A F2    JSR    $8AF2
-873F: 35 10       PULS   X
+873F: 35 10       PULS   X		; restore X
 8741: 7E 8B 45    JMP    $8B45
 8744: 39          RTS
 8745: EC 19       LDD    -$7,X
@@ -4376,7 +4379,7 @@ update_tile_column_86b1:
 8776: C6 01       LDB    #$01
 8778: D7 2B       STB    $2B
 877A: BD 8A F2    JSR    $8AF2
-877D: 35 10       PULS   X
+877D: 35 10       PULS   X		; restore X
 877F: 7E 8B F6    JMP    $8BF6
 8782: 39          RTS
 8783: E6 04       LDB    $4,X
@@ -14255,7 +14258,8 @@ E7A6: 0F AC       CLR    armour_flag_00ac
 E7A8: 34 10       PSHS   X
 E7AA: 8E 05 10    LDX    #$0510
 E7AD: BD 9A 33    JSR    $9A33
-E7B0: 35 90       PULS   X,PC
+E7B0: 35 90       PULS   X,PC	; restore X and return
+
 E7B2: CC A6 31    LDD    #$A631
 E7B5: ED 03       STD    $3,X
 E7B7: E6 12       LDB    -$E,X
@@ -15083,7 +15087,7 @@ EF5A: CE EF 2D    LDU    #$EF2D
 EF5D: A6 C6       LDA    A,U
 EF5F: CB 20       ADDB   #$20
 EF61: DD E8       STD    $E8
-EF63: 34 10       PSHS   X
+EF63: 34 10       PSHS   X		; save X
 EF65: 33 84       LEAU   ,X
 EF67: 8E F0 36    LDX    #$F036
 EF6A: D6 73       LDB    weapon_type_0073
@@ -15145,7 +15149,7 @@ EFD5: E6 85       LDB    B,X
 EFD7: 86 0C       LDA    #$0C
 EFD9: 34 20       PSHS   Y
 EFDB: BD 69 09    JSR    $6909
-EFDE: 35 20       PULS   Y
+EFDE: 35 20       PULS   Y			; restore Y saved at EFD9
 EFE0: 68 50       ASL    -$10,U		; kill enemy: state 1 => 2
 EFE2: CC 02 00    LDD    #$0200
 EFE5: ED 53       STD    -$D,U
@@ -15175,7 +15179,7 @@ F011: ED 33       STD    -$D,Y
 F013: 31 A8 40    LEAY   $40,Y		; next player shot slot
 F016: 0A E1       DEC    $E1
 F018: 10 26 FF 6C LBNE   $EF88
-F01C: 35 90       PULS   X,PC
+F01C: 35 90       PULS   X,PC		; restore X saved at EF63 and return
 
 F0FB: D6 AD       LDB    $AD
 F0FD: 26 58       BNE    $F157

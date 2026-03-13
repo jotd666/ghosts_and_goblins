@@ -432,12 +432,12 @@ l_511e:
 	LOAD_D                                 	| [$512b: ldd    $22]
 	move.w	#0x23a1,d2                      	| [$512d: ldx    #$23a1]
 	add.w	#0x8,d2                          	| [$5130: leax   $8,x]
-	jmp	l_50e1                             	| [$5132: jmp    $50e1]
+	jra	l_50e1                             	| [$5132: jmp    $50e1]
 l_5135:
 	rts                                    	| [$5135: rts]
 l_5136:
 	move.b	#0x04,d1                        	| [$5136: ldb    #$04]
-	jmp	display_osd_text_489b              	| [$5138: jmp    display_osd_text_489b]
+	jra	display_osd_text_489b              	| [$5138: jmp    display_osd_text_489b]
 l_513b:
 	move.b	#0x07,d1                        	| [$513b: ldb    #$07]
 	move.w	#0x23a0,d2                      	| [$513d: ldx    #$23a0]
@@ -714,7 +714,7 @@ l_530f:
 	GET_DP_ADDRESS	0x55                    	| [$5317: ldy    $55]
 	MOVE_W_TO_REG	a0,d3                         	| [...]
 	move.b	#0x03,d1                        	| [$531a: ldb    #$03]
-	jmp	l_5025                             	| [$531c: jmp    $5025]
+	jra	l_5025                             	| [$531c: jmp    $5025]
 l_531f:
 	move.b	#0x0e,d1                        	| [$531f: ldb    #$0e]
 	jbsr	display_osd_text_489b             	| [$5321: jsr    display_osd_text_489b]
@@ -725,7 +725,7 @@ l_531f:
 	move.w	d4,d3                           	| [$5329: leay   $4,u]
 	addq.w	#0x4,d3                         	| [$5329: leay   $4,u]
 	move.b	#0x03,d1                        	| [$532b: ldb    #$03]
-	jmp	l_5025                             	| [$532d: jmp    $5025]
+	jra	l_5025                             	| [$532d: jmp    $5025]
 l_5330:
 	move.b	#0x0f,d1                        	| [$5330: ldb    #$0f]
 	jbsr	display_osd_text_489b             	| [$5332: jsr    display_osd_text_489b]
@@ -736,7 +736,7 @@ l_5330:
 	move.w	d4,d3                           	| [$533a: leay   $8,u]
 	add.w	#0x8,d3                          	| [$533a: leay   $8,u]
 	move.b	#0x03,d1                        	| [$533c: ldb    #$03]
-	jmp	l_5025                             	| [$533e: jmp    $5025]
+	jra	l_5025                             	| [$533e: jmp    $5025]
 l_5347:
 	move.l	d4,-(sp)                        	| [$5347: pshs   u]
 	OP_R_ON_DP_ADDRESS	move,0x51,d0         | [$5349: lda    $51]
@@ -1462,7 +1462,7 @@ l_57d4:
 	GET_DP_ADDRESS	0x55                    	| [$57dc: ldy    $55]
 	MOVE_W_TO_REG	a0,d3                         	| [...]
 	move.b	#0x01,d1                        	| [$57df: ldb    #$01]
-	jmp	l_5025                             	| [$57e1: jmp    $5025]
+	jra	l_5025                             	| [$57e1: jmp    $5025]
 l_57e4:
 	move.b	#0x29,d1                        	| [$57e4: ldb    #$29]
 	jbsr	display_osd_text_489b             	| [$57e6: jsr    display_osd_text_489b]
@@ -1473,7 +1473,7 @@ l_57e4:
 	move.w	d4,d3                           	| [$57ee: leay   $4,u]
 	addq.w	#0x4,d3                         	| [$57ee: leay   $4,u]
 	move.b	#0x01,d1                        	| [$57f0: ldb    #$01]
-	jmp	l_5025                             	| [$57f2: jmp    $5025]
+	jra	l_5025                             	| [$57f2: jmp    $5025]
 l_57f5:
 	move.b	#0x2a,d1                        	| [$57f5: ldb    #$2a]
 	jbsr	display_osd_text_489b             	| [$57f7: jsr    display_osd_text_489b]
@@ -1484,7 +1484,7 @@ l_57f5:
 	move.w	d4,d3                           	| [$57ff: leay   $8,u]
 	add.w	#0x8,d3                          	| [$57ff: leay   $8,u]
 	move.b	#0x01,d1                        	| [$5801: ldb    #$01]
-	jmp	l_5025                             	| [$5803: jmp    $5025]
+	jra	l_5025                             	| [$5803: jmp    $5025]
 
 l_580c:
 	move.w	#0x220a,d2                      	| [$580c: ldx    #$220a]
