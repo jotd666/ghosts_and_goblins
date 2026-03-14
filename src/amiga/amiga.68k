@@ -2816,22 +2816,6 @@ clear_planes_any_blitter_internal:
 	
 	
 	
-* what: blits 16x? data on one plane, cookie cut
-* args:
-* < A0: pointers on 16x? data
-* < A1: plane  (40 rows)
-* < A3: source mask for cookie cut (16x16)
-* < D0: X
-* < D1: Y
-* < D2: source y-offset
-* < D3: height of data
-* trashes: D0-D1
-blit_planes_cookie_cut_16x:
-    lea _custom,A5
-	move.w	d2,d5
-	move.w	d3,d4
-	moveq	#NB_PLAYFIELD_PLANES,d3		| 4 planes
-    moveq  #4,d2       | 16 pixels + 2 shift bytes
 * < A5: custom
 * < D0.W,D1.W: x,y
 * < A0: source (pointer on array of planes)
@@ -2926,7 +2910,11 @@ blit_planes_any_internal_cookie_cut:
 	WRITE_BLITTER_REG_LONG	a1,bltcpt	|pristine background top (bottom) left corner
 	WRITE_BLITTER_REG_LONG	a1,bltdpt	|destination top (bottom) left corner
 	WRITE_BLITTER_REG_SIZE	d4	|rectangle size, starts blit
-	add.l		#BG_SCREEN_PLANE_SIZE,a1
+	.if	BG_SCREEN_PLANE_SIZE > 0x7FFF
+	add.l	#BG_SCREEN_PLANE_SIZE,a1
+	.else
+	add.w	#BG_SCREEN_PLANE_SIZE,a1
+	.endif
 	WAIT_BLIT
 	dbf		d3,6b
 7:
