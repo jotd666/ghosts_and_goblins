@@ -268,7 +268,7 @@ l_60f6:
 	jne	l_60f6                             	| [$60fb: bne    $60f6]
 	move.w	#high_score_location_152c,d2    	| [$60fd: ldx    #high_score_location_152c]
 	move.w	#0x61aa,d3                      	| [$6100: ldy    #$61aa]
-	subq.w	#0x2,d5                         	| [$6104: leas   -$2,s]
+	subq.w	#0x2,d5                         	| [$6104: leas   -$2,s] [alloc_locals]
 	move.b	#0x0a,d0                        	| [$6106: lda    #$0a]
 	GET_REG_ADDRESS	0x1,d5                 	| [$6108: sta    $1,s]
 	move.b	d0,(a0)                         	| [...]
@@ -285,7 +285,7 @@ l_610a:
 	addq.w	#2,d2                           	| [...]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	move.b	#0x03,d1                        	| [$6112: ldb    #$03]
-	GET_REG_ADDRESS	0,d5                   	| [$6114: stb    ,s]
+	GET_REG_ADDRESS	0,d5                   	| [$6114: stb    ,s] [local]
 	move.b	d1,(a0)                         	| [...]
 l_6116:
 	GET_REG_ADDRESS	0,d3                   	| [$6116: lda    ,y+]
@@ -294,13 +294,13 @@ l_6116:
 	GET_REG_ADDRESS	0,d2                   	| [$6118: sta    ,x+]
 	addq.w	#1,d2                           	| [...]
 	move.b	d0,(a0)                         	| [...]
-	GET_REG_ADDRESS	0,d5                   	| [$611a: dec    ,s]
+	GET_REG_ADDRESS	0,d5                   	| [$611a: dec    ,s] [local]
 	subq.b	#1,(a0)                         	| [...]
 	jne	l_6116                             	| [$611c: bne    $6116]
-	GET_REG_ADDRESS	0x1,d5                 	| [$611e: dec    $1,s]
+	GET_REG_ADDRESS	0x1,d5                 	| [$611e: dec    $1,s] [local]
 	subq.b	#1,(a0)                         	| [...]
 	jne	l_610a                             	| [$6120: bne    $610a]
-	addq.w	#0x2,d5                         	| [$6122: leas   $2,s]
+	addq.w	#0x2,d5                         	| [$6122: leas   $2,s] [free_locals]
 	move.b	#0x0a,d1                        	| [$6124: ldb    #$0a]
 	move.w	#0x1518,d3                      	| [$6126: ldy    #$1518]
 	move.w	#high_score_location_152c,d2    	| [$612a: ldx    #high_score_location_152c]
@@ -553,9 +553,9 @@ change_background_62ab:
 	jbsr	compute_bank_address_from_b_6378  	| [$62e6: jsr    compute_bank_address_from_b_6378]
 	jbsr	compute_screen_start_address_6381 	| [$62e9: jsr    compute_screen_start_address_6381]
 	addq.w	#0x1,d4                         	| [$62ec: leau   $1,u]
-	subq.w	#0x2,d5                         	| [$62ee: leas   -$2,s]
+	subq.w	#0x2,d5                         	| [$62ee: leas   -$2,s] [alloc_locals]
 	move.b	#0x04,d1                        	| [$62f0: ldb    #$04] loop 4 times
-	GET_REG_ADDRESS	0x1,d5                 	| [$62f2: stb    $1,s]
+	GET_REG_ADDRESS	0x1,d5                 	| [$62f2: stb    $1,s] [local]
 	move.b	d1,(a0)                         	| [...]
 l_62f4:
 	move.b	#0x08,d1                        	| [$62f4: ldb    #$08]
@@ -563,14 +563,14 @@ l_62f4:
 	move.b	d1,(a0)                         	| [...]
 l_62f8:
 	jbsr	write_4_bg_tiles_633f             	| [$62f8: bsr    write_4_bg_tiles_633f]
-	GET_REG_ADDRESS	0,d5                   	| [$62fa: dec    ,s]
+	GET_REG_ADDRESS	0,d5                   	| [$62fa: dec    ,s] [local]
 	subq.b	#1,(a0)                         	| [...]
 	jne	l_62f8                             	| [$62fc: bne    $62f8]
 	add.w	#0x50,d4                         	| [$62fe: leau   $50,u]
-	GET_REG_ADDRESS	0x1,d5                 	| [$6301: dec    $1,s]
+	GET_REG_ADDRESS	0x1,d5                 	| [$6301: dec    $1,s] [local]
 	subq.b	#1,(a0)                         	| [...]
 	jne	l_62f4                             	| [$6303: bne    $62f4]
-	addq.w	#0x2,d5                         	| [$6305: leas   $2,s]
+	addq.w	#0x2,d5                         	| [$6305: leas   $2,s] [free_locals]
 	movem.l	(sp)+,d4                       	| [$6307: puls   u,pc] restore U saved at 62AB
 	rts                                    	| [...]
 
@@ -594,24 +594,24 @@ l_6309:
 	jbsr	compute_bank_address_from_b_6378  	| [$6320: bsr    compute_bank_address_from_b_6378]
 	jbsr	compute_screen_start_address_6381 	| [$6322: bsr    compute_screen_start_address_6381]
 	addq.w	#0x1,d4                         	| [$6324: leau   $1,u]
-	subq.w	#0x2,d5                         	| [$6326: leas   -$2,s]
+	subq.w	#0x2,d5                         	| [$6326: leas   -$2,s] [alloc_locals]
 	move.b	#0x08,d1                        	| [$6328: ldb    #$08] do that 8 times
 	GET_REG_ADDRESS	0x1,d5                 	| [$632a: stb    $1,s]
 	move.b	d1,(a0)                         	| [...]
 l_632c:
 	move.b	#0x08,d1                        	| [$632c: ldb    #$08] do that 8 times, 64 times total
-	GET_REG_ADDRESS	0,d5                   	| [$632e: stb    ,s]
+	GET_REG_ADDRESS	0,d5                   	| [$632e: stb    ,s] [local]
 	move.b	d1,(a0)                         	| [...]
 l_6330:
 	jbsr	write_4_bg_tiles_633f             	| [$6330: bsr    write_4_bg_tiles_633f]
-	GET_REG_ADDRESS	0,d5                   	| [$6332: dec    ,s]
+	GET_REG_ADDRESS	0,d5                   	| [$6332: dec    ,s] [local]
 	subq.b	#1,(a0)                         	| [...]
 	jne	l_6330                             	| [$6334: bne    $6330]
 	add.w	#0x50,d4                         	| [$6336: leau   $50,u]
-	GET_REG_ADDRESS	0x1,d5                 	| [$6339: dec    $1,s]
+	GET_REG_ADDRESS	0x1,d5                 	| [$6339: dec    $1,s] [local]
 	subq.b	#1,(a0)                         	| [...]
 	jne	l_632c                             	| [$633b: bne    $632c]
-	addq	#2,d5 |  [$633d: puls   d,pc]
+	addq	#2,d5 |  [$633d: puls   d,pc] [free_locals] pop stack & return
 	rts                                    	| [...]
 
 write_4_bg_tiles_633f:
@@ -1076,7 +1076,7 @@ l_666f:
 	GET_REG_ADDRESS	0,d3                   	| [$667b: stx    ,y++]
 	addq.w	#2,d3                           	| [...]
 	MOVE_W_FROM_REG	d2,a0                         	| [...]
-	movem.w	(a3)+,d1-d2  | same order than PULS we're lucky |  [$667d: puls   d,x]
+	movem.w	(a3)+,d1-d2  | same order than PULS we're lucky |  [$667d: puls   d,x] read values and advance
 	ZERO_MSW	d1
 	ZERO_MSW	d2
 	MAKE_A
@@ -1121,7 +1121,7 @@ update_sprites_palette_6693:
 	move.b	#0x08,d1                        	| [$66a4: ldb    #$08] 64 colors (8*8)
 	OP_W_ON_DP_ADDRESS	move,0xe0,d1         | [$66a6: stb    $e0]
 l_66a8:
-	movem.w	(a3)+,d1-d2  | same order than PULS we're lucky |  [$66a8: puls   d,x]
+	movem.w	(a3)+,d1-d2  | same order than PULS we're lucky |  [$66a8: puls   d,x] read values and advance
 	ZERO_MSW	d1
 	ZERO_MSW	d2
 	MAKE_A
@@ -1129,11 +1129,11 @@ l_66a8:
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	GET_REG_ADDRESS	0x0102,d3              	| [$66ae: stx    $0102,y]
 	MOVE_W_FROM_REG	d2,a0                         	| [...]
-	GET_REG_ADDRESS	0,d4                   	| [$66b2: pulu   d,x]
+	GET_REG_ADDRESS	0,d4                   	| [$66b2: pulu   d,x] read values and advance
 	sub.l	a0,d4
-	MOVE_W_TO_REG	a0,d1                         	| [$66b2: pulu   d,x]
+	MOVE_W_TO_REG	a0,d1                         	| [$66b2: pulu   d,x] read values and advance
 	addq	#2,a0
-	MOVE_W_TO_REG	a0,d2                         	| [$66b2: pulu   d,x]
+	MOVE_W_TO_REG	a0,d2                         	| [$66b2: pulu   d,x] read values and advance
 	addq	#2,a0
 	PUSH_SR                                	| [...]
 	MAKE_A                                 	| [...]
@@ -1146,7 +1146,7 @@ l_66a8:
 	GET_REG_ADDRESS	0,d3                   	| [$66b6: stx    ,y++]
 	addq.w	#2,d3                           	| [...]
 	MOVE_W_FROM_REG	d2,a0                         	| [...]
-	movem.w	(a3)+,d1-d2  | same order than PULS we're lucky |  [$66b8: puls   d,x]
+	movem.w	(a3)+,d1-d2  | same order than PULS we're lucky |  [$66b8: puls   d,x] read values and advance
 	ZERO_MSW	d1
 	ZERO_MSW	d2
 	MAKE_A
@@ -1154,11 +1154,11 @@ l_66a8:
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	GET_REG_ADDRESS	0x0102,d3              	| [$66be: stx    $0102,y]
 	MOVE_W_FROM_REG	d2,a0                         	| [...]
-	GET_REG_ADDRESS	0,d4                   	| [$66c2: pulu   d,x]
+	GET_REG_ADDRESS	0,d4                   	| [$66c2: pulu   d,x] read values and advance
 	sub.l	a0,d4
-	MOVE_W_TO_REG	a0,d1                         	| [$66c2: pulu   d,x]
+	MOVE_W_TO_REG	a0,d1                         	| [$66c2: pulu   d,x] read values and advance
 	addq	#2,a0
-	MOVE_W_TO_REG	a0,d2                         	| [$66c2: pulu   d,x]
+	MOVE_W_TO_REG	a0,d2                         	| [$66c2: pulu   d,x] read values and advance
 	addq	#2,a0
 	PUSH_SR                                	| [...]
 	MAKE_A                                 	| [...]
@@ -1200,7 +1200,7 @@ l_66d2:
 	move.b	#0x02,d1                        	| [$66ec: ldb    #$02]
 	OP_W_ON_DP_ADDRESS	move,0xe0,d1         | [$66ee: stb    $e0]
 l_66f0:
-	movem.w	(a3)+,d1-d2  | same order than PULS we're lucky |  [$66f0: puls   d,x]
+	movem.w	(a3)+,d1-d2  | same order than PULS we're lucky |  [$66f0: puls   d,x] read values and advance
 	ZERO_MSW	d1
 	ZERO_MSW	d2
 	MAKE_A
@@ -1225,7 +1225,7 @@ l_66f0:
 	GET_REG_ADDRESS	0,d3                   	| [$66fc: stx    ,y++]
 	addq.w	#2,d3                           	| [...]
 	MOVE_W_FROM_REG	d2,a0                         	| [...]
-	movem.w	(a3)+,d1-d2  | same order than PULS we're lucky |  [$66fe: puls   d,x]
+	movem.w	(a3)+,d1-d2  | same order than PULS we're lucky |  [$66fe: puls   d,x] read values and advance
 	ZERO_MSW	d1
 	ZERO_MSW	d2
 	MAKE_A
@@ -1277,7 +1277,7 @@ l_6720:
 	move.b	#0x08,d1                        	| [$6729: ldb    #$08]
 	OP_W_ON_DP_ADDRESS	move,0xe0,d1         | [$672b: stb    $e0]
 l_672d:
-	movem.w	(a3)+,d1-d2  | same order than PULS we're lucky |  [$672d: puls   d,x]
+	movem.w	(a3)+,d1-d2  | same order than PULS we're lucky |  [$672d: puls   d,x] read values and advance
 	ZERO_MSW	d1
 	ZERO_MSW	d2
 	MAKE_A
@@ -1557,9 +1557,9 @@ l_682e:
 	jbsr	l_6839                            	| [$682e: bsr    $6839]
 	GET_REG_ADDRESS	0x5,d2                 	| [$6830: clr    $5,x]
 	clr.b	(a0)                         	| [...]
-	move.l	d2,-(sp)                        	| [$6832: pshs   x]
+	move.l	d2,-(sp)                        	| [$6832: pshs   x] save X
 	jbsr	play_credit_sound_7950            	| [$6834: jsr    play_credit_sound_7950]
-	movem.l	(sp)+,d2                       	| [$6837: puls   x,pc] X saved at 6832
+	movem.l	(sp)+,d2                       	| [$6837: puls   x,pc] restore X saved at 6832
 	rts                                    	| [...]
 l_6839:
 	GET_REG_ADDRESS	0,d2                   	| [$6839: inc    ,x]
@@ -1888,6 +1888,7 @@ l_6988:
 	OP_W_ON_DP_ADDRESS	move,global_state_0002,d1| [$69a0: stb    global_state_0002]
 l_69a2:
 	rts                                    	| [$69a2: rts]
+
 l_69a3:
 	SET_XC_FLAGS                           	| [$69a3: orcc   #$01]
 	PUSH_SR                                	| [$69a5: pshs   cc]
@@ -1905,6 +1906,7 @@ l_69af:
 	move.b	#0x01,d0                        	| [$69b9: lda    #$01]
 	POP_SR                                 	| [$69bb: puls   cc,pc]
 	rts                                    	| [...]
+
 l_69bd:
 	BIT	#0x01,d1                           	| [$69bd: bitb   #$01]
 	jeq	l_69c7                             	| [$69bf: beq    $69c7]
@@ -1912,6 +1914,7 @@ l_69bd:
 	move.b	#0x00,d0                        	| [$69c3: lda    #$00]
 	POP_SR                                 	| [$69c5: puls   cc,pc]
 	rts                                    	| [...]
+
 l_69c7:
 	CLR_XC_FLAGS                           	| [$69c7: andcc  #$fe]
 	addq	#2,sp |  [$69c9: puls   b,pc] just pop the stack, no CC restore, B was not saved
@@ -5973,7 +5976,7 @@ l_81d0:
 	move.b	#0x00,d1                        	| [$81da: ldb    #$00]
 	OP_W_ON_DP_ADDRESS	move,0x2a,d1         | [$81dc: stb    $2a]
 	jbsr	l_8677                            	| [$81de: jsr    $8677]
-	movem.l	(sp)+,d2                       	| [$81e1: puls   x]
+	movem.l	(sp)+,d2                       	| [$81e1: puls   x] restore X
 	jra	l_8354                             	| [$81e3: jmp    $8354]
 
 l_81e6:
@@ -6309,7 +6312,7 @@ l_832e:
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	OP_W_ON_DP_ADDRESS	subq,stack_save_00e2,#1| [$834e: dec    stack_save_00e2]
 	jne	l_832e                             	| [$8350: bne    $832e]
-	movem.l	(sp)+,d2                       	| [$8352: puls   x,pc]
+	movem.l	(sp)+,d2                       	| [$8352: puls   x,pc] restore X saved at 8328
 	rts                                    	| [...]
 
 l_8354:
@@ -7202,7 +7205,7 @@ l_8710:
 	move.b	#0x00,d1                        	| [$8738: ldb    #$00]
 	OP_W_ON_DP_ADDRESS	move,0x2b,d1         | [$873a: stb    $2b]
 	jbsr	l_8af2                            	| [$873c: jsr    $8af2]
-	movem.l	(sp)+,d2                       	| [$873f: puls   x]
+	movem.l	(sp)+,d2                       	| [$873f: puls   x] restore X
 	jra	l_8b45                             	| [$8741: jmp    $8b45]
 l_8744:
 	rts                                    	| [$8744: rts]
@@ -7259,7 +7262,7 @@ l_8763:
 	move.b	#0x01,d1                        	| [$8776: ldb    #$01]
 	OP_W_ON_DP_ADDRESS	move,0x2b,d1         | [$8778: stb    $2b]
 	jbsr	l_8af2                            	| [$877a: jsr    $8af2]
-	movem.l	(sp)+,d2                       	| [$877d: puls   x]
+	movem.l	(sp)+,d2                       	| [$877d: puls   x] restore X
 	jra	l_8bf6                             	| [$877f: jmp    $8bf6]
 l_8782:
 	rts                                    	| [$8782: rts]
@@ -26030,10 +26033,8 @@ l_e663:
 	GET_REG_ADDRESS	-0xb,d2                	| [$e668: clr    -$b,x]
 	clr.b	(a0)                         	| [...]
 	rts                                    	| [$e66a: rts]
-	GET_ADDRESS	0x8083                     	| [$e66b: clr    $8083]
-	clr.b	(a0)                         	| [...]
-	GET_REG_ADDRESS	0xb,d5                 	| [$e66e: ldb    $b,s]
-	move.b	(a0),d1                         	| [...]
+
+
 l_e670:
 	move.b	#0x04,d0                        	| [$e670: lda    #$04]
 	jbsr	osd_set_bank |  [$e672: sta    bankswitch_3e00]
@@ -26366,8 +26367,9 @@ l_e79e:
 	move.l	d2,-(sp)                        	| [$e7a8: pshs   x]
 	move.w	#0x0510,d2                      	| [$e7aa: ldx    #$0510]
 	jbsr	l_9a33                            	| [$e7ad: jsr    $9a33]
-	movem.l	(sp)+,d2                       	| [$e7b0: puls   x,pc]
+	movem.l	(sp)+,d2                       	| [$e7b0: puls   x,pc] restore X and return
 	rts                                    	| [...]
+
 l_e7b2:
 	move.b	#0xa6,d0                        	| [$e7b2: ldd    #$a631]
 	move.w	#0xa631,d1                      	| [$e7b2: ldd    #$a631]
@@ -27874,7 +27876,7 @@ enemy_shot_collision_ef4a:
 	MAKE_D                                 	| [...]
 	GET_DP_ADDRESS	0xe8                    	| [$ef61: std    $e8]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
-	move.l	d2,-(sp)                        	| [$ef63: pshs   x]
+	move.l	d2,-(sp)                        	| [$ef63: pshs   x] save X
 	move.w	d2,d4                           	| [$ef65: leau   ,x]
 	move.w	#0xf036,d2                      	| [$ef67: ldx    #$f036]
 	OP_R_ON_DP_ADDRESS	move,weapon_type_0073,d1| [$ef6a: ldb    weapon_type_0073]
@@ -28003,7 +28005,7 @@ l_efd0:
 	move.b	#0x0c,d0                        	| [$efd7: lda    #$0c]
 	move.l	d3,-(sp)                        	| [$efd9: pshs   y]
 	jbsr	l_6909                            	| [$efdb: jsr    $6909]
-	movem.l	(sp)+,d3                       	| [$efde: puls   y]
+	movem.l	(sp)+,d3                       	| [$efde: puls   y] restore Y saved at EFD9
 	GET_REG_ADDRESS	-0x10,d4               	| [$efe0: asl    -$10,u] kill enemy: state 1 => 2
 	move.b	(a0),d6	| [$efe0: asl    -$10,u] kill enemy: state 1 => 2
 	asl.b	#1,d6                          	| [$efe0: asl    -$10,u] kill enemy: state 1 => 2
@@ -28063,7 +28065,7 @@ l_f013:
 	add.w	#0x40,d3                         	| [$f013: leay   $40,y] next player shot slot
 	OP_W_ON_DP_ADDRESS	subq,0xe1,#1         | [$f016: dec    $e1]
 	jne	l_ef88                             	| [$f018: lbne   $ef88]
-	movem.l	(sp)+,d2                       	| [$f01c: puls   x,pc]
+	movem.l	(sp)+,d2                       	| [$f01c: puls   x,pc] restore X saved at EF63 and return
 	rts                                    	| [...]
 
 l_f0fb:

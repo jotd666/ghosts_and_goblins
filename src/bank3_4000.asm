@@ -7,18 +7,18 @@ high_score_00d0 = $d0
 clear_screen_and_show_status_4800:
 4800: 8E 20 00    LDX    #$2000
 4803: 10 8E 00 20 LDY    #$0020
-4807: 32 7F       LEAS   -$1,S
+4807: 32 7F       LEAS   -$1,S		; [alloc_locals]
 4809: C6 20       LDB    #$20
-480B: E7 E4       STB    ,S			; do it 32 times
+480B: E7 E4       STB    ,S			; [local] do it 32 times
 480D: 86 20       LDA    #$20
 480F: C6 00       LDB    #$00
 4811: E7 89 04 00 STB    $0400,X		; [unchecked_address]
 4815: A7 80       STA    ,X+		    ; [video_address]
-4817: 6A E4       DEC    ,S				; count one iteration
+4817: 6A E4       DEC    ,S				; [local] count one iteration
 4819: 26 F6       BNE    $4811
 481B: 31 3F       LEAY   -$1,Y
 481D: 26 EA       BNE    $4809
-481F: 32 61       LEAS   $1,S
+481F: 32 61       LEAS   $1,S		; [free_locals]
 4821: 5F          CLRB
 4822: BD 48 9B    JSR    display_osd_text_489b
 4825: 10 8E 00 D0 LDY    #$00D0
@@ -120,7 +120,7 @@ l_5025:
 502F: 0A FC       DEC    $FC
 5031: 26 FA       BNE    $502D
 5033: 35 04       PULS   B
-5035: AE E4       LDX    ,S
+5035: AE E4       LDX    ,S		; [handled]
 5037: 86 04       LDA    #$04
 5039: 97 FC       STA    $FC
 503B: 8D 14       BSR    write_one_digit_to_screen_5051
@@ -461,7 +461,7 @@ copy_highscores_53a3:
 53BB: 10 AE A4    LDY    ,Y
 53BE: 31 24       LEAY   $4,Y
 53C0: BD 53 E1    JSR    $53E1
-53C3: 10 AE E4    LDY    ,S
+53C3: 10 AE E4    LDY    ,S		; [handled]
 53C6: 10 AE A4    LDY    ,Y
 53C9: 30 44       LEAX   $4,U
 53CB: C6 04       LDB    #$04
@@ -472,7 +472,7 @@ copy_highscores_53a3:
 53D7: 31 22       LEAY   $2,Y		; Y += 2
 53D9: 6A E4       DEC    ,S			; count one iteration
 53DB: 26 DA       BNE    $53B7
-53DD: 32 61       LEAS   $1,S
+53DD: 32 61       LEAS   $1,S		; [free_locals]
 53DF: 35 C0       PULS   U,PC
 
 53E1: 86 03       LDA    #$03
@@ -1146,6 +1146,7 @@ jump_table_59c8:
 59E9: BD 69 09    JSR    $6909
 59EC: 0C 0B       INC    $0B
 59EE: 39          RTS
+
 59EF: 86 40       LDA    #$40
 59F1: A7 7F       STA    -$1,S
 59F3: 86 30       LDA    #$30
@@ -1467,10 +1468,10 @@ display_high_score_entry_5c3a:
 5C53: C1 7A       CMPB   #$7A
 5C55: 27 0E       BEQ    $5C65		; last letter: out
 5C57: 5C          INCB
-5C58: 6A E4       DEC    ,S
+5C58: 6A E4       DEC    ,S		; [local]
 5C5A: 26 E9       BNE    $5C45
 5C5C: 86 0D       LDA    #$0D
-5C5E: A7 E4       STA    ,S		; reload column count
+5C5E: A7 E4       STA    ,S		; [local] reload column count
 5C60: 33 C8 26    LEAU   $26,U
 5C63: 20 E0       BRA    $5C45
 5C65: 33 C8 26    LEAU   $26,U
@@ -1482,7 +1483,7 @@ display_high_score_entry_5c3a:
 5C72: E7 C1       STB    ,U++       ; [video_address]
 5C74: 6A E4       DEC    ,S
 5C76: 26 F4       BNE    $5C6C
-5C78: 32 61       LEAS   $1,S
+5C78: 32 61       LEAS   $1,S		; [free_locals]
 5C7A: 33 5E       LEAU   -$2,U
 5C7C: EF 23       STU    $3,Y
 5C7E: 39          RTS

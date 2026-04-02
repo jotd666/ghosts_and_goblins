@@ -37,10 +37,10 @@ clear_screen_and_show_status_4800:
 l_4800:
 	move.w	#0x2000,d2                      	| [$4800: ldx    #$2000]
 	move.w	#0x0020,d3                      	| [$4803: ldy    #$0020]
-	subq.w	#0x1,d5                         	| [$4807: leas   -$1,s]
+	subq.w	#0x1,d5                         	| [$4807: leas   -$1,s] [alloc_locals]
 l_4809:
 	move.b	#0x20,d1                        	| [$4809: ldb    #$20]
-	GET_REG_ADDRESS	0,d5                   	| [$480b: stb    ,s] do it 32 times
+	GET_REG_ADDRESS	0,d5                   	| [$480b: stb    ,s] [local] do it 32 times
 	move.b	d1,(a0)                         	| [...]
 	move.b	#0x20,d0                        	| [$480d: lda    #$20]
 	move.b	#0x00,d1                        	| [$480f: ldb    #$00]
@@ -51,12 +51,12 @@ l_4811:
 	addq.w	#1,d2                           	| [...]
 	move.b	d0,(a0)                         	| [...]
 	VIDEO_BYTE_DIRTY | [...]
-	GET_REG_ADDRESS	0,d5                   	| [$4817: dec    ,s] count one iteration
+	GET_REG_ADDRESS	0,d5                   	| [$4817: dec    ,s] [local] count one iteration
 	subq.b	#1,(a0)                         	| [...]
 	jne	l_4811                             	| [$4819: bne    $4811]
 	subq.w	#0x1,d3                         	| [$481b: leay   -$1,y]
 	jne	l_4809                             	| [$481d: bne    $4809]
-	addq.w	#0x1,d5                         	| [$481f: leas   $1,s]
+	addq.w	#0x1,d5                         	| [$481f: leas   $1,s] [free_locals]
 	moveq	#0,d1                            	| [$4821: clrb]
 	jbsr	display_osd_text_489b             	| [$4822: jsr    display_osd_text_489b]
 	move.w	#0x00d0,d3                      	| [$4825: ldy    #$00d0]
@@ -218,7 +218,7 @@ l_502d:
 	OP_W_ON_DP_ADDRESS	subq,0xfc,#1         | [$502f: dec    $fc]
 	jne	l_502d                             	| [$5031: bne    $502d]
 	movem.l	(sp)+,d1                       	| [$5033: puls   b]
-	move.l	(sp),d2 |  [$5035: ldx    ,s]
+	move.l	(sp),d2 |  [$5035: ldx    ,s] [handled]
 	move.b	#0x04,d0                        	| [$5037: lda    #$04]
 	OP_W_ON_DP_ADDRESS	move,0xfc,d0         | [$5039: sta    $fc]
 l_503b:
@@ -818,7 +818,7 @@ l_53b7:
 	MOVE_W_TO_REG	a0,d3                         	| [...]
 	addq.w	#0x4,d3                         	| [$53be: leay   $4,y]
 	jbsr	l_53e1                            	| [$53c0: jsr    $53e1]
-	move.l	(sp),d3 |  [$53c3: ldy    ,s]
+	move.l	(sp),d3 |  [$53c3: ldy    ,s] [handled]
 	GET_REG_ADDRESS	0,d3                   	| [$53c6: ldy    ,y]
 	MOVE_W_TO_REG	a0,d3                         	| [...]
 	move.w	d4,d2                           	| [$53c9: leax   $4,u]
@@ -832,7 +832,7 @@ l_53b7:
 	GET_REG_ADDRESS	0,d5                   	| [$53d9: dec    ,s] count one iteration
 	subq.b	#1,(a0)                         	| [...]
 	jne	l_53b7                             	| [$53db: bne    $53b7]
-	addq.w	#0x1,d5                         	| [$53dd: leas   $1,s]
+	addq.w	#0x1,d5                         	| [$53dd: leas   $1,s] [free_locals]
 	movem.l	(sp)+,d4                       	| [$53df: puls   u,pc]
 	rts                                    	| [...]
 
@@ -1842,6 +1842,7 @@ l_59e2:
 	jbsr	l_6909                            	| [$59e9: jsr    $6909]
 	OP_W_ON_DP_ADDRESS	addq,0x0b,#1         | [$59ec: inc    $0b]
 	rts                                    	| [$59ee: rts]
+
 l_59ef:
 	move.b	#0x40,d0                        	| [$59ef: lda    #$40]
 	GET_REG_ADDRESS	-0x1,d5                	| [$59f1: sta    -$1,s]
@@ -2346,11 +2347,11 @@ l_5c53:
 	cmp.b	#0x7a,d1                         	| [$5c53: cmpb   #$7a]
 	jeq	l_5c65                             	| [$5c55: beq    $5c65] last letter: out
 	addq.b	#1,d1                           	| [$5c57: incb]
-	GET_REG_ADDRESS	0,d5                   	| [$5c58: dec    ,s]
+	GET_REG_ADDRESS	0,d5                   	| [$5c58: dec    ,s] [local]
 	subq.b	#1,(a0)                         	| [...]
 	jne	l_5c45                             	| [$5c5a: bne    $5c45]
 	move.b	#0x0d,d0                        	| [$5c5c: lda    #$0d]
-	| [$5c5e: sta    ,s] reload column count
+	| [$5c5e: sta    ,s] [local] reload column count
 	move.b	d0,(a0)                         	| [...]
 	add.w	#0x26,d4                         	| [$5c60: leau   $26,u]
 	jra	l_5c45                             	| [$5c63: bra    $5c45]
@@ -2373,7 +2374,7 @@ l_5c6c:
 	GET_REG_ADDRESS	0,d5                   	| [$5c74: dec    ,s]
 	subq.b	#1,(a0)                         	| [...]
 	jne	l_5c6c                             	| [$5c76: bne    $5c6c]
-	addq.w	#0x1,d5                         	| [$5c78: leas   $1,s]
+	addq.w	#0x1,d5                         	| [$5c78: leas   $1,s] [free_locals]
 	subq.w	#0x2,d4                         	| [$5c7a: leau   -$2,u]
 	GET_REG_ADDRESS	0x3,d3                 	| [$5c7c: stu    $3,y]
 	MOVE_W_FROM_REG	d4,a0                         	| [...]
