@@ -5990,9 +5990,11 @@ l_81e7:
 	LOAD_D                                 	| [$81ef: ldd    background_screen_location_006c]
 	add.b	#0x01,d1                         	| [$81f1: addb   #$01]
 	and.b	#0x1f,d1                         	| [$81f3: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$81f5: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,0x6d,d1         | [$81f7: ldb    $6d]
 	and.b	#0xe0,d1                         	| [$81f9: andb   #$e0]
 	GET_REG_ADDRESS	0,d5                   	| [$81fb: orb    ,s+]
@@ -6005,9 +6007,11 @@ l_81e7:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8202: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8204: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,background_screen_location_006c,d0| [$8206: lda    background_screen_location_006c]
 	and.b	#0xfe,d0                         	| [$8208: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$820a: ora    ,s+]
@@ -6024,9 +6028,11 @@ l_81e7:
 	LOAD_D                                 	| [$8216: ldd    background_screen_location_006c]
 	add.b	#0x01,d1                         	| [$8218: addb   #$01]
 	and.b	#0x1f,d1                         	| [$821a: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$821c: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,0x6d,d1         | [$821e: ldb    $6d]
 	and.b	#0xe0,d1                         	| [$8220: andb   #$e0]
 	GET_REG_ADDRESS	0,d5                   	| [$8222: orb    ,s+]
@@ -6039,9 +6045,11 @@ l_81e7:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8229: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$822b: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,background_screen_location_006c,d0| [$822d: lda    background_screen_location_006c]
 	and.b	#0xfe,d0                         	| [$822f: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$8231: ora    ,s+]
@@ -6058,9 +6066,11 @@ l_81e7:
 	LOAD_D                                 	| [$823d: ldd    background_screen_location_006c]
 	add.b	#0x01,d1                         	| [$823f: addb   #$01]
 	and.b	#0x1f,d1                         	| [$8241: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8243: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,0x6d,d1         | [$8245: ldb    $6d]
 	and.b	#0xe0,d1                         	| [$8247: andb   #$e0]
 	GET_REG_ADDRESS	0,d5                   	| [$8249: orb    ,s+]
@@ -6073,9 +6083,11 @@ l_81e7:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8250: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8252: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,background_screen_location_006c,d0| [$8254: lda    background_screen_location_006c]
 	and.b	#0xfe,d0                         	| [$8256: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$8258: ora    ,s+]
@@ -6173,9 +6185,11 @@ l_82b4:
 	LOAD_D                                 	| [$82b4: ldd    background_screen_location_006c]
 	add.b	#0x01,d1                         	| [$82b6: addb   #$01]
 	and.b	#0x1f,d1                         	| [$82b8: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$82ba: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,0x6d,d1         | [$82bc: ldb    $6d]
 	and.b	#0xe0,d1                         	| [$82be: andb   #$e0]
 	GET_REG_ADDRESS	0,d5                   	| [$82c0: orb    ,s+]
@@ -6188,9 +6202,11 @@ l_82b4:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$82c7: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$82c9: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,background_screen_location_006c,d0| [$82cb: lda    background_screen_location_006c]
 	and.b	#0xfe,d0                         	| [$82cd: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$82cf: ora    ,s+]
@@ -6207,9 +6223,11 @@ l_82b4:
 	LOAD_D                                 	| [$82db: ldd    background_screen_location_006c]
 	add.b	#0x01,d1                         	| [$82dd: addb   #$01]
 	and.b	#0x1f,d1                         	| [$82df: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$82e1: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,0x6d,d1         | [$82e3: ldb    $6d]
 	and.b	#0xe0,d1                         	| [$82e5: andb   #$e0]
 	GET_REG_ADDRESS	0,d5                   	| [$82e7: orb    ,s+]
@@ -6222,9 +6240,11 @@ l_82b4:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$82ee: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$82f0: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,background_screen_location_006c,d0| [$82f2: lda    background_screen_location_006c]
 	and.b	#0xfe,d0                         	| [$82f4: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$82f6: ora    ,s+]
@@ -6241,9 +6261,11 @@ l_82b4:
 	LOAD_D                                 	| [$8302: ldd    background_screen_location_006c]
 	add.b	#0x01,d1                         	| [$8304: addb   #$01]
 	and.b	#0x1f,d1                         	| [$8306: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8308: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,0x6d,d1         | [$830a: ldb    $6d]
 	and.b	#0xe0,d1                         	| [$830c: andb   #$e0]
 	GET_REG_ADDRESS	0,d5                   	| [$830e: orb    ,s+]
@@ -6256,9 +6278,11 @@ l_82b4:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8315: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8317: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,background_screen_location_006c,d0| [$8319: lda    background_screen_location_006c]
 	and.b	#0xfe,d0                         	| [$831b: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$831d: ora    ,s+]
@@ -6329,9 +6353,11 @@ l_8354:
 	LOAD_D                                 	| [$8361: ldd    $8,x]
 	add.b	#0x01,d1                         	| [$8363: addb   #$01]
 	and.b	#0x1f,d1                         	| [$8365: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8367: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$8369: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$836b: andb   #$e0]
@@ -6346,9 +6372,11 @@ l_8354:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8374: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8376: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$8378: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$837a: anda   #$fe]
@@ -6377,9 +6405,11 @@ l_8380:
 	LOAD_D                                 	| [$8392: ldd    background_screen_location_006c]
 	add.b	#0x01,d1                         	| [$8394: addb   #$01]
 	and.b	#0x1f,d1                         	| [$8396: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8398: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,0x6d,d1         | [$839a: ldb    $6d]
 	and.b	#0xe0,d1                         	| [$839c: andb   #$e0]
 	GET_REG_ADDRESS	0,d5                   	| [$839e: orb    ,s+]
@@ -6392,9 +6422,11 @@ l_8380:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$83a5: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$83a7: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,background_screen_location_006c,d0| [$83a9: lda    background_screen_location_006c]
 	and.b	#0xfe,d0                         	| [$83ab: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$83ad: ora    ,s+]
@@ -6591,9 +6623,11 @@ l_846e:
 	LOAD_D                                 	| [$8476: ldd    background_screen_location_006c]
 	add.b	#0xff,d1                         	| [$8478: addb   #$ff]
 	and.b	#0x1f,d1                         	| [$847a: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$847c: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,0x6d,d1         | [$847e: ldb    $6d]
 	and.b	#0xe0,d1                         	| [$8480: andb   #$e0]
 	GET_REG_ADDRESS	0,d5                   	| [$8482: orb    ,s+]
@@ -6606,9 +6640,11 @@ l_846e:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8489: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$848b: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,background_screen_location_006c,d0| [$848d: lda    background_screen_location_006c]
 	and.b	#0xfe,d0                         	| [$848f: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$8491: ora    ,s+]
@@ -6625,9 +6661,11 @@ l_846e:
 	LOAD_D                                 	| [$849e: ldd    background_screen_location_006c]
 	add.b	#0xff,d1                         	| [$84a0: addb   #$ff]
 	and.b	#0x1f,d1                         	| [$84a2: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$84a4: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,0x6d,d1         | [$84a6: ldb    $6d]
 	and.b	#0xe0,d1                         	| [$84a8: andb   #$e0]
 	GET_REG_ADDRESS	0,d5                   	| [$84aa: orb    ,s+]
@@ -6640,9 +6678,11 @@ l_846e:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$84b1: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$84b3: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,background_screen_location_006c,d0| [$84b5: lda    background_screen_location_006c]
 	and.b	#0xfe,d0                         	| [$84b7: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$84b9: ora    ,s+]
@@ -6659,9 +6699,11 @@ l_846e:
 	LOAD_D                                 	| [$84c6: ldd    background_screen_location_006c]
 	add.b	#0xff,d1                         	| [$84c8: addb   #$ff]
 	and.b	#0x1f,d1                         	| [$84ca: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$84cc: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,0x6d,d1         | [$84ce: ldb    $6d]
 	and.b	#0xe0,d1                         	| [$84d0: andb   #$e0]
 	GET_REG_ADDRESS	0,d5                   	| [$84d2: orb    ,s+]
@@ -6674,9 +6716,11 @@ l_846e:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$84d9: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$84db: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,background_screen_location_006c,d0| [$84dd: lda    background_screen_location_006c]
 	and.b	#0xfe,d0                         	| [$84df: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$84e1: ora    ,s+]
@@ -6741,9 +6785,11 @@ l_8520:
 	LOAD_D                                 	| [$8520: ldd    background_screen_location_006c]
 	add.b	#0xff,d1                         	| [$8522: addb   #$ff]
 	and.b	#0x1f,d1                         	| [$8524: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8526: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,0x6d,d1         | [$8528: ldb    $6d]
 	and.b	#0xe0,d1                         	| [$852a: andb   #$e0]
 	GET_REG_ADDRESS	0,d5                   	| [$852c: orb    ,s+]
@@ -6756,9 +6802,11 @@ l_8520:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8533: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8535: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,background_screen_location_006c,d0| [$8537: lda    background_screen_location_006c]
 	and.b	#0xfe,d0                         	| [$8539: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$853b: ora    ,s+]
@@ -6775,9 +6823,11 @@ l_8520:
 	LOAD_D                                 	| [$8548: ldd    background_screen_location_006c]
 	add.b	#0xff,d1                         	| [$854a: addb   #$ff]
 	and.b	#0x1f,d1                         	| [$854c: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$854e: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,0x6d,d1         | [$8550: ldb    $6d]
 	and.b	#0xe0,d1                         	| [$8552: andb   #$e0]
 	GET_REG_ADDRESS	0,d5                   	| [$8554: orb    ,s+]
@@ -6790,9 +6840,11 @@ l_8520:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$855b: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$855d: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,background_screen_location_006c,d0| [$855f: lda    background_screen_location_006c]
 	and.b	#0xfe,d0                         	| [$8561: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$8563: ora    ,s+]
@@ -6809,9 +6861,11 @@ l_8520:
 	LOAD_D                                 	| [$8570: ldd    background_screen_location_006c]
 	add.b	#0xff,d1                         	| [$8572: addb   #$ff]
 	and.b	#0x1f,d1                         	| [$8574: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8576: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,0x6d,d1         | [$8578: ldb    $6d]
 	and.b	#0xe0,d1                         	| [$857a: andb   #$e0]
 	GET_REG_ADDRESS	0,d5                   	| [$857c: orb    ,s+]
@@ -6824,9 +6878,11 @@ l_8520:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8583: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8585: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,background_screen_location_006c,d0| [$8587: lda    background_screen_location_006c]
 	and.b	#0xfe,d0                         	| [$8589: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$858b: ora    ,s+]
@@ -6852,9 +6908,11 @@ l_8599:
 	LOAD_D                                 	| [$85a4: ldd    $8,x]
 	add.b	#0xff,d1                         	| [$85a6: addb   #$ff]
 	and.b	#0x1f,d1                         	| [$85a8: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$85aa: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$85ac: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$85ae: andb   #$e0]
@@ -6869,9 +6927,11 @@ l_8599:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$85b7: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$85b9: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$85bb: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$85bd: anda   #$fe]
@@ -6901,9 +6961,11 @@ l_85c3:
 	LOAD_D                                 	| [$85d7: ldd    background_screen_location_006c]
 	add.b	#0xff,d1                         	| [$85d9: addb   #$ff]
 	and.b	#0x1f,d1                         	| [$85db: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$85dd: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,0x6d,d1         | [$85df: ldb    $6d]
 	and.b	#0xe0,d1                         	| [$85e1: andb   #$e0]
 	GET_REG_ADDRESS	0,d5                   	| [$85e3: orb    ,s+]
@@ -6916,9 +6978,11 @@ l_85c3:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$85ea: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$85ec: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	OP_R_ON_DP_ADDRESS	move,background_screen_location_006c,d0| [$85ee: lda    background_screen_location_006c]
 	and.b	#0xfe,d0                         	| [$85f0: anda   #$fe]
 	GET_REG_ADDRESS	0,d5                   	| [$85f2: ora    ,s+]
@@ -7275,9 +7339,11 @@ l_8783:
 	LOAD_D                                 	| [$878b: ldd    $8,x]
 	add.b	#0xff,d1                         	| [$878d: addb   #$ff]
 	and.b	#0x1f,d1                         	| [$878f: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8791: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$8793: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$8795: andb   #$e0]
@@ -7292,9 +7358,11 @@ l_8783:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$879e: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$87a0: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$87a2: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$87a4: anda   #$fe]
@@ -7312,9 +7380,11 @@ l_8783:
 	LOAD_D                                 	| [$87b3: ldd    $8,x]
 	add.b	#0x00,d1                         	| [$87b5: addb   #$00]
 	and.b	#0x1f,d1                         	| [$87b7: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$87b9: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$87bb: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$87bd: andb   #$e0]
@@ -7329,9 +7399,11 @@ l_8783:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$87c6: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$87c8: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$87ca: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$87cc: anda   #$fe]
@@ -7349,9 +7421,11 @@ l_8783:
 	LOAD_D                                 	| [$87db: ldd    $8,x]
 	add.b	#0x01,d1                         	| [$87dd: addb   #$01]
 	and.b	#0x1f,d1                         	| [$87df: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$87e1: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$87e3: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$87e5: andb   #$e0]
@@ -7366,9 +7440,11 @@ l_8783:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$87ee: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$87f0: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$87f2: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$87f4: anda   #$fe]
@@ -7423,9 +7499,11 @@ l_8827:
 	LOAD_D                                 	| [$8827: ldd    $8,x]
 	add.b	#0xff,d1                         	| [$8829: addb   #$ff]
 	and.b	#0x1f,d1                         	| [$882b: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$882d: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$882f: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$8831: andb   #$e0]
@@ -7440,9 +7518,11 @@ l_8827:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$883a: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$883c: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$883e: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8840: anda   #$fe]
@@ -7460,9 +7540,11 @@ l_8827:
 	LOAD_D                                 	| [$884f: ldd    $8,x]
 	add.b	#0x00,d1                         	| [$8851: addb   #$00]
 	and.b	#0x1f,d1                         	| [$8853: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8855: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$8857: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$8859: andb   #$e0]
@@ -7477,9 +7559,11 @@ l_8827:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8862: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8864: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$8866: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8868: anda   #$fe]
@@ -7497,9 +7581,11 @@ l_8827:
 	LOAD_D                                 	| [$8877: ldd    $8,x]
 	add.b	#0x01,d1                         	| [$8879: addb   #$01]
 	and.b	#0x1f,d1                         	| [$887b: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$887d: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$887f: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$8881: andb   #$e0]
@@ -7514,9 +7600,11 @@ l_8827:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$888a: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$888c: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$888e: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8890: anda   #$fe]
@@ -7539,9 +7627,11 @@ l_88a0:
 	LOAD_D                                 	| [$88a8: ldd    $8,x]
 	add.b	#0xff,d1                         	| [$88aa: addb   #$ff]
 	and.b	#0x1f,d1                         	| [$88ac: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$88ae: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$88b0: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$88b2: andb   #$e0]
@@ -7556,9 +7646,11 @@ l_88a0:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$88bb: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$88bd: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$88bf: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$88c1: anda   #$fe]
@@ -7572,9 +7664,11 @@ l_88a0:
 	LOAD_D                                 	| [$88c7: ldd    $8,x]
 	add.b	#0xff,d1                         	| [$88c9: addb   #$ff]
 	and.b	#0x1f,d1                         	| [$88cb: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$88cd: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$88cf: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$88d1: andb   #$e0]
@@ -7589,9 +7683,11 @@ l_88a0:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$88da: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$88dc: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$88de: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$88e0: anda   #$fe]
@@ -7608,9 +7704,11 @@ l_88a0:
 	LOAD_D                                 	| [$88f0: ldd    $8,x]
 	add.b	#0x00,d1                         	| [$88f2: addb   #$00]
 	and.b	#0x1f,d1                         	| [$88f4: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$88f6: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$88f8: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$88fa: andb   #$e0]
@@ -7625,9 +7723,11 @@ l_88a0:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8903: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8905: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$8907: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8909: anda   #$fe]
@@ -7641,9 +7741,11 @@ l_88a0:
 	LOAD_D                                 	| [$890f: ldd    $8,x]
 	add.b	#0x00,d1                         	| [$8911: addb   #$00]
 	and.b	#0x1f,d1                         	| [$8913: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8915: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$8917: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$8919: andb   #$e0]
@@ -7658,9 +7760,11 @@ l_88a0:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8922: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8924: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$8926: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8928: anda   #$fe]
@@ -7677,9 +7781,11 @@ l_88a0:
 	LOAD_D                                 	| [$8936: ldd    $8,x]
 	add.b	#0x01,d1                         	| [$8938: addb   #$01]
 	and.b	#0x1f,d1                         	| [$893a: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$893c: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$893e: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$8940: andb   #$e0]
@@ -7694,9 +7800,11 @@ l_88a0:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8949: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$894b: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$894d: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$894f: anda   #$fe]
@@ -7710,9 +7818,11 @@ l_88a0:
 	LOAD_D                                 	| [$8955: ldd    $8,x]
 	add.b	#0x01,d1                         	| [$8957: addb   #$01]
 	and.b	#0x1f,d1                         	| [$8959: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$895b: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$895d: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$895f: andb   #$e0]
@@ -7727,9 +7837,11 @@ l_88a0:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8968: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$896a: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$896c: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$896e: anda   #$fe]
@@ -7855,9 +7967,11 @@ l_89e9:
 	LOAD_D                                 	| [$89e9: ldd    $8,x]
 	add.b	#0xff,d1                         	| [$89eb: addb   #$ff]
 	and.b	#0x1f,d1                         	| [$89ed: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$89ef: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$89f1: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$89f3: andb   #$e0]
@@ -7872,9 +7986,11 @@ l_89e9:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$89fc: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$89fe: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$8a00: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8a02: anda   #$fe]
@@ -7888,9 +8004,11 @@ l_89e9:
 	LOAD_D                                 	| [$8a08: ldd    $8,x]
 	add.b	#0xff,d1                         	| [$8a0a: addb   #$ff]
 	and.b	#0x1f,d1                         	| [$8a0c: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8a0e: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$8a10: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$8a12: andb   #$e0]
@@ -7905,9 +8023,11 @@ l_89e9:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8a1b: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8a1d: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$8a1f: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8a21: anda   #$fe]
@@ -7924,9 +8044,11 @@ l_89e9:
 	LOAD_D                                 	| [$8a30: ldd    $8,x]
 	add.b	#0x00,d1                         	| [$8a32: addb   #$00]
 	and.b	#0x1f,d1                         	| [$8a34: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8a36: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$8a38: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$8a3a: andb   #$e0]
@@ -7941,9 +8063,11 @@ l_89e9:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8a43: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8a45: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$8a47: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8a49: anda   #$fe]
@@ -7957,9 +8081,11 @@ l_89e9:
 	LOAD_D                                 	| [$8a4f: ldd    $8,x]
 	add.b	#0x00,d1                         	| [$8a51: addb   #$00]
 	and.b	#0x1f,d1                         	| [$8a53: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8a55: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$8a57: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$8a59: andb   #$e0]
@@ -7974,9 +8100,11 @@ l_89e9:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8a62: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8a64: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$8a66: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8a68: anda   #$fe]
@@ -7993,9 +8121,11 @@ l_89e9:
 	LOAD_D                                 	| [$8a77: ldd    $8,x]
 	add.b	#0x01,d1                         	| [$8a79: addb   #$01]
 	and.b	#0x1f,d1                         	| [$8a7b: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8a7d: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$8a7f: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$8a81: andb   #$e0]
@@ -8010,9 +8140,11 @@ l_89e9:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8a8a: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8a8c: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$8a8e: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8a90: anda   #$fe]
@@ -8026,9 +8158,11 @@ l_89e9:
 	LOAD_D                                 	| [$8a96: ldd    $8,x]
 	add.b	#0x01,d1                         	| [$8a98: addb   #$01]
 	and.b	#0x1f,d1                         	| [$8a9a: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8a9c: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0x9,d2                 	| [$8a9e: ldb    $9,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$8aa0: andb   #$e0]
@@ -8043,9 +8177,11 @@ l_89e9:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8aa9: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8aab: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$8aad: lda    $8,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8aaf: anda   #$fe]
@@ -8186,9 +8322,11 @@ l_8b45:
 	LOAD_D                                 	| [$8b52: ldd    -$2,x]
 	add.b	#0x00,d1                         	| [$8b54: addb   #$00]
 	and.b	#0x1f,d1                         	| [$8b56: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8b58: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	-0x1,d2                	| [$8b5a: ldb    -$1,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$8b5c: andb   #$e0]
@@ -8203,9 +8341,11 @@ l_8b45:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8b65: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8b67: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$8b69: lda    -$2,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8b6b: anda   #$fe]
@@ -8234,9 +8374,11 @@ l_8b71:
 	LOAD_D                                 	| [$8b83: ldd    $a,x]
 	add.b	#0x00,d1                         	| [$8b85: addb   #$00]
 	and.b	#0x1f,d1                         	| [$8b87: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8b89: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0xb,d2                 	| [$8b8b: ldb    $b,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$8b8d: andb   #$e0]
@@ -8251,9 +8393,11 @@ l_8b71:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8b96: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8b98: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$8b9a: lda    $a,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8b9c: anda   #$fe]
@@ -8330,9 +8474,11 @@ l_8bf6:
 	LOAD_D                                 	| [$8c01: ldd    -$2,x]
 	add.b	#0x00,d1                         	| [$8c03: addb   #$00]
 	and.b	#0x1f,d1                         	| [$8c05: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8c07: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	-0x1,d2                	| [$8c09: ldb    -$1,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$8c0b: andb   #$e0]
@@ -8347,9 +8493,11 @@ l_8bf6:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8c14: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8c16: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$8c18: lda    -$2,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8c1a: anda   #$fe]
@@ -8379,9 +8527,11 @@ l_8c20:
 	LOAD_D                                 	| [$8c34: ldd    $a,x]
 	add.b	#0x00,d1                         	| [$8c36: addb   #$00]
 	and.b	#0x1f,d1                         	| [$8c38: andb   #$1f]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8c3a: pshs   b]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d1,-(a0)   | [...]
+	exg	a0,a2
 	GET_REG_ADDRESS	0xb,d2                 	| [$8c3c: ldb    $b,x]
 	move.b	(a0),d1                         	| [...]
 	and.b	#0xe0,d1                         	| [$8c3e: andb   #$e0]
@@ -8396,9 +8546,11 @@ l_8c20:
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
 	and.b	#0x01,d0                         	| [$8c47: anda   #$01]
+	exg	a0,a2
 	GET_REG_ADDRESS	0,d5 |  [$8c49: pshs   a]
 	subq.w	#1,d5   | using virtual stack
 	move.b	d0,-(a0)   | [...]
+	exg	a0,a2
 	| [$8c4b: lda    $a,x]
 	move.b	(a0),d0                         	| [...]
 	and.b	#0xfe,d0                         	| [$8c4d: anda   #$fe]

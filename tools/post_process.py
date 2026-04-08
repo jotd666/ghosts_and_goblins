@@ -354,6 +354,10 @@ for i,line in enumerate(lines):
         # add sign extend + optimize
         lines[i-1] = "\text.w\td0\n"+change_instruction("add.w\td0,d0",lines,i-1)
     ###################################################
+##    if "lda    $8,x]" in line and line.strip()[0]=='|':
+##        # restore load that optimizer removed, but in the meantime we killed A0 value with manual stack push
+##        # ... a LOT of times because of manual stack fix that went after the optimizer
+##        line = f"\tGET_REG_ADDRESS    0x8,d2  | [${address:04x}: lda    $8,x]\n"
 
     # handle manual stack manipulation issues using ora  ,s+ / orb  ,s+
     if ",s+" in line:
@@ -365,12 +369,12 @@ for i,line in enumerate(lines):
         if target:
             # find the instruction above that wrongly pushes into native SP stack and change it
             # there are 38 occurrences with ora and same with orb
+            exga2 = "\texg\ta0,a2\n"
             for j in range(i-1,i-10,-1):
                 other_line = lines[j]
                 if "pshs" in other_line:
-                    lines[j] = change_instruction("GET_REG_ADDRESS\t0,d5",lines,j) + f"\tsubq.w\t#1,d5   | using virtual stack\n\tmove.b\t{target},-(a0)   | [...]\n"
+                    lines[j] = exga2+change_instruction("GET_REG_ADDRESS\t0,d5",lines,j) + f"\tsubq.w\t#1,d5   | using virtual stack\n\tmove.b\t{target},-(a0)   | [...]\n"+exga2
                     break
-
 
     # remove stray bcc/bcs issues by protecting SR or moving POP_SR
     elif address in {0xec02}:
