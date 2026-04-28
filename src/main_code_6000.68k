@@ -1720,27 +1720,27 @@ l_68ed:
 	GET_REG_ADDRESS	0,d4                   	| [$68ed: pshu   y,x,d]
 	sub.l	a0,d4
 	subq	#2,a0
-	MOVE_W_FROM_REG	d1,a0                         	| [$68ed: pshu   y,x,d]
+	MOVE_W_FROM_REG	d3,a0                         	| [$68ed: pshu   y,x,d]
 	subq	#2,a0
 	MOVE_W_FROM_REG	d2,a0                         	| [$68ed: pshu   y,x,d]
 	subq	#2,a0
-	MOVE_W_FROM_REG	d3,a0                         	| [$68ed: pshu   y,x,d]
+	MOVE_W_FROM_REG	d1,a0                         	| [$68ed: pshu   y,x,d]
 	add.l	a0,d4
 	GET_REG_ADDRESS	0,d4                   	| [$68ef: pshu   y,x,d]
 	sub.l	a0,d4
 	subq	#2,a0
-	MOVE_W_FROM_REG	d1,a0                         	| [$68ef: pshu   y,x,d]
+	MOVE_W_FROM_REG	d3,a0                         	| [$68ef: pshu   y,x,d]
 	subq	#2,a0
 	MOVE_W_FROM_REG	d2,a0                         	| [$68ef: pshu   y,x,d]
 	subq	#2,a0
-	MOVE_W_FROM_REG	d3,a0                         	| [$68ef: pshu   y,x,d]
+	MOVE_W_FROM_REG	d1,a0                         	| [$68ef: pshu   y,x,d]
 	add.l	a0,d4
 	GET_REG_ADDRESS	0,d4                   	| [$68f1: pshu   x,d]
 	sub.l	a0,d4
 	subq	#2,a0
-	MOVE_W_FROM_REG	d1,a0                         	| [$68f1: pshu   x,d]
-	subq	#2,a0
 	MOVE_W_FROM_REG	d2,a0                         	| [$68f1: pshu   x,d]
+	subq	#2,a0
+	MOVE_W_FROM_REG	d1,a0                         	| [$68f1: pshu   x,d]
 	add.l	a0,d4
 	subq.b	#1,d7 |  [$68f3: dec    ,s] one less
 	jne	l_68ed                             	| [$68f5: bne    $68ed]
@@ -3166,9 +3166,9 @@ l_728f:
 	GET_REG_UNCHECKED_ADDRESS	0,d4                   	| [$728f: pshu   y,d] [video_address]
 	sub.l	a0,d4
 	subq	#2,a0
-	MOVE_W_FROM_REG	d1,a0                         	| [$728f: pshu   y,d] [video_address]
-	subq	#2,a0
 	MOVE_W_FROM_REG	d3,a0                         	| [$728f: pshu   y,d] [video_address]
+	subq	#2,a0
+	MOVE_W_FROM_REG	d1,a0                         	| [$728f: pshu   y,d] [video_address]
 	add.l	a0,d4
 	subq.w	#0x1,d2                         	| [$7291: leax   -$1,x]
 	jne	l_728f                             	| [$7293: bne    $728f]

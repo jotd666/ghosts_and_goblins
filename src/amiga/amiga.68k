@@ -1453,12 +1453,8 @@ compute_mirror_bitplanes:
 
 	movem.l	(a7)+,d0-a6
 	rts
-	
-force_all_screen_redraw:
-	lea		_custom,a5
-	REALLY_WAIT_BLIT
-	GET_MEMORY_START_IN_A6
-	* given the current scroll X/Y, draw all tiles on screen
+
+set_initial_scroll_values:
 	move.w	game_scroll_x,d0
 	move.w	d0,previous_scroll_x
 	add.w	#START_HOST_SCROLL_X,d0			| give us some leeway to the left: 10 screens before havoc
@@ -1467,6 +1463,14 @@ force_all_screen_redraw:
 	move.w	d0,d1
 	add.w	#VISIBLE_SCROLL_WIDTH+BG_TILE_WIDTH,d1		| after that it triggers tile refresh
 	move.w	d1,max_scroll_x
+	rts
+	
+force_all_screen_redraw:
+	lea		_custom,a5
+	REALLY_WAIT_BLIT
+	GET_MEMORY_START_IN_A6
+	* given the current scroll X/Y, draw all tiles on screen
+	jbsr	set_initial_scroll_values
 	
 	move.w	host_scroll_x,d0
 	

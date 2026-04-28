@@ -2696,6 +2696,7 @@ l_5dc0:
 	MAKE_D                                 	| [...]
 	| [$5dd4: std    $7,y]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
+	MAKE_D
 	exg	d4,d1                              	| [$5dd6: exg    u,d]
 	MAKE_A
 	move.b	#0x20,d0                        	| [$5dd8: lda    #$20]
