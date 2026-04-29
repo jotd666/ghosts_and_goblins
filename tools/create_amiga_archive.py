@@ -1,4 +1,5 @@
 import subprocess,os,glob,shutil,pathlib
+import gen_scroll_table,gen_mirror_table
 
 pack_data = True
 
@@ -24,6 +25,9 @@ def packcopy(sourcefile,dest):
 
 progdir = pathlib.Path(__file__).parent.parent.absolute()
 data = progdir / "data"
+
+gen_scroll_table.doit(width = 64)   # FMODE=3
+gen_mirror_table.doit(gen_mirror_table.src_dir / "mirror_table.68k")
 
 gamename = "GhostsNGoblins"
 # JOTD path for cranker, adapt to whatever your path is :)

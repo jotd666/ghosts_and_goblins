@@ -5474,7 +5474,7 @@ sprite_mem_name:
 
 	.include	"context.68k"
 
-	.include	"bg_banks/map.68k"
+	.include	"bg_banks/map_tiles.68k"
 
 
 	.align	2
