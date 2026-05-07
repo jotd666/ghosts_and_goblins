@@ -42,7 +42,7 @@ AGA_OBJS = amiga_aga.o sounds.o main_code_6000_020.o bank3_code_4000_020.o $(MEM
 CD32_OBJS = amiga_cd32.o sounds.o main_code_6000_020.o bank3_code_4000_020.o $(MEM_OBJS) graphics_aga.o vbr.o ReadJoyPad.o ptplayer.o
 
 #../data/hw_tester
-all:  $(HW_TESTER_AGA) $(CDLOADER) $(MAIN_AGA)  $(WHDLOADER_AGA) $(WHDLOADER_AGA_CHIP) $(AMIGASRC)/graphics_aga.68k $(AMIGASRC)/sounds.68k
+all:  $(HW_TESTER_AGA) $(CDLOADER) $(MAIN_CD32) $(MAIN_AGA)  $(WHDLOADER_AGA) $(WHDLOADER_AGA_CHIP) $(AMIGASRC)/graphics_aga.68k $(AMIGASRC)/sounds.68k
 
 all_cd32: all $(MAIN_CD32) $(WHDLOADER_CD32)
 
@@ -67,7 +67,7 @@ $(MAIN_AGA): $(AGA_OBJS)
 	$(GCC_BIN)/m68k-amigaos-ld $(OPT_RELEASE_LINK) -o $(MAIN_AGA) $(AGA_OBJS)
 	
 $(MAIN_CD32): $(CD32_OBJS)
-	$(GCC_BIN)/m68k-amigaos-ld $(OPT_RELEASE_LINK) -o $(MAIN_CD32) $(AGA_OBJS)
+	$(GCC_BIN)/m68k-amigaos-ld $(OPT_RELEASE_LINK) -o $(MAIN_CD32) $(CD32_OBJS)
 	
 ../data/hw_tester: $(HWT_OBJS)
 	$(GCC_BIN)/m68k-amigaos-ld $(OPT_RELEASE_LINK) -o ../data/hw_tester  $(HWT_OBJS)
@@ -102,7 +102,7 @@ hw_tester.o: $(AMIGASRC)/hw_tester.68k options.inc include.inc data.inc $(AMIGAS
 amiga_aga.o: $(AMIGASRC)/amiga.68k $(AMIGASRC)/context.68k options.inc include.inc data.inc $(AMIGASRC)/ReadJoyPad.i $(AMIGASRC)/palette.68k $(AMIGASRC)/graphics_aga.68k $(AMIGASRC)/sound_entries.68k  $(AMIGASRC)/scroll_table_64.68k
 	$(ASM_020) --defsym OPT_CD32_VERSION=0 -I$(AMIGASRC) -I$(AMIGASRC)/mit_includes $(AMIGASRC)/amiga.68k -o amiga_aga.o
 amiga_cd32.o: $(AMIGASRC)/amiga.68k $(AMIGASRC)/context.68k options.inc include.inc data.inc $(AMIGASRC)/ReadJoyPad.i $(AMIGASRC)/palette.68k $(AMIGASRC)/graphics_aga.68k $(AMIGASRC)/sound_entries.68k  $(AMIGASRC)/scroll_table_64.68k
-	$(ASM_020) --defsym OPT_CD32_VERSION=1 -I$(AMIGASRC) -I$(AMIGASRC)/mit_includes $(AMIGASRC)/amiga.68k -o amiga_aga.o
+	$(ASM_020) --defsym OPT_CD32_VERSION=1 -I$(AMIGASRC) -I$(AMIGASRC)/mit_includes $(AMIGASRC)/amiga.68k -o amiga_cd32.o
 amiga_ocs.o: $(AMIGASRC)/amiga.68k options.inc include.inc data.inc $(AMIGASRC)/ReadJoyPad.i $(AMIGASRC)/ocs/palette.68k $(AMIGASRC)/sound_entries.68k $(AMIGASRC)/scroll_table_16.68k
 	$(ASM_000) -I$(AMIGASRC)/ocs -I$(AMIGASRC) -I$(AMIGASRC)/mit_includes $(AMIGASRC)/amiga.68k -o amiga_ocs.o
 amiga_shared.o: $(AMIGASRC)/amiga_shared.68k options.inc  data.inc $(AMIGASRC)/sound_entries.68k $(AMIGASRC)/ReadJoyPad.i
