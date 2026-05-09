@@ -4222,7 +4222,6 @@ update_fg_tile:
 	move.w	#COPPER_NOP,(a0)		| activate weapon & frame palette
 0:
 	lea		fg_tile_address_table,a1
-	move.l	a1,0x110
 	.ifdef	NO68020
 	add.w	d7,d7
 	move.w	(a1,d7.w),d0
@@ -5100,6 +5099,10 @@ force_sound_stop:
 
     jsr		_mt_end
 
+	.ifne	OPT_CD32_VERSION
+	move.l	_cdstop,a0
+	jbsr	(a0)
+	.endif
 	movem.l	(a7)+,d0-d1/a0/a6
 	OSD_EXIT
 	rts
@@ -5116,9 +5119,24 @@ osd_sound_start:
 	jbsr	osd_music_stop
 0:
 
-	moveq	#0,d2
-	
+	move.b	#0,0x110
 	and.w	#0xFF,d0
+	
+	.ifne	OPT_CD32_VERSION
+	move.l	d0,d2	| save D0
+	lea		cdtrack_table,a0
+	move.b	(a0,d0.w),d0	| get CD track to play
+	jeq		55f
+	* it's CD music
+	move.l	_cdplay,a0
+	moveq	#0,d1
+	jbsr	(a0)
+	jra		10f
+55:
+	move.l	d2,d0	| restore d0
+	.endif
+	
+	moveq	#0,d2
 	lsl.w	#3,d0
 	lea		sound_table,a0
 
@@ -5203,7 +5221,7 @@ osd_sound_start:
 		
 
     movem.l d0-a6,-(a7)
-	bsr		force_sound_stop
+	jbsr		force_sound_stop
     lea _custom,a6
  	movem.l	d0/a0,-(a7)
 	
@@ -5223,12 +5241,13 @@ osd_sound_start:
 	*move.w	d2,music_duration
 	*move.w	d2,music_tick
 
+	st.b	music_playing
+
     moveq	#0,d0
 	move.b	music_volume,d0
     jsr	_mt_mastervol
-	st.b	music_playing
     jsr _mt_start
-5:
+
     movem.l (a7)+,d0-a6
 	
 6:
@@ -5236,6 +5255,74 @@ osd_sound_start:
 no_tune:
 	movem.l	(a7)+,d0/a0
 	jra		5b
+	
+	.ifne	OPT_CD32_VERSION
+cdtrack_table:
+	.byte	0	| 00
+	.byte	0	| 01
+	.byte	0	| 02
+	.byte	0	| 03
+	.byte	0	| 04
+	.byte	0	| 05
+	.byte	0	| 06
+	.byte	0	| 07
+	.byte	0	| 08
+	.byte	0	| 09
+	.byte	0	| 0a
+	.byte	0	| 0b
+	.byte	0	| 0c
+	.byte	0	| 0d
+	.byte	0	| 0e
+	.byte	0	| 0f
+	.byte	0	| 10
+	.byte	0	| 11
+	.byte	0	| 12
+	.byte	0	| 13
+	.byte	0	| 14
+	.byte	0	| 15
+	.byte	0	| 16
+	.byte	0	| 17
+	.byte	0	| 18
+	.byte	0	| 19
+	.byte	0	| 1a
+	.byte	0	| 1b
+	.byte	6	| LEVEL7_END1_SND 1c
+	.byte	0	| 1d
+	.byte	0	| 1e
+	.byte	0	| 1f
+	.byte	0	| 20
+	.byte	0	| 21
+	.byte	0	| 22
+	.byte	0	| 23
+	.byte	0	| 24
+	.byte	0	| 25
+	.byte	0	| 26
+	.byte	0	| 27
+	.byte	0	| 28
+	.byte	10	| LEVEL56_TUNE_SND 29
+	.byte	5	| BOSS7_TUNE_SND 2a
+	.byte	8	| LEVEL12_TUNE_SND 2b
+	.byte	0	| 2c
+	.byte	2	| BOSS12_TUNE_SND 2d
+	.byte	4	| BOSS56_TUNE_SND 2e
+	.byte	0	| 2f
+	.byte	0	| 30
+	.byte	0	| 31
+	.byte	7	| LEVEL7_END2_SND 32
+	.byte	9	| LEVEL34_TUNE_SND 33
+	.byte	3	| BOSS34_TUNE_SND 34
+	.byte	0	| 35
+	.byte	0	| 36
+	.byte	0	| 37
+	.byte	0	| 38
+	.byte	0	| 39
+	.byte	0	| 3a
+	.byte	0	| 3b
+	.byte	0	| 3c
+	.byte	0	| 3d
+	.byte	0	| LEVEL_COMPLETE_TUNE_SND 3e
+	.byte	0	| 3f	
+	.endif
 	
 load_music_if_needed:
 	movem.l	d0/a0/a1,-(a7)

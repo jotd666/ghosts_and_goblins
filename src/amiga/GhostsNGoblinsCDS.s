@@ -59,11 +59,10 @@ _reserved
 	dc.w	relocate-_base	; Relocate
 	
 relocate:
-	blitz
 	; copy cd32load functions into exe (at offset 4) as exe expects it
 	exg	a0,a1
 	addq	#4,a1
-	lea	_cdplay,a0
+	lea	_cdplay(pc),a0
 	move.l	(a0)+,(a1)+
 	move.l	(a0)+,(a1)+
 	move.l	(a0)+,(a1)+

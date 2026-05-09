@@ -1,4 +1,6 @@
-- optimize: tag sprites as "non erasable": bags of money, tombstones
+- CD32 version: level 1 music starts right away, should wait
+  other levels musics start but stop 1 second after
+- optimize: tag sprites as "non erasable": bags of money, tombstones, armour: see if it works
 - optimize: implement removal of pattern PUSH / MAKE_A / POP / MAKE_D see if it causes issues
 - after continuing, the map context should be loaded!! sometimes ok sometimes not (release mode level 5??). Maybe another clear screen
   race condition? maybe fixed now
