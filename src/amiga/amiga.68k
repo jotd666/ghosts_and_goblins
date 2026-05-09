@@ -76,7 +76,7 @@ GAME_MAX_SCROLL_X = 0x200
 GAME_MAX_SCROLL_Y = 0x200
 BG_TILE_WIDTH = 16
 
-BG_TILE_FILE_MAX_SIZE = 0x13800
+BG_TILE_FILE_MAX_SIZE = 0x14000
 SPRITE_FILE_MAX_SIZE = 0x1F000
 *SPRITE_FILE_MAX_SIZE = 0x1C800   | 8k smaller without the white arremers
 
@@ -4109,6 +4109,13 @@ compute_fg_tile_xy:
 
 
 
+	.macro	NEXT_SOURCE_PLANE
+	move.l	(a4)+,d0		| next plane
+	jne		5f
+	move.l	#empty_row,d0
+5:	
+	move.l	d0,a0
+	.endm
 
 * < D7: 0-0x400 offset
 * < D0: tile code
@@ -4129,7 +4136,7 @@ update_fg_tile:
 	add.w	d3,d2	| extended tile code
 	move.b	d1,d3	| attribute + tile msbits
 	and.w	#0xF,d3	| clut
-	
+
 	* if weapon frame is written, install palette change branch
 	cmp.w	#0x34E,d7
 	jne		0f
@@ -4140,6 +4147,7 @@ update_fg_tile:
 	move.w	#COPPER_NOP,(a0)		| activate weapon & frame palette
 0:
 	lea		fg_tile_address_table,a1
+	move.l	a1,0x110
 	.ifdef	NO68020
 	add.w	d7,d7
 	move.w	(a1,d7.w),d0
@@ -4167,6 +4175,8 @@ update_fg_tile:
 	* get 2 pointers for 2 attached sprites
 	move.l	(a1)+,a2
 	move.l	(a1),a1
+	
+
 	exg		a1,a2
 	* add offset to destination
 	add.w	d1,a2
@@ -4215,16 +4225,8 @@ update_fg_tile:
 	
 	move.l	d0,a4		| directly pointer on tile bitplanes
 	
-	.macro	NEXT_SOURCE_PLANE
-4:
-	move.l	(a4)+,d0		| next plane
-	jne		5f
-	move.l	#empty_row,d0
-5:	
-	move.l	d0,a0
-	.endm
 	
-standard_tile:
+*standard_tile:
 	* first plane: first sprite
 	NEXT_SOURCE_PLANE
 	.set	offset,0

@@ -5,6 +5,10 @@
 
 ;CHIP_ONLY
 
+; lowest chip possible. CD32 version must fit in $1E0000 bytes
+; including stack, which is very close. Why wasting precious kbs?
+CHIP_BASE = $200
+
 	IFD	CD32_SLAVE
 EXPMEM = 0
 	ELSE
@@ -54,6 +58,7 @@ _config
 	DOSCMD	"WDate  >T:date"
 	ENDC
 
+
 DECL_VERSION:MACRO
 	dc.b	"1.1"
 	IFD BARFLY
@@ -89,7 +94,7 @@ start:
     
     IFEQ EXPMEM
     lea  _expmem(pc),a0
-    move.l  #$2000,(a0)
+    move.l  #CHIP_BASE,(a0)
     ENDC
     lea progstart(pc),a0
     move.l  _expmem(pc),(a0)
@@ -114,7 +119,7 @@ _Relocate	movem.l	d0-d1/a0-a2,-(sp)
 ;        pea     -1                      ;true
 ;        pea     WHDLTAG_LOADSEG
 		IFNE		EXPMEM
-        move.l  #$400,-(a7)       ;chip area
+        move.l  #CHIP_BASE,-(a7)       ;chip area
         pea     WHDLTAG_CHIPPTR        
         pea     8                       ;8 byte alignment
         pea     WHDLTAG_ALIGN
