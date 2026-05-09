@@ -1,3 +1,4 @@
+- optimize: tag sprites as "non erasable": bags of money, tombstones
 - optimize: implement removal of pattern PUSH / MAKE_A / POP / MAKE_D see if it causes issues
 - after continuing, the map context should be loaded!! sometimes ok sometimes not (release mode level 5??). Maybe another clear screen
   race condition? maybe fixed now
@@ -15,7 +16,7 @@
   
 - to save memory (CD32 version?): don't include white arremers, shorten sprite files, lower quality sound samples
   => arremer table index=>is_arremer to fix clut to red else it will become invisible!
-  no pre-mirroring: mirror_planes sets -2 systematically to force in-place, and no blitter chain
+  
 - freeze & optimize 68k code, turn jmp => jra, jsr => jbsr: in post_process
 
 - don't play a tune if same module / same pattern already playing (avoids to repeat music when there's a E8 trigger): does this happen?
@@ -38,8 +39,6 @@
   allows a neat 32+32 colors. In that case, it's doable to use dynamic color change on some colors
 - diff with world version 3 see if the fixes are visible: difficult. 1 diff seen around DDFD, rom bank $4000 to check
 - force tile draw cheat screws up host_scroll and tile feed
-- inprint the tombstones (level 1 & 3) in the background (for instance when drawing left & right tiles but also at start) to save
-  cpu & reduce the shaking effect
 - change weapon trainer: call the routine to redraw weapon: not from interrupt!! if must be done, force to call "a new
   weapon is picked up" with a flag
 

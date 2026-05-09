@@ -2166,18 +2166,29 @@ blit_background:
 	* adjust offset X: X//8
 	lsr.w	#3,d0
 	lea		mulBG_NB_BYTES_PER_ROW_table(pc),a4
+	.ifndef	MC68020
 	add.w	d1,d1
 	* add Y offset: Y*NB_BYTES_PER_ROW
 	add.w	(a4,d1.w),d0
+	add.w	(a4,d1.w),d0
+	.else
+	add.w	(a4,d1.w*2),d0
+	.endif
 	* same offset for source and destination
 	add.w	d0,a1
 	add.w	d0,a0
 
     move.l  #0x09f00000,d3    | A->D copy, ascending mode	
 	move.w	#BG_NB_BYTES_PER_ROW,d1		| blit modulo
+	move.l	#BG_SCREEN_PLANE_SIZE,d0	| pre-load
 
     sub.w   d2,d1       | blit modulo
+ 	move.w	d4,d6		| save height
+	subq	#1,d6       | for cpu restore mode
     lsl.w   #6,d4
+	lea		copy_function_table,a4
+	add.w	(a4,d2.w),a4	| pick proper erase func (4,6,8 width are the only cases here)
+	move.b	#0,0x110
     lsr.w   #1,d2		| blit width
     add.w   d2,d4       | blit height
 	
@@ -2201,24 +2212,33 @@ blit_background:
 	
 	.rept	NB_PLAYFIELD_PLANES-2
 	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
-	add.l	#BG_SCREEN_PLANE_SIZE,a0
-	add.l	#BG_SCREEN_PLANE_SIZE,a1
+	add.l	d0,a0
+	add.l	d0,a1
 	.else
-	add.w	#BG_SCREEN_PLANE_SIZE,a0
-	add.w	#BG_SCREEN_PLANE_SIZE,a1
+	add.w	d0,a0
+	add.w	d0,a1
 	.endif
-	WAIT_BLIT
+	.ifeq	OPT_BLIT_CHAIN_MODE
+	btst	#6,(dmaconr,a5)
+	jeq		0f
+	* if blitter is running, we'll use cpu copy instead. We cannot do it if we
+	* attempt to use blitter interrupts of course
+	jbsr 	(a4)
+	jra		1f
+0:
+	.endif
 	* other bitplanes
 	WRITE_BLITTER_REG_LONG	a0,bltapt	|source graphic top left corner
 	WRITE_BLITTER_REG_LONG	a1,bltdpt	|destination top (bottom) left corner
 	WRITE_BLITTER_REG_SIZE	d4	|rectangle size, starts blit
+1:
 	.endr
 	
 	* last bitplane: just clear: just add to dest
 	.if	BG_SCREEN_PLANE_SIZE>0x7FFF
-	add.l	#BG_SCREEN_PLANE_SIZE,a1
+	add.l	d0,a1
 	.else
-	add.w	#BG_SCREEN_PLANE_SIZE,a1
+	add.w	d0,a1
 	.endif
 	
 	* reuse d1 for bltcon0
@@ -2233,6 +2253,61 @@ blit_background:
 	WRITE_BLITTER_REG_SIZE	d4	|rectangle size, starts blit
 	movem.l	(a7)+,d2-d6/a0-a5
 	rts
+
+
+copy_function_table:
+	.word	copy_none-copy_function_table
+	.word	copy_16-copy_function_table		| not reached here
+	.word	copy_32-copy_function_table
+	.word	copy_48-copy_function_table
+	.word	copy_64-copy_function_table
+	* probably never reached, just in case!
+	.word	copy_none-copy_function_table
+	.word	copy_none-copy_function_table
+
+	.macro	CPU_COPY_PRE
+	move.w	d6,d5
+	move.l	a1,a3
+	move.l	a0,a2
+0:
+	.endm
+	.macro	CPU_COPY_POST
+	add.w	d1,a2   | next row using modulus
+	add.w	d1,a3
+	dbf		d6,0b
+	move.w	d5,d6
+	rts	
+	.endm
+	
+
+* should not be called
+copy_none:
+	.ifndef	RELEASE
+	ILLEGAL
+	.endif
+	rts
+	
+copy_16:
+	CPU_COPY_PRE
+	move.w	(a2)+,(a3)+	
+	CPU_COPY_POST
+	
+copy_32:
+	CPU_COPY_PRE
+	move.l	(a2)+,(a3)+	
+	CPU_COPY_POST
+
+copy_48:
+	CPU_COPY_PRE
+	move.l	(a2)+,(a3)+	
+	move.w	(a2)+,(a3)+	
+	CPU_COPY_POST
+
+copy_64:
+	CPU_COPY_PRE
+	move.l	(a2)+,(a3)+	
+	move.l	(a2)+,(a3)+	
+	CPU_COPY_POST
 
 
 *void gng_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
