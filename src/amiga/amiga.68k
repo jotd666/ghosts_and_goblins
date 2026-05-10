@@ -68,7 +68,7 @@ BORDERBLANK = 1
 START_HOST_SCROLL_X = (CORKSCREW_NB_SCREENS/2)*0x100
 
 
-PREVIOUS_SPRITE_SIZE = 14
+PREVIOUS_SPRITE_SIZE = 10
 CURRENT_SPRITE_SIZE = 4
 COLUMN_SIZE = 0x20
 ROW_SIZE = 0x10
@@ -2346,6 +2346,9 @@ really_update_sprites:
 	***********************
 	
 	move.l	bob_previous_drawed_sprites(pc),a4
+	move.l	(a4)+,d6		| value of scroll X/Y at the time of the draw
+	cmp.l	game_scroll_x,d6
+	seq		d6				| flag set: scrolling hasn't been updated since last draw
 	lea		_custom,a5
 
 
@@ -2354,7 +2357,7 @@ really_update_sprites:
 	move.l	playfield_drawed_screen_ptr(pc),a1
 	lea		object_type_table,a2
 	move.w	#NB_TARGET_SPRITES-1,d7
-	move.l	game_scroll_x,d6
+
 	WAIT_BLIT
 	WRITE_BLITTER_REG_WORD	#-1,bltalwm		| needed for blit_background
 1:
@@ -2369,8 +2372,11 @@ really_update_sprites:
 	move.w	(a4)+,d4			| height
 	move.w	(a4)+,d2		| width
 	move.w	(a4)+,d3		| object code
-	cmp.l	(a4)+,d6		| scrolling values
-	jne		10f				| scrolling active, don't try anything stupid
+	tst.b	d6
+	jeq		10f				| scrolling active, don't try anything stupid
+	* same scroll values now and when the object was drawn. If the object is static
+	* we can safely skip the background restore, which is super nice to do specially
+	* in the graveyard with all those tombs
 	tst.b	(a2,d3.w)
 	jne		101f			| static object in a static screen: don't erase
 10:
@@ -2395,6 +2401,8 @@ really_update_sprites:
 
     lea _custom,A5
 	move.l	bob_previous_drawed_sprites(pc),a6
+	move.l	game_scroll_x,(a6)+	| note down scrolling values at the current time
+	
 	lea		shared_bob_table,a4
 	
 	moveq	#NB_TARGET_SPRITES-1,d7
@@ -2622,7 +2630,6 @@ update_one_bob:
 	move.w	d4,(a6)+			| store height
 	move.w	d2,(a6)+			| store width in bytes
 	move.w	d6,(a6)+			| object code
-	move.l	game_scroll_x,(a6)+	| scrolling values
 	jra		9f
 
 8:
@@ -2640,7 +2647,6 @@ update_one_bob:
 	move.w	d4,(a6)+			| store height
 	move.w	d5,(a6)+			| store width in bytes
 	move.w	d6,(a6)+			| object code
-	move.l	game_scroll_x,(a6)+	| scrolling values at the current time
 
 	move.w	d5,d2			| width in bytes, 4 for 16 pixels+shift
 	moveq	#0,d5			| Y-offset

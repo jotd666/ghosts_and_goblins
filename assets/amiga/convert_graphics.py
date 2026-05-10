@@ -46,11 +46,15 @@ dump_it = True
 
 # tag some tiles as static/semi-static. Still have to be drawn
 # but can sometimes (or always) not erased
+# in the list I've put objects that can disappear so it could cause
+# issues, but in reality things wind up OK because of other objects around
 object_type_table = [0]*SPRITE_NB_TILES
 for i,v in sprite_names.items():
-    # tombstones, score, bag, extra armor, skull
+    # tombstones, bag, extra armor, skull
     # pickups cannot be part of the list because their color change
-    if "tombstone" in v or "score" in v or v=="bag_bonus" or i==0x13D or i==0xA7:
+    # scores almost can, but in some cases they're not erased
+    # bag of money seems to work as player has to pass on it + score afterwards
+    if "tombstone" in v or v=="bag_bonus" or i==0x13D or i==0xA7:
         object_type_table[i] = 1
 
 
