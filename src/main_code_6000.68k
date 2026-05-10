@@ -375,6 +375,7 @@ l_616f:
 * active wait until something is requested
 * during this time, only the irq runs
 l_617f:
+	jbsr	osd_main_loop_hook
 	GET_DP_ADDRESS	task_pointer_0012       	| [$617f: ldx    task_pointer_0012]
 	MOVE_W_TO_REG	a0,d2                         	| [...]
 	GET_REG_ADDRESS	0,d2                   	| [$6181: ldd    ,x] get action number

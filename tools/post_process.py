@@ -329,6 +329,8 @@ for i,line in enumerate(lines):
     elif address == 0x6140:
         # insert read highscore
         line = "\tjbsr\tosd_read_high_scores\n"+line
+    elif address == 0x617f:
+        line = "\tjbsr\tosd_main_loop_hook\n"+line
     ###################################################
     # 2 table of tables to rework almost completely
     # this mixes with table rework and is quite a mess but works

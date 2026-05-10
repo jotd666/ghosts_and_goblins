@@ -1,6 +1,9 @@
 - freeze & optimize 68k code, turn jmp => jra, jsr => jbsr: in post_process
-- CD32 version: level 1 music starts right away, should wait
-  other levels musics start but stop 1 second after
+- CD32 version: other levels musics start but stop 1 second after
+  debug write 2B sound start then
+  force sound stop (probably normal from music start)
+  then write 2B sound start a second time, then not playing at all
+  
 - optimize: implement removal of pattern PUSH / MAKE_A / POP / MAKE_D see if it causes issues
 - different score table for each difficulty / lives?
 - alternate control scheme up for jump, 2nd button for ladder up? if I could RE the game more I could even

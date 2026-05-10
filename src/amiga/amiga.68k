@@ -300,6 +300,7 @@ osd_enter_\@:
 	.global osd_blitz		| for debug
 	.global osd_read_dsw1
 	.global osd_read_dsw2
+	.global	osd_main_loop_hook
 	.global	osd_set_bank
 	.global	osd_read_system
 	.global	osd_read_p1_inputs
@@ -1731,32 +1732,6 @@ level3_interrupt:
 	btst	#5,d0
 	jeq		1f
 
-	* music
-	tst.b	_mt_E8Trigger
-	jeq		0f
-	cmp.b	#2,_mt_E8Trigger
-	jeq		777f
-	* trigger: map/level start music ended: time to start level music
-	* if queued
-	clr.b	_mt_E8Trigger
-	clr.b	wait_for_map_music_end
-	tst.b	play_level_1_tune_after_music_stop
-	jeq		0f
-	clr.b	play_level_1_tune_after_music_stop
-	move.w	#LEVEL12_TUNE_SND,d0
-	jbsr	osd_sound_start
-	jra		0f
-777:
-	clr.b	_mt_E8Trigger
-	* high score entry tune ended: load current level music
-	* (don't play it)
-	moveq	#0,d0
-	move.b	(current_level_0072,a6),d0
-	lea		current_level_music_table,a0
-	add.w	d0,d0
-	move.w 	(a0,d0.w),d0
-	jbsr	load_music_if_needed
-0:
 	tst.b	detect_controllers
 	jeq	0f
 	clr.b	detect_controllers
@@ -1848,9 +1823,10 @@ level1_interrupt:
 
 
 	jbsr	call_nmi
-	
-	
+
 	GET_MEMORY_START_IN_A6
+	
+	
 	move.w	(scroll_x_register_lsb_3b08,a6),d0
 	ror.w	#8,d0		| hardware is in little endian
 	move.w	D0,game_scroll_x
@@ -2188,7 +2164,6 @@ blit_background:
     lsl.w   #6,d4
 	lea		copy_function_table,a4
 	add.w	(a4,d2.w),a4	| pick proper erase func (4,6,8 width are the only cases here)
-	move.b	#0,0x110
     lsr.w   #1,d2		| blit width
     add.w   d2,d4       | blit height
 	
@@ -3596,6 +3571,39 @@ osd_set_bank:
 1:
 	rts
 
+* < A6: game memory
+osd_main_loop_hook:
+	* music
+	move.l	d0,d6		| just save d0, the rest is not changed
+	tst.b	_mt_E8Trigger
+	jeq		0f
+	cmp.b	#2,_mt_E8Trigger
+	jeq		777f
+	* trigger: map/level start music ended: time to start level music
+	* if queued
+	clr.b	_mt_E8Trigger
+	clr.b	wait_for_map_music_end
+	tst.b	play_level_1_tune_after_music_stop
+	jeq		0f
+	clr.b	play_level_1_tune_after_music_stop
+
+	move.w	#LEVEL12_TUNE_SND,d0
+	jbsr	osd_sound_start
+	jra		0f
+777:
+	clr.b	_mt_E8Trigger
+	* high score entry tune ended: load current level music
+	* (don't play it)
+	moveq	#0,d0
+	move.b	(current_level_0072,a6),d0
+	lea		current_level_music_table,a0
+	add.w	d0,d0
+	move.w 	(a0,d0.w),d0
+	jbsr	load_music_if_needed
+0:
+	move.l	d6,d0
+	rts
+	
 * < A6: game memory
 
 osd_weapon_palette_change:
@@ -5126,10 +5134,12 @@ force_sound_stop:
 	.endif
 	movem.l	(a7)+,d0-d1/a0/a6
 	OSD_EXIT
+	move.b	#0,0x110
 	rts
 	
 * < D0.B sound index
 osd_sound_start:
+	move.b	d0,0x111
 	OSD_ENTER
 	movem.l	d0/d1/d2/a0/a1/a6,-(a7)
 	lea		_custom,a6
@@ -5142,20 +5152,7 @@ osd_sound_start:
 
 	and.w	#0xFF,d0
 	
-	.ifne	OPT_CD32_VERSION
-	move.l	d0,d2	| save D0
-	lea		cdtrack_table,a0
-	move.b	(a0,d0.w),d0	| get CD track to play
-	jeq		55f
-	* it's CD music
-	move.l	_cdplay,a0
-	moveq	#0,d1
-	jbsr	(a0)
-	jra		10f
-55:
-	move.l	d2,d0	| restore d0
-	.endif
-	
+
 	moveq	#0,d2
 	lsl.w	#3,d0
 	lea		sound_table,a0
@@ -5245,6 +5242,23 @@ osd_sound_start:
     lea _custom,a6
  	movem.l	d0/a0,-(a7)
 	
+	.ifne	OPT_CD32_VERSION
+	
+	lea		cdtrack_table,a0
+	lsr.w	#3,d0			| divide by 8
+	move.b	(a0,d0.w),d0	| get CD track to play
+	jeq		55f				| not a CD track: normal operation
+	* it's CD music
+	move.l	_cdplay,a0
+	moveq	#0,d1
+	jbsr	(a0)
+	st.b	music_playing
+	add		#8,a7		| pop stack to restore it for a0 and d0
+	jra		60f			| skip all module stuff
+55:
+	movem.l	(a7),d0/a0	| restore d0, no stack pop
+	.endif
+	
 	move.w	(2,a0,d0.w),d1	| pattern number in .mod file
 	lea		module_buffer,a0
 	moveq	#0,d0
@@ -5267,7 +5281,7 @@ osd_sound_start:
 	move.b	music_volume,d0
     jsr	_mt_mastervol
     jsr _mt_start
-
+60:
     movem.l (a7)+,d0-a6
 	
 6:
@@ -5386,6 +5400,7 @@ load_music_if_needed:
 	cmp.w	#SECOND_PLACE_TUNE_SND*8,d0
 	jeq		70f
 	jra		75f
+
 70:
 	cmp.l	current_music_name,a0
 	jeq		75f
