@@ -37,7 +37,7 @@ cmd_prefix = ["make","-f",os.path.join(progdir,"makefile.am")]
 
 subprocess.check_call(cmd_prefix+["clean"],cwd=progdir /"src")
 
-subprocess.check_call(cmd_prefix+["RELEASE_BUILD=1","all_cd32"],cwd=progdir /"src")
+subprocess.check_call(cmd_prefix+["RELEASE_BUILD=1"],cwd=progdir /"src")
 # create archive
 
 outdir = progdir / f"{gamename}"

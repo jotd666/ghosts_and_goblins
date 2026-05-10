@@ -3087,7 +3087,7 @@ bank_table:
 	.long	0  | bank4_4000-0x4000
 	
 bob_previous_positions_1:
-	.fill NB_TARGET_SPRITES*PREVIOUS_SPRITE_SIZE , 1 , -1
+	.fill NB_TARGET_SPRITES*PREVIOUS_SPRITE_SIZE+4 , 1 , -1
 	
 bob_previous_drawed_sprites:
 	.long	bob_previous_positions_1
@@ -3097,7 +3097,7 @@ bob_previous_displayed_sprites:
 	.else
 	.long	bob_previous_positions_2	
 bob_previous_positions_2:
-	.fill NB_TARGET_SPRITES*PREVIOUS_SPRITE_SIZE , 1 , -1
+	.fill NB_TARGET_SPRITES*PREVIOUS_SPRITE_SIZE+4 , 1 , -1
 
 	.endif
 
