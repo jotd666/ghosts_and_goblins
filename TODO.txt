@@ -1,12 +1,7 @@
+- freeze & optimize 68k code, turn jmp => jra, jsr => jbsr: in post_process
 - CD32 version: level 1 music starts right away, should wait
   other levels musics start but stop 1 second after
-- optimize: tag sprites as "non erasable": bags of money, tombstones, armour: see if it works
 - optimize: implement removal of pattern PUSH / MAKE_A / POP / MAKE_D see if it causes issues
-- after continuing, the map context should be loaded!! sometimes ok sometimes not (release mode level 5??). Maybe another clear screen
-  race condition? maybe fixed now
-- After entering a highscore and being too fast on the continues screen with pressing fire to continue, the game switches to the map (as expected), but it's playing the wrong music: it's repeating the last part from the highscore screen instead of the "map music" and you'll start the level without any music at all. Once you finish the level (or in my case more likely: die), all goes back to normal.
-- another curious thing about the time (playing normally this one), when the two minutes counter ends, a :32 is displayed when you are dying, until the next life begins 
-- 50Hz flashy at times, limit framerate?
 - different score table for each difficulty / lives?
 - alternate control scheme up for jump, 2nd button for ladder up? if I could RE the game more I could even
   reinstate the infamous up for jump or ladder.
@@ -15,17 +10,22 @@
   C77B only called for 1 enemy in CB0, never for D10. Trace C4EA see if the same, then narrow down
   debug values in CAF8/CB11 sub player X maybe don't work. check for behaviour diff according to level. Level 2: ok
   level 6: no (current_level_0072)
-  
-- to save memory (CD32 version?): don't include white arremers, shorten sprite files, lower quality sound samples
-  => arremer table index=>is_arremer to fix clut to red else it will become invisible!
-  
-- freeze & optimize 68k code, turn jmp => jra, jsr => jbsr: in post_process
-
 - don't play a tune if same module / same pattern already playing (avoids to repeat music when there's a E8 trigger): does this happen?
 - CD32 version to test with release exe: works with 1E0000 base chip!!
   => need to record the tunes with several loops using service mode and 3F to stop sound: finish wav splitting
      "finish your battle" small song to record
-  => put cdplay, cdstop functions at start (offset 4,8) so game can call them, cd32slave is easy to code
+  
+- to save memory (CD32 version?): don't include white arremers, shorten sprite files, lower quality sound samples
+  => arremer table index=>is_arremer to fix clut to red else it will become invisible!
+  
+
+- after continuing, the map context should be loaded!! sometimes ok sometimes not (release mode level 5??). Maybe another clear screen
+  race condition? maybe fixed now
+- After entering a highscore and being too fast on the continues screen with pressing fire to continue, the game switches to the map (as expected), but it's playing the wrong music: it's repeating the last part from the highscore screen instead of the "map music" and you'll start the level without any music at all. Once you finish the level (or in my case more likely: die), all goes back to normal.
+- another curious thing about the time (playing normally this one), when the two minutes counter ends, a :32 is displayed when you are dying, until the next life begins 
+- 50Hz flashy at times, limit framerate?
+
+
 
 
 - pre-mirror of trunk fails (91) in clut 1 probably because of 0 in planelist (ok on non-blit chain, blit chain specifics)

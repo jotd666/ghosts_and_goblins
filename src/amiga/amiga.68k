@@ -13,17 +13,17 @@ boot:
 	bra.w	start	| don't optimize to bra.b or jra!!
 	* 2 functions that need to be at 4, 8
 _cdplay:
-	.long	0	| cd32load slave writes the address of the play routine here
+	.long	nope	| cd32load slave writes the address of the play routine here
 _cdstop:
-	.long	0	| cd32load slave writes the address of the stop routine here
+	.long	nope	| cd32load slave writes the address of the stop routine here
 _cdstatus:
-	.long	0	| cd32load slave writes the address of the status routine here
+	.long	nope	| cd32load slave writes the address of the status routine here
 				| 0: cd playing
 				| 1: cd stopped playing
 				| 2: cd not started playing
 				| 3: error
 _cdreplay:
-	.long	0	| slave cd32load writes the address of the play-if-play-ended routine here
+	.long	nope	| slave cd32load writes the address of the play-if-play-ended routine here
 	.endif
 start:
 	move.l	a7,old_stack
@@ -68,7 +68,7 @@ BORDERBLANK = 1
 START_HOST_SCROLL_X = (CORKSCREW_NB_SCREENS/2)*0x100
 
 
-PREVIOUS_SPRITE_SIZE = 8
+PREVIOUS_SPRITE_SIZE = 14
 CURRENT_SPRITE_SIZE = 4
 COLUMN_SIZE = 0x20
 ROW_SIZE = 0x10
@@ -2352,7 +2352,9 @@ really_update_sprites:
 	* clear previous positions
 	lea	background_restore_buffer,a0
 	move.l	playfield_drawed_screen_ptr(pc),a1
+	lea		object_type_table,a2
 	move.w	#NB_TARGET_SPRITES-1,d7
+	move.l	game_scroll_x,d6
 	WAIT_BLIT
 	WRITE_BLITTER_REG_WORD	#-1,bltalwm		| needed for blit_background
 1:
@@ -2366,12 +2368,18 @@ really_update_sprites:
 	move.l	#-1,(a4)+			| ack deletion by setting -1 in X & Y
 	move.w	(a4)+,d4			| height
 	move.w	(a4)+,d2		| width
-				
-	bsr		blit_background
+	move.w	(a4)+,d3		| object code
+	cmp.l	(a4)+,d6		| scrolling values
+	jne		10f				| scrolling active, don't try anything stupid
+	tst.b	(a2,d3.w)
+	jne		101f			| static object in a static screen: don't erase
+10:
+	jbsr		blit_background
+101:
 	dbf		d7,1b	
 	bra.b	12f
 11:
-	addq	#PREVIOUS_SPRITE_SIZE,a4
+	add.w	#PREVIOUS_SPRITE_SIZE,a4
 	dbf		d7,1b
 12:	
 
@@ -2492,6 +2500,7 @@ update_one_bob:
 	.endif
 	
 	lea		sprite_group_table(pc),a3
+	move.w	d2,d6				| save code
 	add.w	d2,d2				| code times 2
 	move.w	(a3,d2.w),d4
 	jeq		10f			| nothing to do, normal tile
@@ -2612,7 +2621,8 @@ update_one_bob:
 	clr.w	(a6)+			    | store current sprite attributes to previous ones
 	move.w	d4,(a6)+			| store height
 	move.w	d2,(a6)+			| store width in bytes
-
+	move.w	d6,(a6)+			| object code
+	move.l	game_scroll_x,(a6)+	| scrolling values
 	jra		9f
 
 8:
@@ -2629,6 +2639,8 @@ update_one_bob:
 	move.w	d1,(a6)+			| store current sprite attributes to previous ones
 	move.w	d4,(a6)+			| store height
 	move.w	d5,(a6)+			| store width in bytes
+	move.w	d6,(a6)+			| object code
+	move.l	game_scroll_x,(a6)+	| scrolling values at the current time
 
 	move.w	d5,d2			| width in bytes, 4 for 16 pixels+shift
 	moveq	#0,d5			| Y-offset
@@ -2646,10 +2658,10 @@ update_one_bob:
 * < D3: required orientation
 * < D4: height
 * < D5: width (bytes) including 16 bit shift
-* trashes: only unused registers :) D6,A3
+* trashes: only unused registers :) A3
 
 mirror_sprite_planes:
-	movem.l	d0-d2/a0,-(a7)
+	movem.l	d0-d2/d6/a0,-(a7)
 	* bitplanes aren't pre-computed: check bitplanes current orientation and swap
 	* if required. This is slow but saves memory
 	.if		OPT_BLIT_CHAIN_MODE==0
@@ -2678,7 +2690,7 @@ mirror_sprite_planes:
 	* next bitplane
 1:
 	dbf		d6,0b
-	movem.l	(a7)+,d0-d2/a0
+	movem.l	(a7)+,d0-d2/d6/a0
 	rts
 	
 
@@ -4466,6 +4478,9 @@ scroll_table:
 	.include	"scroll_table_16.68k"
 	.endif
 	
+object_type_table:
+	.include	"object_type_table.68k"
+	
 	.include	"palette.68k"
 osd_debug_hook:
 	rts
@@ -5119,7 +5134,6 @@ osd_sound_start:
 	jbsr	osd_music_stop
 0:
 
-	move.b	#0,0x110
 	and.w	#0xFF,d0
 	
 	.ifne	OPT_CD32_VERSION
