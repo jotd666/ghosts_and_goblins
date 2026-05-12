@@ -10912,7 +10912,7 @@ CA1D: CE CA 22    LDU    #jump_table_ca22
 CA20: 6E D5       JMP    [B,U]	; [indirect_jump] [nb_entries=2]
 
 CA32: DC A0       LDD    copy_of_player_x_00a0                                         
-CA34: C3 00 10    ADDD   #$0010                                       10
+CA34: C3 00 10    ADDD   #$0010
 CA37: ED 88 1C    STD    $1C,X
 CA3A: C6 01       LDB    #$01
 CA3C: E7 1E       STB    -$2,X

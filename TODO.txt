@@ -1,23 +1,14 @@
-- freeze & optimize 68k code, turn jmp => jra, jsr => jbsr: in post_process
+- don't play a tune if same module / same pattern already playing (avoids to repeat music when there's a E8 trigger): 
+  for tunes & CD tunes
 - CD32 version: other levels musics start but stop 1 second after
   debug write 2B sound start then
   force sound stop (probably normal from music start)
   then write 2B sound start a second time, then not playing at all
-  
 - optimize: implement removal of pattern PUSH / MAKE_A / POP / MAKE_D see if it causes issues
 - different score table for each difficulty / lives?
 - alternate control scheme up for jump, 2nd button for ladder up? if I could RE the game more I could even
   reinstate the infamous up for jump or ladder.
-- At level 6, the 2 unicorns seem to easily go left and never return (specially the one on the left). not in the arcade!
-  check when the unicorn code is activated, then activate a trace, with 21 timer set to a fixed value, compare to amiga
-  C77B only called for 1 enemy in CB0, never for D10. Trace C4EA see if the same, then narrow down
-  debug values in CAF8/CB11 sub player X maybe don't work. check for behaviour diff according to level. Level 2: ok
-  level 6: no (current_level_0072)
-- don't play a tune if same module / same pattern already playing (avoids to repeat music when there's a E8 trigger): does this happen?
-- CD32 version to test with release exe: works with 1E0000 base chip!!
-  => need to record the tunes with several loops using service mode and 3F to stop sound: finish wav splitting
-     "finish your battle" small song to record
-  
+ 
 - to save memory (CD32 version?): don't include white arremers, shorten sprite files, lower quality sound samples
   => arremer table index=>is_arremer to fix clut to red else it will become invisible!
   
@@ -31,7 +22,8 @@
 
 
 
-- pre-mirror of trunk fails (91) in clut 1 probably because of 0 in planelist (ok on non-blit chain, blit chain specifics)
+- pre-mirror of trunk fails (91) in clut 1 probably because of 0 in planelist (ok on non-blit chain, blit chain specifics, same issue
+  when using fixed value for blitter data instead of source, annoying!)
 - blit chain: scrolling to fix, wrong values, shaking
 - remove parasite tiles (in the end) because of levelskip some intro tiles are logged in levels 2+
 - remove those "hhhhh" at start fill_screen_with_h 

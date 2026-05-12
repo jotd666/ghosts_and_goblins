@@ -19895,7 +19895,7 @@ l_ca1a:
 l_ca32:
 	GET_DP_ADDRESS	copy_of_player_x_00a0   	| [$ca32: ldd    copy_of_player_x_00a0]
 	LOAD_D                                 	| [$ca32: ldd    copy_of_player_x_00a0]
-	add.w	#0x001010,d1                     	| [$ca34: addd   #$0010                                       10]
+	add.w	#0x0010,d1                       	| [$ca34: addd   #$0010]
 	PUSH_SR                                	| [...]
 	MAKE_A                                 	| [...]
 	POP_SR                                 	| [...]
