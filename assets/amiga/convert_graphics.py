@@ -54,7 +54,9 @@ for i,v in sprite_names.items():
     # pickups cannot be part of the list because their color change
     # scores almost can, but in some cases they're not erased
     # bag of money seems to work as player has to pass on it + score afterwards
-    if "tombstone" in v or v=="bag_bonus" or i==0x13D or i==0xA7:
+    # but that and skulls seem to cause issues. In the end, special case only for tombs
+    # and extra armor
+    if "tombstone" in v  or i==0x13D:  #  or i==0xA7 (skull) or v=="bag_bonus"
         object_type_table[i] = 1
 
 

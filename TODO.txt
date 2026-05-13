@@ -1,13 +1,10 @@
-- don't play a tune if same module / same pattern already playing (avoids to repeat music when there's a E8 trigger): 
-  for tunes & CD tunes
-- CD32 version: other levels musics start but stop 1 second after
-  debug write 2B sound start then
-  force sound stop (probably normal from music start)
-  then write 2B sound start a second time, then not playing at all
-- optimize: implement removal of pattern PUSH / MAKE_A / POP / MAKE_D see if it causes issues
+- CD32 version: other levels musics start but stop 1 second after: put blitz on CD_STOP call and CD_START!!!
+- still missing erase when switching levels for the last BOB bitplane (bags): redraw when bugs, reproduce issues!!
 - different score table for each difficulty / lives?
-- alternate control scheme up for jump, 2nd button for ladder up? if I could RE the game more I could even
-  reinstate the infamous up for jump or ladder.
+- alternate control scheme up for jump: 
+  * ladder check: check if last time up was pressed ladder was there. if so, keep climbing (no jump)
+ 926a:
+	jbsr ou jra		l_9221
  
 - to save memory (CD32 version?): don't include white arremers, shorten sprite files, lower quality sound samples
   => arremer table index=>is_arremer to fix clut to red else it will become invisible!

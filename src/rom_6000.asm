@@ -123,6 +123,12 @@ game_first_loop_done_007f = $7f
 nb_credits_0022 = $22
 continue_timer_000a = $a
 high_score_location_152c = $152c
+copy_of_system_42 = $42
+copy_of_p1_inputs_46 = $46
+copy_of_p2_inputs_48 = $48
+copy_of_current_inputs_4b = $4b
+current_player_27 = $27
+cocktail_mode_53 = $53
 
 SND_STOP_00 = $00
 SND_UNKNOWN_FF = $FF 
@@ -160,7 +166,7 @@ SND_UNKNOWN_23 = $23
 SND_UNKNOWN_24 = $24
 SND_UNKNOWN_25 = $25
 SND_UNKNOWN_26 = $26
-SND_UNKNOWN_27 = $27
+SND_UNKNOWN_27 = current_player_27
 SND_UNKNOWN_2C = $2C
 SND_UNKNOWN_28 = $28
 SND_GAME_OVER_2F = $2F
@@ -431,7 +437,7 @@ read_dip_switches_622c:
 6282: 85 04       BITA   #$04
 6284: 26 01       BNE    $6287
 6286: 5C          INCB
-6287: D7 53       STB    $53
+6287: D7 53       STB    cocktail_mode_53
 6289: D6 41       LDB    copy_of_dsw2_0041
 628B: C4 18       ANDB   #$18
 628D: 54          LSRB
@@ -775,13 +781,13 @@ change_ram_palette_6656:
 666D: D7 E0       STB    $E0
 666F: 35 16       PULS   D,X		; [bank_address]
 6671: ED A8 40    STD    $40,Y
-6674: AF A8 42    STX    $42,Y
+6674: AF A8 42    STX    copy_of_system_42,Y
 6677: 37 16       PULU   D,X		; [bank_address]
 6679: ED A1       STD    ,Y++
 667B: AF A1       STX    ,Y++
 667D: 35 16       PULS   D,X		; read values and advance
 667F: ED A8 40    STD    $40,Y
-6682: AF A8 42    STX    $42,Y
+6682: AF A8 42    STX    copy_of_system_42,Y
 6685: 37 16       PULU   D,X		; [bank_address]
 6687: ED A1       STD    ,Y++
 6689: AF A1       STX    ,Y++
@@ -833,13 +839,13 @@ update_sprites_palette_6693:
 66EE: D7 E0       STB    $E0
 66F0: 35 16       PULS   D,X		; read values and advance
 66F2: ED A8 40    STD    $40,Y
-66F5: AF A8 42    STX    $42,Y
+66F5: AF A8 42    STX    copy_of_system_42,Y
 66F8: 37 16       PULU   D,X		; [bank_address]
 66FA: ED A1       STD    ,Y++
 66FC: AF A1       STX    ,Y++
 66FE: 35 16       PULS   D,X		; read values and advance
 6700: ED A8 40    STD    $40,Y
-6703: AF A8 42    STX    $42,Y
+6703: AF A8 42    STX    copy_of_system_42,Y
 6706: 37 16       PULU   D,X		; [bank_address]
 6708: ED A1       STD    ,Y++
 670A: AF A1       STX    ,Y++
@@ -898,13 +904,13 @@ update_osd_palette_671c:
 677E: 26 F9       BNE    $6779
 6780: B6 30 00    LDA    system_3000
 6783: 43          COMA
-6784: 97 42       STA    $42
+6784: 97 42       STA    copy_of_system_42
 6786: B6 30 01    LDA    p1_3001
 6789: 43          COMA
-678A: 97 46       STA    $46
+678A: 97 46       STA    copy_of_p1_inputs_46
 678C: B6 30 02    LDA    p2_3002
 678F: 43          COMA
-6790: 97 48       STA    $48
+6790: 97 48       STA    copy_of_p2_inputs_48
 6792: 39          RTS
 6793: 4F          CLRA
 6794: E6 02       LDB    $2,X
@@ -968,7 +974,7 @@ update_osd_palette_671c:
 6801: 69 07       ROL    $7,X
 6803: 58          ASLB
 6804: 09 E0       ROL    $E0
-6806: D6 42       LDB    $42
+6806: D6 42       LDB    copy_of_system_42
 6808: 58          ASLB
 6809: 69 0F       ROL    $F,X
 680B: 58          ASLB
@@ -1114,19 +1120,19 @@ random_68f9:
 6914: 10 8E 01 00 LDY    #$0100
 6918: 10 9F 10    STY    $10
 691B: 39          RTS
-691C: 96 4B       LDA    $4B
+691C: 96 4B       LDA    copy_of_current_inputs_4b
 691E: 97 4C       STA    $4C
 6920: D6 28       LDB    game_in_play_0028
 6922: 27 12       BEQ    $6936
-6924: D6 27       LDB    $27
+6924: D6 27       LDB    current_player_27
 6926: 27 04       BEQ    $692C
-6928: D6 53       LDB    $53
+6928: D6 53       LDB    cocktail_mode_53
 692A: 26 05       BNE    $6931
-692C: D6 46       LDB    $46
-692E: D7 4B       STB    $4B
+692C: D6 46       LDB    copy_of_p1_inputs_46
+692E: D7 4B       STB    copy_of_current_inputs_4b
 6930: 39          RTS
-6931: D6 48       LDB    $48
-6933: D7 4B       STB    $4B
+6931: D6 48       LDB    copy_of_p2_inputs_48
+6933: D7 4B       STB    copy_of_current_inputs_4b
 6935: 39          RTS
 6936: D6 4D       LDB    $4D
 6938: 26 10       BNE    $694A
@@ -1134,7 +1140,7 @@ random_68f9:
 693C: F7 3E 00    STB    bankswitch_3e00
 693F: DE 4E       LDU    $4E
 6941: EC C1       LDD    ,U++	; [bank_address]
-6943: 97 4B       STA    $4B
+6943: 97 4B       STA    copy_of_current_inputs_4b
 6945: D7 4D       STB    $4D
 6947: DF 4E       STU    $4E
 6949: 39          RTS
@@ -1155,13 +1161,13 @@ game_not_playing_694d:
 696A: 27 36       BEQ    $69A2
 696C: D6 43       LDB    $43
 696E: 53          COMB
-696F: D4 42       ANDB   $42
+696F: D4 42       ANDB   copy_of_system_42
 6971: C4 03       ANDB   #$03
 6973: 27 2D       BEQ    $69A2
 6975: 8D 2C       BSR    $69A3
 6977: 24 29       BCC    $69A2
 6979: 97 26       STA    $26
-697B: 0F 27       CLR    $27
+697B: 0F 27       CLR    current_player_27
 697D: 0D 51       TST    $51
 697F: 26 07       BNE    $6988
 6981: 1D          SEX
@@ -1917,14 +1923,14 @@ do_restart_71c7:
 71D1: 26 02       BNE    $71D5
 71D3: C6 A3       LDB    #$A3
 71D5: 86 02       LDA    #$02
-71D7: DB 27       ADDB   $27
+71D7: DB 27       ADDB   current_player_27
 71D9: BD 69 09    JSR    $6909
 71DC: 9E 09       LDX    $09
 71DE: 30 1F       LEAX   -$1,X
 71E0: 9F 09       STX    $09
 71E2: 26 0C       BNE    $71F0
 71E4: CC 03 23    LDD    #$0323
-71E7: DB 27       ADDB   $27
+71E7: DB 27       ADDB   current_player_27
 71E9: BD 69 09    JSR    $6909
 71EC: 0C 08       INC    sub_sub_state_0008
 71EE: 0F 0B       CLR    sub_sub_sub_state_000b
@@ -1942,14 +1948,14 @@ do_restart_last_level_71fa:
 7204: 26 02       BNE    $7208
 7206: C6 A3       LDB    #$A3
 7208: 86 02       LDA    #$02
-720A: DB 27       ADDB   $27
+720A: DB 27       ADDB   current_player_27
 720C: BD 69 09    JSR    $6909
 720F: 9E 09       LDX    $09
 7211: 30 1F       LEAX   -$1,X
 7213: 9F 09       STX    $09
 7215: 26 0A       BNE    $7221
 7217: CC 03 23    LDD    #$0323
-721A: DB 27       ADDB   $27
+721A: DB 27       ADDB   current_player_27
 721C: BD 69 09    JSR    $6909
 721F: 0C 0B       INC    sub_sub_sub_state_000b
 7221: 8E 15 A2    LDX    #$15A2
@@ -2484,7 +2490,7 @@ player_dead_777c:
 77A7: 0A 60       DEC    nb_lives_0060
 77A9: 26 10       BNE    $77BB
 77AB: CC 02 0B    LDD    #$020B
-77AE: DB 27       ADDB   $27
+77AE: DB 27       ADDB   current_player_27
 77B0: BD 69 09    JSR    $6909
 77B3: CC 00 F0    LDD    #$00F0
 77B6: DD 09       STD    $09
@@ -2517,10 +2523,10 @@ player_dead_777c:
 77E7: C6 02       LDB    #$02
 77E9: D7 05       STB    sub_state_0005
 77EB: 39          RTS
-77EC: D6 27       LDB    $27
+77EC: D6 27       LDB    current_player_27
 77EE: C8 01       EORB   #$01
-77F0: D7 27       STB    $27
-77F2: D6 53       LDB    $53
+77F0: D7 27       STB    current_player_27
+77F2: D6 53       LDB    cocktail_mode_53
 77F4: 27 06       BEQ    $77FC
 77F6: D6 D8       LDB    $D8
 77F8: C8 01       EORB   #$01
@@ -2578,7 +2584,7 @@ player_dead_777c:
 7871: 26 04       BNE    $7877
 7873: 9E 22       LDX    nb_credits_0022
 7875: 27 08       BEQ    $787F			; not enough credits to continue
-7877: D6 42       LDB    $42
+7877: D6 42       LDB    copy_of_system_42
 7879: C5 03       BITB   #$03
 787B: 27 02       BEQ    $787F			; "start" not pressed
 ; player successfully enabled continue feature
@@ -2587,8 +2593,8 @@ player_dead_777c:
 787F: 4F          CLRA
 7880: 35 84       PULS   B,PC	; pops stack, do not restore CC
 
-7882: D6 46       LDB    $46
-7884: DA 48       ORB    $48
+7882: D6 46       LDB    copy_of_p1_inputs_46
+7884: DA 48       ORB    copy_of_p2_inputs_48
 7886: C5 30       BITB   #$30
 7888: 27 16       BEQ    $78A0
 788A: 8D E0       BSR    $786C
@@ -5414,9 +5420,10 @@ compute_screen_address_8dd2:
 9118: 22 0E       BHI    $9128
 911A: D6 4C       LDB    $4C
 911C: 53          COMB
-911D: D4 4B       ANDB   $4B
+911D: D4 4B       ANDB   copy_of_current_inputs_4b
 911F: C5 10       BITB   #$10
 9121: 27 05       BEQ    $9128
+; shoot button pressed
 9123: BD 9F 51    JSR    $9F51
 9126: 6F 15       CLR    -$B,X
 9128: E6 88 1A    LDB    $1A,X
@@ -5525,25 +5532,29 @@ compute_screen_address_8dd2:
 9215: 7E 91 08    JMP    $9108
 9218: D6 4C       LDB    $4C
 921A: 53          COMB
-921B: D4 4B       ANDB   $4B
+921B: D4 4B       ANDB   copy_of_current_inputs_4b
 921D: C5 20       BITB   #$20
 921F: 27 06       BEQ    $9227
+; jump button pressed
+perform_jump_9221:
 9221: 6C 13       INC    -$D,X
 9223: 4F          CLRA
 9224: 5F          CLRB
 9225: ED 14       STD    -$C,X
 9227: 39          RTS
 9228: D6 4C       LDB    $4C
-922A: D4 4B       ANDB   $4B
+922A: D4 4B       ANDB   copy_of_current_inputs_4b
 922C: C5 08       BITB   #$08
-922E: 26 0B       BNE    $923B
+922E: 26 0B       BNE    player_pressed_up_923b
 9230: C5 04       BITB   #$04
 9232: 10 26 00 9A LBNE   $92D0
 9236: 6F 88 15    CLR    $15,X
 9239: 53          COMB
 923A: 39          RTS
-923B: BD 93 11    JSR    $9311
+player_pressed_up_923b:
+923B: BD 93 11    JSR    check_if_over_ladder_9311
 923E: 24 2A       BCC    $926A
+; a ladder is available, or already on the ladder
 9240: 86 03       LDA    #$03
 9242: A1 88 15    CMPA   $15,X
 9245: 27 21       BEQ    $9268
@@ -5639,6 +5650,7 @@ compute_screen_address_8dd2:
 930D: 26 8F       BNE    $929E
 930F: 5F          CLRB
 9310: 39          RTS
+check_if_over_ladder_9311:
 9311: EC 16       LDD    -$A,X
 9313: DD EC       STD    $EC
 9315: EC 19       LDD    -$7,X
@@ -5704,7 +5716,7 @@ compute_screen_address_8dd2:
 9391: 7E 98 FE    JMP    $98FE
 
 93D0: D6 4C       LDB    $4C
-93D2: D4 4B       ANDB   $4B
+93D2: D4 4B       ANDB   copy_of_current_inputs_4b
 93D4: C5 02       BITB   #$02
 93D6: 26 10       BNE    $93E8
 93D8: C5 01       BITB   #$01
@@ -5831,7 +5843,7 @@ compute_screen_address_8dd2:
 94E3: 6A 88 18    DEC    $18,X
 94E6: 39          RTS
 94E7: D6 4C       LDB    $4C
-94E9: D4 4B       ANDB   $4B
+94E9: D4 4B       ANDB   copy_of_current_inputs_4b
 94EB: C5 02       BITB   #$02
 94ED: 26 0B       BNE    $94FA
 94EF: C5 01       BITB   #$01
@@ -6077,7 +6089,7 @@ compute_screen_address_8dd2:
 9709: CE 98 73    LDU    #$9873
 970C: 7E 98 F3    JMP    $98F3
 970F: D6 4C       LDB    $4C
-9711: D4 4B       ANDB   $4B
+9711: D4 4B       ANDB   copy_of_current_inputs_4b
 9713: C5 02       BITB   #$02
 9715: 26 05       BNE    $971C
 9717: C5 01       BITB   #$01
@@ -6193,7 +6205,7 @@ compute_screen_address_8dd2:
 9A36: 7E 98 F3    JMP    $98F3
 
 9A45: D6 4C       LDB    $4C
-9A47: D4 4B       ANDB   $4B
+9A47: D4 4B       ANDB   copy_of_current_inputs_4b
 9A49: C5 02       BITB   #$02
 9A4B: 26 0A       BNE    $9A57
 9A4D: C5 01       BITB   #$01
@@ -11186,8 +11198,7 @@ CC8E: CC 01 00    LDD    #$0100
 CC91: ED 13       STD    -$D,X
 CC93: E7 15       STB    -$B,X
 CC95: 39          RTS
-CC96: A7 30       STA    -$10,Y
-CC98: 83 CC 96    SUBD   #$CC96
+
 CC9B: 58          ASLB
 CC9C: CE CC A4    LDU    #jump_table_cca4
 CC9F: AD D5       JSR    [B,U]	; [indirect_jump] [nb_entries=3]
@@ -15801,7 +15812,7 @@ FADB: C3 00 10    ADDD   #$0010
 FADE: 84 01       ANDA   #$01
 FAE0: 97 E4       STA    $E4
 FAE2: E7 A8 23    STB    $23,Y
-FAE5: E7 A8 27    STB    $27,Y
+FAE5: E7 A8 27    STB    current_player_27,Y
 FAE8: E7 A8 2B    STB    $2B,Y
 FAEB: E7 A8 2F    STB    $2F,Y
 FAEE: AA 41       ORA    $1,U		; [select_address]

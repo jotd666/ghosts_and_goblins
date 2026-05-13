@@ -389,12 +389,14 @@ for i,line in enumerate(lines):
         lines[i+1] = remove_error(lines[i+1])
         lines[i-3] += "\tPUSH_SR  | save C\n"
 
-    elif address in {0x81c4,0x8441,0xa551,0xa6df,0xb3f0}:
+
+
+    elif address in {0xa551,0x8441,0x81c4,0xa6df,0xb3f0}:
+        lines[i-4] += "\tPUSH_SR  | save\n"
         lines[i+1] = remove_error(lines[i+1])
         lines[i-1] += "\tPOP_SR   | restore\n"
-        if "POP_SR" not in lines[i-4]:
-            raise Exception(f"Cannot move POP_SR before{address:04x}")
-        lines[i-4] = ""  #remove POP_SR
+
+
 
     if address in {0xec80,0xec6a}:
         # remove DAA

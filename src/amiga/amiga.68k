@@ -51,7 +51,7 @@ AFB_68020 = 1
 *NO68020 = 1
 
 
-NB_PLAYFIELD_PLANES = 6  | this is externally defined!!
+NB_PLAYFIELD_PLANES = 6
 	.ifndef	NB_PLAYFIELD_PLANES
 	.error	"NB_PLAYFIELD_PLANES must be defined via --defsym"
 	.endif
@@ -1527,6 +1527,25 @@ force_all_screen_redraw:
 	add.w	#BG_TILE_WIDTH,d5	| keep track of current "scroll"
 	dbf		d2,0b
 	clr.w	x_offset
+	
+	* last precaution, as some BOBs now are optimized to never erase
+	* if we're called that's because the scrolling has completely reset/changed
+	* so it's time to clear the last bob-only layer. Using the cpu is probably best at this point
+	move.l	playfield_drawn_screen_ptr,a0
+	add.l	#BG_SCREEN_PLANE_SIZE*NB_BG_PLANES,a0	| skip tile planes
+	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
+	move.l	playfield_displayed_screen_ptr,a1
+	add.l	#BG_SCREEN_PLANE_SIZE*NB_BG_PLANES,a1	| skip tile planes
+	.endif
+	move.l	#BG_SCREEN_PLANE_SIZE/4-1,d0
+0:
+	clr.l	(a0)+
+	.ifne	OPT_ENABLE_DOUBLE_BUFFERING
+	clr.l	(a1)+
+	.endif
+	dbf		d0,0b
+	
+	
 	rts
 	
 	
@@ -2222,7 +2241,7 @@ blit_background:
 
    * now just wait for blitter ready to write all registers
 	WAIT_BLIT
-    
+    * last bitplane: clear
 	WRITE_BLITTER_REG_LONG	d1,bltcon0	
 	WRITE_BLITTER_REG_LONG	a1,bltdpt	|destination top left corner
 	WRITE_BLITTER_REG_SIZE	d4	|rectangle size, starts blit
@@ -2236,6 +2255,7 @@ copy_function_table:
 	.word	copy_32-copy_function_table
 	.word	copy_48-copy_function_table
 	.word	copy_64-copy_function_table
+	.word	copy_80-copy_function_table
 	* probably never reached, just in case!
 	.word	copy_none-copy_function_table
 	.word	copy_none-copy_function_table
@@ -2284,6 +2304,13 @@ copy_64:
 	move.l	(a2)+,(a3)+	
 	CPU_COPY_POST
 
+copy_80:
+	CPU_COPY_PRE
+	move.l	(a2)+,(a3)+	
+	move.l	(a2)+,(a3)+	
+	move.w	(a2)+,(a3)+	
+	CPU_COPY_POST
+
 
 *void gng_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 *{
@@ -2329,7 +2356,7 @@ really_update_sprites:
 
 	* clear previous positions
 	lea	background_restore_buffer,a0
-	move.l	playfield_drawed_screen_ptr(pc),a1
+	move.l	playfield_drawn_screen_ptr(pc),a1
 	lea		object_type_table,a2
 	move.w	#NB_TARGET_SPRITES-1,d7
 
@@ -2574,7 +2601,7 @@ update_one_bob:
 	move.l	(NB_PLAYFIELD_PLANES*4,a0),d2
 	beq.b	2f		| mask is zero: blank tile => skip
 	
-	move.l		playfield_drawed_screen_ptr(pc),a1
+	move.l		playfield_drawn_screen_ptr(pc),a1
 	
 	move.l	d2,a3
 	* now 2 cases: if Y is negative, we have to clip, else normal
@@ -3083,7 +3110,7 @@ switch_screen_buffers:
 	* let's switch screen buffers, background (chars)
 	* toggle fg planes (double buffering)
 	* also toggle previous sprite positions
-	lea		playfield_drawed_screen_ptr(pc),a0
+	lea		playfield_drawn_screen_ptr(pc),a0
 	lea		bob_previous_positions_1(pc),a2
 	lea		bob_previous_positions_2(pc),a3
 	move.l	playfield_screen_data_1,a1
@@ -3296,7 +3323,7 @@ platform_init:
 	addq	#2,a0	| leave 16 bits hidden for left side clipping
 	jbsr	align_for_fmode
 	move.l	a0,playfield_screen_data_1
-	move.l	a0,playfield_drawed_screen_ptr
+	move.l	a0,playfield_drawn_screen_ptr
 	move.l	a0,playfield_displayed_screen_ptr
 	
 	st		music_track_start_number
@@ -3919,7 +3946,7 @@ update_bg_tile:
 	move.w	#BG_SCREEN_PLANE_SIZE,d5
 	.endif
 	
-	move.l		playfield_drawed_screen_ptr,a1
+	move.l		playfield_drawn_screen_ptr,a1
 	.ifeq	OPT_ENABLE_DOUBLE_BUFFERING
 	.else 
 	* double buffering
@@ -5134,16 +5161,15 @@ force_sound_stop:
 	.endif
 	movem.l	(a7)+,d0-d1/a0/a6
 	OSD_EXIT
-	move.b	#0,0x110
 	rts
 	
 * < D0.B sound index
 osd_sound_start:
-	move.b	d0,0x111
 	OSD_ENTER
 	movem.l	d0/d1/d2/a0/a1/a6,-(a7)
 	lea		_custom,a6
-	
+
+
 	* special case if game starts cut the music that could remain from attract
 	cmp.b	#INTRO_36_SND,d0
 	jne		0f
@@ -5238,7 +5264,6 @@ osd_sound_start:
 		
 
     movem.l d0-a6,-(a7)
-	jbsr		force_sound_stop
     lea _custom,a6
  	movem.l	d0/a0,-(a7)
 	
@@ -5274,6 +5299,9 @@ osd_sound_start:
 
 	*move.w	d2,music_duration
 	*move.w	d2,music_tick
+
+	* stop music (needed for CD tracks)
+	jbsr	osd_music_stop
 
 	st.b	music_playing
 
@@ -5983,7 +6011,7 @@ playfield_screen_data_2:
 	
 	
 
-playfield_drawed_screen_ptr:
+playfield_drawn_screen_ptr:
 	.long	0
 playfield_displayed_screen_ptr:
 	.long	0
