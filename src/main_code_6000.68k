@@ -9337,8 +9337,9 @@ l_9228:
 	and.b	(a0),d1                          	| [...]
 	BIT	#0x08,d1                           	| [$922c: bitb   #$08]
 	jne	player_pressed_up_923b             	| [$922e: bne    player_pressed_up_923b]
+	clr.b	up_previously_pressed_flag
 	BIT	#0x04,d1                           	| [$9230: bitb   #$04]
-	jne	l_92d0                             	| [$9232: lbne   $92d0]
+	jne	player_pressed_down_92d0           	| [$9232: lbne   player_pressed_down_92d0]
 	GET_REG_ADDRESS	0x15,d2                	| [$9236: clr    $15,x]
 	clr.b	(a0)                         	| [...]
 	COM	d1                                 	| [$9239: comb]
@@ -9348,6 +9349,7 @@ player_pressed_up_923b:
 	jcc	l_926a                             	| [$923e: bcc    $926a]
 * a ladder is available, or already on the ladder
 	move.b	#0x03,d0                        	| [$9240: lda    #$03]
+	st.b    is_on_ladder_flag
 	GET_REG_ADDRESS	0x15,d2                	| [$9242: cmpa   $15,x]
 	cmp.b	(a0),d0                          	| [...]
 	jeq	l_9268                             	| [$9245: beq    $9268]
@@ -9377,6 +9379,20 @@ l_9268:
 	moveq	#0,d1                            	| [$9268: clrb]
 	rts                                    	| [$9269: rts]
 l_926a:
+    * not over the ladder
+    tst.b    up_for_jump_flag
+    jeq        1f
+    * "up for jump" infamous option set
+    * are we already on the ladder for a while?
+    tst.b    is_on_ladder_flag
+    jne        0f
+    tst.b    up_previously_pressed_flag
+    jne        0f
+    jbsr    perform_jump_9221
+0:
+    clr.b    is_on_ladder_flag
+    st.b    up_previously_pressed_flag
+1:
 	GET_REG_ADDRESS	0x16,d2                	| [$926a: ldb    $16,x]
 	move.b	(a0),d1                         	| [...]
 	jeq	l_9259                             	| [$926d: beq    $9259]
@@ -9453,9 +9469,10 @@ l_92cb:
 	jbsr	l_9389                            	| [$92cb: jsr    $9389]
 	moveq	#0,d1                            	| [$92ce: clrb]
 	rts                                    	| [$92cf: rts]
-l_92d0:
-	jbsr	l_934a                            	| [$92d0: jsr    $934a]
+player_pressed_down_92d0:
+	jbsr	check_if_above_ladder_934a        	| [$92d0: jsr    check_if_above_ladder_934a]
 	jcc	l_92f4                             	| [$92d3: bcc    $92f4]
+* ladder below us: we can go down
 	move.b	#0x04,d0                        	| [$92d5: lda    #$04]
 	GET_REG_ADDRESS	0x15,d2                	| [$92d7: cmpa   $15,x]
 	cmp.b	(a0),d0                          	| [...]
@@ -9549,7 +9566,7 @@ l_933b:
 l_9348:
 	COM	d1                                 	| [$9348: comb]
 	rts                                    	| [$9349: rts]
-l_934a:
+check_if_above_ladder_934a:
 	GET_REG_ADDRESS	-0xa,d2                	| [$934a: ldd    -$a,x]
 	LOAD_D                                 	| [$934a: ldd    -$a,x]
 	GET_DP_ADDRESS	0xec                    	| [$934c: std    $ec]

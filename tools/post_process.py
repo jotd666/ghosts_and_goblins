@@ -329,6 +329,30 @@ for i,line in enumerate(lines):
     elif address == 0x6140:
         # insert read highscore
         line = "\tjbsr\tosd_read_high_scores\n"+line
+    ######### handing "up for jump" option ########
+    # not trivial as we don't want the character to jump right
+    # after he climbed up a ladder
+    elif address == 0x922e:
+        line += "\tclr.b\tup_previously_pressed_flag\n"
+    elif address == 0x9240:
+        line += "\tst.b    is_on_ladder_flag\n"
+    elif address == 0x926a:
+        line =    """    * not over the ladder
+    tst.b    up_for_jump_flag
+    jeq        1f
+    * "up for jump" infamous option set
+    * are we already on the ladder for a while?
+    tst.b    is_on_ladder_flag
+    jne        0f
+    tst.b    up_previously_pressed_flag
+    jne        0f
+    jbsr    perform_jump_9221
+0:
+    clr.b    is_on_ladder_flag
+    st.b    up_previously_pressed_flag
+1:
+"""+line
+    ####################################################
     elif address == 0x617f:
         line = "\tjbsr\tosd_main_loop_hook\n"+line
     ###################################################

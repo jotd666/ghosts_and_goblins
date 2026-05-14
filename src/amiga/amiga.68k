@@ -489,6 +489,8 @@ _user:
 	sne		no_level_music_flag
 	btst	#3,d1
 	sne		service_mode_flag
+	btst	#4,d1
+	sne		up_for_jump_flag
 	.ifne	OPT_CD32_VERSION
 	* force the flag
 	st		no_level_music_flag

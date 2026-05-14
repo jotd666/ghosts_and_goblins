@@ -5547,7 +5547,7 @@ perform_jump_9221:
 922C: C5 08       BITB   #$08
 922E: 26 0B       BNE    player_pressed_up_923b
 9230: C5 04       BITB   #$04
-9232: 10 26 00 9A LBNE   $92D0
+9232: 10 26 00 9A LBNE   player_pressed_down_92d0
 9236: 6F 88 15    CLR    $15,X
 9239: 53          COMB
 923A: 39          RTS
@@ -5622,8 +5622,10 @@ player_pressed_up_923b:
 92CB: BD 93 89    JSR    $9389
 92CE: 5F          CLRB
 92CF: 39          RTS
-92D0: BD 93 4A    JSR    $934A
+player_pressed_down_92d0:
+92D0: BD 93 4A    JSR    check_if_above_ladder_934a
 92D3: 24 1F       BCC    $92F4
+; ladder below us: we can go down
 92D5: 86 04       LDA    #$04
 92D7: A1 88 15    CMPA   $15,X
 92DA: 27 2E       BEQ    $930A
@@ -5681,6 +5683,7 @@ check_if_over_ladder_9311:
 9346: ED 16       STD    -$A,X
 9348: 53          COMB
 9349: 39          RTS
+check_if_above_ladder_934a:
 934A: EC 16       LDD    -$A,X
 934C: DD EC       STD    $EC
 934E: EC 19       LDD    -$7,X
