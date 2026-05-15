@@ -1,14 +1,8 @@
-- CD32 version: other levels musics start but stop 1 second after: put blitz on CD_STOP call and CD_START!!!
-- still missing erase when switching levels for the last BOB bitplane (bags): redraw when bugs, reproduce issues!!
 - different score table for each difficulty / lives?
-- alternate control scheme up for jump: 
-  * ladder check: check if last time up was pressed ladder was there. if so, keep climbing (no jump)
- 926a:
-	jbsr ou jra		l_9221
- 
 - to save memory (CD32 version?): don't include white arremers, shorten sprite files, lower quality sound samples
   => arremer table index=>is_arremer to fix clut to red else it will become invisible!
-  
+- if same level context as before, it seems that the game still loads the data despite the attempt
+  to optimize (data is already in memory), seen on CD32 version  
 
 - after continuing, the map context should be loaded!! sometimes ok sometimes not (release mode level 5??). Maybe another clear screen
   race condition? maybe fixed now

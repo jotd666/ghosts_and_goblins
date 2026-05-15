@@ -332,6 +332,17 @@ osd_enter_\@:
 	.include	"whdload_funcs.i"
 		.text
 
+	.macro	BKPT comment
+	move.l	a0,-(a7)
+	lea		comment\@(pc),a0
+	move.b	#0,0x110
+	move.l	(a7)+,a0
+	jra		next\@
+comment\@:
+	.asciz	"\comment"
+	.align	2
+next\@:
+	.endm
 
 	    
 _user:
@@ -1371,6 +1382,20 @@ load_context:
 	move.w	game_scroll_x,previous_scroll_x
 	jbsr force_all_screen_redraw
 
+	* we should play CD music here because it was stopped
+	* by CD data load
+	.ifne	OPT_CD32_VERSION
+	cmp.w	#MAP_CONTEXT,previous_context
+	jne		0f
+	moveq	#0,d0
+	move.b	previous_cd_track,d0
+	jmi		0f
+	move.l	_cdplay,a0
+	moveq	#0,d1
+	jsr		(a0)
+0:
+	.endif
+	
 	jbsr	osd_enable_interrupts
 
 	movem.l	(a7)+,d0-a6
@@ -5145,6 +5170,8 @@ osd_music_stop:
 	tst.b	music_playing
 	jne		force_sound_stop
 	rts
+	
+
 
 force_sound_stop:
 	OSD_ENTER
@@ -5160,6 +5187,7 @@ force_sound_stop:
 	.ifne	OPT_CD32_VERSION
 	move.l	_cdstop,a0
 	jbsr	(a0)
+	st.b	previous_cd_track
 	.endif
 	movem.l	(a7)+,d0-d1/a0/a6
 	OSD_EXIT
@@ -5275,11 +5303,19 @@ osd_sound_start:
 	lsr.w	#3,d0			| divide by 8
 	move.b	(a0,d0.w),d0	| get CD track to play
 	jeq		55f				| not a CD track: normal operation
-	* it's CD music
+	cmp.b	previous_cd_track,D0
+	jeq		55f				| don't launch same track twice
+	move.b	d0,previous_cd_track
+	* it's CD music, play only if not map context
+	* (else data load will stop music)
+	* we'll delay the load at the end of load_context routine
+	cmp.w	#MAP_CONTEXT,current_context
+	jeq		54f
 	move.l	_cdplay,a0
 	moveq	#0,d1
 	jbsr	(a0)
 	st.b	music_playing
+54:
 	add		#8,a7		| pop stack to restore it for a0 and d0
 	jra		60f			| skip all module stuff
 55:
@@ -5766,7 +5802,8 @@ coin2_requested:
 	.byte	0
 music_playing:
 	.byte	0
-
+previous_cd_track:
+	.byte	0
 
 music_loops:
 	.byte	0
