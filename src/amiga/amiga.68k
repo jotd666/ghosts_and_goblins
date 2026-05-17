@@ -1322,7 +1322,7 @@ load_context:
 	cmp.w	#MAP_CONTEXT,previous_context
 	jne		1f
 	* coming from map: check if saved_context is the context we want
-	cmp.w	previous_context,d0
+	cmp.w	saved_context,d0
 	jne		1f   
 	* the file buffer already contains the context, just set pointer
 	move.l	#bg_character_table_buffer,bg_character_table_buffer_ptr

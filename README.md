@@ -21,6 +21,7 @@ Credits:
   sound conversion for the Amiga.
 - IM76: music conversion to 3/4-channel modules
 - PascalDe73/Hexaae: icons
+- Steve: cd32 cover pics
 - Capcom: original game
 - English Amiga Board forum members: testing, support and suggestions
 
