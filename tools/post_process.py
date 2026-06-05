@@ -178,6 +178,8 @@ for i,line in enumerate(lines):
         lines[i-1] = remove_error(lines[i-1],ignore_missing=True)
         lines[i-2] = remove_error(lines[i-2],ignore_missing=True)
 
+    if any(x in line for x in ( "check explicit S usage",)):
+        line = remove_error(line,ignore_missing=True)
     lines[i] = line
 
 
@@ -439,7 +441,7 @@ for i,line in enumerate(lines):
     # change target stack usage by host stack usage when needed
     # (pshs + restore register without popping stack happens a lot)
     if address in {0x815b}:
-        lines[i-1] = remove_error(lines[i-1])
+        lines[i-1] = remove_error(lines[i-1],True)
         line = change_instruction("move.l\t(sp),d2",lines,i)
 
     # here it's ok to fully use target stack
@@ -466,9 +468,6 @@ for i,line in enumerate(lines):
             line += "\tZERO_MSW\td3\n" + zd1d2
 
 
-    # we know we handled all pshu properly, remove the errors
-    if "review pshu instruction" in line or "review pulu instruction" in line:
-            line = remove_error(line,True)
 
     # PULS
     if address in {0x662e,0x663e,0x66a8,0x66b8,0x672d,0x673d,0x666f,0x667d,0x66f0,0x66fe} and "movem" in line:
@@ -524,6 +523,9 @@ for i,line in enumerate(lines):
     elif address == 0x7942:
         # sound
         line = "\texg\td0,d1\n"+change_instruction("jbsr\tosd_sound_start",lines,i)+"\texg\td0,d1\n"
+
+
+
 ##    elif address == 0x6C11:
 ##        line = "\tmoveq\t#1,d1\n"+line+"\tmoveq\t#1,d0\n"  # temp show map at start
 # pattern where logging is required outside the IRQ code
@@ -555,6 +557,9 @@ for i,line in enumerate(lines):
 ##        line = "\tGET_ADDRESS 0x6C\n\tmove.w #0x4006,(a0)\n\tENABLE_LOG_REGS\n"+line
 
     ### end of stack management change
+    # we know we handled all pshu properly, remove the errors
+    if any(x in line for x in ("had to be swapped","review pulu instruction","review pshu instruction", "check explicit S usage")):
+        line = remove_error(line,ignore_missing=True)
 
     if "stray cmp" in line:
         # 1 useless CMP instruction

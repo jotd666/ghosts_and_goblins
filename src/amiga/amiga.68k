@@ -1509,6 +1509,7 @@ set_initial_scroll_values:
 force_all_screen_redraw:
 	lea		_custom,a5
 	REALLY_WAIT_BLIT
+	jbsr	osd_disable_interrupts
 	GET_MEMORY_START_IN_A6
 	* given the current scroll X/Y, draw all tiles on screen
 	jbsr	set_initial_scroll_values
@@ -1572,6 +1573,7 @@ force_all_screen_redraw:
 	.endif
 	dbf		d0,0b
 	
+	jbsr	osd_enable_interrupts
 	
 	rts
 	

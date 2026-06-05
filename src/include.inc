@@ -224,6 +224,7 @@ okay\@:
 	move.w	(\src),\dest
 	.endm
 
+	
 	.macro    CMP_W_TO_REG    src,dest
 	cmp.w    (\src),\dest
 	.endm
@@ -241,7 +242,13 @@ okay\@:
 	move.w	\src,(\dest)
 	.endm
 
+	.macro	MOVE_W_FROM_REG_PREDEC	src,dest
+	move.w	\src,-(\dest)
+	.endm
 
+	.macro	MOVE_W_TO_REG_POSTINC	src,dest
+	move.w	(\src)+,\dest
+	.endm
 
 	.macro READ_BE_WORD	srcreg
 	moveq	#0,d6

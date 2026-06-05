@@ -1,22 +1,17 @@
-- different score table for each difficulty / lives?
-- to save memory (CD32 version?): don't include white arremers, shorten sprite files, lower quality sound samples
-  => arremer table index=>is_arremer to fix clut to red else it will become invisible!
-- after continuing, the map context should be loaded!! sometimes ok sometimes not (release mode level 5??). Maybe another clear screen
-  race condition? maybe fixed now
+- LOADING... message when loading data
+- fix "ERROR" messages (new converter)
+- sometimes tiles aren't properly displayed at start of level (real CD32)
 - After entering a highscore and being too fast on the continues screen with pressing fire to continue, the game switches to the map (as expected), but it's playing the wrong music: it's repeating the last part from the highscore screen instead of the "map music" and you'll start the level without any music at all. Once you finish the level (or in my case more likely: die), all goes back to normal.
-- another curious thing about the time (playing normally this one), when the two minutes counter ends, a :32 is displayed when you are dying, until the next life begins 
-- 50Hz flashy at times, limit framerate?
+- There is a bug on v0.93 (probably earlier versions too) that crashes the WHDload slave when saving scores on game-over without using any initials (blank)
+  in bank3 at 5bf6 the value is $FF => jumps in the woods
+  
+- start menu with difficulty/lives / select jump type
 
-
-
-
-- pre-mirror of trunk fails (91) in clut 1 probably because of 0 in planelist (ok on non-blit chain, blit chain specifics, same issue
-  when using fixed value for blitter data instead of source, annoying!)
-- blit chain: scrolling to fix, wrong values, shaking
+- if we add blit chain: scrolling to fix, wrong values, shaking
 - remove parasite tiles (in the end) because of levelskip some intro tiles are logged in levels 2+
 - remove those "hhhhh" at start fill_screen_with_h 
+- different score table for each difficulty / lives?
 - level 3 still tile issues (part 2, hard left after big ladder, even on emulation, try to reproduce as not systematic, maybe release only)
-- real hardware sometimes scrolling seems to reset. Increase delta x scroll to trigger full refresh: to test real hw
 - try to apply patches to fix some original game bugs / difficulty level HP for monsters
 - add foreground tiles (grass, bridge, level 6 pillars): tricky work, added blitting, and not really noticeable
 - demo resets scroll and makes column update buggy at times
@@ -26,6 +21,7 @@
 - force tile draw cheat screws up host_scroll and tile feed
 - change weapon trainer: call the routine to redraw weapon: not from interrupt!! if must be done, force to call "a new
   weapon is picked up" with a flag
+- another curious thing about the time (playing normally this one), when the two minutes counter ends, a :32 is displayed when you are dying, until the next life begins 
 
 
 hacks:

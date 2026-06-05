@@ -2009,7 +2009,7 @@ game_playing_7245:
 7288: D7 DE       STB    tiles_palette_change_command_00de
 728A: 1F 02       TFR    D,Y
 728C: 8E 00 20    LDX    #$0020
-728F: 36 26       PSHU   Y,D	; [video_address]
+728F: 36 26       PSHU   Y,D
 7291: 30 1F       LEAX   -$1,X
 7293: 26 FA       BNE    $728F
 7295: 39          RTS

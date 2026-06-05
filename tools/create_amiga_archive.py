@@ -40,16 +40,16 @@ subprocess.check_call(cmd_prefix+["clean"],cwd=progdir /"src")
 subprocess.check_call(cmd_prefix+["RELEASE_BUILD=1"],cwd=progdir /"src")
 # create archive
 
-outdir = progdir / f"{gamename}"
+outdir = progdir  / "dist" / f"{gamename}"
 
 dataout = outdir / "data"
 if dataout.exists():
     shutil.rmtree(dataout)
 
 if os.path.exists(outdir):
-    for x in outdir.glob("*"):
-        x.unlink()
-outdir.mkdir(exist_ok=True)
+    shutil.rmtree(outdir)
+
+outdir.mkdir(exist_ok=True,parents=True)
 assets = progdir /"assets"/"amiga"
 
 for file in ["readme.md",f"{gamename}_AGA.slave"]:  #f"{gamename}.slave",
@@ -70,6 +70,12 @@ for ext in ["aga"]:
     packcopy(data/exename,dataout)
     #subprocess.run(["cranker_windows.exe","-f",data/exename,"-o",progdir/f"{exename}.rnc"],check=True)
 
+
+arcname = progdir / f"GhostsNGoblins_WHD.lha"
+arcname.unlink(missing_ok=True)
+cmd = ["lha","-r","a",arcname,"*"]
+
+subprocess.run(cmd,cwd=outdir.parent,check=True)
 
 outdir = progdir / f"{gamename}_CD32"
 

@@ -962,22 +962,15 @@ l_662e:
 	movem.w	(a3)+,d1-d2  | same order than PULS we're lucky |  [$662e: puls   d,x] get values from new stack
 	ZERO_MSW	d1
 	ZERO_MSW	d2
-	MAKE_A
 	GET_REG_ADDRESS	0x0100,d3              	| [$6630: std    $0100,y]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	GET_REG_ADDRESS	0x0102,d3              	| [$6634: stx    $0102,y]
 	MOVE_W_FROM_REG	d2,a0                         	| [...]
 	GET_REG_ADDRESS	0,d4                   	| [$6638: pulu   d,x]
-	sub.l	a0,d4
-	MOVE_W_TO_REG	a0,d1                         	| [$6638: pulu   d,x]
-	addq	#2,a0
-	MOVE_W_TO_REG	a0,d2                         	| [$6638: pulu   d,x]
-	addq	#2,a0
-	PUSH_SR                                	| [...]
-	MAKE_A                                 	| [...]
-	POP_SR                                 	| [...]
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d1                         	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d2                         	| [...]
 	add.l	a0,d4
-	MAKE_D                                 	| [...]
 	GET_REG_ADDRESS	0,d3                   	| [$663a: std    ,y++]
 	addq.w	#2,d3                           	| [...]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
@@ -993,16 +986,10 @@ l_662e:
 	GET_REG_ADDRESS	0x0102,d3              	| [$6644: stx    $0102,y]
 	MOVE_W_FROM_REG	d2,a0                         	| [...]
 	GET_REG_ADDRESS	0,d4                   	| [$6648: pulu   d,x]
-	sub.l	a0,d4
-	MOVE_W_TO_REG	a0,d1                         	| [$6648: pulu   d,x]
-	addq	#2,a0
-	MOVE_W_TO_REG	a0,d2                         	| [$6648: pulu   d,x]
-	addq	#2,a0
-	PUSH_SR                                	| [...]
-	MAKE_A                                 	| [...]
-	POP_SR                                 	| [...]
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d1                         	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d2                         	| [...]
 	add.l	a0,d4
-	MAKE_D                                 	| [...]
 	GET_REG_ADDRESS	0,d3                   	| [$664a: std    ,y++]
 	addq.w	#2,d3                           	| [...]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
@@ -1046,16 +1033,10 @@ l_666f:
 	GET_REG_ADDRESS	copy_of_system_42,d3   	| [$6674: stx    copy_of_system_42,y]
 	MOVE_W_FROM_REG	d2,a0                         	| [...]
 	GET_REG_BANK_ADDRESS	0,d4                   	| [$6677: pulu   d,x] [bank_address]
-	sub.l	a0,d4
-	MOVE_W_TO_REG	a0,d1                         	| [$6677: pulu   d,x] [bank_address]
-	addq	#2,a0
-	MOVE_W_TO_REG	a0,d2                         	| [$6677: pulu   d,x] [bank_address]
-	addq	#2,a0
-	PUSH_SR                                	| [...]
-	MAKE_A                                 	| [...]
-	POP_SR                                 	| [...]
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d1                         	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d2                         	| [...]
 	add.l	a0,d4
-	MAKE_D                                 	| [...]
 	GET_REG_ADDRESS	0,d3                   	| [$6679: std    ,y++]
 	addq.w	#2,d3                           	| [...]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
@@ -1071,16 +1052,10 @@ l_666f:
 	GET_REG_ADDRESS	copy_of_system_42,d3   	| [$6682: stx    copy_of_system_42,y]
 	MOVE_W_FROM_REG	d2,a0                         	| [...]
 	GET_REG_BANK_ADDRESS	0,d4                   	| [$6685: pulu   d,x] [bank_address]
-	sub.l	a0,d4
-	MOVE_W_TO_REG	a0,d1                         	| [$6685: pulu   d,x] [bank_address]
-	addq	#2,a0
-	MOVE_W_TO_REG	a0,d2                         	| [$6685: pulu   d,x] [bank_address]
-	addq	#2,a0
-	PUSH_SR                                	| [...]
-	MAKE_A                                 	| [...]
-	POP_SR                                 	| [...]
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d1                         	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d2                         	| [...]
 	add.l	a0,d4
-	MAKE_D                                 	| [...]
 	GET_REG_ADDRESS	0,d3                   	| [$6687: std    ,y++]
 	addq.w	#2,d3                           	| [...]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
@@ -1116,16 +1091,10 @@ l_66a8:
 	GET_REG_ADDRESS	0x0102,d3              	| [$66ae: stx    $0102,y]
 	MOVE_W_FROM_REG	d2,a0                         	| [...]
 	GET_REG_ADDRESS	0,d4                   	| [$66b2: pulu   d,x] read values and advance
-	sub.l	a0,d4
-	MOVE_W_TO_REG	a0,d1                         	| [$66b2: pulu   d,x] read values and advance
-	addq	#2,a0
-	MOVE_W_TO_REG	a0,d2                         	| [$66b2: pulu   d,x] read values and advance
-	addq	#2,a0
-	PUSH_SR                                	| [...]
-	MAKE_A                                 	| [...]
-	POP_SR                                 	| [...]
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d1                         	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d2                         	| [...]
 	add.l	a0,d4
-	MAKE_D                                 	| [...]
 	GET_REG_ADDRESS	0,d3                   	| [$66b4: std    ,y++] write to R/G
 	addq.w	#2,d3                           	| [...]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
@@ -1141,16 +1110,10 @@ l_66a8:
 	GET_REG_ADDRESS	0x0102,d3              	| [$66be: stx    $0102,y]
 	MOVE_W_FROM_REG	d2,a0                         	| [...]
 	GET_REG_ADDRESS	0,d4                   	| [$66c2: pulu   d,x] read values and advance
-	sub.l	a0,d4
-	MOVE_W_TO_REG	a0,d1                         	| [$66c2: pulu   d,x] read values and advance
-	addq	#2,a0
-	MOVE_W_TO_REG	a0,d2                         	| [$66c2: pulu   d,x] read values and advance
-	addq	#2,a0
-	PUSH_SR                                	| [...]
-	MAKE_A                                 	| [...]
-	POP_SR                                 	| [...]
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d1                         	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d2                         	| [...]
 	add.l	a0,d4
-	MAKE_D                                 	| [...]
 	GET_REG_ADDRESS	0,d3                   	| [$66c4: std    ,y++]
 	addq.w	#2,d3                           	| [...]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
@@ -1195,16 +1158,10 @@ l_66f0:
 	GET_REG_ADDRESS	copy_of_system_42,d3   	| [$66f5: stx    copy_of_system_42,y]
 	MOVE_W_FROM_REG	d2,a0                         	| [...]
 	GET_REG_BANK_ADDRESS	0,d4                   	| [$66f8: pulu   d,x] [bank_address]
-	sub.l	a0,d4
-	MOVE_W_TO_REG	a0,d1                         	| [$66f8: pulu   d,x] [bank_address]
-	addq	#2,a0
-	MOVE_W_TO_REG	a0,d2                         	| [$66f8: pulu   d,x] [bank_address]
-	addq	#2,a0
-	PUSH_SR                                	| [...]
-	MAKE_A                                 	| [...]
-	POP_SR                                 	| [...]
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d1                         	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d2                         	| [...]
 	add.l	a0,d4
-	MAKE_D                                 	| [...]
 	GET_REG_ADDRESS	0,d3                   	| [$66fa: std    ,y++]
 	addq.w	#2,d3                           	| [...]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
@@ -1220,16 +1177,10 @@ l_66f0:
 	GET_REG_ADDRESS	copy_of_system_42,d3   	| [$6703: stx    copy_of_system_42,y]
 	MOVE_W_FROM_REG	d2,a0                         	| [...]
 	GET_REG_BANK_ADDRESS	0,d4                   	| [$6706: pulu   d,x] [bank_address]
-	sub.l	a0,d4
-	MOVE_W_TO_REG	a0,d1                         	| [$6706: pulu   d,x] [bank_address]
-	addq	#2,a0
-	MOVE_W_TO_REG	a0,d2                         	| [$6706: pulu   d,x] [bank_address]
-	addq	#2,a0
-	PUSH_SR                                	| [...]
-	MAKE_A                                 	| [...]
-	POP_SR                                 	| [...]
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d1                         	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d2                         	| [...]
 	add.l	a0,d4
-	MAKE_D                                 	| [...]
 	GET_REG_ADDRESS	0,d3                   	| [$6708: std    ,y++]
 	addq.w	#2,d3                           	| [...]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
@@ -1272,16 +1223,10 @@ l_672d:
 	GET_REG_ADDRESS	0x0102,d3              	| [$6733: stx    $0102,y]
 	MOVE_W_FROM_REG	d2,a0                         	| [...]
 	GET_REG_ADDRESS	0,d4                   	| [$6737: pulu   d,x]
-	sub.l	a0,d4
-	MOVE_W_TO_REG	a0,d1                         	| [$6737: pulu   d,x]
-	addq	#2,a0
-	MOVE_W_TO_REG	a0,d2                         	| [$6737: pulu   d,x]
-	addq	#2,a0
-	PUSH_SR                                	| [...]
-	MAKE_A                                 	| [...]
-	POP_SR                                 	| [...]
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d1                         	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d2                         	| [...]
 	add.l	a0,d4
-	MAKE_D                                 	| [...]
 	GET_REG_ADDRESS	0,d3                   	| [$6739: std    ,y++]
 	addq.w	#2,d3                           	| [...]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
@@ -1297,16 +1242,10 @@ l_672d:
 	GET_REG_ADDRESS	0x0102,d3              	| [$6743: stx    $0102,y]
 	MOVE_W_FROM_REG	d2,a0                         	| [...]
 	GET_REG_ADDRESS	0,d4                   	| [$6747: pulu   d,x]
-	sub.l	a0,d4
-	MOVE_W_TO_REG	a0,d1                         	| [$6747: pulu   d,x]
-	addq	#2,a0
-	MOVE_W_TO_REG	a0,d2                         	| [$6747: pulu   d,x]
-	addq	#2,a0
-	PUSH_SR                                	| [...]
-	MAKE_A                                 	| [...]
-	POP_SR                                 	| [...]
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d1                         	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d2                         	| [...]
 	add.l	a0,d4
-	MAKE_D                                 	| [...]
 	GET_REG_ADDRESS	0,d3                   	| [$6749: std    ,y++]
 	addq.w	#2,d3                           	| [...]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
@@ -1697,30 +1636,22 @@ l_68df:
 	move.w	d2,d3                           	| [$68eb: leay   ,x]
 l_68ed:
 	GET_REG_ADDRESS	0,d4                   	| [$68ed: pshu   y,x,d]
-	sub.l	a0,d4
-	subq	#2,a0
-	MOVE_W_FROM_REG	d3,a0                         	| [$68ed: pshu   y,x,d]
-	subq	#2,a0
-	MOVE_W_FROM_REG	d2,a0                         	| [$68ed: pshu   y,x,d]
-	subq	#2,a0
-	MOVE_W_FROM_REG	d1,a0                         	| [$68ed: pshu   y,x,d]
-	add.l	a0,d4
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_FROM_REG_PREDEC	d3,a0                         	| [...]
+	MOVE_W_FROM_REG_PREDEC	d2,a0                         	| [...]
+	MOVE_W_FROM_REG_PREDEC	d1,a0                         	| [...]
+	add.l	a0,d4                            	| [...]
 	GET_REG_ADDRESS	0,d4                   	| [$68ef: pshu   y,x,d]
-	sub.l	a0,d4
-	subq	#2,a0
-	MOVE_W_FROM_REG	d3,a0                         	| [$68ef: pshu   y,x,d]
-	subq	#2,a0
-	MOVE_W_FROM_REG	d2,a0                         	| [$68ef: pshu   y,x,d]
-	subq	#2,a0
-	MOVE_W_FROM_REG	d1,a0                         	| [$68ef: pshu   y,x,d]
-	add.l	a0,d4
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_FROM_REG_PREDEC	d3,a0                         	| [...]
+	MOVE_W_FROM_REG_PREDEC	d2,a0                         	| [...]
+	MOVE_W_FROM_REG_PREDEC	d1,a0                         	| [...]
+	add.l	a0,d4                            	| [...]
 	GET_REG_ADDRESS	0,d4                   	| [$68f1: pshu   x,d]
-	sub.l	a0,d4
-	subq	#2,a0
-	MOVE_W_FROM_REG	d2,a0                         	| [$68f1: pshu   x,d]
-	subq	#2,a0
-	MOVE_W_FROM_REG	d1,a0                         	| [$68f1: pshu   x,d]
-	add.l	a0,d4
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_FROM_REG_PREDEC	d2,a0                         	| [...]
+	MOVE_W_FROM_REG_PREDEC	d1,a0                         	| [...]
+	add.l	a0,d4                            	| [...]
 	subq.b	#1,d7 |  [$68f3: dec    ,s] one less
 	jne	l_68ed                             	| [$68f5: bne    $68ed]
 	movem.l	(sp)+,d1/d4                    	| [$68f7: puls   b,u,pc]
@@ -2542,10 +2473,9 @@ l_6daa:
 	GET_REG_ADDRESS	0x5,d2                 	| [$6db0: stb    $5,x]
 	move.b	d1,(a0)                         	| [...]
 	GET_REG_ADDRESS	0,d4                   	| [$6db2: pshu   x]
-	sub.l	a0,d4
-	subq	#2,a0
-	MOVE_W_FROM_REG	d2,a0                         	| [$6db2: pshu   x]
-	add.l	a0,d4
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_FROM_REG_PREDEC	d2,a0                         	| [...]
+	add.l	a0,d4                            	| [...]
 	add.w	#0x30,d2                         	| [$6db4: leax   $30,x]
 	OP_W_ON_DP_ADDRESS	subq,stack_save_00e2,#1| [$6db7: dec    stack_save_00e2]
 	jne	l_6daa                             	| [$6db9: bne    $6daa]
@@ -2557,10 +2487,9 @@ l_6daa:
 	move.w	#0x1010,d2                      	| [$6dc4: ldx    #$1010]
 l_6dc7:
 	GET_REG_ADDRESS	0,d4                   	| [$6dc7: pshu   x]
-	sub.l	a0,d4
-	subq	#2,a0
-	MOVE_W_FROM_REG	d2,a0                         	| [$6dc7: pshu   x]
-	add.l	a0,d4
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_FROM_REG_PREDEC	d2,a0                         	| [...]
+	add.l	a0,d4                            	| [...]
 	add.w	#counter_16_bit_0020,d2          	| [$6dc9: leax   counter_16_bit_0020,x]
 	subq.b	#1,d1                           	| [$6dcc: decb]
 	jne	l_6dc7                             	| [$6dcd: bne    $6dc7]
@@ -2584,10 +2513,9 @@ l_6ddf:
 	GET_REG_ADDRESS	0x5,d2                 	| [$6de5: stb    $5,x]
 	move.b	d1,(a0)                         	| [...]
 	GET_REG_ADDRESS	0,d4                   	| [$6de7: pshu   x]
-	sub.l	a0,d4
-	subq	#2,a0
-	MOVE_W_FROM_REG	d2,a0                         	| [$6de7: pshu   x]
-	add.l	a0,d4
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_FROM_REG_PREDEC	d2,a0                         	| [...]
+	add.l	a0,d4                            	| [...]
 	add.w	#counter_16_bit_0020,d2          	| [$6de9: leax   counter_16_bit_0020,x]
 	OP_W_ON_DP_ADDRESS	subq,stack_save_00e2,#1| [$6dec: dec    stack_save_00e2]
 	jne	l_6ddf                             	| [$6dee: bne    $6ddf]
@@ -3096,19 +3024,14 @@ l_7283:
 	moveq	#0,d0                            	| [$7286: clra]
 	moveq	#0,d1                            	| [$7287: clrb]
 	OP_W_ON_DP_ADDRESS	move,tiles_palette_change_command_00de,d1| [$7288: stb    tiles_palette_change_command_00de]
-	PUSH_SR
-	MAKE_D                                 	| [...]
 	move.w	d1,d3                           	| [$728a: tfr    d,y]
-	POP_SR
 	move.w	#0x0020,d2                      	| [$728c: ldx    #$0020]
 l_728f:
-	GET_REG_UNCHECKED_ADDRESS	0,d4                   	| [$728f: pshu   y,d] [video_address]
-	sub.l	a0,d4
-	subq	#2,a0
-	MOVE_W_FROM_REG	d3,a0                         	| [$728f: pshu   y,d] [video_address]
-	subq	#2,a0
-	MOVE_W_FROM_REG	d1,a0                         	| [$728f: pshu   y,d] [video_address]
-	add.l	a0,d4
+	GET_REG_ADDRESS	0,d4                   	| [$728f: pshu   y,d]
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_FROM_REG_PREDEC	d3,a0                         	| [...]
+	MOVE_W_FROM_REG_PREDEC	d1,a0                         	| [...]
+	add.l	a0,d4                            	| [...]
 	subq.w	#0x1,d2                         	| [$7291: leax   -$1,x]
 	jne	l_728f                             	| [$7293: bne    $728f]
 	rts                                    	| [$7295: rts]
@@ -6936,17 +6859,13 @@ l_8677:
 	OP_R_ON_DP_ADDRESS	sub,0xb8,d1          | [$869d: subb   $b8]
 	jeq	l_86c3                             	| [$869f: beq    $86c3]
 	OP_W_ON_DP_ADDRESS	move,0xe6,d1         | [$86a1: stb    $e6]
-	PUSH_SR
 	move.w	d2,d1                           	| [$86a3: tfr    x,d]
 	ror.w	#8,d2                            	| [...]
 	move.b	d2,d0                           	| [...] set MSB
 	ror.w	#8,d2                            	| [...]
-	POP_SR
 	or.b	#0x1f,d1                          	| [$86a5: orb    #$1f]
-	PUSH_SR
 	MAKE_D                                 	| [...]
 	move.w	d1,d2                           	| [$86a7: tfr    d,x]
-	POP_SR
 	OP_R_ON_DP_ADDRESS	move,0xe6,d1         | [$86a9: ldb    $e6]
 	addq.w	#0x1,d2                         	| [$86ab: leax   $1,x]
 	move.w	d2,d3                           	| [$86ad: leay   $0400,x]
@@ -8060,19 +7979,15 @@ l_8af2:
 	OP_R_ON_DP_ADDRESS	sub,0xba,d1          | [$8b16: subb   $ba]
 	jeq	l_8b44                             	| [$8b18: beq    $8b44]
 	OP_W_ON_DP_ADDRESS	move,0xe6,d1         | [$8b1a: stb    $e6]
-	PUSH_SR
 	move.w	d2,d1                           	| [$8b1c: tfr    x,d]
 	ror.w	#8,d2                            	| [...]
 	move.b	d2,d0                           	| [...] set MSB
 	ror.w	#8,d2                            	| [...]
-	POP_SR
 	and.b	#0x03,d0                         	| [$8b1e: anda   #$03]
 	and.b	#0x1f,d1                         	| [$8b20: andb   #$1f]
 	add.b	#0x28,d0                         	| [$8b22: adda   #$28]
-	PUSH_SR
 	MAKE_D                                 	| [...]
 	move.w	d1,d2                           	| [$8b24: tfr    d,x]
-	POP_SR
 	OP_R_ON_DP_ADDRESS	move,0xe6,d1         | [$8b26: ldb    $e6]
 	move.w	d2,d3                           	| [$8b28: leay   $0400,x]
 	add.w	#0x0400,d3                       	| [$8b28: leay   $0400,x]
@@ -8635,9 +8550,8 @@ l_8dfc:
 	GET_DP_ADDRESS	0x94                    	| [$8e00: ldu    $94]
 	MOVE_W_TO_REG	a0,d4                         	| [...]
 	GET_REG_ADDRESS	0,d4                   	| [$8e02: pulu   y]
-	sub.l	a0,d4
-	MOVE_W_TO_REG	a0,d3                         	| [$8e02: pulu   y]
-	addq	#2,a0
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d3                         	| [...]
 	add.l	a0,d4
 	GET_DP_ADDRESS	0x94                    	| [$8e04: stu    $94]
 	MOVE_W_FROM_REG	d4,a0                         	| [...]
@@ -8653,10 +8567,9 @@ l_8e0c:
 	GET_DP_ADDRESS	0x94                    	| [$8e0c: ldu    $94]
 	MOVE_W_TO_REG	a0,d4                         	| [...]
 	GET_REG_ADDRESS	0,d4                   	| [$8e0e: pshu   x]
-	sub.l	a0,d4
-	subq	#2,a0
-	MOVE_W_FROM_REG	d2,a0                         	| [$8e0e: pshu   x]
-	add.l	a0,d4
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_FROM_REG_PREDEC	d2,a0                         	| [...]
+	add.l	a0,d4                            	| [...]
 	GET_DP_ADDRESS	0x94                    	| [$8e10: stu    $94]
 	MOVE_W_FROM_REG	d4,a0                         	| [...]
 	OP_W_ON_DP_ADDRESS	addq,0x93,#1         | [$8e12: inc    $93]
@@ -8667,9 +8580,8 @@ l_8e15:
 	GET_DP_ADDRESS	0x96                    	| [$8e19: ldu    $96]
 	MOVE_W_TO_REG	a0,d4                         	| [...]
 	GET_REG_ADDRESS	0,d4                   	| [$8e1b: pulu   y]
-	sub.l	a0,d4
-	MOVE_W_TO_REG	a0,d3                         	| [$8e1b: pulu   y]
-	addq	#2,a0
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d3                         	| [...]
 	add.l	a0,d4
 	GET_DP_ADDRESS	0x96                    	| [$8e1d: stu    $96]
 	MOVE_W_FROM_REG	d4,a0                         	| [...]
@@ -8683,10 +8595,9 @@ l_8e25:
 	GET_DP_ADDRESS	0x96                    	| [$8e25: ldu    $96]
 	MOVE_W_TO_REG	a0,d4                         	| [...]
 	GET_REG_ADDRESS	0,d4                   	| [$8e27: pshu   x]
-	sub.l	a0,d4
-	subq	#2,a0
-	MOVE_W_FROM_REG	d2,a0                         	| [$8e27: pshu   x]
-	add.l	a0,d4
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_FROM_REG_PREDEC	d2,a0                         	| [...]
+	add.l	a0,d4                            	| [...]
 	GET_DP_ADDRESS	0x96                    	| [$8e29: stu    $96]
 	MOVE_W_FROM_REG	d4,a0                         	| [...]
 	OP_W_ON_DP_ADDRESS	addq,0x98,#1         | [$8e2b: inc    $98]
@@ -8695,9 +8606,8 @@ l_8e2e:
 	GET_DP_ADDRESS	0xa8                    	| [$8e2e: ldu    $a8]
 	MOVE_W_TO_REG	a0,d4                         	| [...]
 	GET_REG_ADDRESS	0,d4                   	| [$8e30: pulu   y]
-	sub.l	a0,d4
-	MOVE_W_TO_REG	a0,d3                         	| [$8e30: pulu   y]
-	addq	#2,a0
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_TO_REG_POSTINC	a0,d3                         	| [...]
 	add.l	a0,d4
 	GET_DP_ADDRESS	0xa8                    	| [$8e32: stu    $a8]
 	MOVE_W_FROM_REG	d4,a0                         	| [...]
@@ -8708,10 +8618,9 @@ l_8e38:
 	GET_DP_ADDRESS	0xa8                    	| [$8e38: ldu    $a8]
 	MOVE_W_TO_REG	a0,d4                         	| [...]
 	GET_REG_ADDRESS	0,d4                   	| [$8e3a: pshu   x]
-	sub.l	a0,d4
-	subq	#2,a0
-	MOVE_W_FROM_REG	d2,a0                         	| [$8e3a: pshu   x]
-	add.l	a0,d4
+	sub.l	a0,d4                            	| [...]
+	MOVE_W_FROM_REG_PREDEC	d2,a0                         	| [...]
+	add.l	a0,d4                            	| [...]
 	GET_DP_ADDRESS	0xa8                    	| [$8e3c: stu    $a8]
 	MOVE_W_FROM_REG	d4,a0                         	| [...]
 	OP_W_ON_DP_ADDRESS	addq,0xa7,#1         | [$8e3e: inc    $a7]
