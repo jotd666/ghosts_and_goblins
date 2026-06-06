@@ -45,7 +45,7 @@ _config
 	dc.b	"C1:X:start on second loop:3;"
 	dc.b	"C1:X:cheat keys:4;"
 	dc.b	"C2:X:50 Hz update:0;"
-	;dc.b	"C2:X:skip intro/map sequence:1;"   ; for quick testing purposes, not for operational use
+	dc.b	"C2:X:skip intro/map sequence:1;"   ; for quick testing purposes, not for operational use
 	dc.b	"C2:X:no level music:2;"
 	dc.b	"C2:X:service mode:3;"
 	dc.b	"C2:X:use up for jump:4;"

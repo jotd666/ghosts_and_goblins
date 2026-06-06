@@ -1,12 +1,8 @@
 - LOADING... message when loading data
-- fix "ERROR" messages (new converter)
-- sometimes tiles aren't properly displayed at start of level (real CD32)
-- After entering a highscore and being too fast on the continues screen with pressing fire to continue, the game switches to the map (as expected), but it's playing the wrong music: it's repeating the last part from the highscore screen instead of the "map music" and you'll start the level without any music at all. Once you finish the level (or in my case more likely: die), all goes back to normal.
-- There is a bug on v0.93 (probably earlier versions too) that crashes the WHDload slave when saving scores on game-over without using any initials (blank)
-  in bank3 at 5bf6 the value is $FF => jumps in the woods
-  
 - start menu with difficulty/lives / select jump type
 
+- sometimes tiles aren't properly displayed at start of level (real CD32)
+- After entering a highscore and being too fast on the continues screen with pressing fire to continue, the game switches to the map (as expected), but it's playing the wrong music: it's repeating the last part from the highscore screen instead of the "map music" and you'll start the level without any music at all. Once you finish the level (or in my case more likely: die), all goes back to normal.
 - if we add blit chain: scrolling to fix, wrong values, shaking
 - remove parasite tiles (in the end) because of levelskip some intro tiles are logged in levels 2+
 - remove those "hhhhh" at start fill_screen_with_h 
