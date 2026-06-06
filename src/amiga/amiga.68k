@@ -497,7 +497,7 @@ apply_settings:
 	move.l	misc_options,d1
 	btst	#0,d1
 	seq		frameskip
-	btst	#1,d1
+	btst	#6,d1
 	sne		skip_intro_flag
 	btst	#2,d1
 	sne		no_level_music_flag
@@ -505,6 +505,8 @@ apply_settings:
 	sne		service_mode_flag
 	btst	#4,d1
 	sne		up_for_jump_flag
+	btst	#5,d1
+	sne		startup_menu_flag
 	.ifne	OPT_CD32_VERSION
 	* force the flag
 	st		no_level_music_flag
@@ -558,7 +560,6 @@ apply_settings:
 	move.b	d0,dip_switches_2
 	rts
 
-	.ifndef	RELEASE
 display_text:
 	move.l	a0,-(a7)
 0:
@@ -573,6 +574,7 @@ display_text:
 	move.l	(a7)+,a0
 	rts
 
+	.ifndef	RELEASE
 	
 * < A1: address
 * < D0: number
@@ -878,7 +880,9 @@ demo_game:
 	move.l	#mirror_buffer,mirror_buffer_ptr
 	jbsr	mirror_common_sprites
 	.endif
-
+	
+	tst.b	startup_menu_flag
+	jeq		1f
 	move.b	#4,current_menu_column    | on start
 	* install startup menu irq handler
 	move.l	system_vbr(pc),a1
@@ -896,7 +900,7 @@ demo_game:
 	
 	* disable interrupts again for game
 	jbsr	osd_disable_interrupts
-	
+1:	
 	* install game irq handler
 	move.l	system_vbr(pc),a1
 	pea		level1_interrupt(pc)
@@ -6322,7 +6326,9 @@ interrupt_mode:
 pause_flag:
 	.word	0
 frameskip:
-	.word	0
+	.byte	0
+startup_menu_flag:
+	.byte
 no_main_tune:
 	.word	0
 	
