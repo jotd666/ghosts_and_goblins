@@ -240,18 +240,18 @@ BIT_FIRE_2 = 5
 	move.w	#\v,_custom+color	
 	.endm
 
-	.macro	WRITE_TEXT	text,color
-	lea		(0x2047+0x20*row,a6),a0
+	.macro	WRITE_TEXT	text,x_offset
 	lea		\text,a1
-	move.b	#\color,d0
+	lea		(0x2047+\x_offset+0x20*row,a6),a0
+	move.b	current_color,d0
 	jbsr	display_text
 	.set	row,row+1
 	.endm
 
-	.macro	WRITE_HEX	value,color
+	.macro	WRITE_HEX	value
 	move.w	\value,d1
 	lea		(0x2047+0x20*row+14,a6),a0
-	move.b	#\color,d0
+	move.b	current_color,d0
 	jbsr	display_number
 	.set	row,row+1
 	.endm
@@ -465,8 +465,14 @@ _user:
 	lea		debug_copperlist,a0
 	move.l	a0,cop1lc(a5)
 	
+	jbsr	apply_settings
 
 
+	jsr	 _detect_controller_types
+
+	jra		demo_game
+
+apply_settings:
 	move.l	cheat_flags,d0
 	jeq		1f
 	btst	#0,d0
@@ -487,10 +493,7 @@ _user:
 
 0:
 1:	
-	
-	move.b	start_level+3,start_level_flag
-	
-	* default is 25Hz, game crawls at 50Hz unless on pistorm
+	* default is 25Hz, but works fine on 50Hz on 68060 at least
 	move.l	misc_options,d1
 	btst	#0,d1
 	seq		frameskip
@@ -527,6 +530,8 @@ _user:
 	st		cheat_used
 
 0:
+
+0:
 	* set dip switches
 	* (some settings are not modifiable)
 	move.b	#0x20,d0	| demo sounds on
@@ -551,13 +556,11 @@ _user:
 	or.b	d1,d0
 	not.b	d0
 	move.b	d0,dip_switches_2
-	
-	jsr	 _detect_controller_types
-
-	jra		demo_game
+	rts
 
 	.ifndef	RELEASE
 display_text:
+	move.l	a0,-(a7)
 0:
 	move.b	(a1)+,d1
 	jmi		1f
@@ -567,6 +570,7 @@ display_text:
 	addq	#1,a0
 	jra		0b
 1:
+	move.l	(a7)+,a0
 	rts
 
 	
@@ -874,11 +878,36 @@ demo_game:
 	move.l	#mirror_buffer,mirror_buffer_ptr
 	jbsr	mirror_common_sprites
 	.endif
+
+	move.b	#4,current_menu_column    | on start
+	* install startup menu irq handler
+	move.l	system_vbr(pc),a1
+	pea		startup_level1_interrupt(pc)
+	move.l	(a7)+,(0x64,a1)
 	
+	* fire the startup menu
+	jbsr	osd_enable_interrupts
+0:
+	tst.b	startup_menu_done
+	jeq		0b
+
+	* re-apply settings
+	jbsr	apply_settings
+	
+	* disable interrupts again for game
+	jbsr	osd_disable_interrupts
+	
+	* install game irq handler
+	move.l	system_vbr(pc),a1
+	pea		level1_interrupt(pc)
+	move.l	(a7)+,(0x64,a1)
+
 	moveq	#0,d0
 	jbsr	osd_set_bank
 	GET_MEMORY_START_AND_DP	
 	jmp		reset_6000								| pass control to the mpatrol core
+	
+
 	
 	.ifne	OPT_SPRITE_MIRRORING
 mirror_common_sprites:
@@ -1477,10 +1506,7 @@ relocate_sprites_file:
 	cmp.w	#-2,(a2)
 	jeq		5f
 	* yes, we need to fill the data
-*	cmp.w	#0x91,d7
-*	jne		55f
-*	BREAKPOINT	"trunk"
-*55:
+
 
 
 	jbsr	compute_mirror_bitplanes
@@ -1954,25 +1980,28 @@ level1_interrupt:
 	jeq		0f
 	.set	row,2
 	GET_MEMORY_START_IN_A6
-	WRITE_TEXT	scrollx_text,2
-	WRITE_TEXT	scrolly_text,2
-	WRITE_TEXT	hscrollx_text,2
-	WRITE_TEXT	last_x_offset_text,2
-	WRITE_TEXT	debug_1_text,4
-	WRITE_TEXT	debug_2_text,4
-	WRITE_TEXT	debug_3_text,4
+	move.b	#2,current_color
+	WRITE_TEXT	scrollx_text,0
+	WRITE_TEXT	scrolly_text,0
+	WRITE_TEXT	hscrollx_text,0
+	WRITE_TEXT	last_x_offset_text,0
+	move.b	#4,current_color
+	WRITE_TEXT	debug_1_text,0
+	WRITE_TEXT	debug_2_text,0
+	WRITE_TEXT	debug_3_text,0
 
 	.set		row,2
-	WRITE_HEX	game_scroll_x,3
-	WRITE_HEX	game_scroll_y,3
-	WRITE_HEX	host_scroll_x,3
-	WRITE_HEX	x_offset,3
+	move.b	#3,current_color
+	WRITE_HEX	game_scroll_x
+	WRITE_HEX	game_scroll_y
+	WRITE_HEX	host_scroll_x
+	WRITE_HEX	x_offset
 	lea		display_slots,a2
 	tst.b	(a2)
 	jeq		10f
 	move.w	(2,a2),d0
 	move.w	(a6,d0.w),d0
-	WRITE_HEX	d0,3
+	WRITE_HEX	d0
 	.set	row,row-1	
 10:
 	.set	row,row+1	
@@ -1981,7 +2010,7 @@ level1_interrupt:
 	jeq		10f
 	move.w	(2,a2),d0
 	move.w	(a6,d0.w),d0
-	WRITE_HEX	d0,3
+	WRITE_HEX	d0
 	.set	row,row-1		
 10:
 	.set	row,row+1	
@@ -1990,7 +2019,7 @@ level1_interrupt:
 	jeq		10f
 	move.w	(2,a2),d0
 	move.w	(a6,d0.w),d0
-	WRITE_HEX	d0,3
+	WRITE_HEX	d0
 	.set	row,row-1		
 10:
 	
@@ -2026,6 +2055,195 @@ level1_interrupt:
 	move.l	(a7)+,d0
 	.endif
     rte
+	
+
+startup_level1_interrupt:
+    movem.l d0-d7/a0-a6,-(a7)
+	lea		_custom,a5
+	move.w	(intreqr,a5),d0		| leave this, we need it for later on
+	* we're going to ack copper & software level 1 interrupt now
+	* do it twice (040/pistorm bug)
+	.rept	2
+	move.w	#0x14,(intreq,a5)
+	.endr
+	btst	#4,d0
+	jeq	100f
+	
+	GET_MEMORY_START_IN_A6
+	move.b	#7,d0		| color
+	lea		(0x2040+0x20*2,a6),a0
+	lea		gng_credits_text,a1
+	jbsr	display_text
+
+	lea		(0x2040+0x20*4,a6),a0
+	lea		gng_credits_text_2,a1
+	jbsr	display_text
+
+
+	** difficulty
+	lea		(0x2043+0x20*10,a6),a5
+	lea		difficulty_text,a1
+	lea		(0x20*2,a5),a0
+	move.b	#2,d0		| color
+	moveq	#0,d1
+	jbsr	different_color
+	jbsr	display_text
+	
+	lea		difficulty_table_str,a2
+	move.b	difficulty_level+3,d1
+	and.w	#3,d1
+	add.w	d1,d1
+	add.w	d1,d1
+	move.l	(a2,d1.w),a1
+	add.w	#0xD,a0
+	jbsr	display_text
+	
+	** start lives
+	
+	lea		start_lives_text,a1
+	lea		(0x20*4,a5),a0
+	move.b	#2,d0		| color
+	moveq	#1,d1
+	jbsr	different_color
+	jbsr	display_text
+	
+	lea		lives_table_str,a2
+	move.b	start_lives+3,d1
+	and.w	#3,d1
+	add.w	d1,d1
+	add.w	d1,d1
+	move.l	(a2,d1.w),a1
+	add.w	#0xD,a0
+	jbsr	display_text
+
+	** jump method
+
+	lea		jump_with_text,a1
+	lea		(0x20*6,a5),a0
+	move.b	#2,d0		| color
+	moveq	#2,d1
+	jbsr	different_color
+	jbsr	display_text
+
+	lea		up_for_jump_table_str,a2
+	move.b	misc_options+3,d1
+	btst	#4,d1
+	sne		d1
+	and.w	#1,d1
+	add.w	d1,d1
+	add.w	d1,d1
+	move.l	(a2,d1.w),a1
+	add.w	#0xD,a0
+	jbsr	display_text
+
+	lea		refresh_rate_text,a1
+	lea		(0x20*8,a5),a0
+	move.b	#2,d0		| color
+	moveq	#3,d1
+	jbsr	different_color
+	jbsr	display_text
+
+	lea		refresh_table_str,a2
+	move.b	misc_options+3,d1
+	btst	#0,d1
+	sne		d1
+	and.w	#1,d1
+	add.w	d1,d1
+	add.w	d1,d1
+	move.l	(a2,d1.w),a1
+	add.w	#0xD,a0
+	jbsr	display_text
+
+
+	
+	move.b	#6,d0		| color
+	moveq	#4,d1
+	jbsr	different_color
+	lea		run_text,a1
+	lea		(0x20*14+4,a5),a0
+	jbsr	display_text
+
+
+	move.l	joypad_1_state,d6
+
+	move.l	_previous_joypad_1_state,d5
+	btst	#JPB_BTN_RED,d6
+	jeq		0f
+	btst	#JPB_BTN_RED,d5
+	jne		0f
+	* fire pressed: which column are we
+	move.b	current_menu_column,d0
+	cmp.b	#4,d0
+	jne		10f
+	* read until released
+2:
+	move.l	joypad_1_state,d6
+	btst	#JPB_BTN_RED,d6
+	jne		2b
+    st.b	startup_menu_done	
+10:
+	cmp.b	#0,d0
+	jne		11f
+	* change difficulty
+	add.b	#1,difficulty_level+3
+	cmp.b	#4,difficulty_level+3
+	jne		13f
+	clr.b	difficulty_level+3
+11:
+	cmp.b	#1,d0
+	jne		12f
+	* change lives
+	add.b	#1,start_lives+3
+	cmp.b	#4,start_lives+3
+	jne		13f
+	clr.b	start_lives+3
+12:
+	cmp.b	#2,d0
+	jne		13f
+	* change control for jump
+	bchg	#4,misc_options+3
+13:
+	cmp.b	#3,d0
+	jne		14f
+	* change refresh
+	bchg	#0,misc_options+3
+14:
+0:
+	btst	#JPB_BTN_UP,d6
+	jeq		0f
+	btst	#JPB_BTN_UP,d5
+	jne		0f
+	subq.b	#1,current_menu_column
+0:
+	btst	#JPB_BTN_DOWN,d6
+	jeq		0f
+	btst	#JPB_BTN_DOWN,d5
+	jne		0f
+	addq.b	#1,current_menu_column
+0:
+	tst.b	current_menu_column
+	jpl		1f
+	move.b	#4,current_menu_column
+1:
+	cmp.b	#5,current_menu_column
+	jne		1f
+	clr.b	current_menu_column	
+1:
+	move.l	d6,_previous_joypad_1_state
+	add.b	#0x40,menu_flip_flop
+100:
+    movem.l (a7)+,d0-d7/a0-a6
+    rte
+	
+
+different_color:
+	cmp.b	current_menu_column,d1
+	jne		0f
+	tst.b	menu_flip_flop
+	jmi		0f
+	move.b	#4,d0		| alt color 1 times out of 2 if correct column
+0:
+	rts
 	
 	
 osd_blitz:
@@ -3467,8 +3685,6 @@ platform_init:
 
 	* install keyboard and vblank/copper handler
 	move.l	system_vbr(pc),a1
-	pea		level1_interrupt(pc)
-	move.l	(a7)+,(0x64,a1)
 	pea		level2_interrupt(pc)
 	move.l	(a7)+,(0x68,a1)
 	pea		level3_interrupt(pc)
@@ -5546,6 +5762,31 @@ cpu_init:
 	moveq	#0,d7
 	rts	
 	
+gng_credits_text:
+	.ascii	"Ghosts N Goblins Amiga AGA"
+	.byte	0xff
+gng_credits_text_2:
+	.ascii	"  Code JOTD - Music IM"
+	.byte	7,6,0xFF
+
+refresh_rate_text:
+	.ascii	"Refresh"
+	.byte	0xff
+difficulty_text:
+	.ascii	"Difficulty"
+	.byte	0xff
+start_lives_text:
+	.ascii	"Start lives"
+	.byte	0xff
+
+jump_with_text:
+	.ascii	"Jump with"
+	.byte	0xff
+run_text:
+	.ascii	"START"
+	.byte	0xff
+
+
 	.ifndef	RELEASE
 scrollx_text:
 	.ascii	"Game ScrollX "
@@ -5788,6 +6029,14 @@ return_address:
 current_music_name:
 	.long	0
 	
+menu_flip_flop:
+	.byte	0
+current_menu_column:
+	.byte	0
+current_color:
+	.byte	2
+startup_menu_done:
+	.byte	0
 play_level_1_tune_after_music_stop:
 	.byte	0
 wait_for_map_music_end:
@@ -5854,6 +6103,64 @@ difficulty_table:
 	.byte	0	| normal
 	.byte	4	| difficult
 	.byte	6	| very difficult
+	
+refresh_table_str:
+	.long	r25
+	.long	r50
+difficulty_table_str:
+	.long	diff_easy
+	.long	diff_normal
+	.long	diff_difficult
+	.long	diff_very_difficult
+	
+lives_table_str:
+	.long	three
+	.long	four
+	.long	five
+	.long	seven
+	
+up_for_jump_table_str:
+	.long	second_button_str
+	.long	up_str
+	
+r25:
+	.byte	2,5
+	.ascii	" Hz"
+	.byte	0xff
+r50:
+	.byte	5,0
+	.ascii	" Hz"
+	.byte	0xff
+second_button_str:
+	.ascii	"button "
+	.byte	2,0xFF
+up_str:
+	.ascii	"up      "
+	.byte	0xff
+four:
+	.ascii	"four "
+	.byte	0xff
+five:
+	.ascii	"five "
+	.byte	0xff
+seven:
+	.ascii	"seven"
+	.byte	0xff
+three:
+	.ascii	"three"
+	.byte	0xff
+diff_easy:
+	.ascii	"easy          "
+	.byte	0xFF
+diff_normal:
+	.ascii	"normal        "
+	.byte	0xFF
+diff_difficult:
+	.ascii	"difficult     "
+	.byte	0xFF
+diff_very_difficult:
+	.ascii	"very difficult"
+	.byte	0xFF
 	
 level_12_music:
 	.asciz	"GnG_Stage_1-2.mod"

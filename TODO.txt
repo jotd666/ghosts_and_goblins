@@ -1,5 +1,5 @@
 - LOADING... message when loading data
-- start menu with difficulty/lives / select jump type
+
 
 - sometimes tiles aren't properly displayed at start of level (real CD32)
 - After entering a highscore and being too fast on the continues screen with pressing fire to continue, the game switches to the map (as expected), but it's playing the wrong music: it's repeating the last part from the highscore screen instead of the "map music" and you'll start the level without any music at all. Once you finish the level (or in my case more likely: die), all goes back to normal.
