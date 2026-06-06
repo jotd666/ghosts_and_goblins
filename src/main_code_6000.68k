@@ -2,7 +2,7 @@
 	.global	irq_65c4
 	.global	reset_6000
 	.global	l_68df
-	.global	l_6909
+	.global	set_value_in_revolving_6909
 	.global	l_691c
 	.global	queue_sound_forced_791d
 	.global	l_7a0f
@@ -874,7 +874,7 @@ l_6455:
 	move.b	#0x01,d1                        	| [$6466: ldb    #$01]
 	OP_W_ON_DP_ADDRESS	move,0xf0,d1         | [$6468: stb    $f0]
 	move.w	#0x0e00,d1                      	| [$646a: ldd    #$0e00]
-	jbsr	l_6909                            	| [$646d: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$646d: jsr    $6909]
 	rts                                    	| [$6470: rts]
 l_6471:
 	GET_REG_ADDRESS	0x5,d2                 	| [$6471: ldb    $5,x]
@@ -1584,9 +1584,9 @@ l_689d:
 	move.b	#0x01,d1                        	| [$68a9: ldb    #$01]
 	OP_W_ON_DP_ADDRESS	move,0xf0,d1         | [$68ab: stb    $f0]
 	move.w	#0x0404,d1                      	| [$68ad: ldd    #$0404]
-	jbsr	l_6909                            	| [$68b0: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$68b0: jsr    $6909]
 	move.w	#0x0000,d1                      	| [$68b3: ldd    #$0000]
-	jbsr	l_6909                            	| [$68b6: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$68b6: jsr    $6909]
 	OP_W_ON_DP_ADDRESS	addq,sub_state_0005,#1| [$68b9: inc    sub_state_0005]
 l_68bb:
 	rts                                    	| [$68bb: rts]
@@ -1669,7 +1669,7 @@ random_68f9:
 	OP_W_ON_DP_ADDRESS	move,0x70,d1         | [$6906: stb    $70]
 	rts                                    	| [$6908: rts]
 
-l_6909:
+set_value_in_revolving_6909:
  	move.w	(0x10,a5),d3                       | [$6909: ldy    $10]
 	GET_REG_ADDRESS	0,d3                   	| [$690c: std    ,y++]
 	addq.w	#2,d3                           	| [...]
@@ -1822,9 +1822,9 @@ l_69cb:
 	GET_DP_ADDRESS	0x24                    	| [$69d2: std    $24]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	move.w	#0x0402,d1                      	| [$69d4: ldd    #$0402]
-	jbsr	l_6909                            	| [$69d7: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$69d7: jsr    $6909]
 	move.w	#0x0500,d1                      	| [$69da: ldd    #$0500]
-	jbsr	l_6909                            	| [$69dd: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$69dd: jsr    $6909]
 	move.b	#0x04,d1                        	| [$69e0: ldb    #$04]
 	OP_W_ON_DP_ADDRESS	move,sub_state_0005,d1| [$69e2: stb    sub_state_0005]
 	OP_1_ON_DP_ADDRESS	clr,sub_sub_state_0008| [$69e4: clr    sub_sub_state_0008]
@@ -1858,21 +1858,21 @@ display_title_69fc:
 
 l_6a08:
 	move.w	#0x0119,d1                      	| [$6a08: ldd    #$0119]
-	jbsr	l_6909                            	| [$6a0b: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6a0b: jsr    $6909]
 	move.w	#0x0206,d1                      	| [$6a0e: ldd    #$0206]
-	jbsr	l_6909                            	| [$6a11: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6a11: jsr    $6909]
 	move.w	#0x0205,d1                      	| [$6a14: ldd    #$0205]
-	jbsr	l_6909                            	| [$6a17: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6a17: jsr    $6909]
 	move.w	#0x020a,d1                      	| [$6a1a: ldd    #$020a]
-	jbsr	l_6909                            	| [$6a1d: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6a1d: jsr    $6909]
 	move.w	#0x1000,d1                      	| [$6a20: ldd    #$1000]
-	jbsr	l_6909                            	| [$6a23: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6a23: jsr    $6909]
 	move.w	#0x0900,d1                      	| [$6a26: ldd    #$0900]
-	jbsr	l_6909                            	| [$6a29: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6a29: jsr    $6909]
 	move.w	#0x0402,d1                      	| [$6a2c: ldd    #$0402]
-	jbsr	l_6909                            	| [$6a2f: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6a2f: jsr    $6909]
 	move.w	#0x0500,d1                      	| [$6a32: ldd    #$0500]
-	jbsr	l_6909                            	| [$6a35: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6a35: jsr    $6909]
 	move.w	#0x00f0,d1                      	| [$6a38: ldd    #$00f0]
 	GET_DP_ADDRESS	0x06                    	| [$6a3b: std    $06]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
@@ -1902,7 +1902,7 @@ display_high_scores_6a4d:
 
 l_6a5b:
 	move.w	#0x0115,d1                      	| [$6a5b: ldd    #$0115]
-	jbsr	l_6909                            	| [$6a5e: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6a5e: jsr    $6909]
 	move.b	#0x01,d1                        	| [$6a61: ldb    #$01]
 	OP_W_ON_DP_ADDRESS	move,0xf0,d1         | [$6a63: stb    $f0]
 	OP_W_ON_DP_ADDRESS	addq,sub_sub_state_0008,#1| [$6a65: inc    sub_sub_state_0008]
@@ -1911,9 +1911,9 @@ l_6a68:
 	OP_R_ON_DP_ADDRESS	move,0xf0,d1         | [$6a68: ldb    $f0]
 	jne	l_6a7f                             	| [$6a6a: bne    $6a7f]
 	move.w	#0x0500,d1                      	| [$6a6c: ldd    #$0500]
-	jbsr	l_6909                            	| [$6a6f: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6a6f: jsr    $6909]
 	move.w	#0x0b00,d1                      	| [$6a72: ldd    #$0b00]
-	jbsr	l_6909                            	| [$6a75: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6a75: jsr    $6909]
 	move.w	#0x012c,d1                      	| [$6a78: ldd    #$012c]
 	GET_DP_ADDRESS	0x06                    	| [$6a7b: std    $06]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
@@ -1954,7 +1954,7 @@ l_6a9d:
 
 l_6aab:
 	move.w	#0x011b,d1                      	| [$6aab: ldd    #$011b]
-	jbsr	l_6909                            	| [$6aae: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6aae: jsr    $6909]
 	jbsr	set_player_game_start_values_6c03 	| [$6ab1: jsr    set_player_game_start_values_6c03]
 	OP_R_ON_DP_ADDRESS	move,counter_16_bit_0020,d1| [$6ab4: ldb    counter_16_bit_0020]
 	and.b	#0x0c,d1                         	| [$6ab6: andb   #$0c]
@@ -2017,7 +2017,7 @@ l_6b14:
 	jbsr	l_6c9c                            	| [$6b14: jsr    $6c9c]
 	jbsr	l_68df                            	| [$6b17: jsr    $68df]
 	move.w	#0x1000,d1                      	| [$6b1a: ldd    #$1000]
-	jbsr	l_6909                            	| [$6b1d: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6b1d: jsr    $6909]
 	move.b	#0x03,d0                        	| [$6b20: ldd    #$0384]
 	move.w	#0x0384,d1                      	| [$6b20: ldd    #$0384]
 	GET_DP_ADDRESS	0x06                    	| [$6b23: std    $06]
@@ -2035,7 +2035,7 @@ l_6b2a:
 	add.b	#0x2e,d1                         	| [$6b34: addb   #$2e]
 	move.b	#0x02,d0                        	| [$6b36: lda    #$02]
 	MAKE_D
-	jbsr	l_6909                            	| [$6b38: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6b38: jsr    $6909]
 l_6b3b:
 	jbsr	l_72a1                            	| [$6b3b: jsr    $72a1]
 	GET_DP_ADDRESS	0x06                    	| [$6b3e: ldx    $06]
@@ -2087,7 +2087,7 @@ l_6b6c:
 	GET_DP_ADDRESS	scroll_y_value_00d6     	| [$6b77: std    scroll_y_value_00d6]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	move.w	#0x0119,d1                      	| [$6b79: ldd    #$0119]
-	jbsr	l_6909                            	| [$6b7c: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6b7c: jsr    $6909]
 	move.b	#0x01,d1                        	| [$6b7f: ldb    #$01]
 	OP_W_ON_DP_ADDRESS	move,0xf0,d1         | [$6b81: stb    $f0]
 	OP_W_ON_DP_ADDRESS	addq,sub_sub_state_0008,#1| [$6b83: inc    sub_sub_state_0008]
@@ -2115,14 +2115,14 @@ l_6b8e:
 	GET_DP_ADDRESS	background_screen_location_006c	| [$6b9c: std    background_screen_location_006c]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	move.w	#0x0600,d1                      	| [$6b9e: ldd    #$0600]
-	jbsr	l_6909                            	| [$6ba1: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6ba1: jsr    $6909]
 	move.b	#0x01,d1                        	| [$6ba4: ldb    #$01]
 	OP_W_ON_DP_ADDRESS	move,tiles_palette_change_command_00de,d1| [$6ba6: stb    tiles_palette_change_command_00de]
 	jbsr	l_68df                            	| [$6ba8: jsr    $68df]
 	move.w	#0x0207,d1                      	| [$6bab: ldd    #$0207]
-	jbsr	l_6909                            	| [$6bae: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6bae: jsr    $6909]
 	move.w	#0x0205,d1                      	| [$6bb1: ldd    #$0205]
-	jbsr	l_6909                            	| [$6bb4: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6bb4: jsr    $6909]
 	move.w	#0x0208,d1                      	| [$6bb7: ldd    #$0208]
 	GET_DP_ADDRESS	nb_credits_0022         	| [$6bba: ldx    nb_credits_0022]
 	MOVE_W_TO_REG	a0,d2                         	| [...]
@@ -2134,19 +2134,19 @@ l_6bc1:
 	jeq	l_6bc7                             	| [$6bc3: beq    $6bc7]
 	move.b	#0x09,d1                        	| [$6bc5: ldb    #$09]
 l_6bc7:
-	jbsr	l_6909                            	| [$6bc7: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6bc7: jsr    $6909]
 	move.w	#0x020a,d1                      	| [$6bca: ldd    #$020a]
-	jbsr	l_6909                            	| [$6bcd: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6bcd: jsr    $6909]
 	move.w	#0x1000,d1                      	| [$6bd0: ldd    #$1000]
-	jbsr	l_6909                            	| [$6bd3: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6bd3: jsr    $6909]
 	move.w	#0x0402,d1                      	| [$6bd6: ldd    #$0402]
-	jbsr	l_6909                            	| [$6bd9: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6bd9: jsr    $6909]
 	move.w	#0x0500,d1                      	| [$6bdc: ldd    #$0500]
-	jbsr	l_6909                            	| [$6bdf: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6bdf: jsr    $6909]
 	move.w	#0x0a00,d1                      	| [$6be2: ldd    #$0a00]
-	jbsr	l_6909                            	| [$6be5: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6be5: jsr    $6909]
 	move.w	#0x0409,d1                      	| [$6be8: ldd    #$0409]
-	jbsr	l_6909                            	| [$6beb: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6beb: jsr    $6909]
 	move.w	#0x00f0,d1                      	| [$6bee: ldd    #$00f0]
 	GET_DP_ADDRESS	0x06                    	| [$6bf1: std    $06]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
@@ -2225,7 +2225,7 @@ l_6c33:
 	GET_DP_ADDRESS	0x2e                    	| [$6c4b: std    $2e]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	move.w	#0x0c00,d1                      	| [$6c4d: ldd    #$0c00]
-	jra	l_6909                             	| [$6c50: jmp    $6909]
+	jra	set_value_in_revolving_6909                             	| [$6c50: jmp    $6909]
 l_6c53:
 	moveq	#0,d1                            	| [$6c53: clrb]
 	OP_W_ON_DP_ADDRESS	move,0x81,d1         | [$6c54: stb    $81]
@@ -2266,7 +2266,7 @@ l_6c6c:
 	jbsr	l_8f84                            	| [$6c8d: jsr    $8f84]
 	jbsr	l_7283                            	| [$6c90: jsr    $7283]
 	move.w	#0x0700,d1                      	| [$6c93: ldd    #$0700]
-	jbsr	l_6909                            	| [$6c96: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6c96: jsr    $6909]
 	jra	l_68df                             	| [$6c99: jmp    $68df]
 l_6c9c:
 	jbsr	l_6d9c                            	| [$6c9c: jsr    $6d9c]
@@ -2395,7 +2395,7 @@ l_6d25:
 	clr.b	(a0)                         	| [...]
 	jbsr	l_9074                            	| [$6d7c: jsr    $9074]
 	move.w	#0x0800,d1                      	| [$6d7f: ldd    #$0800]
-	jbsr	l_6909                            	| [$6d82: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6d82: jsr    $6909]
 	move.w	#0x0530,d2                      	| [$6d85: ldx    #$0530]
 	move.w	#0x0004,d3                      	| [$6d88: ldy    #$0004]
 	moveq	#0,d0                            	| [$6d8c: clra]
@@ -2662,7 +2662,7 @@ l_6ee4:
 	GET_DP_ADDRESS	time_00aa               	| [$6ee6: std    time_00aa]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	move.w	#0x0d00,d1                      	| [$6ee8: ldd    #$0d00]
-	jbsr	l_6909                            	| [$6eeb: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$6eeb: jsr    $6909]
 	moveq	#0,d0                            	| [$6eee: clra]
 	moveq	#0,d1                            	| [$6eef: clrb]
 	OP_W_ON_DP_ADDRESS	move,0x90,d1         | [$6ef0: stb    $90]
@@ -2723,9 +2723,9 @@ init_new_game_70fb:
 	move.b	#0x01,d1                        	| [$70ff: ldb    #$01]
 	OP_W_ON_DP_ADDRESS	move,0xf0,d1         | [$7101: stb    $f0]
 	move.w	#0x0404,d1                      	| [$7103: ldd    #$0404]
-	jbsr	l_6909                            	| [$7106: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$7106: jsr    $6909]
 	move.w	#0x0000,d1                      	| [$7109: ldd    #$0000]
-	jbsr	l_6909                            	| [$710c: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$710c: jsr    $6909]
 	jbsr	set_player_game_start_values_6c03 	| [$710f: jsr    set_player_game_start_values_6c03]
 	OP_W_ON_DP_ADDRESS	addq,sub_state_0005,#1| [$7112: inc    sub_state_0005] now run game
 l_7114:
@@ -2774,9 +2774,9 @@ table_of_jump_tables_7139:
 init_game_intro_sequence_7159:
 	jbsr	l_7a39                            	| [$7159: jsr    $7a39]
 	move.w	#0x011a,d1                      	| [$715c: ldd    #$011a]
-	jbsr	l_6909                            	| [$715f: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$715f: jsr    $6909]
 	move.w	#0x0e00,d1                      	| [$7162: ldd    #$0e00]
-	jbsr	l_6909                            	| [$7165: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$7165: jsr    $6909]
 	jbsr	l_68df                            	| [$7168: jsr    $68df]
 	move.w	#0x0510,d2                      	| [$716b: ldx    #$0510]
 	moveq	#0,d0                            	| [$716e: clra]
@@ -2825,7 +2825,7 @@ init_restart_7197:
 	GET_DP_ADDRESS	0x09                    	| [$719d: std    $09]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	move.w	#0x011a,d1                      	| [$719f: ldd    #$011a]
-	jbsr	l_6909                            	| [$71a2: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$71a2: jsr    $6909]
 	move.b	#0x01,d1                        	| [$71a5: ldb    #$01]
 	OP_W_ON_DP_ADDRESS	move,0xf0,d1         | [$71a7: stb    $f0]
 	OP_W_ON_DP_ADDRESS	addq,sub_sub_sub_state_000b,#1| [$71a9: inc    sub_sub_sub_state_000b]
@@ -2837,7 +2837,7 @@ continue_restart_71ac:
 	move.b	#0x01,d1                        	| [$71b0: ldb    #$01]
 	OP_W_ON_DP_ADDRESS	move,0xf0,d1         | [$71b2: stb    $f0]
 	move.w	#0x0e00,d1                      	| [$71b4: ldd    #$0e00]
-	jbsr	l_6909                            	| [$71b7: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$71b7: jsr    $6909]
 	jbsr	l_68df                            	| [$71ba: jsr    $68df]
 	OP_1_ON_DP_ADDRESS	clr,0x80             | [$71bd: clr    $80]
 	moveq	#0,d0                            	| [$71bf: clra]
@@ -2860,7 +2860,8 @@ do_restart_71c7:
 l_71d5:
 	move.b	#0x02,d0                        	| [$71d5: lda    #$02]
 	OP_R_ON_DP_ADDRESS	add,current_player_27,d1| [$71d7: addb   current_player_27]
-	jbsr	l_6909                            	| [$71d9: jsr    $6909]
+	MAKE_D
+	jbsr	set_value_in_revolving_6909                            	| [$71d9: jsr    $6909]
 l_71dc:
 	GET_DP_ADDRESS	0x09                    	| [$71dc: ldx    $09]
 	MOVE_W_TO_REG	a0,d2                         	| [...]
@@ -2870,7 +2871,7 @@ l_71dc:
 	jne	l_71f0                             	| [$71e2: bne    $71f0]
 	move.w	#0x0323,d1                      	| [$71e4: ldd    #$0323]
 	OP_R_ON_DP_ADDRESS	add,current_player_27,d1| [$71e7: addb   current_player_27]
-	jbsr	l_6909                            	| [$71e9: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$71e9: jsr    $6909]
 	OP_W_ON_DP_ADDRESS	addq,sub_sub_state_0008,#1| [$71ec: inc    sub_sub_state_0008]
 	OP_1_ON_DP_ADDRESS	clr,sub_sub_sub_state_000b| [$71ee: clr    sub_sub_sub_state_000b]
 l_71f0:
@@ -2891,7 +2892,7 @@ l_7208:
 	move.b	#0x02,d0                        	| [$7208: lda    #$02]
 	OP_R_ON_DP_ADDRESS	add,current_player_27,d1| [$720a: addb   current_player_27]
 	MAKE_D
-	jbsr	l_6909                            	| [$720c: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$720c: jsr    $6909]
 l_720f:
 	GET_DP_ADDRESS	0x09                    	| [$720f: ldx    $09]
 	MOVE_W_TO_REG	a0,d2                         	| [...]
@@ -2901,7 +2902,7 @@ l_720f:
 	jne	l_7221                             	| [$7215: bne    $7221]
 	move.w	#0x0323,d1                      	| [$7217: ldd    #$0323]
 	OP_R_ON_DP_ADDRESS	add,current_player_27,d1| [$721a: addb   current_player_27]
-	jbsr	l_6909                            	| [$721c: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$721c: jsr    $6909]
 	OP_W_ON_DP_ADDRESS	addq,sub_sub_sub_state_000b,#1| [$721f: inc    sub_sub_sub_state_000b]
 l_7221:
 	move.w	#0x15a2,d2                      	| [$7221: ldx    #$15a2]
@@ -2951,7 +2952,7 @@ l_7251:
 
 l_725f:
 	move.w	#0x0404,d1                      	| [$725f: ldd    #$0404]
-	jbsr	l_6909                            	| [$7262: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$7262: jsr    $6909]
 	jbsr	l_6c65                            	| [$7265: jsr    $6c65]
 	jbsr	l_7283                            	| [$7268: jsr    $7283]
 	OP_W_ON_DP_ADDRESS	addq,0x0e,#1         | [$726b: inc    $0e]
@@ -3067,10 +3068,10 @@ l_7315:
 * this weapon has no effect, try again with a ...
 l_7321:
 	move.w	#0x0e00,d1                      	| [$7321: ldd    #$0e00]
-	jbsr	l_6909                            	| [$7324: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$7324: jsr    $6909]
 	jbsr	l_68df                            	| [$7327: jsr    $68df]
 	move.w	#0x0232,d1                      	| [$732a: ldd    #$0232]
-	jbsr	l_6909                            	| [$732d: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$732d: jsr    $6909]
 	move.w	#0x21f9,d2                      	| [$7330: ldx    #$21f9]
 	move.w	#0x7356,d4                      	| [$7333: ldu    #$7356]
 	move.b	#0x06,d0                        	| [$7336: ldd    #$0606]
@@ -3141,9 +3142,9 @@ l_7381:
 
 l_7399:
 	move.w	#0x022d,d1                      	| [$7399: ldd    #$022d]
-	jbsr	l_6909                            	| [$739c: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$739c: jsr    $6909]
 	move.w	#0x0c15,d1                      	| [$739f: ldd    #$0c15]
-	jbsr	l_6909                            	| [$73a2: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$73a2: jsr    $6909]
 	move.w	#0x021c,d1                      	| [$73a5: ldd    #$021c]
 	GET_DP_ADDRESS	0x09                    	| [$73a8: std    $09]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
@@ -3156,9 +3157,9 @@ l_73ac:
 	MOVE_W_FROM_REG	d2,a0                         	| [...]
 	jne	l_73fd                             	| [$73b2: bne    $73fd]
 	move.w	#0x011a,d1                      	| [$73b4: ldd    #$011a]
-	jbsr	l_6909                            	| [$73b7: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$73b7: jsr    $6909]
 	move.w	#0x022f,d1                      	| [$73ba: ldd    #$022f]
-	jbsr	l_6909                            	| [$73bd: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$73bd: jsr    $6909]
 	move.w	#0x01a4,d1                      	| [$73c0: ldd    #$01a4]
 	GET_DP_ADDRESS	0x09                    	| [$73c3: std    $09]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
@@ -3171,12 +3172,12 @@ l_73c7:
 	MOVE_W_FROM_REG	d2,a0                         	| [...]
 	jne	l_73fd                             	| [$73cd: bne    $73fd]
 	move.w	#0x0e00,d1                      	| [$73cf: ldd    #$0e00]
-	jbsr	l_6909                            	| [$73d2: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$73d2: jsr    $6909]
 	move.w	#0x011a,d1                      	| [$73d5: ldd    #$011a]
-	jbsr	l_6909                            	| [$73d8: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$73d8: jsr    $6909]
 	jbsr	l_68df                            	| [$73db: jsr    $68df]
 	move.w	#0x0230,d1                      	| [$73de: ldd    #$0230]
-	jbsr	l_6909                            	| [$73e1: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$73e1: jsr    $6909]
 	move.w	#0x00b4,d1                      	| [$73e4: ldd    #$00b4]
 	GET_DP_ADDRESS	0x09                    	| [$73e7: std    $09]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
@@ -3213,7 +3214,7 @@ l_73fe:
 
 l_741c:
 	move.w	#0x0e00,d1                      	| [$741c: ldd    #$0e00]
-	jbsr	l_6909                            	| [$741f: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$741f: jsr    $6909]
 	move.w	#0x15c2,d2                      	| [$7422: ldx    #$15c2]
 	moveq	#0,d0                            	| [$7425: clra]
 	moveq	#0,d1                            	| [$7426: clrb]
@@ -3226,7 +3227,7 @@ l_741c:
 	GET_DP_ADDRESS	0x09                    	| [$742e: std    $09]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	move.w	#0x022c,d1                      	| [$7430: ldd    #$022c]
-	jbsr	l_6909                            	| [$7433: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$7433: jsr    $6909]
 	OP_W_ON_DP_ADDRESS	addq,sub_sub_sub_state_000b,#1| [$7436: inc    sub_sub_sub_state_000b]
 l_7438:
 	GET_DP_ADDRESS	0x09                    	| [$7438: ldu    $09]
@@ -3257,7 +3258,7 @@ l_744f:
 
 l_7465:
 	move.w	#0x0227,d1                      	| [$7465: ldd    #$0227]
-	jbsr	l_6909                            	| [$7468: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$7468: jsr    $6909]
 	GET_ADDRESS	0x0553                     	| [$746b: clr    $0553]
 	clr.b	(a0)                         	| [...]
 	GET_ADDRESS	0x0555                     	| [$746e: clr    $0555]
@@ -3329,7 +3330,7 @@ l_74b1:
 	cmp.w	#0x0010,d1                       	| [$74d7: cmpd   #$0010]
 	jhi	l_ed2a                             	| [$74db: lbhi   $ed2a]
 	move.w	#0x0c09,d1                      	| [$74df: ldd    #$0c09]
-	jbsr	l_6909                            	| [$74e2: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$74e2: jsr    $6909]
 	GET_ADDRESS	0x0555                     	| [$74e5: stb    $0555]
 	move.b	d1,(a0)                         	| [...]
 	OP_W_ON_DP_ADDRESS	addq,sub_sub_sub_state_000b,#1| [$74e8: inc    sub_sub_sub_state_000b]
@@ -3691,7 +3692,7 @@ l_76e8:
 	add.w	d6,d4                            	| [$76fa: leau   b,u]
 	GET_REG_ADDRESS	0,d4                   	| [$76fc: ldd    ,u]
 	LOAD_D                                 	| [$76fc: ldd    ,u]
-	jbsr	l_6909                            	| [$76fe: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$76fe: jsr    $6909]
 	OP_W_ON_DP_ADDRESS	addq,0x0e,#1         | [$7701: inc    $0e]
 l_7703:
 	rts                                    	| [$7703: rts]
@@ -3736,7 +3737,7 @@ l_779d:
 	jne	l_77bb                             	| [$77a9: bne    $77bb]
 	move.w	#0x020b,d1                      	| [$77ab: ldd    #$020b]
 	OP_R_ON_DP_ADDRESS	add,current_player_27,d1| [$77ae: addb   current_player_27]
-	jbsr	l_6909                            	| [$77b0: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$77b0: jsr    $6909]
 	move.w	#0x00f0,d1                      	| [$77b3: ldd    #$00f0]
 	GET_DP_ADDRESS	0x09                    	| [$77b6: std    $09]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
@@ -3840,19 +3841,19 @@ l_783a:
 	move.b	#0x01,d1                        	| [$7843: ldb    #$01]
 	OP_W_ON_DP_ADDRESS	move,0xf0,d1         | [$7845: stb    $f0]
 	move.w	#0x011a,d1                      	| [$7847: ldd    #$011a]
-	jbsr	l_6909                            	| [$784a: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$784a: jsr    $6909]
 	OP_W_ON_DP_ADDRESS	addq,sub_sub_sub_state_000b,#1| [$784d: inc    sub_sub_sub_state_000b]
 	rts                                    	| [$784f: rts]
 l_7850:
 	move.b	#0x01,d1                        	| [$7850: ldb    #$01]
 	OP_W_ON_DP_ADDRESS	move,0xf0,d1         | [$7852: stb    $f0]
 	move.w	#0x0e00,d1                      	| [$7854: ldd    #$0e00]
-	jbsr	l_6909                            	| [$7857: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$7857: jsr    $6909]
 	OP_W_ON_DP_ADDRESS	addq,sub_sub_sub_state_000b,#1| [$785a: inc    sub_sub_sub_state_000b]
 	rts                                    	| [$785c: rts]
 l_785d:
 	move.w	#0x0225,d1                      	| [$785d: ldd    #$0225]
-	jbsr	l_6909                            	| [$7860: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$7860: jsr    $6909]
 	move.b	#0x10,d1                        	| [$7863: ldb    #$10]
 	OP_W_ON_DP_ADDRESS	move,continue_timer_000a,d1| [$7865: stb    continue_timer_000a] continue? 10 seconds to choose
 	OP_W_ON_DP_ADDRESS	addq,sub_sub_state_0008,#1| [$7867: inc    sub_sub_state_0008]
@@ -3946,7 +3947,7 @@ l_78db:
 	move.b	#0x01,d1                        	| [$78db: ldb    #$01]
 	OP_W_ON_DP_ADDRESS	move,0xf0,d1         | [$78dd: stb    $f0]
 	move.w	#0x011a,d1                      	| [$78df: ldd    #$011a]
-	jbsr	l_6909                            	| [$78e2: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$78e2: jsr    $6909]
 	OP_W_ON_DP_ADDRESS	addq,sub_sub_sub_state_000b,#1| [$78e5: inc    sub_sub_sub_state_000b]
 	rts                                    	| [$78e7: rts]
 
@@ -3954,7 +3955,7 @@ l_78e8:
 	move.b	#0x01,d1                        	| [$78e8: ldb    #$01]
 	OP_W_ON_DP_ADDRESS	move,0xf0,d1         | [$78ea: stb    $f0]
 	move.w	#0x0e00,d1                      	| [$78ec: ldd    #$0e00]
-	jbsr	l_6909                            	| [$78ef: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$78ef: jsr    $6909]
 	moveq	#0,d1                            	| [$78f2: clrb]
 	OP_W_ON_DP_ADDRESS	move,sub_sub_state_0008,d1| [$78f3: stb    sub_sub_state_0008]
 	OP_W_ON_DP_ADDRESS	move,sub_sub_sub_state_000b,d1| [$78f5: stb    sub_sub_sub_state_000b]
@@ -4325,7 +4326,7 @@ l_7aec:
 	GET_DP_ADDRESS	background_screen_location_006c	| [$7af7: std    background_screen_location_006c] shows a fixed scenery in the fields
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	move.w	#0x0600,d1                      	| [$7af9: ldd    #$0600]
-	jbsr	l_6909                            	| [$7afc: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$7afc: jsr    $6909]
 	move.b	#0x00,d0                        	| [$7aff: ldd    #$0060]
 	move.w	#0x0060,d1                      	| [$7aff: ldd    #$0060]
 	GET_REG_ADDRESS	-0xa,d2                	| [$7b02: std    -$a,x]
@@ -4879,7 +4880,7 @@ l_7e01:
 	GET_DP_ADDRESS	background_screen_location_006c	| [$7e0c: std    background_screen_location_006c]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	move.w	#0x0600,d1                      	| [$7e0e: ldd    #$0600]
-	jbsr	l_6909                            	| [$7e11: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$7e11: jsr    $6909]
 	move.b	#0x0e,d1                        	| [$7e14: ldb    #$0e]
 	OP_W_ON_DP_ADDRESS	move,tiles_palette_change_command_00de,d1| [$7e16: stb    tiles_palette_change_command_00de]
 	move.b	#0x00,d0                        	| [$7e18: ldd    #$0020]
@@ -4979,7 +4980,7 @@ l_7e82:
 	move.b	#0x02,d1                        	| [$7e96: ldb    #$02]
 	OP_W_ON_DP_ADDRESS	move,game_intro_played_0071,d1| [$7e98: stb    game_intro_played_0071]
 	move.w	#0x011a,d1                      	| [$7e9a: ldd    #$011a]
-	jbsr	l_6909                            	| [$7e9d: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$7e9d: jsr    $6909]
 	move.w	#0x0890,d2                      	| [$7ea0: ldx    #$0890]
 	jbsr	l_7dbc                            	| [$7ea3: jsr    $7dbc]
 	GET_REG_ADDRESS	-0xd,d2                	| [$7ea6: inc    -$d,x]
@@ -4999,7 +5000,7 @@ l_7ea9:
 
 l_7eb7:
 	move.w	#0x0231,d1                      	| [$7eb7: ldd    #$0231]
-	jbsr	l_6909                            	| [$7eba: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$7eba: jsr    $6909]
 	move.b	#0x06,d1                        	| [$7ebd: ldb    #$06]
 	GET_REG_ADDRESS	-0x1,d2                	| [$7ebf: stb    -$1,x]
 	move.b	d1,(a0)                         	| [...]
@@ -5394,7 +5395,7 @@ l_80ab:
 l_80b7:
 	move.w	#0x0640,d2                      	| [$80b7: ldx    #$0640]
 	move.w	#0x0600,d1                      	| [$80ba: ldd    #$0600]
-	jbsr	l_6909                            	| [$80bd: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$80bd: jsr    $6909]
 	jbsr	l_802c                            	| [$80c0: jsr    $802c]
 	jbsr	l_807e                            	| [$80c3: bsr    $807e]
 	move.b	#0x01,d0                        	| [$80c5: ldd    #$011e]
@@ -10189,7 +10190,7 @@ l_9984:
 	OP_W_ON_DP_ADDRESS	move,0xdf,d1         | [$9986: stb    $df]
 	move.w	#0x0801,d1                      	| [$9988: ldd    #$0801]
 l_998b:
-	jbsr	l_6909                            	| [$998b: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$998b: jsr    $6909]
 	GET_REG_ADDRESS	0,d2                   	| [$998e: ldd    ,x]
 	LOAD_D                                 	| [$998e: ldd    ,x]
 	GET_REG_ADDRESS	0x11,d2                	| [$9990: std    $11,x]
@@ -10436,7 +10437,7 @@ l_9b19:
 	GET_REG_ADDRESS	-0x4,d2                	| [$9b2f: std    -$4,x]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	move.w	#0x0800,d1                      	| [$9b31: ldd    #$0800]
-	jbsr	l_6909                            	| [$9b34: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$9b34: jsr    $6909]
 l_9b37:
 	move.w	#0x9b54,d3                      	| [$9b37: ldy    #$9b54]
 	move.w	#0x0540,d4                      	| [$9b3b: ldu    #$0540]
@@ -22210,7 +22211,7 @@ l_da87:
 	subq.b	#1,(a0)                         	| [...]
 	jne	l_daa1                             	| [$da92: bne    $daa1]
 	move.w	#0x0c09,d1                      	| [$da94: ldd    #$0c09]
-	jbsr	l_6909                            	| [$da97: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$da97: jsr    $6909]
 	move.b	#0x03,d0                        	| [$da9a: ldd    #$0300]
 	move.w	#0x0300,d1                      	| [$da9a: ldd    #$0300]
 	GET_REG_ADDRESS	-0xd,d2                	| [$da9d: std    -$d,x]
@@ -24238,7 +24239,7 @@ l_e448:
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	GET_REG_ADDRESS	0x2,d4                 	| [$e45b: ldd    $2,u]
 	LOAD_D                                 	| [$e45b: ldd    $2,u]
-	jbsr	l_6909                            	| [$e45d: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$e45d: jsr    $6909]
 	jbsr	l_7988                            	| [$e460: jsr    $7988]
 	OP_R_ON_DP_ADDRESS	move,0xe0,d1         | [$e463: ldb    $e0]
                                          | [$e465: lsrb]
@@ -25012,7 +25013,7 @@ l_e7b2:
 	subq.b	#1,d1                           	| [$e7b9: decb]
 	OP_W_ON_DP_ADDRESS	move,weapon_type_0073,d1| [$e7ba: stb    weapon_type_0073]
 	move.w	#0x0800,d1                      	| [$e7bc: ldd    #$0800]
-	jra	l_6909                             	| [$e7bf: jmp    $6909]
+	jra	set_value_in_revolving_6909                             	| [$e7bf: jmp    $6909]
 l_e7c2:
 	jbsr	l_7988                            	| [$e7c2: jsr    $7988]
 	move.b	#0x02,d0                        	| [$e7c5: lda    #$02]
@@ -25043,7 +25044,7 @@ l_e7d3:
 	move.b	d1,(a0)                         	| [...]
 	GET_REG_BANK_ADDRESS	0x2,d4                 	| [$e7e4: ldd    $2,u] [bank_address]
 	LOAD_D                                 	| [$e7e4: ldd    $2,u] [bank_address]
-	jra	l_6909                             	| [$e7e6: jmp    $6909]
+	jra	set_value_in_revolving_6909                             	| [$e7e6: jmp    $6909]
 l_e7e9:
 	jbsr	l_7988                            	| [$e7e9: jsr    $7988]
 	move.w	#0xe806,d4                      	| [$e7ec: ldu    #$e806]
@@ -25067,7 +25068,7 @@ l_e7e9:
 	move.b	d1,(a0)                         	| [...]
 	GET_REG_ADDRESS	0x2,d4                 	| [$e801: ldd    $2,u]
 	LOAD_D                                 	| [$e801: ldd    $2,u]
-	jra	l_6909                             	| [$e803: jmp    $6909]
+	jra	set_value_in_revolving_6909                             	| [$e803: jmp    $6909]
 	GET_REG_ADDRESS	-0x4,d2                	| [$e806: adcb   -$4,x]
 	move.b	(a0),d6	| [...]
 	addx.b	d6,d1                         	| [...]
@@ -26153,7 +26154,7 @@ l_ed48:
 	jbsr	l_79bf                            	| [$ed4e: jsr    $79bf]
 l_ed51:
 	move.w	#0x0d00,d1                      	| [$ed51: ldd    #$0d00]
-	jra	l_6909                             	| [$ed54: jmp    $6909]
+	jra	set_value_in_revolving_6909                             	| [$ed54: jmp    $6909]
 l_ed57:
 	rts                                    	| [$ed57: rts]
 l_ed58:
@@ -26192,7 +26193,7 @@ l_ed64:
 	move.b	#0x01,d1                        	| [$ed7d: ldb    #$01]
 	OP_W_ON_DP_ADDRESS	move,0x81,d1         | [$ed7f: stb    $81]
 	move.w	#0x0d00,d1                      	| [$ed81: ldd    #$0d00]
-	jra	l_6909                             	| [$ed84: jmp    $6909]
+	jra	set_value_in_revolving_6909                             	| [$ed84: jmp    $6909]
 l_ed87:
 	rts                                    	| [$ed87: rts]
 
@@ -26266,7 +26267,7 @@ check_if_award_extra_life_edea:
 	jhi	l_edfe                             	| [$edef: bhi    $edfe]
 	OP_W_ON_DP_ADDRESS	addq,nb_lives_0060,#1| [$edf1: inc    nb_lives_0060]
 	move.w	#0x0700,d1                      	| [$edf3: ldd    #$0700]
-	jbsr	l_6909                            	| [$edf6: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$edf6: jsr    $6909]
 	jbsr	l_7a3e                            	| [$edf9: jsr    $7a3e]
 	COM	d1                                 	| [$edfc: comb]
 	rts                                    	| [$edfd: rts]
@@ -26587,7 +26588,7 @@ l_efd0:
 	move.b	#0x0c,d0                        	| [$efd7: lda    #$0c]
 	move.l	d3,-(sp)                        	| [$efd9: pshs   y]
 	MAKE_D
-	jbsr	l_6909                            	| [$efdb: jsr    $6909]
+	jbsr	set_value_in_revolving_6909                            	| [$efdb: jsr    $6909]
 	movem.l	(sp)+,d3                       	| [$efde: puls   y] restore Y saved at EFD9
 	GET_REG_ADDRESS	-0x10,d4               	| [$efe0: asl    -$10,u] kill enemy: state 1 => 2
 	move.b	(a0),d6	| [$efe0: asl    -$10,u] kill enemy: state 1 => 2
