@@ -49,7 +49,7 @@ _config
 	dc.b	"C2:X:service mode:3;"
 	dc.b	"C2:X:use up for jump:4;"
 	dc.b	"C2:X:startup menu:5;"
-	dc.b	"C2:X:skip intro/map sequence:6;"   ; for quick testing purposes, not for operational use
+	;dc.b	"C2:X:skip intro/map sequence:6;"   ; for quick testing purposes, not for operational use
 
 	dc.b	"C3:L:difficulty level:easy,normal,difficult,very difficult;"
 	dc.b	"C4:L:lives:3,4,5,7;"
