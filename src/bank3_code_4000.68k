@@ -114,11 +114,8 @@ l_487d:
 	jbsr	multiply_ab                       	| [$4885: mul]
 	MAKE_D                                 	| [...]
 	add.w	#0x2000,d1                       	| [$4886: addd   #$2000]
-	PUSH_SR                                	| [...]
 	MAKE_A                                 	| [...]
-	MAKE_D                                 	| [...]
 	move.w	d1,d2                           	| [$4889: tfr    d,x]
-	POP_SR
 	move.b	#0x20,d0                        	| [$488b: lda    #$20]
 	move.b	#0x00,d1                        	| [$488d: ldb    #$00]
 l_488f:
@@ -637,9 +634,6 @@ compute_and_display_time_52b9:
 	GET_REG_ADDRESS	0,d4                   	| [$52ca: pulu   d]
 	sub.l	a0,d4                            	| [...]
 	MOVE_W_TO_REG_POSTINC	a0,d1                         	| [...]
-	PUSH_SR                                	| [...]
-	MAKE_A                                 	| [...]
-	POP_SR                                 	| [...]
 	add.l	a0,d4
 	move.w	#0x20a2,d2                      	| [$52cc: ldx    #$20a2]
 	move.b	#0x0b,d0                        	| [$52cf: lda    #$0b]
@@ -661,9 +655,6 @@ compute_and_display_time_52b9:
 	LOAD_D                                 	| [$52e1: ldd    $fc]
 	jbsr	l_5064                            	| [$52e3: jsr    $5064]
 	movem.l	(sp)+,d0/d2                    	| [$52e6: puls   a,x]
-	PUSH_SR                                	| [...]
-	MAKE_D                                 	| [...]
-	POP_SR                                 	| [...]
 	addq.w	#0x4,d4                         	| [$52e8: leau   $4,u]
 	GET_REG_UNCHECKED_ADDRESS	0x0400,d2              	| [$52ea: sta    $0400,x] [unchecked_address]
 	move.b	d0,(a0)                         	| [...]
@@ -1036,17 +1027,13 @@ l_556e:
 l_5589:
 	jra	l_5589                             	| [$5589: bra    $5589]
 l_558b:
-	PUSH_SR
 	move.b	d1,d0                           	| [$558b: tfr    b,a]
-	POP_SR
                                          | [$558d: lsra]
                                          | [$558e: lsra]
                                          | [$558f: lsra]
 	lsr.b	#4,d0                            	| [$5590: lsra]
 	jbsr	l_5597                            	| [$5591: bsr    $5597]
-	PUSH_SR
 	move.b	d1,d0                           	| [$5593: tfr    b,a]
-	POP_SR
 	and.b	#0x0f,d0                         	| [$5595: anda   #$0f]
 l_5597:
 	move.l	d1,-(sp)                        	| [$5597: pshs   b]
@@ -2343,9 +2330,6 @@ l_5c8e:
 	GET_REG_ADDRESS	0x3,d3                 	| [$5ca4: ldd    $3,y]
 	LOAD_D                                 	| [$5ca4: ldd    $3,y]
 	sub.w	#0x001c,d1                       	| [$5ca6: subd   #$001c]
-	PUSH_SR                                	| [...]
-	MAKE_A                                 	| [...]
-	POP_SR                                 	| [...]
 	and.b	#0x1f,d1                         	| [$5ca9: andb   #$1f]
 	jne	l_5cc1                             	| [$5cab: bne    $5cc1]
 	| [$5cad: ldd    $3,y]
@@ -2370,7 +2354,6 @@ l_5cc1:
 	GET_REG_ADDRESS	0x3,d3                 	| [$5cc1: ldd    $3,y]
 	LOAD_D                                 	| [$5cc1: ldd    $3,y]
 	add.w	#0x0002,d1                       	| [$5cc3: addd   #$0002]
-	MAKE_A                                 	| [...]
 	| [$5cc6: std    $3,y]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	GET_REG_ADDRESS	0x2,d3                 	| [$5cc8: clr    $2,y]
@@ -2397,15 +2380,11 @@ l_5ccb:
 	GET_REG_ADDRESS	0x3,d3                 	| [$5ce1: ldd    $3,y]
 	LOAD_D                                 	| [$5ce1: ldd    $3,y]
 	sub.w	#0x0004,d1                       	| [$5ce3: subd   #$0004]
-	PUSH_SR                                	| [...]
-	MAKE_A                                 	| [...]
-	POP_SR                                 	| [...]
 	and.b	#0x1f,d1                         	| [$5ce6: andb   #$1f]
 	jne	l_5cfc                             	| [$5ce8: bne    $5cfc]
 	| [$5cea: ldd    $3,y]
 	LOAD_D                                 	| [$5cea: ldd    $3,y]
 	sub.w	#0x0028,d1                       	| [$5cec: subd   #$0028]
-	MAKE_A                                 	| [...]
 	| [$5cef: std    $3,y]
 	MOVE_W_FROM_REG	d1,a0                         	| [...]
 	GET_REG_ADDRESS	0x2,d3                 	| [$5cf1: clr    $2,y]

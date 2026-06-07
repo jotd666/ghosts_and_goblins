@@ -473,6 +473,8 @@ _user:
 	jra		demo_game
 
 apply_settings:
+	move.b	start_level+3,start_level_flag
+	
 	move.l	cheat_flags,d0
 	jeq		1f
 	btst	#0,d0
@@ -2070,9 +2072,13 @@ startup_level1_interrupt:
 	.rept	2
 	move.w	#0x14,(intreq,a5)
 	.endr
-	btst	#4,d0
+	* ignore copper mid-screen
+	btst	#2,d0
 	jeq	100f
 	
+	tst.b	credits_displayed
+	jne		0f
+	st.b	credits_displayed
 	GET_MEMORY_START_IN_A6
 	move.b	#7,d0		| color
 	lea		(0x2040+0x20*2,a6),a0
@@ -2082,7 +2088,7 @@ startup_level1_interrupt:
 	lea		(0x2040+0x20*4,a6),a0
 	lea		gng_credits_text_2,a1
 	jbsr	display_text
-
+0:
 
 	** difficulty
 	lea		(0x2043+0x20*10,a6),a5
@@ -2236,6 +2242,10 @@ startup_level1_interrupt:
 	move.l	d6,_previous_joypad_1_state
 	add.b	#0x40,menu_flip_flop
 100:
+	* ack again, displaying all chars all the time is too demanding
+ 	.rept	2
+	move.w	#0x14,(intreq,a5)
+	.endr
     movem.l (a7)+,d0-d7/a0-a6
     rte
 	
@@ -6039,6 +6049,8 @@ current_menu_column:
 	.byte	0
 current_color:
 	.byte	2
+credits_displayed:
+	.byte	0
 startup_menu_done:
 	.byte	0
 play_level_1_tune_after_music_stop:

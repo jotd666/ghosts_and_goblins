@@ -8231,7 +8231,6 @@ compute_screen_address_8dd2:
 	MAKE_D                                 	| [...]
 	GET_DP_ADDRESS	0xea                    	| [$8df6: addd   $ea]
 	ADD_W_TO_REG	a0,d1                          	| [...]
-	MAKE_A                                 	| [...]
 	move.w	d1,d3                           	| [$8df8: tfr    d,y]
 	movem.l	(sp)+,D0/D1                    	| [$8dfa: puls   d,pc]
 	rts                                    	| [...]
