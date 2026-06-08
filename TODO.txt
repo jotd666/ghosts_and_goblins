@@ -1,12 +1,16 @@
 - LOADING... message when loading data
-- wrong PUSH/POPSR optimizations in last commit: after shield attackers on level 1
-  one grass shore has a "downstep": revert last commit! test!!
+- option Infinite time doesn't work
+- After entering a highscore and being too fast on the continues screen with pressing fire to
+  continue, the game switches to the map (as expected), but it's playing the wrong music:
+  it's repeating the last part from the highscore screen instead of the "map music" and
+  you'll start the level without any music at all. Once you finish the level
+  (or in my case more likely: die), all goes back to normal.
+
+very minor/not reproduced:
 
 - sometimes tiles aren't properly displayed at start of level (real CD32)
-- After entering a highscore and being too fast on the continues screen with pressing fire to continue, the game switches to the map (as expected), but it's playing the wrong music: it's repeating the last part from the highscore screen instead of the "map music" and you'll start the level without any music at all. Once you finish the level (or in my case more likely: die), all goes back to normal.
 - if we add blit chain: scrolling to fix, wrong values, shaking
 - remove parasite tiles (in the end) because of levelskip some intro tiles are logged in levels 2+
-- remove those "hhhhh" at start fill_screen_with_h 
 - different score table for each difficulty / lives?
 - level 3 still tile issues (part 2, hard left after big ladder, even on emulation, try to reproduce as not systematic, maybe release only)
 - try to apply patches to fix some original game bugs / difficulty level HP for monsters
