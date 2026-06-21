@@ -1,5 +1,9 @@
 - LOADING... message when loading data
 - option Infinite time doesn't work
+- The only minor issue is that the armour sound in the intro cuts out too soon,
+  and the sound when hitting goblins on the second level is drowned out by the weapon
+  sound when it hits something hard, but perhaps the priority of the weapon sound could be
+  increased when it hits an enemy
 - After entering a highscore and being too fast on the continues screen with pressing fire to
   continue, the game switches to the map (as expected), but it's playing the wrong music:
   it's repeating the last part from the highscore screen instead of the "map music" and
