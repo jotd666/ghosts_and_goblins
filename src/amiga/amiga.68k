@@ -305,6 +305,9 @@ osd_enter_\@:
 	.global	osd_read_system
 	.global	osd_read_p1_inputs
 	.global	osd_read_p2_inputs
+	.global	osd_trigger_sprite_dma
+	
+
 	
 	.global	osd_video_byte_dirty
 	.global	osd_video_word_dirty
@@ -2658,7 +2661,7 @@ really_update_sprites:
 	*********************
 	
 	GET_MEMORY_START_IN_A6
-	lea		(SPRITE_ADDRESS+SPRITE_BUFFER_SIZE-CURRENT_SPRITE_SIZE,a6),a0
+	lea		buffered_spriteram+SPRITE_BUFFER_SIZE-CURRENT_SPRITE_SIZE,a0
 	*lea		mockup+SPRITE_BUFFER_SIZE-CURRENT_SPRITE_SIZE,a0
 
 
@@ -2675,7 +2678,23 @@ really_update_sprites:
 	dbf		d7,1b
 
 	rts
-	
+
+
+* Claude A.I. suggested that I freeze the sprite buffer to avoid tile/sprite delays
+* ... and it worked!
+
+osd_trigger_sprite_dma:
+	movem.l	d0/a0/a1,-(a7)
+	lea		(SPRITE_ADDRESS,a6),a0
+	lea		buffered_spriteram,a1
+	moveq	#SPRITE_BUFFER_SIZE/16-1,d0
+0:
+	.rept	4
+	move.l	(a0)+,(a1)+
+	.endr
+	dbf		d0,0b
+	movem.l	(a7)+,d0/a0/a1
+	rts	
 *mockup:
 *.byte  0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8	|	0x0000
 *.byte  0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8,0xf8	|	0x0010
@@ -3926,7 +3945,6 @@ osd_video_word_dirty:
 osd_video_byte_dirty:
 	OSD_ENTER
 	movem.l	d0-d7/a0-a2/a5,-(a7)
-	move.b	(a0),d0
 	move.l	a0,d7		| save address
 	sub.l	a6,d7
 	jmi		osd_w_videoram_out
@@ -6082,7 +6100,8 @@ saved_context:
 	.word	-1
 previous_context:
 	.word	-1
-
+buffered_spriteram:
+	.skip	SPRITE_BUFFER_SIZE
 music_track_start_number:
 	.word	-1
 music_pattern:

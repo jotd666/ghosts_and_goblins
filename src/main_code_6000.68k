@@ -881,12 +881,14 @@ l_647a:
 	rts                                    	| [$6480: rts]
 
 irq_65c4:
-	 |  [$65c4: stb    $3c00]
+	* unlike MAME, we have to freeze the sprite state here else we have delays between tiles and sprites
+	* Claude A.I. pointed that out on Commando that's really amazing
+	jbsr	osd_trigger_sprite_dma |  [$65c4: stb    $3c00]
                                          | [$65c7: nop]
                                          | [$65c8: nop]
                                          | [$65c9: nop]
-	move.b	#0x00,d0                        	| [$65ca: ldd    #$0001]
-	move.w	#0x0001,d1                      	| [$65ca: ldd    #$0001]
+	                        	| [$65ca: ldd    #$0001]
+	moveq	#0x0001,d1                      	| [$65ca: ldd    #$0001]
 	GET_DP_ADDRESS	counter_16_bit_0020     	| [$65cd: addd   counter_16_bit_0020]
 	ADD_W_TO_REG	a0,d1                          	| [...]
 	MAKE_A                                 	| [...]
