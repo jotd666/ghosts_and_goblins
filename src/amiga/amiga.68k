@@ -5294,13 +5294,13 @@ osd_read_high_scores:
 	beq.b	0f
 	move.l	d0,a2
 	move.l	a0,a1
-	bsr		get_hiscore_name
+	jbsr	get_hiscore_name
 	move.l	a1,-(a7)
  	jsr		resload_GetFileSize(a2)		
 	move.l	(a7)+,a1
 	tst.l	d0
 	beq.b	1f
-	bsr		get_hiscore_name
+	jbsr	get_hiscore_name
 	jsr		resload_LoadFile(a2)	
 	bra.b	1f
 0:
@@ -5350,8 +5350,8 @@ osd_write_high_scores:
 	* whdload
 	move.l	a0,a1
 	move.l	d0,a2
+	jbsr		get_hiscore_name
 	move.l	#SCORE_FILE_SIZE,d0
-	bsr		get_hiscore_name
 	jsr		resload_SaveFile(a2)
 2:
 
@@ -5361,6 +5361,12 @@ osd_write_high_scores:
 
 	
 get_hiscore_name:
+	lea	lives_part,a0
+	move.b	start_lives+3,(a0)
+	add.b	#0x30,(a0)		| 0,1,2,...
+	lea		difficulty_part,a0
+	move.b	difficulty_level+3,(a0)
+	add.b	#0x61,(a0)		| a,b,c,d
     lea normal_hiscorename,a0
 	rts
 	
@@ -6123,7 +6129,12 @@ highscore_loaded:
 last_sound_played:
 	.byte	0
 normal_hiscorename:
-	.asciz	"gng.high"
+	.ascii	"gng_"
+lives_part:
+	.byte	0
+difficulty_part:
+	.byte	0
+	.asciz	".high"
 	
 
 lives_table:

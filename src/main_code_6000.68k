@@ -25796,6 +25796,8 @@ l_ed2a:
 	OP_R_ON_DP_ADDRESS	move,counter_8_bit_0021,d1| [$ed2a: ldb    counter_8_bit_0021]
 	and.b	#0x3f,d1                         	| [$ed2c: andb   #$3f]
 	jne	l_ed57                             	| [$ed2e: bne    $ed57]
+	tst.b 	infinite_time_flag
+	jne		l_ed48
 	GET_DP_ADDRESS	time_00aa               	| [$ed30: ldd    time_00aa]
 	LOAD_D                                 	| [$ed30: ldd    time_00aa]
 	sub.w	#0x0001,d1                       	| [$ed32: subd   #$0001]

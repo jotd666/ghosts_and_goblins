@@ -12,7 +12,7 @@ sound_dir = this_dir / ".." / "sounds"
 # put below some exceptions
 sound_settings_dict = {
 0x1 : {"channel":2,"priority":100},   # lose armour
-0x10 : {"channel":2,"priority":100},  # wear armour
+0x10 : {"channel":3,"priority":100},  # wear armour
 0x2 : {"channel":2,"priority":100},
 0xb : {"channel":3,"priority":5},  # flying goblin (low pri)
 0x3 : {"channel":2,"priority":100},
@@ -27,7 +27,7 @@ sound_settings_dict = {
 0x1B : {"channel":3,"priority":50},  # enemy killed
 0x3A : {"channel":1,"priority":100},  # intro tune
 0xc : {"channel":3,"priority":1},  # giant stomps
-0xd : {"channel":3,"priority":60},  # shot bounces
+0xd : {"channel":3,"priority":40},  # shot bounces
 0xf : {"channel":3,"priority":100},
 0x6 : {"channel":3,"priority":5},   # player shot
 0x21 : {"channel":3,"priority":100},  # dragon
