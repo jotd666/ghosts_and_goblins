@@ -1,16 +1,3 @@
-- the sound when hitting goblins on the second level is drowned out by the weapon
-  sound when it hits something hard, but perhaps the priority of the weapon sound could be
-  increased when it hits an enemy
-  actually we could force play of bouncing weapon 0xD after 0X1A sound (with a timer) only on non-CD32 version
-
-
-- After entering a highscore and being too fast on the continues screen with pressing fire to
-  continue, the game switches to the map (as expected), but it's playing the wrong music:
-  it's repeating the last part from the highscore screen instead of the "map music" and
-  you'll start the level without any music at all. Once you finish the level
-  (or in my case more likely: die), all goes back to normal.
-  => solution: when switch to map context, force music? or when checking to save highscores, force music?
-
 very minor/not reproduced:
 
 - LOADING... message when loading data

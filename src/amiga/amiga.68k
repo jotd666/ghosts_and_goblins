@@ -1354,6 +1354,8 @@ load_context:
 	* and use that map context aleady in RAM
 	move.w	previous_context,saved_context
 	move.l	#bg_tile_palette,bg_character_table_buffer_ptr
+	
+	jbsr	load_current_level_music
 	jra		30f
 0:
 	* is previous context map?
@@ -1773,6 +1775,18 @@ install_bank_4:
 	rts
 
 call_nmi:
+	.ifeq	OPT_CD32_VERSION
+	move.b	shot_bounce_sound_play_countdown,d0
+	jeq		0f
+	subq.b	#1,d0
+	move.b	d0,shot_bounce_sound_play_countdown
+	jne		0f
+	* countdown reached 0: force play sound
+	move.b	#SHOT_BOUNCES_0D_SND,d0
+	jbsr	osd_sound_start
+0:
+	.endif
+	
 	* reset most registers (not D5)
 	jbsr	cpu_init
 	* set base for RAM
@@ -3899,15 +3913,19 @@ osd_main_loop_hook:
 	clr.b	_mt_E8Trigger
 	* high score entry tune ended: load current level music
 	* (don't play it)
+	jbsr	load_current_level_music
+0:
+	move.l	d6,d0
+	rts
+	
+load_current_level_music:
 	moveq	#0,d0
+	GET_MEMORY_START_IN_A6
 	move.b	(current_level_0072,a6),d0
 	lea		current_level_music_table,a0
 	add.w	d0,d0
 	move.w 	(a0,d0.w),d0
-	jbsr	load_music_if_needed
-0:
-	move.l	d6,d0
-	rts
+	jbra	load_music_if_needed
 	
 * < A6: game memory
 
@@ -5463,7 +5481,16 @@ osd_sound_start:
 
 	and.w	#0xFF,d0
 	
-
+	* another special case: if enemy is hit, the "weapon bounce" metallic sound
+	* is lost (unless on CD32). Make it play in the end using a timer
+	.ifeq	OPT_CD32_VERSION
+	cmp.b	#ENEMY_HIT_1A_SND,d0
+	jne		0f
+	* arm timer
+	move.b	#16,shot_bounce_sound_play_countdown
+0:
+	.endif
+	
 	moveq	#0,d2
 	lsl.w	#3,d0
 	lea		sound_table,a0
@@ -6065,7 +6092,10 @@ return_address:
 	
 current_music_name:
 	.long	0
-	
+	.ifeq	OPT_CD32_VERSION
+shot_bounce_sound_play_countdown:
+	.byte	0
+	.endif
 menu_flip_flop:
 	.byte	0
 current_menu_column:
