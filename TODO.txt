@@ -8,8 +8,6 @@ very minor/not reproduced:
 - try to apply patches to fix some original game bugs / difficulty level HP for monsters
 - add foreground tiles (grass, bridge, level 6 pillars): tricky work, added blitting, and not really noticeable
 - demo resets scroll and makes column update buggy at times
-- level 2 see if we can use dynamic color change, see if separating ice towers from rest of game tiles (except house right after)
-  allows a neat 32+32 colors. In that case, it's doable to use dynamic color change on some colors
 - diff with world version 3 see if the fixes are visible: difficult. 1 diff seen around DDFD, rom bank $4000 to check
 - force tile draw cheat screws up host_scroll and tile feed
 - change weapon trainer: call the routine to redraw weapon: not from interrupt!! if must be done, force to call "a new

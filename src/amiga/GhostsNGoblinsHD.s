@@ -62,7 +62,7 @@ _config
 
 
 DECL_VERSION:MACRO
-	dc.b	"1.2"
+	dc.b	"1.4"
 	IFD BARFLY
 		dc.b	" "
 		INCBIN	"T:date"
@@ -93,7 +93,12 @@ start:
 	LEA	_resload(PC),A1
 	MOVE.L	A0,(A1)
 	move.l	a0,a2
-    
+ 
+	move.l	#WCPUF_Base_NC|WCPUF_Exp_CB|WCPUF_Slave_CB|WCPUF_IC|WCPUF_DC|WCPUF_BC|WCPUF_SS|WCPUF_SB,d0
+	move.l	#WCPUF_All,d1
+	move.l	(_resload,pc),a2
+	jsr		(resload_SetCPU,a2)
+ 
     IFEQ EXPMEM
     lea  _expmem(pc),a0
     move.l  #CHIP_BASE,(a0)
@@ -101,6 +106,12 @@ start:
     lea progstart(pc),a0
     move.l  _expmem(pc),(a0)
 
+	* stack in fast memory, super important especially
+	* with interrupt-driven blits
+	move.l	_expmem(pc),a0
+	add.l	#EXPMEM-4,a0
+	move.l	a0,a7
+	
 	lea	exe(pc),a0
 	move.l  progstart(pc),a1
 	jsr	(resload_LoadFileDecrunch,a2)
