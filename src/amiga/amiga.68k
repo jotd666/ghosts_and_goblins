@@ -863,6 +863,9 @@ demo_game:
 	
 	jbsr	cache_fg_tiles_address
 	jbsr	cache_bg_tiles_address
+	* consistent scroll window before the first frame (else column updates
+	* bounce between left and right until the first full redraw)
+	jbsr	set_initial_scroll_values
 
 	* load level 1 music
 	.ifeq	OPT_CD32_VERSION
@@ -1707,15 +1710,23 @@ set_scroll_values:
 	add.w	d2,d0
 	move.w	d0,host_scroll_x
 	
+4:
+	* draw as many columns as needed (more than 1 if the scroll moved >= 16 pixels)
+	* at most 2: a diff >= 32 triggers a full redraw. The bound also protects
+	* against min/max being inconsistent (never initialized)
+	moveq	#1,d4
+40:
 	* now, are we still in min/max boundaries?
+	move.w	host_scroll_x,d0
 	cmp.w	min_scroll_x,d0
 	jcc		0f
 	* min overshoot: we have to do something on the left
-
+	move.w	d4,-(a7)
 	jbsr	draw_left_tiles
+	move.w	(a7)+,d4
 	sub.w	#BG_TILE_WIDTH,max_scroll_x
 	sub.w	#BG_TILE_WIDTH,min_scroll_x
-	
+	dbf		d4,40b
 	jra		5f
 0:
 
@@ -1723,11 +1734,12 @@ set_scroll_values:
 	cmp.w	max_scroll_x,d0
 	jcs		5f
 	* max overshoot: we have to do something on the right: draw the tiles
-
+	move.w	d4,-(a7)
 	jbsr	draw_right_tiles
+	move.w	(a7)+,d4
 	add.w	#BG_TILE_WIDTH,max_scroll_x
 	add.w	#BG_TILE_WIDTH,min_scroll_x
-
+	dbf		d4,40b
 5:
 
 	rts
@@ -4022,12 +4034,15 @@ osd_w_videoram_out:
 	
 bg_tile:
 	and.w	#0x3FF,d7
-	
+	* compute_x_offset + update_bg_tile must see the same scrolling state:
+	* the VBL interrupt redraws columns or the whole screen and uses x_offset too
+	move.w	_custom+intenar,-(a7)
+	move.w	#0x0004,_custom+intena		| no level 1 interrupt
 	* we need to see if the tile is on screen considering X scolling
 	* positions. Compute first X & last X coord visible
 
 	jbsr	compute_x_offset
-	jmi		osd_w_videoram_out
+	jmi		1f
 	
 	* tile is in screen considered the current scrolling: update it
 	* (don't check Y we need update no matter when in that case)
@@ -4043,8 +4058,14 @@ bg_tile:
 	* tile on screen
 
 	jbsr	update_bg_tile
-
+1:
+	btst	#2,(1,a7)					| was level 1 enabled?
+	jeq		2f
+	move.w	#0xC004,_custom+intena
+2:
+	addq.w	#2,a7
 	jra		osd_w_videoram_out
+
 	
 	
 	.macro	COPY_TILE8_PLANE_ROW
