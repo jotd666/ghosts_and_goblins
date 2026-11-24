@@ -62,7 +62,7 @@ _config
 
 
 DECL_VERSION:MACRO
-	dc.b	"1.4"
+	dc.b	"1.5"
 	IFD BARFLY
 		dc.b	" "
 		INCBIN	"T:date"
@@ -108,9 +108,11 @@ start:
 
 	* stack in fast memory, super important especially
 	* with interrupt-driven blits
+	IFNE EXPMEM
 	move.l	_expmem(pc),a0
 	add.l	#EXPMEM-4,a0
 	move.l	a0,a7
+	ENDC
 	
 	lea	exe(pc),a0
 	move.l  progstart(pc),a1
